@@ -13,7 +13,7 @@ internal static class ModHooks
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetLoadedGameData))]
     [HarmonyPostfix]
-    private static void SetLoadedGameData(SaveGameData saveGameData)
+    private static void GameManager_SetLoadedGameData(SaveGameData saveGameData)
     {
         AfterSavegameLoadHook?.Invoke(saveGameData);
     }
@@ -24,7 +24,7 @@ internal static class ModHooks
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.OnApplicationQuit))]
     [HarmonyPostfix]
-    private static void OnApplicationQuit()
+    private static void GameManager_OnApplicationQuit()
     {
         ApplicationQuitHook?.Invoke();
     }
@@ -35,23 +35,56 @@ internal static class ModHooks
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.BeginSceneTransition))]
     [HarmonyPrefix]
-    private static void BeginSceneTransition(GameManager.SceneLoadInfo info)
+    private static void GameManager_BeginSceneTransition(GameManager.SceneLoadInfo info)
     {
         if (BeforeSceneLoadHook != null) info.SceneName = BeforeSceneLoadHook.Invoke(info.SceneName);
     }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadScene))]
     [HarmonyPrefix]
-    private static void LoadScene(ref string destScene)
+    private static void GameManager_LoadScene(ref string destScene)
     {
         if (BeforeSceneLoadHook != null) destScene = BeforeSceneLoadHook.Invoke(destScene);
     }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadSceneAdditive))]
     [HarmonyPrefix]
-    private static void LoadSceneAdditive(ref string destScene)
+    private static void GameManager_LoadSceneAdditive(ref string destScene)
     {
         if (BeforeSceneLoadHook != null) destScene = BeforeSceneLoadHook.Invoke(destScene);
+    }
+    #endregion
+
+    #region FinishedLoadingModsHook
+    private static event Action finishedLoadingModsHook;
+    private static bool finishedLoadingModsInvoked;
+
+    public static event Action FinishedLoadingModsHook
+    {
+        add
+        {
+            finishedLoadingModsHook += value;
+            if (finishedLoadingModsInvoked)
+            {
+                value();
+            }
+        }
+        remove
+        {
+            finishedLoadingModsHook -= value;
+        }
+    }
+
+    // This is where the Hollow Knight modding API loads mods and where it would invoke this hook
+    [HarmonyPatch(typeof(OnScreenDebugInfo), nameof(OnScreenDebugInfo.Awake))]
+    [HarmonyPrefix]
+    private static void OnScreenDebugInfo_Awake()
+    {
+        if (!finishedLoadingModsInvoked)
+        {
+            finishedLoadingModsHook?.Invoke();
+        }
+        finishedLoadingModsInvoked = true;
     }
     #endregion
 
@@ -60,7 +93,7 @@ internal static class ModHooks
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadFirstScene))]
     [HarmonyPostfix]
-    private static IEnumerator LoadFirstScene(IEnumerator orig)
+    private static IEnumerator GameManager_LoadFirstScene(IEnumerator orig)
     {
         yield return orig;
         NewGameHook?.Invoke();
@@ -68,7 +101,7 @@ internal static class ModHooks
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.OnWillActivateFirstLevel))]
     [HarmonyPostfix]
-    private static void OnWillActivateFirstLevel()
+    private static void GameManager_OnWillActivateFirstLevel()
     {
         NewGameHook?.Invoke();
     }
@@ -78,7 +111,7 @@ internal static class ModHooks
     public static event Func<int, int> TakeHealthHook;
 
     [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.TakeHealth))]
-    private static void TakeHealth(ref int amount)
+    private static void PlayerData_TakeHealth(ref int amount)
     {
         if (TakeHealthHook != null)
         {

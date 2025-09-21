@@ -61,8 +61,8 @@ namespace DebugMod
             EnemiesPanel.BuildMenu(canvas);
             Console.BuildMenu(canvas);
 
-            Modding.ModHooks.FinishedLoadingModsHook += () => InfoPanel.BuildInfoPanels(canvas);
-            Modding.ModHooks.FinishedLoadingModsHook += () => KeyBindPanel.BuildMenu(canvas);
+            ModHooks.FinishedLoadingModsHook += () => InfoPanel.BuildInfoPanels(canvas);
+            ModHooks.FinishedLoadingModsHook += () => KeyBindPanel.BuildMenu(canvas);
 
             DontDestroyOnLoad(canvas);
         }
@@ -252,22 +252,15 @@ namespace DebugMod
                 }
             }
 
-            if (DebugMod.infiniteSoul 
-                && PlayerData.instance.MPCharge < PlayerData.instance.maxMP 
-                && PlayerData.instance.health > 0 
+            if (DebugMod.infiniteSoul
+                && PlayerData.instance.silk < PlayerData.instance.silkMax
+                && PlayerData.instance.health > 0
                 && HeroController.instance != null
                 && !HeroController.instance.cState.dead
                 && GameManager.instance.IsGameplayScene())
             {
-                PlayerData.instance.MPCharge = PlayerData.instance.maxMP - 1;
-                if (PlayerData.instance.MPReserveMax > 0)
-                {
-                    PlayerData.instance.MPReserve = PlayerData.instance.MPReserveMax - 1;
-                    HeroController.instance.TakeReserveMP(1);
-                    HeroController.instance.AddMPChargeSpa(2);
-                }
-                //HeroController.instance.TakeReserveMP(1);
-                HeroController.instance.AddMPChargeSpa(1);
+                PlayerData.instance.silk = PlayerData.instance.silkMax;
+                HeroController.instance.AddSilk(1, false);
             }
 
             if (DebugMod.playerInvincible && PlayerData.instance != null)
@@ -277,22 +270,22 @@ namespace DebugMod
 
             if (DebugMod.noclip)
             {
-                if (DebugMod.IH.inputActions.left.IsPressed)
+                if (DebugMod.IH.inputActions.Left.IsPressed)
                 {
                     DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x - Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.y, DebugMod.noclipPos.z);
                 }
 
-                if (DebugMod.IH.inputActions.right.IsPressed)
+                if (DebugMod.IH.inputActions.Right.IsPressed)
                 {
                     DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x + Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.y, DebugMod.noclipPos.z);
                 }
 
-                if (DebugMod.IH.inputActions.up.IsPressed)
+                if (DebugMod.IH.inputActions.Up.IsPressed)
                 {
                     DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x, DebugMod.noclipPos.y + Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.z);
                 }
 
-                if (DebugMod.IH.inputActions.down.IsPressed)
+                if (DebugMod.IH.inputActions.Down.IsPressed)
                 {
                     DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x, DebugMod.noclipPos.y - Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.z);
                 }

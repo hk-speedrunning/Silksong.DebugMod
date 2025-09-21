@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -131,19 +127,8 @@ namespace DebugMod
                 }
                 else
                 {
-                    if (bossData[DebugMod.GetSceneName()].Value == "killedGrimm")
-                    {
-                        PlayerData.instance.SetIntInternal("grimmChildLevel", 2);
-                        PlayerData.instance.SetIntInternal("flamesCollected", 3);
-                        PlayerData.instance.SetBoolInternal("grimmChildAwoken", false);
-                        PlayerData.instance.SetBoolInternal("foughtGrimm", false);
-                        PlayerData.instance.SetBoolInternal("killedGrimm", false);
-                    }
-                    else
-                    {
-                        PlayerData.instance.GetType().GetField(bossData[DebugMod.GetSceneName()].Value)
-                            .SetValue(PlayerData.instance, false);
-                    }
+                    PlayerData.instance.GetType().GetField(bossData[DebugMod.GetSceneName()].Value)
+                        .SetValue(PlayerData.instance, false);
 
                     Console.AddLine("Boss control for this scene was reset, re-enter scene or warp");
                 }
