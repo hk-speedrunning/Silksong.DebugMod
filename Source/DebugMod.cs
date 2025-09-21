@@ -1,42 +1,24 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
-//we now use ienumerator so this is required (lost my mind over this)
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using Modding;
+using System.Reflection;
+using BepInEx;
+using GlobalEnums;
+using HarmonyLib;
+using JetBrains.Annotations;
 using MonoMod.ModInterop;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using GlobalEnums;
-using JetBrains.Annotations;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
-using System.Security.Policy;
 
 namespace DebugMod
 {
-    public class DebugMod : Mod, IGlobalSettings<GlobalSettings>, ILocalSettings<SaveSettings>, ICustomMenuMod
+    [BepInAutoPlugin("com.spacemonkeyy.debugmod")]
+    [HarmonyPatch]
+    public partial class DebugMod : BaseUnityPlugin
     {
-        public override string GetVersion()
-        {
-            Assembly asm = typeof(DebugMod).Assembly;
-            string ver = asm.GetName().Version.ToString();
-
-            using var sha1 = SHA1.Create();
-            using FileStream stream = File.OpenRead(asm.Location);
-
-            byte[] hashBytes = sha1.ComputeHash(stream);
-
-            string hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-
-            return $"{ver}-{hash.Substring(0, 6)}";
-        }
-
         private static GameManager _gm;
         private static InputHandler _ih;
         private static HeroController _hc;
@@ -115,12 +97,12 @@ namespace DebugMod
         static int alphaStart;
         static int alphaEnd;
         
-        public override void Initialize()
+        public void Awake()
         {
-            instance.Log("Initializing");
+            Logger.LogInfo("Initializing");
 
             float startTime = Time.realtimeSinceStartup;
-            instance.Log("Building MethodInfo dict...");
+            Logger.LogInfo("Building MethodInfo dict...");
             
             bindMethods.Clear();
             foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
@@ -138,11 +120,11 @@ namespace DebugMod
                 }
             }
             
-            instance.Log("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
+            Logger.LogInfo("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
 
             if (settings.FirstRun)
             {
-                instance.Log("First run detected, setting default binds");
+                Logger.LogInfo("First run detected, setting default binds");
 
                 settings.FirstRun = false;
                 ResetKeyBinds();
@@ -180,18 +162,15 @@ namespace DebugMod
             Object.DontDestroyOnLoad(UIObj);
             
             saveStateManager = new SaveStateManager();
-            ModHooks.AfterSavegameLoadHook += LoadCharacter;
 
-            //ModHooks.HitInstanceHook += DoDamage;
-            
+            Harmony harmony = new(Id);
+            harmony.PatchAll();
+
+            ModHooks.AfterSavegameLoadHook += LoadCharacter;
             ModHooks.NewGameHook += NewCharacter;
             ModHooks.BeforeSceneLoadHook += OnLevelUnload;
             ModHooks.TakeHealthHook += PlayerDamaged;
             ModHooks.ApplicationQuitHook += SaveSettings;
-
-            //hooks needed for savestate fixes
-            On.HeroController.HazardRespawn += OnHazardRespawn;
-            On.HeroController.Invulnerable += OnInvulnerable;
 
             if (settings.ShowCursorWhileUnpaused)
             {
@@ -209,91 +188,12 @@ namespace DebugMod
             Console.AddLine("New session started " + DateTime.Now);
         }
 
-        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
-        {
-            Panth1Prefab = preloadedObjects["GG_Atrium"]["GG_Challenge_Door (1)"];
-            Panth2Prefab = preloadedObjects["GG_Atrium"]["GG_Challenge_Door (2)"];
-            Panth3Prefab = preloadedObjects["GG_Atrium"]["GG_Challenge_Door (3)"];
-            Panth4Prefab = preloadedObjects["GG_Atrium"]["GG_Challenge_Door (4)"];
-            Panth5Prefab = preloadedObjects["GG_Atrium_Roof"]["GG_Final_Challenge_Door"];
-            Object.DontDestroyOnLoad(Panth1Prefab);
-            Object.DontDestroyOnLoad(Panth2Prefab);
-            Object.DontDestroyOnLoad(Panth3Prefab);
-            Object.DontDestroyOnLoad(Panth4Prefab);
-            Object.DontDestroyOnLoad(Panth5Prefab);
-            base.Initialize(preloadedObjects);
-        }
-
         public DebugMod()
         {
             instance = this;
             // Register exports early so other mods can use them when initializing
             typeof(DebugExport).ModInterop();
-
-            // idk
-            DoTrollMenu();
         }
-
-        #region Troll Menu
-        private static int chooser;
-        private static bool OpenedSave;
-        private void DoTrollMenu()
-        {
-            chooser = Random.Range(1, 1000);
-            OpenedSave = false;
-            if (chooser != 1) return;
-            GameObject DebugEasterEgg = new GameObject("DebugEasterEgg");
-            Object.DontDestroyOnLoad(DebugEasterEgg);
-
-            On.SetVersionNumber.Start += ChangeVersionNumber;
-            On.MenuStyleTitle.SetTitle += FixMenuTitle;
-        }
-
-        private void FixMenuTitle(On.MenuStyleTitle.orig_SetTitle orig, MenuStyleTitle self, int index)
-        {
-            if (GameObject.Find("DebugEasterEgg") == null) orig(self, index);
-            else if (OpenedSave) orig(self, index);
-
-            else
-            {
-                Log("Running");
-                MenuStyleTitle.TitleSpriteCollection spriteCollection =
-                    index < 0 || index >= self.TitleSprites.Length
-                        ? self.DefaultTitleSprite
-                        : self.TitleSprites[index];
-
-                Texture2D RealTitle_texture = new Texture2D(1, 1);
-                using (Stream stream = Assembly.GetExecutingAssembly()
-                    .GetManifestResourceStream("DebugMod.Images.SilkNever.png"))
-                {
-                    byte[] bytes = new byte[stream.Length];
-                    stream.Read(bytes, 0, bytes.Length);
-                    RealTitle_texture.LoadImage(bytes, false);
-                    RealTitle_texture.name = "SilkNever";
-                }
-
-                var RealTitle = Sprite.Create(RealTitle_texture,
-                    new Rect(0, 0, RealTitle_texture.width, RealTitle_texture.height),
-                    new Vector2(0.5f, 0.5f), spriteCollection.Default.pixelsPerUnit, 0, SpriteMeshType.FullRect);
-
-                self.Title.sprite = RealTitle;
-            }
-        }
-
-        private void ChangeVersionNumber(On.SetVersionNumber.orig_Start orig, SetVersionNumber self)
-        {
-            Text textUi = ReflectionHelper.GetField<SetVersionNumber, Text>(self, "textUi");
-
-            if (!(textUi != null)) return;
-            
-            string VersionNumber = OpenedSave ? Constants.GAME_VERSION : "1.2.2.1";
-            StringBuilder stringBuilder = new StringBuilder(VersionNumber);
-            textUi.text = stringBuilder.ToString();
-        }
-
-        #endregion
-
-
         internal static void ResetKeyBinds()
         {
             settings.binds.Clear();
@@ -316,21 +216,11 @@ namespace DebugMod
 
         private void SaveSettings()
         {
+            // TODO: save settings
+            /*
             SaveGlobalSettings();
             instance.Log("Saved");
-        }
-
-        //preloading required for pantheon savestates
-        public override List<(string, string)> GetPreloadNames()
-        {
-            return new List<(string, string)>
-            {
-                ("GG_Atrium", "GG_Challenge_Door (1)"),
-                ("GG_Atrium", "GG_Challenge_Door (2)"),
-                ("GG_Atrium", "GG_Challenge_Door (3)"),
-                ("GG_Atrium", "GG_Challenge_Door (4)"),
-                ("GG_Atrium_Roof", "GG_Final_Challenge_Door"),
-        };
+            */
         }
 
         private int PlayerDamaged(int damageAmount)
@@ -347,25 +237,24 @@ namespace DebugMod
         }
 
         //save coros so they can be forcibly stopped
-        public static IEnumerator OnHazardRespawn(On.HeroController.orig_HazardRespawn orig, HeroController self)
+        [HarmonyPatch(typeof(HeroController), nameof(HeroController.HazardRespawn))]
+        [HarmonyPostfix]
+        public static void OnHazardRespawn(HeroController __instance, IEnumerator __result)
         {
-            CurrentHazardCoro = orig(self);
-            return CurrentHazardCoro;
+            CurrentHazardCoro = __result;
         }
 
-        public static IEnumerator OnInvulnerable(On.HeroController.orig_Invulnerable orig, HeroController self, float duration)
+        [HarmonyPatch(typeof(HeroController), nameof(HeroController.Invulnerable))]
+        [HarmonyPostfix]
+        public static void OnInvulnerable(HeroController __instance, IEnumerator __result)
         {
-            CurrentInvulnCoro = orig(self, duration);
-            return CurrentInvulnCoro;
+            CurrentInvulnCoro = __result;
         }
+
         private void NewCharacter() => LoadCharacter(null);
 
         private void LoadCharacter(SaveGameData saveGameData)
         {
-            OpenedSave = true;
-            var DebugEasterEggChecker = GameObject.Find("DebugEasterEgg");
-            if (DebugEasterEggChecker != null) GameObject.Destroy(DebugEasterEggChecker);
-
             //NailDamage = saveGameData?.playerData.nailDamage ?? 5;
             
             Console.Reset();
@@ -415,7 +304,7 @@ namespace DebugMod
         {
             if (GM == null)
             {
-                instance.LogWarn("GameManager reference is null in GetSceneName");
+                instance.Logger.LogWarning("GameManager reference is null in GetSceneName");
                 return "";
             }
 
@@ -467,7 +356,7 @@ namespace DebugMod
                     string cat = attr.category;
                     bool allowLock = attr.allowLock;
 
-                    instance.Log($"Recieved Action: {name} (from {BindableFunctionsClass.Name})");
+                    instance.Logger.LogInfo($"Recieved Action: {name} (from {BindableFunctionsClass.Name})");
                     AdditionalBindMethods.Add(name, (cat, allowLock, (Action)Delegate.CreateDelegate(typeof(Action), method)));
                 } 
             }
@@ -488,15 +377,9 @@ namespace DebugMod
         [PublicAPI]
         public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
         {
-            instance.Log($"Received Action: {name}");
+            instance.Logger.LogInfo($"Received Action: {name}");
             AdditionalBindMethods.Add(name, (category, allowLock, method));
         }
-
-
-        public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) =>
-            ModMenu.CreateMenuScreen(modListMenu).Build();
-
-        public bool ToggleButtonInsideMenu => false;
     }
 
 
