@@ -1,7 +1,4 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using Modding;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace DebugMod.MonoBehaviours
 {

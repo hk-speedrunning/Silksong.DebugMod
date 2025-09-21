@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using HarmonyLib;
+using UnityEngine;
 
 namespace DebugMod;
 
@@ -52,6 +53,17 @@ internal static class ModHooks
     private static void GameManager_LoadSceneAdditive(ref string destScene)
     {
         if (BeforeSceneLoadHook != null) destScene = BeforeSceneLoadHook.Invoke(destScene);
+    }
+    #endregion
+
+    #region ColliderCreateHook
+    public static event Action<GameObject> ColliderCreateHook;
+
+    [HarmonyPatch(typeof(PlayMakerUnity2DProxy), nameof(PlayMakerUnity2DProxy.Start))]
+    [HarmonyPostfix]
+    private static void PlayMakerUnity2DProxy_Start(PlayMakerUnity2DProxy __instance)
+    {
+        ColliderCreateHook?.Invoke(__instance.gameObject);
     }
     #endregion
 
