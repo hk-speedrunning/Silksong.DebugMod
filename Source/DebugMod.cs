@@ -99,10 +99,10 @@ namespace DebugMod
         
         public void Awake()
         {
-            Logger.LogInfo("Initializing");
+            Log("Initializing");
 
             float startTime = Time.realtimeSinceStartup;
-            Logger.LogInfo("Building MethodInfo dict...");
+            Log("Building MethodInfo dict...");
             
             bindMethods.Clear();
             foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
@@ -120,11 +120,11 @@ namespace DebugMod
                 }
             }
             
-            Logger.LogInfo("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
+            Log("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
 
             if (settings.FirstRun)
             {
-                Logger.LogInfo("First run detected, setting default binds");
+                Log("First run detected, setting default binds");
 
                 settings.FirstRun = false;
                 ResetKeyBinds();
@@ -304,7 +304,7 @@ namespace DebugMod
         {
             if (GM == null)
             {
-                instance.Logger.LogWarning("GameManager reference is null in GetSceneName");
+                instance.LogWarn("GameManager reference is null in GetSceneName");
                 return "";
             }
 
@@ -356,7 +356,7 @@ namespace DebugMod
                     string cat = attr.category;
                     bool allowLock = attr.allowLock;
 
-                    instance.Logger.LogInfo($"Recieved Action: {name} (from {BindableFunctionsClass.Name})");
+                    instance.Log($"Recieved Action: {name} (from {BindableFunctionsClass.Name})");
                     AdditionalBindMethods.Add(name, (cat, allowLock, (Action)Delegate.CreateDelegate(typeof(Action), method)));
                 } 
             }
@@ -377,10 +377,28 @@ namespace DebugMod
         [PublicAPI]
         public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
         {
-            instance.Logger.LogInfo($"Received Action: {name}");
+            instance.Log($"Received Action: {name}");
             AdditionalBindMethods.Add(name, (category, allowLock, method));
         }
+
+        public void LogDebug(string message)
+        {
+            Logger.LogDebug(message);
+        }
+
+        public void Log(string message)
+        {
+            Logger.LogInfo(message);
+        }
+
+        public void LogWarn(string message)
+        {
+            Logger.LogWarning(message);
+        }
+
+        public void LogError(string message)
+        {
+            Logger.LogError(message);
+        }
     }
-
-
 }
