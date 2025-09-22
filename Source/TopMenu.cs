@@ -70,7 +70,7 @@ namespace DebugMod
 
             
             //Skills panel buttons
-            // panel.GetPanel("Skills Panel").AddButton("All Skills", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, AllSkillsClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Skills", 10);
+            panel.GetPanel("Skills Panel").AddButton("All Skills", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, AllSkillsClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Skills", 10);
             // panel.GetPanel("Skills Panel").AddButton("Scream", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, ScreamClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Scream: " + PlayerData.instance.screamLevel, 10);
             // panel.GetPanel("Skills Panel").AddButton("Fireball", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, FireballClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Fireball: " + PlayerData.instance.fireballLevel, 10);
             // panel.GetPanel("Skills Panel").AddButton("Quake", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, QuakeClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Quake: " + PlayerData.instance.quakeLevel, 10);

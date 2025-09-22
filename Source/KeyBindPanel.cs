@@ -58,9 +58,12 @@ namespace DebugMod
                 pageData.Clear();
                 foreach (string categoryName in Categories)
                 {
-                    for (int i = 0; i < CategoryInfos[categoryName].NumPages; i++)
+                    if (CategoryInfos.TryGetValue(categoryName, out CategoryInfo info))
                     {
-                        pageData.Add((categoryName, i));
+                        for (int i = 0; i < info.NumPages; i++)
+                        {
+                            pageData.Add((categoryName, i));
+                        }
                     }
                 }
             }

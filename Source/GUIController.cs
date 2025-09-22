@@ -61,8 +61,8 @@ namespace DebugMod
             EnemiesPanel.BuildMenu(canvas);
             Console.BuildMenu(canvas);
 
-            ModHooks.FinishedLoadingModsHook += () => InfoPanel.BuildInfoPanels(canvas);
-            ModHooks.FinishedLoadingModsHook += () => KeyBindPanel.BuildMenu(canvas);
+            InfoPanel.BuildInfoPanels(canvas);
+            KeyBindPanel.BuildMenu(canvas);
 
             DontDestroyOnLoad(canvas);
         }
@@ -131,7 +131,7 @@ namespace DebugMod
         public void Update()
         {
             if (DebugMod.GM == null) return;
-            
+
             SaveStatesPanel.Update();
             TopMenu.Update();
             EnemiesPanel.Update();

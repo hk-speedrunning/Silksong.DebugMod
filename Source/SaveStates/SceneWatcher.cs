@@ -44,7 +44,7 @@ namespace DebugMod
         [HarmonyPostfix]
         private static void OnCustomSceneManagerStart(CustomSceneManager __instance)
         {
-            if (!scenesWithManager.ContainsKey(__instance.gameObject.scene))
+            if (scenesWithManager == null || !scenesWithManager.ContainsKey(__instance.gameObject.scene))
                 return;
 
             int id = scenesWithManager[__instance.gameObject.scene];

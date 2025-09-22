@@ -83,7 +83,7 @@ namespace DebugMod.InfoPanels
 
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hero State", () => HeroController.instance.hero_state.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Velocity", () => HeroController.instance.current_velocity.ToString());
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Naildmg", () => DebugMod.RefKnightSlash.FsmVariables.GetFsmInt("damageDealt").Value + " (Flat " + PlayerData.instance.nailDamage + ", x" + DebugMod.RefKnightSlash.FsmVariables.GetFsmFloat("Multiplier").Value + ")");
+            // MainInfoPanel.AddInfo(10f, 150f, y += 20, "Naildmg", () => DebugMod.RefKnightSlash.FsmVariables.GetFsmInt("damageDealt").Value + " (Flat " + PlayerData.instance.nailDamage + ", x" + DebugMod.RefKnightSlash.FsmVariables.GetFsmFloat("Multiplier").Value + ")");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => (PlayerData.instance.silk).ToString());
             y += 58f;
@@ -132,9 +132,9 @@ namespace DebugMod.InfoPanels
             // MainInfoPanel.AddInfo(300f, 440f, y += 20, "canSuperdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canQuickmap", () => GetStringForBool(HeroController.instance.CanQuickMap()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canInventory", () => GetStringForBool(HeroController.instance.CanOpenInventory()));
-            MainInfoPanel.AddInfo(300f, 440f, y += 20, "canWarp", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Dream Warp Allowed").Value));
-            MainInfoPanel.AddInfo(300f, 440f, y += 20, "canDGate", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Can Dream Gate").Value));
-            MainInfoPanel.AddInfo(300f, 440f, y += 20, "gateAllow", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Dream Gate Allowed").Value));
+            // MainInfoPanel.AddInfo(300f, 440f, y += 20, "canWarp", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Dream Warp Allowed").Value));
+            // MainInfoPanel.AddInfo(300f, 440f, y += 20, "canDGate", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Can Dream Gate").Value));
+            // MainInfoPanel.AddInfo(300f, 440f, y += 20, "gateAllow", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Dream Gate Allowed").Value));
 
             return MainInfoPanel;
         }

@@ -98,8 +98,28 @@ namespace DebugMod
         public void Awake()
         {
             Log("Initializing");
-
             float startTime = Time.realtimeSinceStartup;
+
+            // Add Unity errors to main log
+            Application.logMessageReceived += (condition, stackTrace, type) =>
+            {
+                string[] blacklist =
+                [
+                    "Couldn't find a Game Manager, make sure one exists in the scene."
+                ];
+
+                if (type is LogType.Error or LogType.Exception)
+                {
+                    foreach (string s in blacklist)
+                    {
+                        if (condition.Contains(s)) return;
+                    }
+
+                    string message = $"[UNITY] {condition}\n{stackTrace}";
+                    LogError(message.Trim());
+                }
+            };
+
             Log("Building MethodInfo dict...");
             
             bindMethods.Clear();

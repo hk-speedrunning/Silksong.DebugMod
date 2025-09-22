@@ -117,9 +117,9 @@ internal static class ModHooks
     {
         if (!finishedLoadingModsInvoked)
         {
+            finishedLoadingModsInvoked = true;
             finishedLoadingModsHook?.Invoke();
         }
-        finishedLoadingModsInvoked = true;
     }
     #endregion
 
@@ -146,6 +146,7 @@ internal static class ModHooks
     public static event Func<int, int> TakeHealthHook;
 
     [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.TakeHealth))]
+    [HarmonyPrefix]
     private static void PlayerData_TakeHealth(ref int amount)
     {
         if (TakeHealthHook != null)

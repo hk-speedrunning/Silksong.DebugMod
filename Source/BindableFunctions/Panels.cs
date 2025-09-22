@@ -5,7 +5,6 @@
         [BindableMethod(name = "Toggle All UI", category = "Mod UI", allowLock = false)]
         public static void ToggleAllPanels()
         {
-            DebugMod.instance.Log("ToggleAllPanels()");
             bool active = !(
                 DebugMod.settings.HelpPanelVisible ||
                 DebugMod.settings.InfoPanelVisible ||
