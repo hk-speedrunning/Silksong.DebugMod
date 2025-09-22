@@ -138,19 +138,5 @@ namespace DebugMod
                 Console.AddLine("No boss in this scene to respawn");
             }
         }
-
-        public static void RespawnGhost()
-        {
-            if (ghostFound)
-            {
-                PlayerData.instance.GetType().GetField(ghostData[DebugMod.GetSceneName()])
-                    .SetValue(PlayerData.instance, 0);
-                Console.AddLine("Ghost Boss for this scene was reset, re-enter scene or warp");
-            }
-            else
-            {
-                Console.AddLine("No ghost in this scene to respawn");
-            }
-        }
     }
 }

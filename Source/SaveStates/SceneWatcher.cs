@@ -59,7 +59,7 @@ namespace DebugMod
         public class LoadedSceneInfo
         {
             private static int counter = 0;
-            private static LoadedSceneInfo activeInfo;
+            public static LoadedSceneInfo activeInfo;
             
             public readonly string name;
             public string activeSceneWhenLoaded { get; internal set; }

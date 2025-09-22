@@ -381,7 +381,7 @@ namespace DebugMod
             }
             catch (Exception ex)
             {
-                DebugMod.instance.LogError(ex);
+                DebugMod.instance.LogError(ex.Message);
                 //throw ex;
             }
         }

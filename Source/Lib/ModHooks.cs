@@ -31,6 +31,18 @@ internal static class ModHooks
     }
     #endregion
 
+    #region BeforePlayerDeadHook
+
+    public static event Action BeforePlayerDeadHook;
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.PlayerDead))]
+    [HarmonyPrefix]
+    private static void GameManager_PlayerDead()
+    {
+        BeforePlayerDeadHook?.Invoke();
+    }
+    #endregion
+
     #region BeforeSceneLoadHook
     public static event Func<string, string> BeforeSceneLoadHook;
 
@@ -64,6 +76,17 @@ internal static class ModHooks
     private static void PlayMakerUnity2DProxy_Start(PlayMakerUnity2DProxy __instance)
     {
         ColliderCreateHook?.Invoke(__instance.gameObject);
+    }
+    #endregion
+
+    #region CursorHook
+    public static event Action CursorHook;
+
+    [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.Update))]
+    [HarmonyPostfix]
+    private static void InputHandler_Update()
+    {
+        CursorHook?.Invoke();
     }
     #endregion
 

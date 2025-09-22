@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -10,15 +11,17 @@ using UnityEngine;
 
 namespace DebugMod.MonoBehaviours
 {
+    [HarmonyPatch]
     public class TimeScale:MonoBehaviour
     {
-         public void Awake()
+        private static bool hooksActive;
+
+        public void Awake()
         {
             DebugMod.TimeScaleActive = true;
             Time.timeScale = DebugMod.CurrentTimeScale;
 
-            On.GameManager.SetTimeScale_float += GameManager_SetTimeScale_1;
-            On.QuitToMenu.Start += QuitToMenu_Start;
+            hooksActive = true;
 
             _coroutineHooks = new ILHook[FreezeCoroutines.Length];
 
@@ -29,7 +32,7 @@ namespace DebugMod.MonoBehaviours
             
         }
         
-         public void OnDestroy()
+        public void OnDestroy()
         {
             
             foreach (ILHook hook in _coroutineHooks)
@@ -38,49 +41,63 @@ namespace DebugMod.MonoBehaviours
             Time.timeScale = 1;
             DebugMod.CurrentTimeScale = 1f;
 
-            On.GameManager.SetTimeScale_float -= GameManager_SetTimeScale_1;
-            On.QuitToMenu.Start -= QuitToMenu_Start;
+            hooksActive = false;
         }
          
-         private readonly MethodInfo[] FreezeCoroutines = (
-             from method in typeof(GameManager).GetMethods()
-             where method.Name.StartsWith("FreezeMoment")
-             where method.ReturnType == typeof(IEnumerator)
-             select method.GetCustomAttribute<IteratorStateMachineAttribute>() into attr
-             select attr.StateMachineType into type
-             select type.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance)
-         ).ToArray();
+        private readonly MethodInfo[] FreezeCoroutines = (
+            from method in typeof(GameManager).GetMethods()
+            where method.Name.StartsWith("FreezeMoment")
+            where method.ReturnType == typeof(IEnumerator)
+            select method.GetCustomAttribute<IteratorStateMachineAttribute>() into attr
+            select attr.StateMachineType into type
+            select type.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance)
+        ).ToArray();
 
-         private ILHook[] _coroutineHooks;
-         private void ScaleFreeze(ILContext il)
-         {
-             var cursor = new ILCursor(il);
+        private ILHook[] _coroutineHooks;
+        private void ScaleFreeze(ILContext il)
+        {
+            var cursor = new ILCursor(il);
 
-             cursor.GotoNext
-             (
-                 MoveType.After,
-                 x => x.MatchLdfld(out _),
-                 x => x.MatchCall<Time>("get_unscaledDeltaTime")
-             );
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdfld(out _),
+                x => x.MatchCall<Time>("get_unscaledDeltaTime")
+            );
 
-             cursor.EmitDelegate<Func<float>>(() => DebugMod.CurrentTimeScale);
+            cursor.EmitDelegate<Func<float>>(() => DebugMod.CurrentTimeScale);
 
-             cursor.Emit(OpCodes.Mul);
-         }
+            cursor.Emit(OpCodes.Mul);
+        }
 
-         private IEnumerator QuitToMenu_Start(On.QuitToMenu.orig_Start orig, QuitToMenu self)
-         {
-             yield return orig(self);
+        [HarmonyPatch(typeof(QuitToMenu), nameof(QuitToMenu.Start))]
+        [HarmonyPostfix]
+        private static IEnumerator QuitToMenu_Start(IEnumerator orig)
+        {
+            bool shouldRun = hooksActive;
+            yield return orig;
 
-             TimeController.GenericTimeScale = DebugMod.CurrentTimeScale;
-         }
+            if (shouldRun)
+            {
+                TimeManager.TimeScale = DebugMod.CurrentTimeScale;
+            }
+        }
 
-         private void GameManager_SetTimeScale_1(On.GameManager.orig_SetTimeScale_float orig, GameManager self, float newTimeScale)
-         {
-             if (ReflectionHelper.GetField<GameManager, int>(self, "timeSlowedCount") > 1)
-                 newTimeScale = Math.Min(newTimeScale, TimeController.GenericTimeScale);
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetTimeScale), typeof(float))]
+        [HarmonyPrefix]
+        private static bool GameManager_SetTimeScale_1(GameManager __instance, float newTimeScale)
+        {
+            if (!hooksActive)
+            {
+                return true;
+            }
+
+            float temp = newTimeScale;
+            if (__instance.timeSlowedCount > 1)
+                temp = Math.Min(temp, TimeManager.TimeScale);
             
-             TimeController.GenericTimeScale = (newTimeScale <= 0.01f ? 0f : newTimeScale) * DebugMod.CurrentTimeScale;
-         }
+            TimeManager.TimeScale = (temp <= 0.01f ? 0f : temp) * DebugMod.CurrentTimeScale;
+            return false;
+        }
     }
 }

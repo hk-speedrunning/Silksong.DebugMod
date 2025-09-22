@@ -1,24 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Drawing.Text;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
-using DebugMod.Hitbox;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using IL.HutongGames.PlayMaker.Actions;
-using Modding;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
-using TeamCherry;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-using On.HutongGames.PlayMaker.Actions;
 using static DebugMod.SaveState;
 
 namespace DebugMod
@@ -38,7 +19,7 @@ namespace DebugMod
         public static (string SequenceName, int BossIndex) SavePanthScene(string scene)
         {
             int BossIndex = BossSequenceController.BossIndex;
-            BossSequence sequence = ReflectionHelper.GetField<BossSequence>(typeof(BossSequenceController), "currentSequence");
+            BossSequence sequence = BossSequenceController.currentSequence;
             return (sequence.ToString(), BossIndex);
         }
 
@@ -68,8 +49,8 @@ namespace DebugMod
             }
             BossSequence sequence = GameObject.Instantiate(doorPrefab).GetComponent<BossSequenceDoor>().bossSequence;
             BossSequenceController.SetupNewSequence(sequence, BossSequenceController.ChallengeBindings.None, HeroController.instance.playerData.ToString());
-            ReflectionHelper.SetField<int>(typeof(BossSequenceController), "bossIndex", BossIndex);
-            ReflectionHelper.CallMethod(typeof(BossSequenceController), "SetupBossScene");
+            BossSequenceController.bossIndex = BossIndex;
+            BossSequenceController.SetupBossScene();
             isPanthState = true;
         }
         //TODO: Set this up to be able to avoid double loads

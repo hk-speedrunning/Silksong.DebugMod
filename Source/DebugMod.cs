@@ -46,8 +46,6 @@ namespace DebugMod
 
 
         internal static DebugMod instance;
-
-        //internal static int NailDamage;
         
         public static GlobalSettings settings { get; set; } = new GlobalSettings();
         public void OnLoadGlobal(GlobalSettings s)
@@ -82,6 +80,7 @@ namespace DebugMod
         internal static bool PauseGameNoUIActive = false;
         internal static bool savestateFixes = true;
         public static bool overrideLoadLockout = false;
+        internal static int extraNailDamage;
 
         internal static GameObject Panth1Prefab;
         internal static GameObject Panth2Prefab;
@@ -259,7 +258,6 @@ namespace DebugMod
             
             Console.Reset();
             EnemiesPanel.Reset();
-            DreamGate.Reset();
 
             playerInvincible = false;
             infiniteHP = false;
@@ -310,6 +308,13 @@ namespace DebugMod
 
             string sceneName = GM.GetSceneNameString();
             return sceneName;
+        }
+
+        [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Setter)]
+        [HarmonyPostfix]
+        public static int Get_NailDamage(int nailDamage)
+        {
+            return nailDamage + extraNailDamage;
         }
 
         public static float GetLoadTime()

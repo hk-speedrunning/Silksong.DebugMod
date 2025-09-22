@@ -4,7 +4,7 @@
     {
         static PlayerDeathWatcher()
         {
-            Modding.ModHooks.BeforePlayerDeadHook += SetPlayerDead;
+            ModHooks.BeforePlayerDeadHook += SetPlayerDead;
         }
 
         public static bool playerDead;
@@ -26,10 +26,10 @@
             {
                 "Hero death detected. Game playtime: ",
                 PlayerData.instance.playTime.ToString(),
-                " Shade Zone: ",
-                PlayerData.instance.shadeMapZone.ToString(),
-                " Shade Geo: ",
-                PlayerData.instance.geoPool.ToString(),
+                // " Shade Zone: ",
+                // PlayerData.instance.shadeMapZone.ToString(),
+                // " Shade Geo: ",
+                // PlayerData.instance.geoPool.ToString(),
                 " Respawn scene: ",
                 PlayerData.instance.respawnScene.ToString()
             }));

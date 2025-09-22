@@ -1,20 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using DebugMod.Hitbox;
 using DebugMod.MethodHelpers;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
 using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod
 {
@@ -106,6 +93,7 @@ namespace DebugMod
             }
         }
 
+        /*
         [BindableMethod(name = "Toggle HUD", category = "Visual")]
         public static void ToggleHUD()
         {
@@ -120,6 +108,7 @@ namespace DebugMod
                 Console.AddLine("Enabling HUD...");
             }
         }
+        */
 
         [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
         public static void ResetZoom()
@@ -190,22 +179,13 @@ namespace DebugMod
 
         internal static void SetAlwaysShowCursor()
         {
-            On.InputHandler.OnGUI -= CursorDisplayActive;
-            On.InputHandler.OnGUI += CursorDisplayActive;
             ModHooks.CursorHook -= CursorDisplayActive;
             ModHooks.CursorHook += CursorDisplayActive;
         }
 
         internal static void UnsetAlwaysShowCursor()
         {
-            On.InputHandler.OnGUI -= CursorDisplayActive;
             ModHooks.CursorHook -= CursorDisplayActive;
-        }
-
-        private static void CursorDisplayActive(On.InputHandler.orig_OnGUI orig, InputHandler self)
-        {
-            orig(self);
-            Cursor.visible = true;
         }
 
         private static void CursorDisplayActive()

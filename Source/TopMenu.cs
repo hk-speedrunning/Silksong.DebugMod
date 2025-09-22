@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -254,36 +253,6 @@ namespace DebugMod
                 savepanel.GetButton("File Load").SetTextColor(SaveStateManager.currentStateOperation == "Load new state from file" ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                 savepanel.GetButton("Load State On Death").SetTextColor(DebugMod.stateOnDeath ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
             }
-
-            if (panel.GetPanel("DreamGate Panel").active)
-            {
-                panel.GetPanel("DreamGate Panel").GetButton("Delete Item").SetTextColor(DreamGate.delMenu ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
-
-                panel.GetPanel("DreamGate Panel").GetButton("Right1").UpdateText("");
-                panel.GetPanel("DreamGate Panel").GetButton("Right2").UpdateText("");
-                panel.GetPanel("DreamGate Panel").GetButton("Right3").UpdateText("");
-                panel.GetPanel("DreamGate Panel").GetButton("Right4").UpdateText("");
-                panel.GetPanel("DreamGate Panel").GetButton("Right5").UpdateText("");
-                panel.GetPanel("DreamGate Panel").GetButton("Right6").UpdateText("");
-
-                int i = 0;
-                int buttonNum = 1;
-
-                foreach (string entryName in DreamGate.dgData.Keys)
-                {
-                    if (i >= DreamGate.scrollPosition)
-                    {
-                        panel.GetPanel("DreamGate Panel").GetButton("Right" + buttonNum).UpdateText(entryName);
-                        buttonNum++;
-                        if (buttonNum > 6)
-                        {
-                            break;
-                        }
-                    }
-                    
-                    i++;
-                }
-            }
         }
 
         private static void RefreshItemsMenu()
@@ -393,6 +362,7 @@ namespace DebugMod
             BindableFunctions.KillSelf();
         }
 
+        /*
         private static void AllCharmsClicked(string buttonName)
         {
             BindableFunctions.GiveAllCharms();
@@ -432,12 +402,14 @@ namespace DebugMod
         {
             BindableFunctions.IncreaseGrimmchildLevel();
         }
+        */
 
         private static void AllSkillsClicked(string buttonName)
         {
             BindableFunctions.GiveAllSkills();
         }
 
+        /*
         private static void ScreamClicked(string buttonName)
         {
             BindableFunctions.IncreaseScreamLevel();
@@ -507,12 +479,14 @@ namespace DebugMod
         {
             BindableFunctions.RespawnGhost();
         }
+        */
 
         private static void RespawnBossClicked(string buttonName)
         {
             BindableFunctions.RespawnBoss();
         }
 
+        /*
         private static void FailedChampClicked(string buttonName)
         {
             BindableFunctions.ToggleFailedChamp();
@@ -547,12 +521,14 @@ namespace DebugMod
         {
             BindableFunctions.GiveRancidEgg();
         }
+        */
 
         private static void GeoClicked(string buttonName)
         {
             BindableFunctions.GiveGeo();
         }
 
+        /*
         private static void EssenceClicked(string buttonName)
         {
             BindableFunctions.GiveEssence();
@@ -607,7 +583,7 @@ namespace DebugMod
         {
             BindableFunctions.AllStags();
         }
-        
+        */
         private static void MaskClicked(string buttonName)
         {
             BindableFunctions.GiveMask();
@@ -617,6 +593,7 @@ namespace DebugMod
             BindableFunctions.GiveVessel();
         }
 
+        /*
         private static void ReadDataClicked(string buttonName)
         {
             BindableFunctions.ReadDGData();
@@ -662,6 +639,8 @@ namespace DebugMod
                 DreamGate.scrollPosition++;
             }
         }
+        */
+
         private static void KeyBindLockClicked(string buttonName)
         {
             BindableFunctions.ToggleLockKeyBinds();

@@ -1,21 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
-using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
@@ -38,9 +21,9 @@ namespace DebugMod
         [BindableMethod(name = "Give Vessel", category = "Mask & Vessels")]
         public static void GiveVessel()
         {
-            if (PlayerData.instance.MPReserveMax < 99)
+            if (PlayerData.instance.silkMax < 18)
             {
-                HeroController.instance.AddToMaxMPReserve(33);
+                HeroController.instance.AddToMaxSilk(1);
                 PlayMakerFSM.BroadcastEvent("NEW SOUL ORB");
                 Console.AddLine("Added Vessel");
             }
@@ -57,13 +40,13 @@ namespace DebugMod
             {
                 PlayerData.instance.maxHealth -= 1;
                 PlayerData.instance.maxHealthBase -= 1;
-                if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                else
-                {
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(false);
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                }
+                // if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+                // else
+                // {
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(false);
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+                // }
                 Console.AddLine("Took Away Mask");
             }
             else
@@ -75,16 +58,16 @@ namespace DebugMod
         [BindableMethod(name = "Take Away Vessel", category = "Mask & Vessels")]
         public static void TakeAwayVessel()
         {
-            if (PlayerData.instance.MPReserveMax > 0)
+            if (PlayerData.instance.silkMax > 9)
             {
-                PlayerData.instance.MPReserveMax -= 33;
-                if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                else
-                {
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(false);
-                    GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                }
+                PlayerData.instance.silkMax--;
+                // if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+                // else
+                // {
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(false);
+                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+                // }
                 Console.AddLine("Removed Vessel");
             }
             else
@@ -122,14 +105,14 @@ namespace DebugMod
         [BindableMethod(name = "Add Soul", category = "Mask & Vessels")]
         public static void AddSoul()
         {
-            HeroController.instance.AddMPCharge(33);
+            HeroController.instance.AddSilk(1, true);
 
             Console.AddLine("Added Soul");
         }
         [BindableMethod(name = "Take Soul", category = "Mask & Vessels")]
         public static void TakeSoul()
         {
-            HeroController.instance.TakeMP(33);
+            HeroController.instance.TakeSilk(1);
 
             Console.AddLine("Attempting to take soul");
         }

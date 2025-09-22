@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
 using DebugMod.MonoBehaviours;
 using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod
 {
@@ -27,7 +16,7 @@ namespace DebugMod
             {
                 num = 5;
             }
-            PlayerData.instance.nailDamage += num;
+            DebugMod.extraNailDamage += num;
             PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
             Console.AddLine("Increased base nailDamage by " + num);
         }
@@ -38,14 +27,14 @@ namespace DebugMod
             int num2 = PlayerData.instance.nailDamage - 4;
             if (num2 >= 0)
             {
-                PlayerData.instance.nailDamage = num2;
+                DebugMod.extraNailDamage -= 4;
                 PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
                 Console.AddLine("Decreased base nailDamage by 4");
             }
             else
             {
                 Console.AddLine("Cannot set base nailDamage less than 0 therefore forcing 0 value");
-                PlayerData.instance.nailDamage = 0;
+                DebugMod.extraNailDamage = PlayerData.instance.nailDamage;
                 PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
             }
         }
@@ -154,7 +143,7 @@ namespace DebugMod
             var GC = GameCameras.instance;
             
             //nail damage
-            pd.nailDamage = 5 + pd.nailSmithUpgrades * 4;
+            DebugMod.extraNailDamage = 0;
             PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
             //Hero Light
@@ -164,8 +153,8 @@ namespace DebugMod
             gameObject.GetComponent<SpriteRenderer>().color = color;
             
             //HUD
-            if (!GC.hudCanvas.gameObject.activeInHierarchy) 
-                GC.hudCanvas.gameObject.SetActive(true);
+            // if (!GC.hudCanvas.gameObject.activeInHierarchy) 
+            //     GC.hudCanvas.gameObject.SetActive(true);
             
             //Hide Hero
             tk2dSprite component = DebugMod.RefKnight.GetComponent<tk2dSprite>();

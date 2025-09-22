@@ -1,24 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
-using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
+        /*
         [BindableMethod(name = "Give Pale Ore", category = "Consumables")]
         public static void GivePaleOre()
         {
@@ -39,6 +23,7 @@ namespace DebugMod
             PlayerData.instance.rancidEggs += 10;
             Console.AddLine("Giving player 10 rancid eggs");
         }
+        */
 
         [BindableMethod(name = "Give Geo", category = "Consumables")]
         public static void GiveGeo()
@@ -47,6 +32,7 @@ namespace DebugMod
             Console.AddLine("Giving player 1000 geo");
         }
 
+        /*
         [BindableMethod(name = "Give Essence", category = "Consumables")]
         public static void GiveEssence()
         {
@@ -170,5 +156,6 @@ namespace DebugMod
             PlayerData.instance.mapRestingGrounds = true;
             PlayerData.instance.mapAbyss = true;
         }
+        */
     }
 }

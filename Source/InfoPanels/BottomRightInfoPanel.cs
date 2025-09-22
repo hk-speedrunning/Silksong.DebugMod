@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using DebugMod.Canvas;
-using UnityEngine;
 using InControl;
-using JetBrains.Annotations;
+using UnityEngine;
 
 namespace DebugMod.InfoPanels
 {
@@ -48,8 +46,8 @@ namespace DebugMod.InfoPanels
             int time1 = Mathf.FloorToInt(Time.realtimeSinceStartup / 60f);
             int time2 = Mathf.FloorToInt(Time.realtimeSinceStartup - (float)(time1 * 60));
 
-            panel.GetText("Right1").UpdateText(string.Format("{0:00}:{1:00}", time1, time2) + "\n" + DebugMod.GetLoadTime() + "s\n" + InfoPanel.GetHeroPos() + "\n" + string.Format("L: {0} R: {1}", DebugMod.IH.inputActions.left.RawValue, DebugMod.IH.inputActions.right.RawValue));
-            panel.GetText("Right2").UpdateText(DebugMod.IH.inputActions.moveVector.Vector.x + ", " + DebugMod.IH.inputActions.moveVector.Vector.y + "\n" + InfoPanel.GetStringForBool(InputManager.AnyKeyIsPressed) + "\n" + InfoPanel.GetStringForBool(DebugMod.IH.inputActions.left.IsPressed || DebugMod.IH.inputActions.right.IsPressed) + "\n" + DebugMod.IH.inputX);
+            panel.GetText("Right1").UpdateText(string.Format("{0:00}:{1:00}", time1, time2) + "\n" + DebugMod.GetLoadTime() + "s\n" + InfoPanel.GetHeroPos() + "\n" + string.Format("L: {0} R: {1}", DebugMod.IH.inputActions.Left.RawValue, DebugMod.IH.inputActions.Right.RawValue));
+            panel.GetText("Right2").UpdateText(DebugMod.IH.inputActions.MoveVector.Vector.x + ", " + DebugMod.IH.inputActions.MoveVector.Vector.y + "\n" + InfoPanel.GetStringForBool(InputManager.AnyKeyIsPressed) + "\n" + InfoPanel.GetStringForBool(DebugMod.IH.inputActions.Left.IsPressed || DebugMod.IH.inputActions.Right.IsPressed));
             panel.GetText("Right3").UpdateText(BindableFunctions.frameCounter + "\n" + frameTime.ToString("mm':'ss'.'ff"));
         }
 

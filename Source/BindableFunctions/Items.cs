@@ -1,24 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
-using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
+        /*
         [BindableMethod(name = "Give Lantern", category = "Items")]
         public static void ToggleLantern()
         {
@@ -180,5 +164,6 @@ namespace DebugMod
             
             Console.AddLine("Unlocked all stags");
         }
+        */
     }
 }

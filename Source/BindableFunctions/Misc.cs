@@ -1,21 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using DebugMod.Hitbox;
 using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
 using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-using Modding.Utils;
-using System.ComponentModel;
 
 namespace DebugMod
 {
@@ -101,7 +88,7 @@ namespace DebugMod
             {
                 if (UIManager.instance.uiState.ToString() == "PAUSED")
                 {
-                    InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle());
+                    InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle(false));
                     GameManager.instance.HazardRespawn();
                     Console.AddLine("Closing Pause Menu and respawning...");
                     return;
@@ -128,12 +115,14 @@ namespace DebugMod
             Console.AddLine("Manual respawn point on this map set to" + manualRespawn);
         }
 
+        /*
         [BindableMethod(name = "Toggle Infected Crossroads", category = "Misc")]
         public static void ToggleInfection()
         {
             PlayerData.instance.crossroadsInfected = !PlayerData.instance.crossroadsInfected;
             Console.AddLine($"Crossroads are now " + (PlayerData.instance.crossroadsInfected ? "enabled" : "disabled"));
         }
+        */
 
         [BindableMethod(name = "Force Camera Follow", category = "Misc")]
         public static void ForceCameraFollow()
@@ -162,6 +151,7 @@ namespace DebugMod
             HeroController.instance.EnableRenderer();
         }
 
+        /*
         internal static Action ClearSceneDataHook;
 
         [BindableMethod(name = "Refresh Scene Data", category = "Misc")]
@@ -221,6 +211,7 @@ namespace DebugMod
 
             PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
         }
+        */
 
         [BindableMethod(name = "Start/End Frame Advance", category = "Misc")]
         public static void ToggleFrameAdvance()

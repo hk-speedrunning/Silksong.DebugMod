@@ -1,55 +1,38 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
-using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
         [BindableMethod(name = "Give All", category = "Skills")]
         public static void GiveAllSkills()
         {
-            PlayerData.instance.screamLevel = 2;
-            PlayerData.instance.fireballLevel = 2;
-            PlayerData.instance.quakeLevel = 2;
+            // TODO: double check these
+
+            PlayerData.instance.silkRegenMax = 3;
 
             PlayerData.instance.hasDash = true;
-            PlayerData.instance.canDash = true;
-            PlayerData.instance.hasShadowDash = true;
-            PlayerData.instance.canShadowDash = true;
+            PlayerData.instance.hasBrolly = true;
             PlayerData.instance.hasWalljump = true;
-            PlayerData.instance.canWallJump = true;
+            PlayerData.instance.hasHarpoonDash = true;
             PlayerData.instance.hasDoubleJump = true;
-            PlayerData.instance.hasSuperDash = true;
-            PlayerData.instance.canSuperDash = true;
-            PlayerData.instance.hasAcidArmour = true;
+            PlayerData.instance.hasSuperJump = true;
 
-            PlayerData.instance.hasDreamNail = true;
-            PlayerData.instance.dreamNailUpgraded = true;
-            PlayerData.instance.hasDreamGate = true;
+            PlayerData.instance.hasNeedolin = true;
+            PlayerData.instance.hasNeedolinMemoryPowerup = true;
 
-            PlayerData.instance.hasNailArt = true;
-            PlayerData.instance.hasCyclone = true;
-            PlayerData.instance.hasDashSlash = true;
-            PlayerData.instance.hasUpwardSlash = true;
-            PlayerData.instance.hasAllNailArts = true;
+            PlayerData.instance.hasSilkCharge = true;
+            PlayerData.instance.hasSilkSpecial = true;
+            PlayerData.instance.hasSilkBomb = true;
+            PlayerData.instance.hasSilkBossNeedle = true;
+            PlayerData.instance.hasThreadSphere = true;
+            PlayerData.instance.hasParry = true;
+            PlayerData.instance.hasNeedleThrow = true;
+
+            PlayerData.instance.hasChargeSlash = true;
 
             Console.AddLine("Giving player all skills");
         }
 
+        /*
         [BindableMethod(name = "Increment Dash", category = "Skills")]
         public static void ToggleMothwingCloak()
         {
@@ -245,5 +228,6 @@ namespace DebugMod
 
             PlayerData.instance.hasAllNailArts = PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash && PlayerData.instance.hasCyclone;
         }
+        */
     }
 }

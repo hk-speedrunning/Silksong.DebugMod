@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.Drawing.Text;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Claims;
 using DebugMod.Hitbox;
 using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using On;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -118,7 +113,7 @@ namespace DebugMod
             }
             catch (Exception e)
             {
-                DebugMod.instance.LogError(e);
+                DebugMod.instance.LogError(e.Message);
             }
             data.savedPd = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(PlayerData.instance));
             data.savedSd = JsonUtility.FromJson<SceneData>(JsonUtility.ToJson(SceneData.instance));
@@ -218,7 +213,7 @@ namespace DebugMod
             }
             catch (Exception ex)
             {
-                DebugMod.instance.LogDebug(ex);
+                DebugMod.instance.LogDebug(ex.Message);
                 throw;
             }
         }
@@ -255,11 +250,11 @@ namespace DebugMod
                 DebugMod.CurrentInvulnCoro = null;
 
                 //fixes knockback storage
-                ReflectionHelper.CallMethod(HeroController.instance, "CancelDamageRecoil");
+                HeroController.instance.CancelDamageRecoil();
 
                 //ends hazard respawn animation
                 var invPulse = HeroController.instance.GetComponent<InvulnerablePulse>();
-                invPulse.stopInvulnerablePulse();
+                invPulse.StopInvulnerablePulse();
             }
 
             if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
@@ -312,7 +307,7 @@ namespace DebugMod
                         EntryGateName = "door_dreamEnter",
                         EntryDelay = 0f,
                         WaitForSceneTransitionCameraFade = false,
-                        Visualization = GameManager.SceneLoadVisualizations.GodsAndGlory,
+                        Visualization = GameManager.SceneLoadVisualizations.Default,
                         AlwaysUnloadUnusedAssets = true
                     }
                 );
@@ -339,19 +334,19 @@ namespace DebugMod
 
             GameManager.instance.cameraCtrl.PositionToHero(false);
 
-            ReflectionHelper.SetField(GameManager.instance.cameraCtrl, "isGameplayScene", true);
-            ReflectionHelper.CallMethod(GameManager.instance, "UpdateUIStateFromGameState");
+            GameManager.instance.cameraCtrl.isGameplayScene = true;
+            GameManager.instance.UpdateUIStateFromGameState();
 
             if (loadDuped)
             {
                 yield return new WaitUntil(() => GameManager.instance.IsInSceneTransition == false);
                 for (int i = 1; i < sceneData.Length; i++)
                 {
-                    On.GameManager.UpdateSceneName += sceneData[i].UpdateSceneNameOverride;
+                    SceneWatcher.LoadedSceneInfo.activeInfo = sceneData[i];
                     AsyncOperation loadop = USceneManager.LoadSceneAsync(sceneData[i].name, LoadSceneMode.Additive);
                     loadop.allowSceneActivation = true;
                     yield return loadop;
-                    On.GameManager.UpdateSceneName -= sceneData[i].UpdateSceneNameOverride;
+                    SceneWatcher.LoadedSceneInfo.activeInfo = null;
                     GameManager.instance.RefreshTilemapInfo(sceneData[i].name);
                     GameManager.instance.cameraCtrl.SceneInit();
                 }
@@ -391,7 +386,8 @@ namespace DebugMod
                 DebugMod.settings.ShowHitBoxes = cs;
             }
 
-            if (!isPanthState) ReflectionHelper.CallMethod(HeroController.instance, "FinishedEnteringScene", true, false);
+            
+            if (!isPanthState) HeroController.instance.FinishedEnteringScene(true, false);
 
             if (data.roomSpecificOptions != "0" && data.roomSpecificOptions != null)
             {
@@ -412,7 +408,7 @@ namespace DebugMod
                     HeroController.instance.UnPause();
                 }
                 MenuButtonList.ClearAllLastSelected();
-                TimeController.GenericTimeScale = 1f;
+                TimeManager.TimeScale = 1f;
             }
 
             TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
@@ -472,17 +468,30 @@ namespace DebugMod
         private void HUDFixes()
         {
 
-            GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+            // GameCameras.instance.hudCanvas.gameObject.SetActive(true);
 
-            HeroController.instance.geoCounter.geoTextMesh.text = data.savedPd.geo.ToString();
+            if (CurrencyCounter._currencyCounters.TryGetValue(CurrencyType.Money, out List<CurrencyCounter> list))
+            {
+                foreach (CurrencyCounter counter in list)
+                {
+                    counter.geoTextMesh.Text = data.savedPd.geo.ToString();
+                }
+            }
+            if (CurrencyCounter._currencyCounters.TryGetValue(CurrencyType.Shard, out list))
+            {
+                foreach (CurrencyCounter counter in list)
+                {
+                    counter.geoTextMesh.Text = data.savedPd.ShellShards.ToString();
+                }
+            }
 
             bool isInfiniteHp = DebugMod.infiniteHP;
             DebugMod.infiniteHP = false;
-            PlayerData.instance.hasXunFlower = false;
+            // PlayerData.instance.hasXunFlower = false;
             PlayerData.instance.health = data.savedPd.health;
             HeroController.instance.TakeHealth(1);
             HeroController.instance.AddHealth(1);
-            PlayerData.instance.hasXunFlower = data.savedPd.hasXunFlower;
+            // PlayerData.instance.hasXunFlower = data.savedPd.hasXunFlower;
             DebugMod.infiniteHP = isInfiniteHp;
 
             int healthBlue = data.savedPd.healthBlue;
@@ -508,17 +517,17 @@ namespace DebugMod
                 fsm.SetState("Check if Full");
             }
 
-            if (PlayerData.instance.MPReserveMax < 33) GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Init");
-            else GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Up Check");
-            if (PlayerData.instance.MPReserveMax < 66) GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Init");
-            else GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Up Check");
-            if (PlayerData.instance.MPReserveMax < 99) GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Init");
-            else GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Up Check");
-            if (PlayerData.instance.MPReserveMax < 132) GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Init");
-            else GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Up Check");
+            // if (PlayerData.instance.MPReserveMax < 33) GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Init");
+            // else GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Up Check");
+            // if (PlayerData.instance.MPReserveMax < 66) GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Init");
+            // else GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Up Check");
+            // if (PlayerData.instance.MPReserveMax < 99) GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Init");
+            // else GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Up Check");
+            // if (PlayerData.instance.MPReserveMax < 132) GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Init");
+            // else GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Up Check");
 
-            HeroController.instance.TakeMP(1);
-            HeroController.instance.AddMPChargeSpa(1);
+            // HeroController.instance.TakeMP(1);
+            // HeroController.instance.AddMPChargeSpa(1);
 
             PlayMakerFSM.BroadcastEvent("MP DRAIN");
             PlayMakerFSM.BroadcastEvent("MP LOSE");

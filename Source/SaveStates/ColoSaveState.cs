@@ -1,22 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Drawing.Text;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Security.Claims;
-using DebugMod.Hitbox;
-using GlobalEnums;
 using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using IL.HutongGames.PlayMaker.Actions;
-using Modding;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod
 {

@@ -1,19 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using DebugMod.Hitbox;
-using DebugMod.MonoBehaviours;
-using GlobalEnums;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using Modding;
-using Newtonsoft.Json;
-using UnityEngine;
-using Object = UnityEngine.Object;
-using USceneManager = UnityEngine.SceneManagement.SceneManager;
+﻿using Object = UnityEngine.Object;
 
 namespace DebugMod
 {
@@ -46,11 +31,6 @@ namespace DebugMod
         public static void ToggleInfiniteSoul()
         {
             DebugMod.infiniteSoul = !DebugMod.infiniteSoul;
-            if (DebugMod.infiniteSoul)
-            {
-                //running this is a solution to inf soul not filling vessels when main is 99, not elegant but it works
-                HeroController.instance.SetMPCharge(0);
-            }
             Console.AddLine("Infinite SOUL set to " + DebugMod.infiniteSoul.ToString().ToUpper());
         }
 
@@ -118,8 +98,6 @@ namespace DebugMod
 
             HeroController.instance.heroDeathPrefab.SetActive(true);
             DebugMod.GM.ReadyForRespawn(false);
-            GameCameras.instance.hudCanvas.gameObject.SetActive(false);
-            GameCameras.instance.hudCanvas.gameObject.SetActive(true);
         }
 
 

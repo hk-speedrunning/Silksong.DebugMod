@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using DebugMod.Canvas;
 using UnityEngine;
-using InControl;
-using JetBrains.Annotations;
 
 namespace DebugMod.InfoPanels
 {
@@ -87,14 +85,14 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Velocity", () => HeroController.instance.current_velocity.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Naildmg", () => DebugMod.RefKnightSlash.FsmVariables.GetFsmInt("damageDealt").Value + " (Flat " + PlayerData.instance.nailDamage + ", x" + DebugMod.RefKnightSlash.FsmVariables.GetFsmFloat("Multiplier").Value + ")");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => (PlayerData.instance.MPCharge + PlayerData.instance.MPReserve).ToString());
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => (PlayerData.instance.silk).ToString());
             y += 58f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage.ToString());
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Grubs", () => PlayerData.instance.grubsCollected + " / 46");
+            // MainInfoPanel.AddInfo(10f, 150f, y += 20, "Grubs", () => PlayerData.instance.grubsCollected + " / 46");
             y += 58f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "isInvuln", () => GetStringForBool(HeroController.instance.cState.invulnerable));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Invincible", () => GetStringForBool(PlayerData.instance.isInvincible));
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "invinciTest", () => GetStringForBool(PlayerData.instance.invinciTest));
+            // MainInfoPanel.AddInfo(10f, 150f, y += 20, "invinciTest", () => GetStringForBool(PlayerData.instance.invinciTest));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Damage State", () => HeroController.instance.damageMode.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Dead State", () => GetStringForBool(HeroController.instance.cState.dead));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hazard Death", () => HeroController.instance.cState.hazardDeath.ToString());
@@ -103,7 +101,7 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Transition", () => GetStringForBool(HeroController.instance.cState.transitioning));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Trans State", () => GetTransState());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Is Gameplay", () => GetStringForBool(DebugMod.GM.IsGameplayScene()));
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Game State", () => GameManager.instance.gameState.ToString());
+            // MainInfoPanel.AddInfo(10f, 150f, y += 20, "Game State", () => GameManager.instance.gameState.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "UI State", () => UIManager.instance.uiState.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hero Paused", () => GetStringForBool(HeroController.instance.cState.isPaused));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Camera Mode", () => DebugMod.RefCamera.mode.ToString());
@@ -131,7 +129,7 @@ namespace DebugMod.InfoPanels
             y += 30f;
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Attacking", () => GetStringForBool(HeroController.instance.cState.attacking));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canCast", () => GetStringForBool(HeroController.instance.CanCast()));
-            MainInfoPanel.AddInfo(300f, 440f, y += 20, "canSuperdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
+            // MainInfoPanel.AddInfo(300f, 440f, y += 20, "canSuperdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canQuickmap", () => GetStringForBool(HeroController.instance.CanQuickMap()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canInventory", () => GetStringForBool(HeroController.instance.CanOpenInventory()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canWarp", () => GetStringForBool(DebugMod.RefDreamNail.FsmVariables.GetFsmBool("Dream Warp Allowed").Value));
@@ -148,13 +146,13 @@ namespace DebugMod.InfoPanels
             MinimalInfoPanel.AddInfo(10, 40, 10, "Vel", () => HeroController.instance.current_velocity.ToString());
             MinimalInfoPanel.AddInfo(110, 140, 10, "Pos", () => GetHeroPos());
             
-            MinimalInfoPanel.AddInfo(10, 40, 30, "MP", () => (PlayerData.instance.MPCharge + PlayerData.instance.MPReserve).ToString());
-            MinimalInfoPanel.AddInfo(100, 190, 30, "CanCdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
+            MinimalInfoPanel.AddInfo(10, 40, 30, "MP", () => (PlayerData.instance.silk).ToString());
+            // MinimalInfoPanel.AddInfo(100, 190, 30, "CanCdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
             
             MinimalInfoPanel.AddInfo(10, 100, 50, "NailDmg", () => DebugMod.RefKnightSlash.FsmVariables.GetFsmInt("damageDealt").Value + " (Flat " + PlayerData.instance.nailDamage + ", x" + DebugMod.RefKnightSlash.FsmVariables.GetFsmFloat("Multiplier").Value + ")");
             
             MinimalInfoPanel.AddInfo(10, 95, 70, "Completion", () => PlayerData.instance.completionPercentage.ToString() + "%");
-            MinimalInfoPanel.AddInfo(140, 195, 70, "Grubs", () => PlayerData.instance.grubsCollected + " / 46");
+            // MinimalInfoPanel.AddInfo(140, 195, 70, "Grubs", () => PlayerData.instance.grubsCollected + " / 46");
             
             MinimalInfoPanel.AddInfo(10, 140, 90, "Scene Name", () => DebugMod.GetSceneName());
             MinimalInfoPanel.AddInfo(10, 140, 110, "Current SaveState", () => SaveStateManager.quickState.IsSet() ? SaveStateManager.quickState.GetSaveStateID() : "No savestate");

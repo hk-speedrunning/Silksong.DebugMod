@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
-using IL.HutongGames.PlayMaker.Actions;
-using HutongGames;
-using TeamCherry;
 using UnityEngine;
-using Modding.Utils;
-using System.Drawing.Text;
 
 namespace DebugMod
 {
