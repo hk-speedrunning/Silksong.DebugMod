@@ -1,5 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+
+    <!-- 
+      Imports silksong path properties only if present in order to allow CI builds. The file should be gitignored.
+      If you are checking out from git and need to create a new one, you can use `dotnet new silksongpath` to generate one.
+    -->
+    <Import Condition="Exists('SilksongPath.props')" Project="SilksongPath.props" />
+
+    <PropertyGroup>
     <ProjectGuid>{932ED497-4C09-461E-B198-8B44FD9B288F}</ProjectGuid>
 
     <RootNamespace>DebugMod</RootNamespace>
@@ -16,12 +23,6 @@
     </RestoreAdditionalProjectSources>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-    
-  <!-- 
-  Imports silksong path properties only if present in order to allow CI builds. The file should be gitignored.
-  If you are checking out from git and need to create a new one, you can use `dotnet new silksongpath` to generate one.
-  -->
-  <Import Condition="Exists('SilksongPath.props')" Project="SilksongPath.props" />
   
   <ItemGroup>
      <None Remove="Images\**\*.png" />

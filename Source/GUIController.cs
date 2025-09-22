@@ -49,7 +49,7 @@ namespace DebugMod
         {
             LoadResources();
 
-            canvas = new GameObject();
+            canvas = new GameObject("DebugModCanvas");
             canvas.AddComponent<UnityEngine.Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             CanvasScaler scaler = canvas.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -353,7 +353,7 @@ namespace DebugMod
                     {
                         DebugMod.instance.LogWarn("[DEBUG MOD] Couldn't find GUIController");
 
-                        GameObject GUIObj = new GameObject();
+                        GameObject GUIObj = new GameObject("GUIController");
                         _instance = GUIObj.AddComponent<GUIController>();
                         DontDestroyOnLoad(GUIObj);
                     }

@@ -34,7 +34,8 @@ namespace DebugMod
             else
             {
                 Console.AddLine("Cannot set base nailDamage less than 0 therefore forcing 0 value");
-                DebugMod.extraNailDamage = PlayerData.instance.nailDamage;
+                DebugMod.extraNailDamage = 0;
+                DebugMod.extraNailDamage = -PlayerData.instance.nailDamage;
                 PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
             }
         }

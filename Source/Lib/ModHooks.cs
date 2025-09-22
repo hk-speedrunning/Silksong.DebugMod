@@ -12,7 +12,7 @@ internal static class ModHooks
     #region AfterSavegameLoadHook
     public static event Action<SaveGameData> AfterSavegameLoadHook;
 
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetLoadedGameData))]
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetLoadedGameData), typeof(SaveGameData), typeof(int))]
     [HarmonyPostfix]
     private static void GameManager_SetLoadedGameData(SaveGameData saveGameData)
     {

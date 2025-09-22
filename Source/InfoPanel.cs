@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using InControl;
-using JetBrains.Annotations;
 using DebugMod.Canvas;
 using DebugMod.InfoPanels;
+using JetBrains.Annotations;
+using UnityEngine;
 
 namespace DebugMod
 {
@@ -73,7 +72,7 @@ namespace DebugMod
 
             foreach (InfoPanel infoPanel in AllPanels.Values)
             {
-                if (infoPanel.Active != infoPanel.panel.active)
+                if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.active)
                 {
                     infoPanel.panel?.SetActive(infoPanel.Active, !infoPanel.Active);
                 }

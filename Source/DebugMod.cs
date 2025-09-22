@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 using MonoMod.ModInterop;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 
 namespace DebugMod
 {
@@ -154,17 +153,12 @@ namespace DebugMod
                 alphaKeyDict.Add(tmpKeyCode, alphaInt++);
             }
             
-            
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += LevelActivated;
-            GameObject UIObj = new GameObject();
-            UIObj.AddComponent<GUIController>();
-            Object.DontDestroyOnLoad(UIObj);
-            
             saveStateManager = new SaveStateManager();
 
             Harmony harmony = new(Id);
             harmony.PatchAll();
 
+            SceneManager.activeSceneChanged += LevelActivated;
             ModHooks.AfterSavegameLoadHook += LoadCharacter;
             ModHooks.NewGameHook += NewCharacter;
             ModHooks.BeforeSceneLoadHook += OnLevelUnload;
@@ -176,9 +170,16 @@ namespace DebugMod
                 BindableFunctions.SetAlwaysShowCursor();
             }
 
-            BossHandler.PopulateBossLists();
-            GUIController.Instance.BuildMenus();
-            SceneWatcher.Init();
+            ModHooks.FinishedLoadingModsHook += () =>
+            {
+                GameObject UIObj = new GameObject("GUIController");
+                UIObj.AddComponent<GUIController>();
+                DontDestroyOnLoad(UIObj);
+
+                BossHandler.PopulateBossLists();
+                GUIController.Instance.BuildMenus();
+                SceneWatcher.Init();
+            };
 
             KeyBindLock = false;
             TimeScaleActive = false;
@@ -280,7 +281,7 @@ namespace DebugMod
                 _loadingChar = false;
             }
 
-            if (GM.IsGameplayScene())
+            if (GM && GM.IsGameplayScene())
             {
                 _loadTime = Time.realtimeSinceStartup;
                 Console.AddLine("New scene loaded: " + sceneName);
@@ -310,7 +311,7 @@ namespace DebugMod
             return sceneName;
         }
 
-        [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Setter)]
+        [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Getter)]
         [HarmonyPostfix]
         public static int Get_NailDamage(int nailDamage)
         {
