@@ -30,6 +30,22 @@ namespace DebugMod
             KeyCode.Mouse0
         };
 
+        public static GUIController Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    DebugMod.instance.Log("Creating new GUIController");
+
+                    GameObject GUIObj = new GameObject("GUIController");
+                    _instance = GUIObj.AddComponent<GUIController>();
+                    DontDestroyOnLoad(GUIObj);
+                }
+                return _instance;
+            }
+        }
+
         /// <summary>
         /// If this returns true, all DebugMod UI elements will be hidden.
         /// </summary>
@@ -339,29 +355,6 @@ namespace DebugMod
                 {
                     hitboxes.Unload();
                 }
-            }
-        }
-
-        public static GUIController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = UnityEngine.Object.FindObjectOfType<GUIController>();
-                    if (_instance == null)
-                    {
-                        DebugMod.instance.LogWarn("[DEBUG MOD] Couldn't find GUIController");
-
-                        GameObject GUIObj = new GameObject("GUIController");
-                        _instance = GUIObj.AddComponent<GUIController>();
-                        DontDestroyOnLoad(GUIObj);
-                    }
-                }
-                return _instance;
-            }
-            set
-            {
             }
         }
     }

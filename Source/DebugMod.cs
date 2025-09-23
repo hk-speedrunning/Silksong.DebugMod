@@ -192,10 +192,6 @@ namespace DebugMod
 
             ModHooks.FinishedLoadingModsHook += () =>
             {
-                GameObject UIObj = new GameObject("GUIController");
-                UIObj.AddComponent<GUIController>();
-                DontDestroyOnLoad(UIObj);
-
                 BossHandler.PopulateBossLists();
                 GUIController.Instance.BuildMenus();
                 SceneWatcher.Init();
