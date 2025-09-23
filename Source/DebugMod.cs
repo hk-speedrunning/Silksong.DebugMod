@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
-using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
 using MonoMod.ModInterop;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -46,20 +46,8 @@ namespace DebugMod
 
         internal static DebugMod instance;
         
-        public static GlobalSettings settings { get; set; } = new GlobalSettings();
-        public void OnLoadGlobal(GlobalSettings s)
-        {
-            DebugMod.settings = s;
-            if (settings.binds is null)
-            {
-                settings.binds = new();
-                DebugMod.ResetKeyBinds();
-            }
-        }
-        public GlobalSettings OnSaveGlobal() => DebugMod.settings;
-        public SaveSettings LocalSaveData { get; set; } = new SaveSettings();
-        public void OnLoadLocal(SaveSettings s) => this.LocalSaveData = s;
-        public SaveSettings OnSaveLocal() => this.LocalSaveData;
+        public static Settings settings { get; set; } = new Settings();
+        public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
         private static float _loadTime;
         private static float _unloadTime;
@@ -140,17 +128,14 @@ namespace DebugMod
             
             Log("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
 
-            if (settings.FirstRun)
+            LoadSettings();
+
+            if (settings.FirstRun || settings.binds == null)
             {
                 Log("First run detected, setting default binds");
 
                 settings.FirstRun = false;
                 ResetKeyBinds();
-            }
-
-            if (!Directory.Exists(settings.ModBaseDirectory)) 
-            {
-                Directory.CreateDirectory(settings.ModBaseDirectory);
             }
 
             if (settings.NumPadForSaveStates)
@@ -209,6 +194,7 @@ namespace DebugMod
             // Register exports early so other mods can use them when initializing
             typeof(DebugExport).ModInterop();
         }
+
         internal static void ResetKeyBinds()
         {
             settings.binds.Clear();
@@ -229,13 +215,41 @@ namespace DebugMod
             settings.binds.Add("Zoom Out", KeyCode.PageDown);
         }
 
+        private void LoadSettings()
+        {
+            try
+            {
+                if (!Directory.Exists(ModBaseDirectory))
+                {
+                    Directory.CreateDirectory(ModBaseDirectory);
+                }
+
+                string path = Path.Combine(ModBaseDirectory, "Settings.json");
+
+                if (File.Exists(path))
+                {
+                    settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
+                    Log("Loaded settings");
+                }
+            }
+            catch (Exception e)
+            {
+                LogError($"Error loading settings: {e}");
+            }
+        }
+
         private void SaveSettings()
         {
-            // TODO: save settings
-            /*
-            SaveGlobalSettings();
-            instance.Log("Saved");
-            */
+            try
+            {
+                string path = Path.Combine(ModBaseDirectory, "Settings.json");
+                File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
+                Log("Saved settings");
+            }
+            catch (Exception e)
+            {
+                LogError($"Error saving settings: {e}");
+            }
         }
 
         private int PlayerDamaged(int damageAmount)
@@ -270,8 +284,6 @@ namespace DebugMod
 
         private void LoadCharacter(SaveGameData saveGameData)
         {
-            //NailDamage = saveGameData?.playerData.nailDamage ?? 5;
-            
             Console.Reset();
             EnemiesPanel.Reset();
 
@@ -279,6 +291,7 @@ namespace DebugMod
             infiniteHP = false;
             infiniteSilk = false;
             noclip = false;
+            extraNailDamage = 0;
 
             _loadingChar = true;
         }
@@ -336,25 +349,6 @@ namespace DebugMod
         public static float GetLoadTime()
         {
             return (float)Math.Round(_loadTime - _unloadTime, 2);
-        }
-
-        public static void Teleport(string scenename, Vector3 pos)
-        {
-            HC.transform.position = pos;
-
-            HC.EnterWithoutInput(false);
-            HC.proxyFSM.SendEvent("HeroCtrl-LeavingScene");
-            HC.transform.SetParent(null);
-
-            GM.NoLongerFirstGame();
-            GM.SaveLevelState();
-            GM.SetState(GameState.EXITING_LEVEL);
-            GM.entryGateName = "dreamGate";
-            RefCamera.FreezeInPlace();
-
-            HC.ResetState();
-
-            GM.LoadScene(scenename);
         }
 
         /// <summary>

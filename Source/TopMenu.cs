@@ -107,7 +107,7 @@ namespace DebugMod
             // panel.GetPanel("Items Panel").AddImage("Bullshit Flower Glow", GUIController.Instance.images["BlueGlow"], new Vector2(0f, 297f), new Vector2(47f, 45f), new Rect(0f, 0f, GUIController.Instance.images["BlueGlow"].width, GUIController.Instance.images["BlueGlow"].height));
 
             //Boss panel
-            panel.GetPanel("Bosses Panel").AddButton("Respawn Boss", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.RespawnBoss, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Boss", 10);
+            // panel.GetPanel("Bosses Panel").AddButton("Respawn Boss", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.RespawnBoss, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Boss", 10);
             // panel.GetPanel("Bosses Panel").AddButton("Respawn Ghost", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 50f), Vector2.zero, RespawnGhostClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Ghost", 9);
 
             // panel.GetPanel("Bosses Panel").AddButton("Failed Champ", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 110f), Vector2.zero, FailedChampClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Failed Champ", 10);

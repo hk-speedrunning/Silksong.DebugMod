@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -7,22 +6,11 @@ using UnityEngine;
 
 namespace DebugMod
 {
-    //Empty class required for DebugMod class definition
-    public class SaveSettings {}
-
-    [Serializable]
-    public class KeyBinds
-    {
-        public Dictionary<string, string> binds_to_file = new Dictionary<string, string>();
-    }
-    
-    public class GlobalSettings
+    public class Settings
     {
         //Save members
         [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public Dictionary<string, KeyCode> binds = new Dictionary<string, KeyCode>();
-
-        public readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
         public bool ConsoleVisible = true;
 

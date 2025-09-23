@@ -30,7 +30,7 @@ namespace DebugMod
         public static SaveState quickState;
         public static bool inSelectSlotState = false;   // a mutex, in practice?
         public static int currentStateSlot = -1;
-        public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.settings.ModBaseDirectory, "Savestates Current Patch");
+        public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
         public static string path = Path.Combine(saveStatesBaseDirectory, "0"); // initialize to page 0, this gets read and updated by callbacks during runtime.
         public static string currentStateOperation = null;
 
