@@ -69,12 +69,6 @@ namespace DebugMod
         public static bool overrideLoadLockout = false;
         internal static int extraNailDamage;
 
-        internal static GameObject Panth1Prefab;
-        internal static GameObject Panth2Prefab;
-        internal static GameObject Panth3Prefab;
-        internal static GameObject Panth4Prefab;
-        internal static GameObject Panth5Prefab;
-
         internal static Dictionary<string, (string category, bool allowLock, Action method)> bindMethods = new();
         internal static Dictionary<string, (string category, bool allowLock, Action method)> AdditionalBindMethods = new();
 

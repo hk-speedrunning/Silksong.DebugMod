@@ -233,12 +233,6 @@ namespace DebugMod
             System.Diagnostics.Stopwatch loadingStateTimer = new System.Diagnostics.Stopwatch();
             loadingStateTimer.Start();
 
-            //setup panth stuff since it wants to be loaded one room ahead of time
-            if (PanthSaveState.panthSequences.Contains(data.roomSpecificOptions) && (data.saveScene != "GG_Atrium") &&  (data.saveScene != "GG_Atrium_Roof"))
-            {
-                PanthSaveState.LoadPanthScene(data.roomSpecificOptions, data.specialIndex);
-            }
-
             //called here because this needs to be done here
             if (DebugMod.savestateFixes)
             {
@@ -414,8 +408,6 @@ namespace DebugMod
             TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
 
             HUDFixes();
-            
-            if (isPanthState) yield return PanthSaveState.SetupPanthTransition();
 
             //set timescale back
             Time.timeScale = DebugMod.CurrentTimeScale;
