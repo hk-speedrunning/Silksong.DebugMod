@@ -1,15 +1,18 @@
-﻿namespace DebugMod
+﻿using System;
+
+namespace DebugMod
 {
     public static partial class BindableFunctions
     {
         [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
         public static void GiveMask()
         {
-            if (PlayerData.instance.maxHealthBase < 9)
+            if (PlayerData.instance.maxHealthBase < 10)
             {
                 HeroController.instance.MaxHealth();
                 HeroController.instance.AddToMaxHealth(1);
-                PlayMakerFSM.BroadcastEvent("MAX HP UP");
+                EventRegister.SendEvent("MAX HP UP");
+
                 Console.AddLine("Added Mask");
             }
             else
@@ -24,7 +27,8 @@
             if (PlayerData.instance.silkMax < 18)
             {
                 HeroController.instance.AddToMaxSilk(1);
-                PlayMakerFSM.BroadcastEvent("NEW SOUL ORB");
+                EventRegister.SendEvent("SPOOL MAX UP");
+
                 Console.AddLine("Added Spool");
             }
             else
@@ -40,13 +44,11 @@
             {
                 PlayerData.instance.maxHealth -= 1;
                 PlayerData.instance.maxHealthBase -= 1;
-                // if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                // else
-                // {
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(false);
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                // }
+                PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
+
+                // TODO: find a way to do this that doesn't hide the HUD for several seconds
+                EventRegister.SendEvent("HUD APPEAR RESET");
+
                 Console.AddLine("Took Away Mask");
             }
             else
@@ -61,13 +63,11 @@
             if (PlayerData.instance.silkMax > 9)
             {
                 PlayerData.instance.silkMax--;
-                // if (!GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                // else
-                // {
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(false);
-                //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-                // }
+                PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+
+                // TODO: find a way to do this that doesn't hide the HUD for several seconds
+                EventRegister.SendEvent("HUD APPEAR RESET");
+
                 Console.AddLine("Removed Spool");
             }
             else
@@ -76,7 +76,6 @@
             }
         }
 
-        
         [BindableMethod(name = "Add Health", category = "Masks & Spools")]
         public static void AddHealth()
         {
@@ -89,6 +88,7 @@
 
             Console.AddLine("Added Health");
         }
+
         [BindableMethod(name = "Take Health", category = "Masks & Spools")]
         public static void TakeHealth()
         {
@@ -109,6 +109,7 @@
 
             Console.AddLine("Added Silk");
         }
+
         [BindableMethod(name = "Take Silk", category = "Masks & Spools")]
         public static void TakeSilk()
         {
@@ -116,6 +117,7 @@
 
             Console.AddLine("Attempting to take silk");
         }
+
         [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
         public static void Lifeblood()
         {

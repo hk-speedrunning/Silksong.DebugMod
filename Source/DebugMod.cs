@@ -195,13 +195,12 @@ namespace DebugMod
                 BossHandler.PopulateBossLists();
                 GUIController.Instance.BuildMenus();
                 SceneWatcher.Init();
+
+                Console.AddLine("New session started " + DateTime.Now);
             };
 
             KeyBindLock = false;
             TimeScaleActive = false;
-
-
-            Console.AddLine("New session started " + DateTime.Now);
         }
 
         public DebugMod()
