@@ -5,8 +5,6 @@
         [BindableMethod(name = "Give All", category = "Skills")]
         public static void GiveAllSkills()
         {
-            // TODO: double check these
-
             PlayerData.instance.silkRegenMax = 3;
 
             PlayerData.instance.hasDash = true;
@@ -17,217 +15,182 @@
             PlayerData.instance.hasSuperJump = true;
 
             PlayerData.instance.hasNeedolin = true;
+            PlayerData.instance.UnlockedFastTravelTeleport = true;
             PlayerData.instance.hasNeedolinMemoryPowerup = true;
-
-            PlayerData.instance.hasSilkCharge = true;
-            PlayerData.instance.hasSilkSpecial = true;
-            PlayerData.instance.hasSilkBomb = true;
-            PlayerData.instance.hasSilkBossNeedle = true;
-            PlayerData.instance.hasThreadSphere = true;
-            PlayerData.instance.hasParry = true;
-            PlayerData.instance.hasNeedleThrow = true;
 
             PlayerData.instance.hasChargeSlash = true;
 
             Console.AddLine("Giving player all skills");
         }
 
-        /*
-        [BindableMethod(name = "Increment Dash", category = "Skills")]
-        public static void ToggleMothwingCloak()
+        [BindableMethod(name = "Give Silk Heart", category = "Skills")]
+        public static void IncrementSilkHeart()
         {
-            if (!PlayerData.instance.hasDash && !PlayerData.instance.hasShadowDash)
+            if (PlayerData.instance.silkRegenMax < 3)
+            {
+                PlayerData.instance.silkRegenMax++;
+                Console.AddLine($"Giving player Silk Heart (now {PlayerData.instance.silkRegenMax})");
+            }
+            else
+            {
+                PlayerData.instance.silkRegenMax = 0;
+                Console.AddLine("Taking away all Silk Hearts");
+            }
+        }
+
+        [BindableMethod(name = "Give Swift Step", category = "Skills")]
+        public static void ToggleSwiftStep()
+        {
+            if (!PlayerData.instance.hasDash)
             {
                 PlayerData.instance.hasDash = true;
-                PlayerData.instance.canDash = true;
-                Console.AddLine("Giving player Mothwing Cloak");
-            }
-            else if (PlayerData.instance.hasDash && !PlayerData.instance.hasShadowDash)
-            {
-                PlayerData.instance.hasShadowDash = true;
-                PlayerData.instance.canShadowDash = true;
-                EventRegister.SendEvent("GOT SHADOW DASH");
-                Console.AddLine("Giving player Shade Cloak");
+                Console.AddLine("Giving player Swift Step");
             }
             else
             {
                 PlayerData.instance.hasDash = false;
-                PlayerData.instance.canDash = false;
-                PlayerData.instance.hasShadowDash = false;
-                PlayerData.instance.canShadowDash = false;
-                Console.AddLine("Taking away both dash upgrades");
+                Console.AddLine("Taking away Swift Step");
             }
         }
 
-        [BindableMethod(name = "Give Mantis Claw", category = "Skills")]
-        public static void ToggleMantisClaw()
+        [BindableMethod(name = "Increment Cloak", category = "Skills")]
+        public static void IncrementCloak()
+        {
+            if (!PlayerData.instance.hasBrolly && !PlayerData.instance.hasDoubleJump)
+            {
+                PlayerData.instance.hasBrolly = true;
+                Console.AddLine("Giving player Drifter's Cloak");
+            }
+            else if (PlayerData.instance.hasBrolly && !PlayerData.instance.hasDoubleJump)
+            {
+                PlayerData.instance.hasDoubleJump = true;
+                Console.AddLine("Giving player Faydown Cloak");
+            }
+            else
+            {
+                PlayerData.instance.hasBrolly = false;
+                PlayerData.instance.hasDoubleJump = false;
+                Console.AddLine("Taking away cloak upgrades");
+            }
+        }
+
+        [BindableMethod(name = "Give Cling Grip", category = "Skills")]
+        public static void ToggleClingGrip()
         {
             if (!PlayerData.instance.hasWalljump)
             {
                 PlayerData.instance.hasWalljump = true;
-                PlayerData.instance.canWallJump = true;
-                Console.AddLine("Giving player Mantis Claw");
+                Console.AddLine("Giving player Cling Grip");
             }
             else
             {
                 PlayerData.instance.hasWalljump = false;
-                PlayerData.instance.canWallJump = false;
-                Console.AddLine("Taking away Mantis Claw");
+                Console.AddLine("Taking away Cling Grip");
             }
         }
 
-        [BindableMethod(name = "Give Monarch Wings", category = "Skills")]
-        public static void ToggleMonarchWings()
+        [BindableMethod(name = "Give Needolin", category = "Skills")]
+        public static void ToggleNeedolin()
         {
-            if (!PlayerData.instance.hasDoubleJump)
+            if (!PlayerData.instance.hasNeedolin)
             {
-                PlayerData.instance.hasDoubleJump = true;
-                Console.AddLine("Giving player Monarch Wings");
+                PlayerData.instance.hasNeedolin = true;
+                Console.AddLine("Giving player Needolin");
             }
             else
             {
-                PlayerData.instance.hasDoubleJump = false;
-                Console.AddLine("Taking away Monarch Wings");
+                PlayerData.instance.hasNeedolin = false;
+                PlayerData.instance.UnlockedFastTravelTeleport = false;
+                PlayerData.instance.hasNeedolinMemoryPowerup = false;
+                Console.AddLine("Taking away Needolin and any upgrades");
             }
         }
 
-        [BindableMethod(name = "Give Crystal Heart", category = "Skills")]
-        public static void ToggleCrystalHeart()
+        [BindableMethod(name = "Give Clawline", category = "Skills")]
+        public static void ToggleClawline()
         {
-            if (!PlayerData.instance.hasSuperDash)
+            if (!PlayerData.instance.hasHarpoonDash)
             {
-                PlayerData.instance.hasSuperDash = true;
-                PlayerData.instance.canSuperDash = true;
-                Console.AddLine("Giving player Crystal Heart");
+                PlayerData.instance.hasHarpoonDash = true;
+                Console.AddLine("Giving player Clawline");
             }
             else
             {
-                PlayerData.instance.hasSuperDash = false;
-                PlayerData.instance.canSuperDash = false;
-                Console.AddLine("Taking away Crystal Heart");
+                PlayerData.instance.hasHarpoonDash = false;
+                Console.AddLine("Taking away Clawline");
             }
         }
 
-        [BindableMethod(name = "Give Isma's Tear", category = "Skills")]
-        public static void ToggleIsmasTear()
+        [BindableMethod(name = "Give Silk Soar", category = "Skills")]
+        public static void ToggleSilkSoar()
         {
-            if (!PlayerData.instance.hasAcidArmour)
+            if (!PlayerData.instance.hasSuperJump)
             {
-                PlayerData.instance.hasAcidArmour = true;
-                PlayMakerFSM.BroadcastEvent("GET ACID ARMOUR");
-                Console.AddLine("Giving player Isma's Tear");
+                PlayerData.instance.hasSuperJump = true;
+                Console.AddLine("Giving player Silk Soar");
             }
             else
             {
-                PlayerData.instance.hasAcidArmour = false;
-                Console.AddLine("Taking away Isma's Tear");
+                PlayerData.instance.hasSuperJump = false;
+                Console.AddLine("Taking away Silk Soar");
             }
         }
 
-        [BindableMethod(name = "Give Dream Nail", category = "Skills")]
-        public static void ToggleDreamNail()
+        [BindableMethod(name = "Give Beastling Call", category = "Skills")]
+        public static void ToggleBeastlingCall()
         {
-            if (!PlayerData.instance.hasDreamNail && !PlayerData.instance.dreamNailUpgraded)
+            if (!PlayerData.instance.hasNeedolin && !PlayerData.instance.UnlockedFastTravelTeleport)
             {
-                PlayerData.instance.hasDreamNail = true;
-                Console.AddLine("Giving player Dream Nail");
+                PlayerData.instance.hasNeedolin = true;
+                PlayerData.instance.UnlockedFastTravelTeleport = true;
+                Console.AddLine("Giving player Needolin with Beastling Call");
             }
-            else if (PlayerData.instance.hasDreamNail && !PlayerData.instance.dreamNailUpgraded)
+            else if (PlayerData.instance.hasNeedolin && !PlayerData.instance.UnlockedFastTravelTeleport)
             {
-                PlayerData.instance.dreamNailUpgraded = true;
-                Console.AddLine("Giving player Awoken Dream Nail");
+                PlayerData.instance.UnlockedFastTravelTeleport = true;
+                Console.AddLine("Giving player Beastling Call");
             }
             else
             {
-                PlayerData.instance.hasDreamNail = false;
-                PlayerData.instance.dreamNailUpgraded = false;
-                Console.AddLine("Taking away both Dream Nail upgrades");
+                PlayerData.instance.UnlockedFastTravelTeleport = false;
+                Console.AddLine("Taking away Beastling Call");
             }
         }
 
-        [BindableMethod(name = "Give Dream Gate", category = "Skills")]
-        public static void ToggleDreamGate()
+        [BindableMethod(name = "Give Elegy of the Deep", category = "Skills")]
+        public static void ToggleElegyOfTheDeep()
         {
-            if (!PlayerData.instance.hasDreamNail && !PlayerData.instance.hasDreamGate)
+            if (!PlayerData.instance.hasNeedolin && !PlayerData.instance.hasNeedolinMemoryPowerup)
             {
-                PlayerData.instance.hasDreamNail = true;
-                PlayerData.instance.hasDreamGate = true;
-                FSMUtility.LocateFSM(DebugMod.RefKnight, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
-                Console.AddLine("Giving player both Dream Nail and Dream Gate");
+                PlayerData.instance.hasNeedolin = true;
+                PlayerData.instance.hasNeedolinMemoryPowerup = true;
+                Console.AddLine("Giving player Needolin with Elegy of the Deep");
             }
-            else if (PlayerData.instance.hasDreamNail && !PlayerData.instance.hasDreamGate)
+            else if (PlayerData.instance.hasNeedolin && !PlayerData.instance.hasNeedolinMemoryPowerup)
             {
-                PlayerData.instance.hasDreamGate = true;
-                FSMUtility.LocateFSM(DebugMod.RefKnight, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = true;
-                Console.AddLine("Giving player Dream Gate");
+                PlayerData.instance.hasNeedolinMemoryPowerup = true;
+                Console.AddLine("Giving player Elegy of the Deep");
             }
             else
             {
-                PlayerData.instance.hasDreamGate = false;
-                FSMUtility.LocateFSM(DebugMod.RefKnight, "Dream Nail").FsmVariables.GetFsmBool("Dream Warp Allowed").Value = false;
-                Console.AddLine("Taking away Dream Gate");
+                PlayerData.instance.hasNeedolinMemoryPowerup = false;
+                Console.AddLine("Taking away Elegy of the Deep");
             }
         }
 
-        [BindableMethod(name = "Give Great Slash", category = "Skills")]
-        public static void ToggleGreatSlash()
+        [BindableMethod(name = "Give Needle Strike", category = "Skills")]
+        public static void ToggleNeedleStrike()
         {
-            if (!PlayerData.instance.hasDashSlash)
+            if (!PlayerData.instance.hasChargeSlash)
             {
-                PlayerData.instance.hasDashSlash = true;
-                PlayerData.instance.hasNailArt = true;
-                Console.AddLine("Giving player Great Slash");
+                PlayerData.instance.hasChargeSlash = true;
+                Console.AddLine("Giving player Needle Strike");
             }
             else
             {
-                PlayerData.instance.hasDashSlash = false;
-                Console.AddLine("Taking away Great Slash");
+                PlayerData.instance.hasChargeSlash = false;
+                Console.AddLine("Taking away Needle Strike");
             }
-
-            if (!PlayerData.instance.hasUpwardSlash && !PlayerData.instance.hasDashSlash && !PlayerData.instance.hasCyclone) PlayerData.instance.hasNailArt = false;
-
-            PlayerData.instance.hasAllNailArts = PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash && PlayerData.instance.hasCyclone;
         }
-
-        [BindableMethod(name = "Give Dash Slash", category = "Skills")]
-        public static void ToggleDashSlash()
-        {
-            if (!PlayerData.instance.hasUpwardSlash)
-            {
-                PlayerData.instance.hasUpwardSlash = true;
-                PlayerData.instance.hasNailArt = true;
-                Console.AddLine("Giving player Dash Slash");
-            }
-            else
-            {
-                PlayerData.instance.hasUpwardSlash = false;
-                Console.AddLine("Taking away Dash Slash");
-            }
-
-            if (!PlayerData.instance.hasUpwardSlash && !PlayerData.instance.hasDashSlash && !PlayerData.instance.hasCyclone) PlayerData.instance.hasNailArt = false;
-
-            PlayerData.instance.hasAllNailArts = PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash && PlayerData.instance.hasCyclone;
-        }
-
-        [BindableMethod(name = "Give Cyclone Slash", category = "Skills")]
-        public static void ToggleCycloneSlash()
-        {
-            if (!PlayerData.instance.hasCyclone)
-            {
-                PlayerData.instance.hasCyclone = true;
-                PlayerData.instance.hasNailArt = true;
-                Console.AddLine("Giving player Cyclone Slash");
-            }
-            else
-            {
-                PlayerData.instance.hasCyclone = false;
-                Console.AddLine("Taking away Cyclone Slash");
-            }
-
-            if (!PlayerData.instance.hasUpwardSlash && !PlayerData.instance.hasDashSlash && !PlayerData.instance.hasCyclone) PlayerData.instance.hasNailArt = false;
-
-            PlayerData.instance.hasAllNailArts = PlayerData.instance.hasUpwardSlash && PlayerData.instance.hasDashSlash && PlayerData.instance.hasCyclone;
-        }
-        */
     }
 }
