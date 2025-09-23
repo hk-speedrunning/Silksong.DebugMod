@@ -1,20 +1,21 @@
-﻿using DebugMod.Canvas;
+﻿using System;
+using DebugMod.Canvas;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace DebugMod
 {
     public abstract class TopMenuButton
     {
-        public UnityAction<string> ClickedFunction { get; protected set; }
+        public Action ClickedFunction { get; protected set; }
 
         public abstract void CreateButton(CanvasPanel panel);
     }
-    public class TextButton:TopMenuButton
+
+    public class TextButton : TopMenuButton
     {
         public string ButtonText { get; }
         
-        public TextButton(string buttonText, UnityAction<string> clickedFunction)
+        public TextButton(string buttonText, Action clickedFunction)
         {
             ButtonText = buttonText;
             ClickedFunction = clickedFunction;
@@ -38,7 +39,7 @@ namespace DebugMod
     {
         public Texture2D ButtonImage { get; }
         
-        public ImageButton(Texture2D buttonImage,UnityAction<string> clickedFunction)
+        public ImageButton(Texture2D buttonImage, Action clickedFunction)
         {
             ClickedFunction = clickedFunction;
             ButtonImage = buttonImage;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -49,6 +50,11 @@ namespace DebugMod.Canvas
             button.AddClickEvent(func);
 
             buttons.Add(name, button);
+        }
+
+        public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect bgSubSection, Font font = null, string text = null, int fontSize = 13)
+        {
+            AddButton(name, tex, pos, sz, func, bgSubSection, font, text, fontSize);
         }
 
         public void AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect bgSubSection)

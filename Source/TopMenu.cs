@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using DebugMod.Canvas;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace DebugMod
 {
@@ -23,17 +23,17 @@ namespace DebugMod
             
             //Main buttons
             panel.AddButton("Hide Menu", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 28f), Vector2.zero, HideMenuClicked, buttonRect, GUIController.Instance.trajanBold, "Hide Menu");
-            panel.AddButton("Kill All", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 28f), Vector2.zero, _ => BindableFunctions.KillAll(), buttonRect, GUIController.Instance.trajanBold, "Kill All");
-            panel.AddButton("Set Spawn", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 28f), Vector2.zero, _=> BindableFunctions.SetHazardRespawn(), buttonRect, GUIController.Instance.trajanBold, "Set Spawn");
-            panel.AddButton("Respawn", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 28f), Vector2.zero, _=> BindableFunctions.Respawn(), buttonRect, GUIController.Instance.trajanBold, "Respawn");
-            panel.AddButton("Other", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 28f), Vector2.zero, _=> panel.TogglePanel("Other Panel"), buttonRect, GUIController.Instance.trajanBold, "Other");
-            panel.AddButton("DreamGate", GUIController.Instance.images["ButtonRect"], new Vector2(546f, 28f), Vector2.zero, _=>  panel.TogglePanel("DreamGate Panel"), buttonRect, GUIController.Instance.trajanBold, "DreamGate");
-            panel.AddButton("Cheats", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 68f), Vector2.zero, _ =>  panel.TogglePanel("Cheats Panel"), buttonRect, GUIController.Instance.trajanBold, "Cheats");
-            panel.AddButton("Charms", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 68f), Vector2.zero, _=>   panel.TogglePanel("Charms Panel"), buttonRect, GUIController.Instance.trajanBold, "Charms");
-            panel.AddButton("Skills", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 68f), Vector2.zero, _=> panel.TogglePanel("Skills Panel"), buttonRect, GUIController.Instance.trajanBold, "Skills");
-            panel.AddButton("Items", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 68f), Vector2.zero, _=>  panel.TogglePanel("Items Panel"), buttonRect, GUIController.Instance.trajanBold, "Items");
-            panel.AddButton("Bosses", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, _=>  panel.TogglePanel("Bosses Panel"), buttonRect, GUIController.Instance.trajanBold, "Bosses");
-            panel.AddButton("SaveStates", GUIController.Instance.images["ButtonRect"], new Vector2(546f, 68f), Vector2.zero, _ => panel.TogglePanel("SaveStates Panel"), buttonRect, GUIController.Instance.trajanBold, "SaveStates");
+            panel.AddButton("Kill All", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 28f), Vector2.zero, BindableFunctions.KillAll, buttonRect, GUIController.Instance.trajanBold, "Kill All");
+            panel.AddButton("Set Spawn", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 28f), Vector2.zero, BindableFunctions.SetHazardRespawn, buttonRect, GUIController.Instance.trajanBold, "Set Spawn");
+            panel.AddButton("Respawn", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 28f), Vector2.zero, BindableFunctions.Respawn, buttonRect, GUIController.Instance.trajanBold, "Respawn");
+            panel.AddButton("Other", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 28f), Vector2.zero, () => panel.TogglePanel("Other Panel"), buttonRect, GUIController.Instance.trajanBold, "Other");
+            panel.AddButton("DreamGate", GUIController.Instance.images["ButtonRect"], new Vector2(546f, 28f), Vector2.zero, () => panel.TogglePanel("DreamGate Panel"), buttonRect, GUIController.Instance.trajanBold, "DreamGate");
+            panel.AddButton("Cheats", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 68f), Vector2.zero, () => panel.TogglePanel("Cheats Panel"), buttonRect, GUIController.Instance.trajanBold, "Cheats");
+            panel.AddButton("Charms", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 68f), Vector2.zero, () => panel.TogglePanel("Charms Panel"), buttonRect, GUIController.Instance.trajanBold, "Charms");
+            panel.AddButton("Skills", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 68f), Vector2.zero, () => panel.TogglePanel("Skills Panel"), buttonRect, GUIController.Instance.trajanBold, "Skills");
+            panel.AddButton("Items", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 68f), Vector2.zero, () => panel.TogglePanel("Items Panel"), buttonRect, GUIController.Instance.trajanBold, "Items");
+            panel.AddButton("Bosses", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, () => panel.TogglePanel("Bosses Panel"), buttonRect, GUIController.Instance.trajanBold, "Bosses");
+            panel.AddButton("SaveStates", GUIController.Instance.images["ButtonRect"], new Vector2(546f, 68f), Vector2.zero, () => panel.TogglePanel("SaveStates Panel"), buttonRect, GUIController.Instance.trajanBold, "SaveStates");
 
 
             //Dropdown panels
@@ -48,13 +48,13 @@ namespace DebugMod
 
 
             //Cheats panel
-            panel.GetPanel("Cheats Panel").AddButton("Infinite Jump", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, InfiniteJumpClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Jump", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Infinite Silk", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, InfiniteSilkClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Silk", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, InfiniteHPClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Invincibility", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, InvincibilityClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Invincibility", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Noclip", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, NoclipClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Noclip", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Kill Self", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, KillSelfClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kill Self", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Lock KeyBinds", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, KeyBindLockClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Lock KeyBinds", 9);
+            panel.GetPanel("Cheats Panel").AddButton("Infinite Jump", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.ToggleInfiniteJump, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Jump", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Infinite Silk", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.ToggleInfiniteSilk, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Silk", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.ToggleInfiniteHP, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Invincibility", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.ToggleInvincibility, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Invincibility", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Noclip", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleNoclip, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Noclip", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Kill Self", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.KillSelf, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kill Self", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Lock KeyBinds", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, BindableFunctions.ToggleLockKeyBinds, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Lock KeyBinds", 9);
 
             // TODO: implement skills, charms, etc.
             
@@ -70,7 +70,7 @@ namespace DebugMod
 
             
             //Skills panel buttons
-            panel.GetPanel("Skills Panel").AddButton("All Skills", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, AllSkillsClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Skills", 10);
+            panel.GetPanel("Skills Panel").AddButton("All Skills", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveAllSkills, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Skills", 10);
             // panel.GetPanel("Skills Panel").AddButton("Scream", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, ScreamClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Scream: " + PlayerData.instance.screamLevel, 10);
             // panel.GetPanel("Skills Panel").AddButton("Fireball", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, FireballClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Fireball: " + PlayerData.instance.fireballLevel, 10);
             // panel.GetPanel("Skills Panel").AddButton("Quake", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, QuakeClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Quake: " + PlayerData.instance.quakeLevel, 10);
@@ -129,7 +129,7 @@ namespace DebugMod
             // panel.GetPanel("Items Panel").AddImage("Bullshit Flower Glow", GUIController.Instance.images["BlueGlow"], new Vector2(0f, 297f), new Vector2(47f, 45f), new Rect(0f, 0f, GUIController.Instance.images["BlueGlow"].width, GUIController.Instance.images["BlueGlow"].height));
 
             //Boss panel
-            panel.GetPanel("Bosses Panel").AddButton("Respawn Boss", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, RespawnBossClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Boss", 10);
+            panel.GetPanel("Bosses Panel").AddButton("Respawn Boss", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.RespawnBoss, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Boss", 10);
             // panel.GetPanel("Bosses Panel").AddButton("Respawn Ghost", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 50f), Vector2.zero, RespawnGhostClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Respawn Ghost", 9);
 
             // panel.GetPanel("Bosses Panel").AddButton("Failed Champ", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 110f), Vector2.zero, FailedChampClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Failed Champ", 10);
@@ -163,13 +163,13 @@ namespace DebugMod
 
             //SaveStates Panel
             //TODO: Make the left/right page arrows, make them hidden when an option isn't up, integrate this into its own menu instead of top menu and combine it with the file panel itself
-            panel.GetPanel("SaveStates Panel").AddButton("QuickSlot Save", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, QuickslotSaveClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "QuickSlot Save", 8);
-            panel.GetPanel("SaveStates Panel").AddButton("QuickSlot Load", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 50f), Vector2.zero, QuickslotLoadClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "QuickSlot Load", 8);
-            panel.GetPanel("SaveStates Panel").AddButton("File Save", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 80f), Vector2.zero, FileslotSaveClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "File Save", 10);
-            panel.GetPanel("SaveStates Panel").AddButton("File Load", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 100f), Vector2.zero, FileslotLoadClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "File Load", 10);
-            panel.GetPanel("SaveStates Panel").AddButton("Scroll Left", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(-15f, 115f), Vector2.zero, PrevPageClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Left", 8);
-            panel.GetPanel("SaveStates Panel").AddButton("Scroll Right", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(20f, 115f), Vector2.zero, NextPageClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Right", 8);
-            panel.GetPanel("SaveStates Panel").AddButton("Load State On Death", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 145f), Vector2.zero, LoadOnDeathClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "State On Death", 9);
+            panel.GetPanel("SaveStates Panel").AddButton("QuickSlot Save", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.SaveState, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "QuickSlot Save", 8);
+            panel.GetPanel("SaveStates Panel").AddButton("QuickSlot Load", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 50f), Vector2.zero, BindableFunctions.LoadState, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "QuickSlot Load", 8);
+            panel.GetPanel("SaveStates Panel").AddButton("File Save", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 80f), Vector2.zero, BindableFunctions.NewSaveStateToFile, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "File Save", 10);
+            panel.GetPanel("SaveStates Panel").AddButton("File Load", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 100f), Vector2.zero, BindableFunctions.LoadFromFile, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "File Load", 10);
+            panel.GetPanel("SaveStates Panel").AddButton("Scroll Left", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(-15f, 115f), Vector2.zero, BindableFunctions.PrevStatePage, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Left", 8);
+            panel.GetPanel("SaveStates Panel").AddButton("Scroll Right", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(20f, 115f), Vector2.zero, BindableFunctions.NextStatePage, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Right", 8);
+            panel.GetPanel("SaveStates Panel").AddButton("Load State On Death", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 145f), Vector2.zero, BindableFunctions.LoadStateOnDeath, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "State On Death", 9);
 
             panel.FixRenderOrder();
         }
@@ -312,9 +312,7 @@ namespace DebugMod
             // panel.GetButton("Quake", "Skills Panel").UpdateText("Quake: " + PlayerData.instance.quakeLevel);
         }
 
-        //TODO: Remove all these pointless functions, call BindableFunctions.whatever directly
-
-        private static void HideMenuClicked(string buttonName)
+        private static void HideMenuClicked()
         {
             // Text text = CanvasUtil.CreateTextPanel(GUIController.Instance.canvas, "", 27, TextAnchor.MiddleCenter,
             //     new CanvasUtil.RectData(
@@ -331,368 +329,17 @@ namespace DebugMod
             BindableFunctions.ToggleAllPanels();
         }
 
-        #region ClickedFunctions
-        private static void InfiniteJumpClicked(string buttonName)
-        {
-            BindableFunctions.ToggleInfiniteJump();
-        }
-
-        private static void InfiniteSilkClicked(string buttonName)
-        {
-            BindableFunctions.ToggleInfiniteSilk();
-        }
-
-        private static void InfiniteHPClicked(string buttonName)
-        {
-            BindableFunctions.ToggleInfiniteHP();
-        }
-
-        private static void InvincibilityClicked(string buttonName)
-        {
-            BindableFunctions.ToggleInvincibility();
-        }
-
-        private static void NoclipClicked(string buttonName)
-        {
-            BindableFunctions.ToggleNoclip();
-        }
-
-        private static void KillSelfClicked(string buttonName)
-        {
-            BindableFunctions.KillSelf();
-        }
-
-        /*
-        private static void AllCharmsClicked(string buttonName)
-        {
-            BindableFunctions.GiveAllCharms();
-        }
-        
-        private static void RemoveAllCharmsClicked(string buttonName)
-        {
-            BindableFunctions.RemoveAllCharms();
-        }
-
-        private static void KingsoulClicked(string buttonName)
-        {
-            BindableFunctions.IncreaseKingsoulLevel();
-        }
-
-        private static void FragileHeartFixClicked(string buttonName)
-        {
-            BindableFunctions.FixFragileHeart();
-        }
-
-        private static void FragileGreedFixClicked(string buttonName)
-        {
-            BindableFunctions.FixFragileGreed();
-        }
-
-        private static void FragileStrengthFixClicked(string buttonName)
-        {
-            BindableFunctions.FixFragileStrength();
-        }
-
-        private static void OvercharmClicked(string buttonName)
-        {
-            BindableFunctions.ToggleOvercharm();
-        }
-
-        private static void GrimmchildClicked(string buttonName)
-        {
-            BindableFunctions.IncreaseGrimmchildLevel();
-        }
-        */
-
-        private static void AllSkillsClicked(string buttonName)
-        {
-            BindableFunctions.GiveAllSkills();
-        }
-
-        /*
-        private static void ScreamClicked(string buttonName)
-        {
-            BindableFunctions.IncreaseScreamLevel();
-        }
-
-        private static void FireballClicked(string buttonName)
-        {
-            BindableFunctions.IncreaseFireballLevel();
-        }
-
-        private static void QuakeClicked(string buttonName)
-        {
-            BindableFunctions.IncreaseQuakeLevel();
-        }
-
-        private static void MothwingCloakClicked(string buttonName)
-        {
-            BindableFunctions.ToggleMothwingCloak();
-        }
-
-        private static void MantisClawClicked(string buttonName)
-        {
-            BindableFunctions.ToggleMantisClaw();
-        }
-
-        private static void MonarchWingsClicked(string buttonName)
-        {
-            BindableFunctions.ToggleMonarchWings();
-        }
-
-        private static void CrystalHeartClicked(string buttonName)
-        {
-            BindableFunctions.ToggleCrystalHeart();
-        }
-
-        private static void IsmasTearClicked(string buttonName)
-        {
-            BindableFunctions.ToggleIsmasTear();
-        }
-
-        private static void DreamNailClicked(string buttonName)
-        {
-            BindableFunctions.ToggleDreamNail();
-        }
-
-        private static void DreamGateClicked(string buttonName)
-        {
-            BindableFunctions.ToggleDreamGate();
-        }
-
-        private static void GreatSlashClicked(string buttonName)
-        {
-            BindableFunctions.ToggleGreatSlash();
-        }
-
-        private static void DashSlashClicked(string buttonName)
-        {
-            BindableFunctions.ToggleDashSlash();
-        }
-
-        private static void CycloneSlashClicked(string buttonName)
-        {
-            BindableFunctions.ToggleCycloneSlash();
-        }
-
-        private static void RespawnGhostClicked(string buttonName)
-        {
-            BindableFunctions.RespawnGhost();
-        }
-        */
-
-        private static void RespawnBossClicked(string buttonName)
-        {
-            BindableFunctions.RespawnBoss();
-        }
-
-        /*
-        private static void FailedChampClicked(string buttonName)
-        {
-            BindableFunctions.ToggleFailedChamp();
-        }
-
-        private static void SoulTyrantClicked(string buttonName)
-        {
-            BindableFunctions.ToggleSoulTyrant();
-        }
-
-        private static void LostKinClicked(string buttonName)
-        {
-            BindableFunctions.ToggleLostKin();
-        }
-
-        private static void NKGrimmClicked(string buttonName)
-        {
-            BindableFunctions.ToggleNKGrimm();
-        }
-
-        private static void PaleOreClicked(string buttonName)
-        {
-            BindableFunctions.GivePaleOre();
-        }
-
-        private static void SimpleKeyClicked(string buttonName)
-        {
-            BindableFunctions.GiveSimpleKey();
-        }
-
-        private static void RancidEggClicked(string buttonName)
-        {
-            BindableFunctions.GiveRancidEgg();
-        }
-        */
-
-        private static void GeoClicked(string buttonName)
-        {
-            BindableFunctions.GiveGeo();
-        }
-
-        /*
-        private static void EssenceClicked(string buttonName)
-        {
-            BindableFunctions.GiveEssence();
-        }
-
-        private static void LanternClicked(string buttonName)
-        {
-            BindableFunctions.ToggleLantern();
-        }
-
-        private static void TramPassClicked(string buttonName)
-        {
-            BindableFunctions.ToggleTramPass();
-        }
-
-        private static void MapQuillClicked(string buttonName)
-        {
-            BindableFunctions.ToggleMapQuill();
-        }
-
-        private static void CityKeyClicked(string buttonName)
-        {
-            BindableFunctions.ToggleCityKey();
-        }
-
-        private static void SlyKeyClicked(string buttonName)
-        {
-            BindableFunctions.ToggleSlyKey();
-        }
-
-        private static void ElegantKeyClicked(string buttonName)
-        {
-            BindableFunctions.ToggleElegantKey();
-        }
-
-        private static void LoveKeyClicked(string buttonName)
-        {
-            BindableFunctions.ToggleLoveKey();
-        }
-
-        private static void KingsbrandClicked(string buttonName)
-        {
-            BindableFunctions.ToggleKingsbrand();
-        }
-
-        private static void FlowerClicked(string buttonName)
-        {
-            BindableFunctions.ToggleXunFlower();
-        }
-        
-        private static void StagsClicked(string buttonName)
-        {
-            BindableFunctions.AllStags();
-        }
-        */
-        private static void MaskClicked(string buttonName)
-        {
-            BindableFunctions.GiveMask();
-        }
-        private static void SpoolClicked(string buttonName)
-        {
-            BindableFunctions.GiveSpool();
-        }
-
-        /*
-        private static void ReadDataClicked(string buttonName)
-        {
-            BindableFunctions.ReadDGData();
-        }
-
-        private static void SaveDataClicked(string buttonName)
-        {
-            BindableFunctions.SaveDGData();
-        }
-
-        private static void DeleteItemClicked(string buttonName)
-        {
-            DreamGate.delMenu = !DreamGate.delMenu;
-        }
-
-        private static void AddItemClicked(string buttonName)
-        {
-            BindableFunctions.AddDGPosition();
-        }
-
-        private static void SetWarpClicked(string buttonName)
-        {
-            string text = panel.GetPanel("DreamGate Panel").GetButton(buttonName).GetText();
-
-            if (!String.IsNullOrEmpty(text))
-            {
-                DreamGate.ClickedEntry(text);
-            }
-        }
-
-        private static void ScrollUpClicked(string buttonName)
-        {
-            if (DreamGate.scrollPosition > 0)
-            {
-                DreamGate.scrollPosition--;
-            }
-        }
-
-        private static void ScrollDownClicked(string buttonName)
-        {
-            if (DreamGate.scrollPosition + 6 < DreamGate.dgData.Count)
-            {
-                DreamGate.scrollPosition++;
-            }
-        }
-        */
-
-        private static void KeyBindLockClicked(string buttonName)
-        {
-            BindableFunctions.ToggleLockKeyBinds();
-        }
-
-        private static void LoadOnDeathClicked(string buttonName)
-        {
-            BindableFunctions.LoadStateOnDeath();
-        }
-
-        private static void QuickslotSaveClicked(string buttonName)
-        {
-            BindableFunctions.SaveState();
-        }
-
-        private static void QuickslotLoadClicked(string buttonName)
-        {
-            BindableFunctions.LoadState();
-        }
-
-        private static void FileslotSaveClicked(string buttonName)
-        {
-            BindableFunctions.NewSaveStateToFile();
-        }
-
-        private static void FileslotLoadClicked(string buttonName)
-        {
-            BindableFunctions.LoadFromFile();
-        }
-
-        private static void NextPageClicked(string buttonName)
-        {
-            BindableFunctions.NextStatePage();
-        }
-
-        private static void PrevPageClicked(string buttonName)
-        {
-            BindableFunctions.PrevStatePage();
-        }
-        #endregion
-
         internal static void AddTopMenuContent(string MenuName, List<TopMenuButton> ButtonList)
         {
             if (panel.GetPanel(MenuName) == null)
             {
                 Rect buttonRect = new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height);
-                UnityAction<string> ClickedFunction = _ => panel.TogglePanel(MenuName);
+                Action action = () => panel.TogglePanel(MenuName);
 
                 Vector2 Pos = AllPossibleLocations.First();
                 AllPossibleLocations.Remove(Pos);
 
-                panel.AddButton(MenuName, GUIController.Instance.images["ButtonRect"], Pos, Vector2.zero, ClickedFunction, buttonRect, GUIController.Instance.trajanBold, MenuName);
+                panel.AddButton(MenuName, GUIController.Instance.images["ButtonRect"], Pos, Vector2.zero, action, buttonRect, GUIController.Instance.trajanBold, MenuName);
                 panel.AddPanel(MenuName, GUIController.Instance.images["DropdownBG"], new Vector2(Pos.x, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, GUIController.Instance.images["DropdownBG"].height));
             }
 
