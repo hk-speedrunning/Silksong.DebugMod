@@ -173,7 +173,7 @@ namespace DebugMod
             EnemiesPanel.hpBars = false;
             EnemiesPanel.autoUpdate = false;
             pd.infiniteAirJump=false;
-            DebugMod.infiniteSoul = false;
+            DebugMod.infiniteSilk = false;
             DebugMod.infiniteHP = false; 
             pd.isInvincible=false; 
             DebugMod.noclip=false;

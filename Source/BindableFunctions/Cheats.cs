@@ -27,11 +27,11 @@ namespace DebugMod
             Console.AddLine("Infinite Jump set to " + PlayerData.instance.infiniteAirJump.ToString().ToUpper());
         }
 
-        [BindableMethod(name = "Infinite Soul", category = "Cheats")]
-        public static void ToggleInfiniteSoul()
+        [BindableMethod(name = "Infinite Silk", category = "Cheats")]
+        public static void ToggleInfiniteSilk()
         {
-            DebugMod.infiniteSoul = !DebugMod.infiniteSoul;
-            Console.AddLine("Infinite SOUL set to " + DebugMod.infiniteSoul.ToString().ToUpper());
+            DebugMod.infiniteSilk = !DebugMod.infiniteSilk;
+            Console.AddLine("Infinite Silk set to " + DebugMod.infiniteSilk.ToString().ToUpper());
         }
 
         [BindableMethod(name = "Infinite HP", category = "Cheats")]

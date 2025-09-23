@@ -45,7 +45,7 @@ namespace DebugMod
                 "Spells",
                 "Bosses",
                 "Items",
-                "Mask & Vessels",
+                "Masks & Spools",
                 "Consumables",
                 "Dreamgate",
             };

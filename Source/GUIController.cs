@@ -268,7 +268,7 @@ namespace DebugMod
                 }
             }
 
-            if (DebugMod.infiniteSoul
+            if (DebugMod.infiniteSilk
                 && PlayerData.instance.silk < PlayerData.instance.silkMax
                 && PlayerData.instance.health > 0
                 && HeroController.instance != null

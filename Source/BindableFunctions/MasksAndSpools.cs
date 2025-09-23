@@ -2,7 +2,7 @@
 {
     public static partial class BindableFunctions
     {
-        [BindableMethod(name = "Give Mask", category = "Mask & Vessels")]
+        [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
         public static void GiveMask()
         {
             if (PlayerData.instance.maxHealthBase < 9)
@@ -18,22 +18,22 @@
             }
         }
         
-        [BindableMethod(name = "Give Vessel", category = "Mask & Vessels")]
-        public static void GiveVessel()
+        [BindableMethod(name = "Give Spool", category = "Masks & Spools")]
+        public static void GiveSpool()
         {
             if (PlayerData.instance.silkMax < 18)
             {
                 HeroController.instance.AddToMaxSilk(1);
                 PlayMakerFSM.BroadcastEvent("NEW SOUL ORB");
-                Console.AddLine("Added Vessel");
+                Console.AddLine("Added Spool");
             }
             else
             {
-                Console.AddLine("You have the maximum number of vessels");
+                Console.AddLine("You have the maximum number of spools");
             }
         }
         
-        [BindableMethod(name = "Take Away Mask", category = "Mask & Vessels")]
+        [BindableMethod(name = "Take Away Mask", category = "Masks & Spools")]
         public static void TakeAwayMask()
         {
             if (PlayerData.instance.maxHealthBase > 1)
@@ -55,8 +55,8 @@
             }
         }
         
-        [BindableMethod(name = "Take Away Vessel", category = "Mask & Vessels")]
-        public static void TakeAwayVessel()
+        [BindableMethod(name = "Take Away Spool", category = "Masks & Spools")]
+        public static void TakeAwaySpool()
         {
             if (PlayerData.instance.silkMax > 9)
             {
@@ -68,16 +68,16 @@
                 //     GameCameras.instance.hudCanvas.gameObject.SetActive(false);
                 //     GameCameras.instance.hudCanvas.gameObject.SetActive(true);
                 // }
-                Console.AddLine("Removed Vessel");
+                Console.AddLine("Removed Spool");
             }
             else
             {
-                Console.AddLine("You have the minimum number of vessels");
+                Console.AddLine("You have the minimum number of spools");
             }
         }
 
         
-        [BindableMethod(name = "Add Health", category = "Mask & Vessels")]
+        [BindableMethod(name = "Add Health", category = "Masks & Spools")]
         public static void AddHealth()
         {
             if (PlayerData.instance.health <= 0 || HeroController.instance.cState.dead || !GameManager.instance.IsGameplayScene())
@@ -89,7 +89,7 @@
 
             Console.AddLine("Added Health");
         }
-        [BindableMethod(name = "Take Health", category = "Mask & Vessels")]
+        [BindableMethod(name = "Take Health", category = "Masks & Spools")]
         public static void TakeHealth()
         {
             if (PlayerData.instance.health <= 0 || HeroController.instance.cState.dead || !GameManager.instance.IsGameplayScene())
@@ -102,21 +102,21 @@
             Console.AddLine("Attempting to take health");
         }
         
-        [BindableMethod(name = "Add Soul", category = "Mask & Vessels")]
-        public static void AddSoul()
+        [BindableMethod(name = "Add Silk", category = "Masks & Spools")]
+        public static void AddSilk()
         {
             HeroController.instance.AddSilk(1, true);
 
-            Console.AddLine("Added Soul");
+            Console.AddLine("Added Silk");
         }
-        [BindableMethod(name = "Take Soul", category = "Mask & Vessels")]
-        public static void TakeSoul()
+        [BindableMethod(name = "Take Silk", category = "Masks & Spools")]
+        public static void TakeSilk()
         {
             HeroController.instance.TakeSilk(1);
 
-            Console.AddLine("Attempting to take soul");
+            Console.AddLine("Attempting to take silk");
         }
-        [BindableMethod(name = "Add Lifeblood", category = "Mask & Vessels")]
+        [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
         public static void Lifeblood()
         {
             EventRegister.SendEvent("ADD BLUE HEALTH");

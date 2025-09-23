@@ -67,7 +67,7 @@ namespace DebugMod
 
         internal static bool stateOnDeath;
         internal static bool infiniteHP;
-        internal static bool infiniteSoul;
+        internal static bool infiniteSilk;
         internal static bool playerInvincible;
         internal static bool noclip;
         internal static Vector3 noclipPos;
@@ -278,7 +278,7 @@ namespace DebugMod
 
             playerInvincible = false;
             infiniteHP = false;
-            infiniteSoul = false;
+            infiniteSilk = false;
             noclip = false;
 
             _loadingChar = true;

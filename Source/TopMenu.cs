@@ -49,7 +49,7 @@ namespace DebugMod
 
             //Cheats panel
             panel.GetPanel("Cheats Panel").AddButton("Infinite Jump", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, InfiniteJumpClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Jump", 10);
-            panel.GetPanel("Cheats Panel").AddButton("Infinite Soul", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, InfiniteSoulClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Soul", 10);
+            panel.GetPanel("Cheats Panel").AddButton("Infinite Silk", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, InfiniteSilkClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Silk", 10);
             panel.GetPanel("Cheats Panel").AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, InfiniteHPClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
             panel.GetPanel("Cheats Panel").AddButton("Invincibility", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, InvincibilityClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Invincibility", 10);
             panel.GetPanel("Cheats Panel").AddButton("Noclip", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, NoclipClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Noclip", 10);
@@ -226,7 +226,7 @@ namespace DebugMod
             if (panel.GetPanel("Cheats Panel").active)
             {
                 panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
-                panel.GetButton("Infinite Soul", "Cheats Panel").SetTextColor(DebugMod.infiniteSoul ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
+                panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                 panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                 panel.GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                 panel.GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
@@ -337,9 +337,9 @@ namespace DebugMod
             BindableFunctions.ToggleInfiniteJump();
         }
 
-        private static void InfiniteSoulClicked(string buttonName)
+        private static void InfiniteSilkClicked(string buttonName)
         {
-            BindableFunctions.ToggleInfiniteSoul();
+            BindableFunctions.ToggleInfiniteSilk();
         }
 
         private static void InfiniteHPClicked(string buttonName)
@@ -588,9 +588,9 @@ namespace DebugMod
         {
             BindableFunctions.GiveMask();
         }
-        private static void VesselClicked(string buttonName)
+        private static void SpoolClicked(string buttonName)
         {
-            BindableFunctions.GiveVessel();
+            BindableFunctions.GiveSpool();
         }
 
         /*
