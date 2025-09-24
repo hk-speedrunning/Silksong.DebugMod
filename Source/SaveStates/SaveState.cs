@@ -7,6 +7,7 @@ using System.Reflection;
 using DebugMod.Hitbox;
 using GlobalEnums;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
@@ -23,7 +24,6 @@ namespace DebugMod
 
         //used to stop double loads/saves
         public static bool loadingSavestate { get; private set; }
-        internal static bool isPanthState = false;
 
         [Serializable]
         public class SaveStateData
@@ -221,7 +221,7 @@ namespace DebugMod
         //loadDuped is used by external mods
         private IEnumerator LoadStateCoro(bool loadDuped)
         {
-            //var used to prevent saves/loads, double save/loads softlock in menderbug, double load, black screen, etc
+            //var used to prevent saves/loads, double save/loads softlock in temp scene, double load, black screen, etc
             loadingSavestate = true;
             bool stateondeath = DebugMod.stateOnDeath;
             DebugMod.stateOnDeath = false;
@@ -260,14 +260,9 @@ namespace DebugMod
             GameManager.instance.entryGateName = "dreamGate";
             GameManager.instance.startedOnThisScene = true;
 
-            //Menderbug room loads faster (Thanks Magnetic Pizza)
-            string dummySceneName =
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Room_Mender_House" ?
-                    "Room_Mender_House" :
-                    "Room_Sly_Storeroom";
+            string dummySceneName = "Demo Start";
 
-            USceneManager.LoadScene(dummySceneName);
-
+            Addressables.LoadSceneAsync($"Scenes/{dummySceneName}");
             yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummySceneName);
 
             JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
@@ -287,42 +282,19 @@ namespace DebugMod
             //this kills enemies that were dead on the state, they respawn from previous code
             JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
 
-            //TODO:Set this more eloquently
-            if (isPanthState)
-            {
-                HeroController.instance.IgnoreInputWithoutReset();
-                HeroController.instance.EnterWithoutInput(true);
-                GameManager.instance.BeginSceneTransition
-                (
-                    new DebugModSaveStateSceneLoadInfo
-                    {
-                        SceneName = data.saveScene,
-                        HeroLeaveDirection = GatePosition.unknown,
-                        EntryGateName = "door_dreamEnter",
-                        EntryDelay = 0f,
-                        WaitForSceneTransitionCameraFade = false,
-                        Visualization = GameManager.SceneLoadVisualizations.Default,
-                        AlwaysUnloadUnusedAssets = true
-                    }
-                );
-            }   
-            else
-            {
-
-                GameManager.instance.BeginSceneTransition
-                (
-                    new DebugModSaveStateSceneLoadInfo
-                    {
-                        SceneName = data.saveScene,
-                        HeroLeaveDirection = GatePosition.unknown,
-                        EntryGateName = "dreamGate",
-                        EntryDelay = 0f,
-                        WaitForSceneTransitionCameraFade = false,
-                        Visualization = 0,
-                        AlwaysUnloadUnusedAssets = true
-                    }
-                );
-            }
+            GameManager.instance.BeginSceneTransition
+            (
+                new DebugModSaveStateSceneLoadInfo
+                {
+                    SceneName = data.saveScene,
+                    HeroLeaveDirection = GatePosition.unknown,
+                    EntryGateName = "dreamGate",
+                    EntryDelay = 0f,
+                    WaitForSceneTransitionCameraFade = false,
+                    Visualization = 0,
+                    AlwaysUnloadUnusedAssets = true
+                }
+            );
 
             yield return new WaitUntil(() => USceneManager.GetActiveScene().name == data.saveScene);
 
@@ -380,8 +352,7 @@ namespace DebugMod
                 DebugMod.settings.ShowHitBoxes = cs;
             }
 
-            
-            if (!isPanthState) HeroController.instance.FinishedEnteringScene(true, false);
+            HeroController.instance.FinishedEnteringScene(true, false);
 
             if (data.roomSpecificOptions != "0" && data.roomSpecificOptions != null)
             {
@@ -421,19 +392,13 @@ namespace DebugMod
         private void SaveStateGlitchFixes()
         {
             var rb2d = HeroController.instance.GetComponent<Rigidbody2D>();
-            PlayMakerFSM wakeFSM = HeroController.instance.gameObject.LocateMyFSM("Dream Return");
-            PlayMakerFSM spellFSM = HeroController.instance.gameObject.LocateMyFSM("Spell Control");
-
-            //White screen fixes
-            wakeFSM.SetState("Idle");
 
             //float
             HeroController.instance.AffectedByGravity(true);
             rb2d.gravityScale = 0.79f;
-            spellFSM.SetState("Inactive");
                 
             //invuln
-            HeroController.instance.gameObject.LocateMyFSM("Roar Lock").FsmVariables.FindFsmBool("No Roar").Value = false;
+            HeroController.instance.gameObject.LocateMyFSM("Roar and Wound States").FsmVariables.FindFsmBool("Force Roar Lock").Value = false;
             HeroController.instance.cState.invulnerable = false;
 
             //no clip
@@ -492,22 +457,24 @@ namespace DebugMod
                 EventRegister.SendEvent("ADD BLUE HEALTH");
             }
 
+            EventRegister.SendEvent("HUD APPEAR RESET");
+
             //should fix hp
             //the "Idle" mesh never gets disabled when Charm Indicator runs
             //running the animation quickly would work but this does too and i understand it
-            int maxHP = GameManager.instance.playerData.maxHealth;
-            for (int i = maxHP; i > 0; i--)
-            {
-                GameObject health = GameObject.Find("Health " + i.ToString());
-                PlayMakerFSM fsm = health.LocateMyFSM("health_display");
-                Transform idle = health.transform.Find("Idle");
-                //This is the "HP Full" mesh, which covers the empty mesh
-                idle.gameObject.GetComponent<MeshRenderer>().enabled = false;
-                //This is the "HP Empty" mesh
-                health.GetComponent<MeshRenderer>().enabled = true;
-                //This turns back on the "HP Full" mesh if we should
-                fsm.SetState("Check if Full");
-            }
+            // int maxHP = GameManager.instance.playerData.maxHealth;
+            // for (int i = maxHP; i > 0; i--)
+            // {
+            //     GameObject health = GameObject.Find("Health " + i.ToString());
+            //     PlayMakerFSM fsm = health.LocateMyFSM("health_display");
+            //     Transform idle = health.transform.Find("Idle");
+            //     //This is the "HP Full" mesh, which covers the empty mesh
+            //     idle.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            //     //This is the "HP Empty" mesh
+            //     health.GetComponent<MeshRenderer>().enabled = true;
+            //     //This turns back on the "HP Full" mesh if we should
+            //     fsm.SetState("Check if Full");
+            // }
 
             // if (PlayerData.instance.MPReserveMax < 33) GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Init");
             // else GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Up Check");
@@ -521,9 +488,9 @@ namespace DebugMod
             // HeroController.instance.TakeMP(1);
             // HeroController.instance.AddMPChargeSpa(1);
 
-            PlayMakerFSM.BroadcastEvent("MP DRAIN");
-            PlayMakerFSM.BroadcastEvent("MP LOSE");
-            PlayMakerFSM.BroadcastEvent("MP RESERVE DOWN");
+            // PlayMakerFSM.BroadcastEvent("MP DRAIN");
+            // PlayMakerFSM.BroadcastEvent("MP LOSE");
+            // PlayMakerFSM.BroadcastEvent("MP RESERVE DOWN");
 
         }
         #endregion
