@@ -1,9 +1,8 @@
-﻿using System;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
+        /*
         [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
         public static void GiveMask()
         {
@@ -11,7 +10,8 @@ namespace DebugMod
             {
                 HeroController.instance.MaxHealth();
                 HeroController.instance.AddToMaxHealth(1);
-                EventRegister.SendEvent("MAX HP UP");
+
+                HudHelper.RefreshMasks();
 
                 Console.AddLine("Added Mask");
             }
@@ -46,8 +46,7 @@ namespace DebugMod
                 PlayerData.instance.maxHealthBase -= 1;
                 PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
 
-                // TODO: find a way to do this that doesn't hide the HUD for several seconds
-                EventRegister.SendEvent("HUD APPEAR RESET");
+                HudHelper.RefreshMasks();
 
                 Console.AddLine("Took Away Mask");
             }
@@ -65,7 +64,6 @@ namespace DebugMod
                 PlayerData.instance.silkMax--;
                 PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
 
-                // TODO: find a way to do this that doesn't hide the HUD for several seconds
                 EventRegister.SendEvent("HUD APPEAR RESET");
 
                 Console.AddLine("Removed Spool");
@@ -75,6 +73,7 @@ namespace DebugMod
                 Console.AddLine("You have the minimum number of spools");
             }
         }
+        */
 
         [BindableMethod(name = "Add Health", category = "Masks & Spools")]
         public static void AddHealth()

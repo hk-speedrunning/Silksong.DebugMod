@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using DebugMod.Hitbox;
+using DebugMod.MethodHelpers;
 using GlobalEnums;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -457,40 +458,8 @@ namespace DebugMod
                 EventRegister.SendEvent("ADD BLUE HEALTH");
             }
 
-            EventRegister.SendEvent("HUD APPEAR RESET");
-
-            //should fix hp
-            //the "Idle" mesh never gets disabled when Charm Indicator runs
-            //running the animation quickly would work but this does too and i understand it
-            // int maxHP = GameManager.instance.playerData.maxHealth;
-            // for (int i = maxHP; i > 0; i--)
-            // {
-            //     GameObject health = GameObject.Find("Health " + i.ToString());
-            //     PlayMakerFSM fsm = health.LocateMyFSM("health_display");
-            //     Transform idle = health.transform.Find("Idle");
-            //     //This is the "HP Full" mesh, which covers the empty mesh
-            //     idle.gameObject.GetComponent<MeshRenderer>().enabled = false;
-            //     //This is the "HP Empty" mesh
-            //     health.GetComponent<MeshRenderer>().enabled = true;
-            //     //This turns back on the "HP Full" mesh if we should
-            //     fsm.SetState("Check if Full");
-            // }
-
-            // if (PlayerData.instance.MPReserveMax < 33) GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Init");
-            // else GameObject.Find("Vessel 1").LocateMyFSM("vessel_orb").SetState("Up Check");
-            // if (PlayerData.instance.MPReserveMax < 66) GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Init");
-            // else GameObject.Find("Vessel 2").LocateMyFSM("vessel_orb").SetState("Up Check");
-            // if (PlayerData.instance.MPReserveMax < 99) GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Init");
-            // else GameObject.Find("Vessel 3").LocateMyFSM("vessel_orb").SetState("Up Check");
-            // if (PlayerData.instance.MPReserveMax < 132) GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Init");
-            // else GameObject.Find("Vessel 4").LocateMyFSM("vessel_orb").SetState("Up Check");
-
-            // HeroController.instance.TakeMP(1);
-            // HeroController.instance.AddMPChargeSpa(1);
-
-            // PlayMakerFSM.BroadcastEvent("MP DRAIN");
-            // PlayMakerFSM.BroadcastEvent("MP LOSE");
-            // PlayMakerFSM.BroadcastEvent("MP RESERVE DOWN");
+            HudHelper.RefreshMasks();
+            // HudHelper.RefreshSpool();
 
         }
         #endregion
