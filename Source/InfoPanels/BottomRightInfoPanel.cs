@@ -28,7 +28,7 @@ namespace DebugMod.InfoPanels
             panel.AddText("Right1 Label", "Session Time\nLoad\nHero Pos\nMove Raw", new Vector2(1285, 747), Vector2.zero, GUIController.Instance.arial);
             panel.AddText("Right1", "", new Vector2(1385, 747), Vector2.zero, GUIController.Instance.trajanNormal);
 
-            panel.AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed\nInput X", new Vector2(1525, 747), Vector2.zero, GUIController.Instance.arial);
+            panel.AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed", new Vector2(1525, 747), Vector2.zero, GUIController.Instance.arial);
             panel.AddText("Right2", "", new Vector2(1625, 747), Vector2.zero, GUIController.Instance.trajanNormal);
 
             panel.AddText("Right3 Label", "Frame Counter\nGame Time Elapsed", new Vector2(1670, 747), Vector2.zero, GUIController.Instance.arial);

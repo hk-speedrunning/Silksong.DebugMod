@@ -7,6 +7,7 @@ using System.Reflection;
 using DebugMod.Hitbox;
 using DebugMod.MethodHelpers;
 using GlobalEnums;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
@@ -17,9 +18,9 @@ namespace DebugMod
     /// <summary>
     /// Handles struct SaveStateData and individual SaveState operations
     /// </summary>
-     internal class SaveState
-
-     {
+    [HarmonyPatch]
+    internal class SaveState
+    {
         // Some mods (ItemChanger) check type to detect vanilla scene loads.
         private class DebugModSaveStateSceneLoadInfo : GameManager.SceneLoadInfo { }
 
@@ -261,6 +262,7 @@ namespace DebugMod
             GameManager.instance.entryGateName = "dreamGate";
             GameManager.instance.startedOnThisScene = true;
 
+            // For some reason this is in the full game files, but it works so why not
             string dummySceneName = "Demo Start";
 
             Addressables.LoadSceneAsync($"Scenes/{dummySceneName}");
@@ -489,6 +491,24 @@ namespace DebugMod
         {
             return new SaveState.SaveStateData(this.data);
         }
+        #endregion
+
+        #region patches
+
+        // Bring back dream gate transitions >:(
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.FindEntryPoint))]
+        [HarmonyPrefix]
+        private static bool FindEntryPoint(GameManager __instance, ref Vector2? __result, string entryPointName)
+        {
+            if (entryPointName == "dreamGate" && !__instance.RespawningHero)
+            {
+                __result = __instance.hero_ctrl.LocateSpawnPoint().position;
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
     }
 }
