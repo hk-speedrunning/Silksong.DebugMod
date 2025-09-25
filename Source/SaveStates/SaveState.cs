@@ -244,6 +244,7 @@ namespace DebugMod
                 if (DebugMod.CurrentInvulnCoro != null) HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
                 DebugMod.CurrentHazardCoro = null;
                 DebugMod.CurrentInvulnCoro = null;
+                HeroController.instance.hazardInvulnRoutine = null;
 
                 //fixes knockback storage
                 HeroController.instance.CancelDamageRecoil();
