@@ -390,7 +390,6 @@ namespace DebugMod
 
             yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
             HUDFixes();
-
         }
         
         //these are toggleable, as they will prevent glitches from persisting
