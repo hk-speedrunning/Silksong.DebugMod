@@ -1,8 +1,10 @@
-﻿namespace DebugMod
+﻿using System;
+using DebugMod.MethodHelpers;
+
+namespace DebugMod
 {
     public static partial class BindableFunctions
     {
-        /*
         [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
         public static void GiveMask()
         {
@@ -55,7 +57,7 @@
                 Console.AddLine("You have the minimum number of masks");
             }
         }
-        
+
         [BindableMethod(name = "Take Away Spool", category = "Masks & Spools")]
         public static void TakeAwaySpool()
         {
@@ -73,7 +75,6 @@
                 Console.AddLine("You have the minimum number of spools");
             }
         }
-        */
 
         [BindableMethod(name = "Add Health", category = "Masks & Spools")]
         public static void AddHealth()

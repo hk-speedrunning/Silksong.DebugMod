@@ -331,8 +331,9 @@ namespace DebugMod
 
             HeroController.instance.CharmUpdate();
 
-            PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");    //update twister             
-            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");       //update nail
+            PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
+            PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
+            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
             FieldInfo cameraGameplayScene = typeof(CameraController).GetField("isGameplayScene", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -381,13 +382,14 @@ namespace DebugMod
 
             TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
 
-            HUDFixes();
-
             //set timescale back
             Time.timeScale = DebugMod.CurrentTimeScale;
             DebugMod.stateOnDeath = stateondeath;
 
             Console.AddLine("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
+
+            yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+            HUDFixes();
 
         }
         
@@ -427,9 +429,6 @@ namespace DebugMod
         //Moving all HUD related code to here for clarity
         private void HUDFixes()
         {
-
-            // GameCameras.instance.hudCanvas.gameObject.SetActive(true);
-
             if (CurrencyCounter._currencyCounters.TryGetValue(CurrencyType.Money, out List<CurrencyCounter> list))
             {
                 foreach (CurrencyCounter counter in list)
