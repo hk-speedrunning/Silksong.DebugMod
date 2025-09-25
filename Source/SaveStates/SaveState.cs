@@ -502,7 +502,7 @@ namespace DebugMod
         {
             if (entryPointName == "dreamGate" && !__instance.RespawningHero)
             {
-                __result = __instance.hero_ctrl.LocateSpawnPoint().position;
+                __result = HeroController.instance.gameObject.transform.position;
                 return false;
             }
 
