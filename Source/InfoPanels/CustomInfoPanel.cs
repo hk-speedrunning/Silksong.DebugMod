@@ -87,7 +87,7 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.silkMax);
             y += 58f;
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage.ToString() + "%");
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
             y += 58f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "isInvuln", () => GetStringForBool(HeroController.instance.cState.Invulnerable));
@@ -143,12 +143,11 @@ namespace DebugMod.InfoPanels
             MinimalInfoPanel.AddInfo(110, 140, 10, "Pos", () => GetHeroPos());
             
             MinimalInfoPanel.AddInfo(10, 40, 30, "MP", () => (PlayerData.instance.silk).ToString());
-            // MinimalInfoPanel.AddInfo(100, 190, 30, "CanCdash", () => GetStringForBool(HeroController.instance.CanSuperDash()));
             
             MinimalInfoPanel.AddInfo(10, 100, 50, "NailDmg", () => PlayerData.instance.nailDamage.ToString());
             
-            MinimalInfoPanel.AddInfo(10, 95, 70, "Completion", () => PlayerData.instance.completionPercentage.ToString() + "%");
-            // MinimalInfoPanel.AddInfo(140, 195, 70, "Grubs", () => PlayerData.instance.grubsCollected + " / 46");
+            MinimalInfoPanel.AddInfo(10, 95, 70, "Completion", () => PlayerData.instance.completionPercentage + "%");
+            MinimalInfoPanel.AddInfo(140, 195, 70, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
             
             MinimalInfoPanel.AddInfo(10, 140, 90, "Scene Name", () => DebugMod.GetSceneName());
             MinimalInfoPanel.AddInfo(10, 140, 110, "Current SaveState", () => SaveStateManager.quickState.IsSet() ? SaveStateManager.quickState.GetSaveStateID() : "No savestate");
