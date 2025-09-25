@@ -12,7 +12,6 @@ namespace DebugMod
             {
                 HeroController.instance.MaxHealth();
                 HeroController.instance.AddToMaxHealth(1);
-
                 HudHelper.RefreshMasks();
 
                 Console.AddLine("Added Mask");
@@ -29,7 +28,7 @@ namespace DebugMod
             if (PlayerData.instance.silkMax < 18)
             {
                 HeroController.instance.AddToMaxSilk(1);
-                EventRegister.SendEvent("SPOOL MAX UP");
+                HudHelper.RefreshSpool();
 
                 Console.AddLine("Added Spool");
             }
@@ -47,7 +46,6 @@ namespace DebugMod
                 PlayerData.instance.maxHealth -= 1;
                 PlayerData.instance.maxHealthBase -= 1;
                 PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
-
                 HudHelper.RefreshMasks();
 
                 Console.AddLine("Took Away Mask");
@@ -65,8 +63,7 @@ namespace DebugMod
             {
                 PlayerData.instance.silkMax--;
                 PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
-
-                EventRegister.SendEvent("HUD APPEAR RESET");
+                HudHelper.RefreshSpool();
 
                 Console.AddLine("Removed Spool");
             }

@@ -459,7 +459,7 @@ namespace DebugMod
             }
 
             HudHelper.RefreshMasks();
-            // HudHelper.RefreshSpool();
+            HudHelper.RefreshSpool();
 
         }
         #endregion

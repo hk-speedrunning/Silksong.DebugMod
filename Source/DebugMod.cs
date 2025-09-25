@@ -86,7 +86,9 @@ namespace DebugMod
             {
                 string[] blacklist =
                 [
-                    "Couldn't find a Game Manager, make sure one exists in the scene."
+                    "Couldn't find a Game Manager, make sure one exists in the scene.",
+                    "gm.tilemap is null!",
+                    "Coroutine couldn't be started because the the game object 'Tool Icon U' is inactive!",
                 ];
 
                 if (type is LogType.Error or LogType.Exception)

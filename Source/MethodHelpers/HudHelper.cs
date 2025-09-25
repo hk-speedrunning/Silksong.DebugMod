@@ -26,7 +26,7 @@ public static class HudHelper
             {
                 if (fsm.gameObject.activeSelf)
                 {
-                    fsm.OnEnable();
+                    fsm.fsm.OnEnable();
                 }
                 else
                 {
@@ -37,5 +37,26 @@ public static class HudHelper
                 fsm.SetState("Check Max HP");
             }
         }
+    }
+
+    public static void RefreshSpool()
+    {
+        SilkSpool spool = GameCameras.instance.silkSpool;
+        spool.DrawSpool();
+
+        Transform parent = spool.activeParent.transform.parent;
+        GameObject fleaEgg = null;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            GameObject child = parent.GetChild(i).gameObject;
+            if (child.name == "Tool Flea Egg HUD")
+            {
+                fleaEgg = child;
+                break;
+            }
+        }
+
+        // Loading save states breaks this FSM for some reason
+        fleaEgg.GetComponent<SpriteRenderer>().enabled = ToolItemManager.GetToolByName("Flea Charm").IsEquippedHud;
     }
 }
