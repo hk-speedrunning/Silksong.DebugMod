@@ -83,19 +83,24 @@ namespace DebugMod.InfoPanels
 
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hero State", () => HeroController.instance.hero_state.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Velocity", () => HeroController.instance.current_velocity.ToString());
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Naildmg", () => PlayerData.instance.nailDamage.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.silkMax);
-            y += 58f;
+            y += 30f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
-            y += 58f;
+            y += 30f;
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Needle Base", () => PlayerData.instance.nailDamage.ToString());
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Damage", () => DebugMod.lastHit != null ?
+                $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "");
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Type", () => DebugMod.lastHit?.AttackType.ToString());
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "");
+            y += 30f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "isInvuln", () => GetStringForBool(HeroController.instance.cState.Invulnerable));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Invincible", () => GetStringForBool(PlayerData.instance.isInvincible));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Damage State", () => HeroController.instance.damageMode.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Dead State", () => GetStringForBool(HeroController.instance.cState.dead));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hazard Death", () => HeroController.instance.cState.hazardDeath.ToString());
-            y += 58f;
+            y += 30f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Scene Name", () => DebugMod.GetSceneName());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Transition", () => GetStringForBool(HeroController.instance.cState.transitioning));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Trans State", () => GetTransState());

@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 
 namespace DebugMod
 {
-    [BepInAutoPlugin("org.silksong-modding.debugmod")]
+    [BepInAutoPlugin("org.silksong-modding.debugmod", version: "0.1.0")]
     [BepInDependency("org.silksong-modding.modlist")]
     [HarmonyPatch]
     public partial class DebugMod : BaseUnityPlugin
@@ -51,6 +51,10 @@ namespace DebugMod
         private static float _loadTime;
         private static float _unloadTime;
         private static bool _loadingChar;
+
+        internal static HitInstance? lastHit;
+        internal static int lastDamage;
+        internal static float lastScaling;
 
         internal static bool stateOnDeath;
         internal static bool infiniteHP;
@@ -276,6 +280,10 @@ namespace DebugMod
             noclip = false;
             extraNailDamage = 0;
 
+            lastHit = null;
+            lastDamage = 0;
+            lastScaling = 0f;
+
             _loadingChar = true;
         }
 
@@ -327,6 +335,27 @@ namespace DebugMod
         public static int Get_NailDamage(int nailDamage)
         {
             return nailDamage + extraNailDamage;
+        }
+
+
+        [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.TakeDamage))]
+        [HarmonyPrefix]
+        public static void TakeDamage(HealthManager __instance, HitInstance hitInstance)
+        {
+            HitInstance scaled = __instance.ApplyDamageScaling(hitInstance);
+            lastHit = scaled;
+            lastDamage = __instance.damageOverride ? 1 : Mathf.RoundToInt(scaled.DamageDealt * scaled.Multiplier);
+
+            int scaleLevel = hitInstance.DamageScalingLevel - 1;
+            if (hitInstance.IsUsingNeedleDamageMult)
+            {
+                scaleLevel = PlayerData.instance.nailUpgrades;
+            }
+            else if (hitInstance.RepresentingTool && hitInstance.RepresentingTool.Type != ToolItemType.Skill)
+            {
+                scaleLevel = PlayerData.instance.ToolKitUpgrades;
+            }
+            lastScaling = __instance.damageScaling.GetMultFromLevel(scaleLevel);
         }
 
         public static float GetLoadTime()
