@@ -2,6 +2,9 @@ For any questions or bugs reports, join the [Modding Discord](https://discord.gg
 
 [![Discord](https://img.shields.io/discord/879125729936298015.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/F6Y5TeFQ8j)
 
+**For moderation reasons, this mod requires [Silksong.ModList](https://github.com/silksong-modding/Silksong.ModList) to be installed.
+If you forget to install Silksong.ModList, DebugMod will silently fail to load.**
+
 # Features
 
 The mod is still in early development, and some features are missing or broken. These features are confirmed to work:
