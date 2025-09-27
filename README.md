@@ -17,6 +17,7 @@ The mod is still in early development, and some features are missing or broken. 
 * View debug information about the game
 * A toggleable overlay in-game through which to use the mod's features
 * Configurable keybinds for most features
+* Visualize and color-code hitboxes
 * Change the player's respawn point to anywhere in the current scene
 * Recall to the set respawn point
 * Kill all enemies
