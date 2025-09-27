@@ -84,20 +84,8 @@ namespace DebugMod
             // Add Unity errors to main log
             Application.logMessageReceived += (condition, stackTrace, type) =>
             {
-                string[] blacklist =
-                [
-                    "Couldn't find a Game Manager, make sure one exists in the scene.",
-                    "gm.tilemap is null!",
-                    "Coroutine couldn't be started because the the game object 'Tool Icon U' is inactive!",
-                ];
-
-                if (type is LogType.Error or LogType.Exception)
+                if (type is LogType.Error or LogType.Exception && condition.Contains("Exception"))
                 {
-                    foreach (string s in blacklist)
-                    {
-                        if (condition.Contains(s)) return;
-                    }
-
                     string message = $"[UNITY] {condition}\n{stackTrace}";
                     LogError(message.Trim());
                 }

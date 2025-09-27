@@ -1,5 +1,4 @@
 ﻿using System;
-using DebugMod.Hitbox;
 using DebugMod.MethodHelpers;
 using UnityEngine;
 
@@ -15,6 +14,7 @@ namespace DebugMod
             Console.AddLine("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
         }
 
+        /*
         [BindableMethod(name = "Shade Spawn Points", category = "Visual")]
         public static void ShadeSpawnPoint()
         {
@@ -61,6 +61,7 @@ namespace DebugMod
             };
             Console.AddLine($"Shade Reach Showing {displaytext}");
         }
+        */
 
         [BindableMethod(name = "Toggle Vignette", category = "Visual")]
         public static void ToggleVignette()
@@ -93,22 +94,20 @@ namespace DebugMod
             }
         }
 
-        /*
         [BindableMethod(name = "Toggle HUD", category = "Visual")]
         public static void ToggleHUD()
         {
-            if (GameCameras.instance.hudCanvas.gameObject.activeInHierarchy)
+            if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
             {
-                GameCameras.instance.hudCanvas.gameObject.SetActive(false);
+                GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(false);
                 Console.AddLine("Disabling HUD...");
             }
             else
             {
-                GameCameras.instance.hudCanvas.gameObject.SetActive(true);
+                GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
                 Console.AddLine("Enabling HUD...");
             }
         }
-        */
 
         [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
         public static void ResetZoom()

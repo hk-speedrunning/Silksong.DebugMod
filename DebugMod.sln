@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebugMod", "Source\DebugMod.csproj", "{932ED497-4C09-461E-B198-8B44FD9B288F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Silksong.DebugMod", "Source\Silksong.DebugMod.csproj", "{932ED497-4C09-461E-B198-8B44FD9B288F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
