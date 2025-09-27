@@ -39,11 +39,10 @@ We plan on adding any missing features from the Hollow Knight debug mod soon.
 1) Right click Silksong in Steam -> Properties -> Installed Files -> Browse...
 3) Copy the contents of the BepInEx zip into this folder (overwrite files if asked)
 4) Open and close the game once so BepInEx can generate its initial files
-5) Download DebugMod from here: https://github.com/hk-speedrunning/Silksong.DebugMod/releases/latest
-6) Extract the contents of the mod zip into a folder named DebugMod (make sure there is no folder inside that folder)
-7) Copy this folder into `BepInEx/plugins` in the game folder (overwrite files if asked)
-8) Install [Silksong.ModList](https://github.com/silksong-modding/Silksong.ModList) (same process as 5-7)
-9) This mod should not affect saves negatively, but it is a good idea to back them up anyway.
+5) Download DebugMod and ModList from here: https://github.com/hk-speedrunning/Silksong.DebugMod/releases/latest
+6) Copy the DebugMod and Silksong.ModList folders into `BepInEx/plugins` in the game folder (overwrite files if asked)
+7) Install [Silksong.ModList](https://github.com/silksong-modding/Silksong.ModList) (same process as 5-7)
+8) This mod should not affect saves negatively, but it is a good idea to back them up anyway.
    Saves are located at `%AppData%/../LocalLow/Team Cherry/Hollow Knight Silksong`
    
 # Credits
