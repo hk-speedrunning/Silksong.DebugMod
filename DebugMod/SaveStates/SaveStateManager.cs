@@ -180,16 +180,6 @@ namespace DebugMod
             {
                 currentStateOperation = operationName;
             }
-
-            //TODO: this probably isn't necessary and makes it miserable to do anything with canceling it
-            if (DebugMod.settings.binds.TryGetValue(currentStateOperation, out KeyCode keycode))
-            {
-                DebugMod.alphaKeyDict.Add(keycode, (int)keycode);
-            }
-            else
-            {
-                throw new Exception("Helper func SelectSlot could not find a binding for the `" + currentStateOperation + "` savestate process");
-            }
             
             yield return null;
             timeoutHelper = DateTime.Now.AddSeconds(timeoutAmount);
@@ -219,7 +209,6 @@ namespace DebugMod
                 else Console.AddLine("Timeout (" + timeoutAmount.ToString() + ")s was reached");
             }
             
-            DebugMod.alphaKeyDict.Remove((KeyCode)keycode);
             currentStateOperation = null;
             GUIController.inputEsc = GUIController.didInput = false;
             DebugMod.settings.SaveStatePanelVisible = inSelectSlotState = false;
