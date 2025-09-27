@@ -82,7 +82,7 @@ namespace DebugMod
         #region saving
         public void SaveSaveState(SaveStateType stateType)
         {
-            if (!SaveState.loadingSavestate)
+            if (SaveState.loadingSavestate == null)
             {
                 switch (stateType)
                 {

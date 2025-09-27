@@ -25,7 +25,7 @@ namespace DebugMod
         private class DebugModSaveStateSceneLoadInfo : GameManager.SceneLoadInfo { }
 
         //used to stop double loads/saves
-        public static bool loadingSavestate { get; private set; }
+        public static SaveState loadingSavestate { get; private set; }
 
         [Serializable]
         public class SaveStateData
@@ -41,8 +41,6 @@ namespace DebugMod
             public bool isKinematized;
             public string[] loadedScenes;
             public string[] loadedSceneActiveScenes;
-            //Special Case Variables
-            public int specialIndex;
             public string roomSpecificOptions;
 
 
@@ -53,8 +51,6 @@ namespace DebugMod
                 saveStateIdentifier = _data.saveStateIdentifier;
                 saveScene = _data.saveScene;
 
-                //Special Case Variables
-                specialIndex = _data.specialIndex;
                 cameraLockArea = _data.cameraLockArea;
                 savedPd = _data.savedPd;
                 savedSd = _data.savedSd;
@@ -106,26 +102,28 @@ namespace DebugMod
             GameManager.instance.SaveLevelState();
             data.saveScene = GameManager.instance.GetSceneNameString();
             data.saveStateIdentifier = $"(tmp)_{data.saveScene}-{DateTime.Now.ToString("H:mm_d-MMM")}";
+
             //implementation so room specifics can be automatically saved
             try
             {
-                var roomSpecificData = RoomSpecific.SaveRoomSpecific(data.saveScene);
-                data.roomSpecificOptions = roomSpecificData.value ?? 0.ToString();
-                data.specialIndex = roomSpecificData.index;
+                data.roomSpecificOptions = RoomSpecific.SaveRoomSpecific(data.saveScene);
             }
             catch (Exception e)
             {
                 DebugMod.instance.LogError(e.Message);
             }
+
             data.savedPd = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(PlayerData.instance));
             data.savedSd = JsonUtility.FromJson<SceneData>(JsonUtility.ToJson(SceneData.instance));
             data.savePos = HeroController.instance.gameObject.transform.position;
             data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
             data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
             data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().isKinematic;
+
             var scenes = SceneWatcher.LoadedScenes;
             data.loadedScenes = scenes.Select(s => s.name).ToArray();
             data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
+
             Console.AddLine("Saved temp state");
         }
 
@@ -169,7 +167,7 @@ namespace DebugMod
             if (!PlayerDeathWatcher.playerDead && 
                 !HeroController.instance.cState.transitioning && 
                 HeroController.instance.transform.parent == null && // checks if in elevator/conveyor
-                !loadingSavestate)
+                loadingSavestate == null)
             {
                 GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
             }
@@ -224,7 +222,7 @@ namespace DebugMod
         private IEnumerator LoadStateCoro(bool loadDuped)
         {
             //var used to prevent saves/loads, double save/loads softlock in temp scene, double load, black screen, etc
-            loadingSavestate = true;
+            loadingSavestate = this;
             bool stateondeath = DebugMod.stateOnDeath;
             DebugMod.stateOnDeath = false;
 
@@ -347,7 +345,7 @@ namespace DebugMod
             HeroController.instance.GetComponent<Rigidbody2D>().isKinematic = data.isKinematized;
 
             loadingStateTimer.Stop();
-            loadingSavestate = false;
+            loadingSavestate = null;
 
             if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
             {
@@ -359,10 +357,10 @@ namespace DebugMod
 
             HeroController.instance.FinishedEnteringScene(true, false);
 
-            if (data.roomSpecificOptions != "0" && data.roomSpecificOptions != null)
+            if (!string.IsNullOrEmpty(data.roomSpecificOptions))
             {
                 Console.AddLine("Performing Room Specific Option " + data.roomSpecificOptions);
-                RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions, data.specialIndex);
+                RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
             }
             //removes things like bench storage no clip float etc
             if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
