@@ -50,21 +50,21 @@
   </Target>
     
   <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
-	  <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
-	  <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
+      <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
+      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
 
-	  <PropertyGroup>
-		<ModlistVersion>v0.1.0</ModlistVersion>
-		<ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/$(ModlistVersion)/Silksong.Modlist.zip</ModlistUrl>
-	  </PropertyGroup>
+      <PropertyGroup>
+        <ModlistVersion>v0.1.0</ModlistVersion>
+        <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/$(ModlistVersion)/Silksong.Modlist.zip</ModlistUrl>
+      </PropertyGroup>
       <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)"/>
       <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist"/>
 
-	  <PropertyGroup>
-		<ExportFolder>bin/Publish</ExportFolder>
-	  </PropertyGroup>
-	  <MakeDir Directories="$(ExportFolder)" />
-	  <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName).zip" Overwrite="True" />
+      <PropertyGroup>
+        <ExportFolder>bin/Publish</ExportFolder>
+      </PropertyGroup>
+      <MakeDir Directories="$(ExportFolder)" />
+      <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName).zip" Overwrite="True" />
   </Target>
     
 </Project>

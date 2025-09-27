@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 
 namespace DebugMod
 {
-    [BepInAutoPlugin("org.silksong-modding.debugmod", version: "0.1.0")]
+    [BepInAutoPlugin("io.github.hk-speedrunning.debugmod", version: "0.1.0")]
     [BepInDependency("org.silksong-modding.modlist")]
     [HarmonyPatch]
     public partial class DebugMod : BaseUnityPlugin
