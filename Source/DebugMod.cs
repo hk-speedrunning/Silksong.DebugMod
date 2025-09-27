@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 
 namespace DebugMod
 {
-    [BepInAutoPlugin("com.spacemonkeyy.debugmod")]
+    [BepInAutoPlugin("org.silksong-modding.debugmod")]
     [BepInDependency("org.silksong-modding.modlist")]
     [HarmonyPatch]
     public partial class DebugMod : BaseUnityPlugin
