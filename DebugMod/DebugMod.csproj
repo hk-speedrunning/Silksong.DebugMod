@@ -6,7 +6,7 @@
     -->
     <Import Condition="Exists('SilksongPath.props')" Project="SilksongPath.props" />
 
-    <PropertyGroup>
+  <PropertyGroup>
     <ProjectGuid>{932ED497-4C09-461E-B198-8B44FD9B288F}</ProjectGuid>
 
     <RootNamespace>DebugMod</RootNamespace>
@@ -25,61 +25,46 @@
   </PropertyGroup>
   
   <ItemGroup>
-     <None Remove="Images\**\*.png" />
+    <None Remove="Images\**\*.png" />
   </ItemGroup>
   <ItemGroup>
-     <EmbeddedResource Include="Images\**\*.png" />
+    <EmbeddedResource Include="Images\**\*.png" />
   </ItemGroup>
 
   <ItemGroup>
-     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
-     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
-     <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all" />
-     <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
-     <!--If you're unable resolve this dependency, check that you're using the nuget v3 package feed instead of v2.-->
-     <PackageReference Include="Silksong.GameLibs" Version="1.1.0-silksong1.0.28561" />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all" />
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
+    <!--If you're unable resolve this dependency, check that you're using the nuget v3 package feed instead of v2.-->
+    <PackageReference Include="Silksong.GameLibs" Version="1.1.0-silksong1.0.28561" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Binaries Include="$(TargetPath)" />
+    <Binaries Include="$(TargetDir)/$(TargetName).pdb" />
   </ItemGroup>
 
   <Target Name="CopyMod" AfterTargets="PostBuildEvent" Condition="'$(SilksongFolder)' != ''">
-      <ItemGroup>
-          <Binaries Include="$(TargetPath)" />
-          <Binaries Include="$(TargetDir)/$(TargetName).pdb" />
-      </ItemGroup>
-
       <Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongFolder)/BepInEx/plugins/$(TargetName)" />
-
-      <PropertyGroup>
-          <ExportFolder>bin/Publish</ExportFolder>
-      </PropertyGroup>
-
-      <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
-      <MakeDir Directories="$(ExportFolder)" />
-      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive" />
-      <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName).zip" Overwrite="True" />
   </Target>
     
-  <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
-      <MakeDir Directories="$(ProjectDir)Output" />
-      <Delete Files="$(ProjectDir)/$(TargetName).zip" />
-      <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)/Output/" />
-      <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ProjectDir)/Output/" />
-      <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ProjectDir)/Output/" />
-      <Copy SourceFiles="$(SolutionDir)/README.md" DestinationFolder="$(ProjectDir)/Output/" ContinueOnError="true" />
-      <ZipDirectory DestinationFile="$(ProjectDir)/$(TargetName).zip" SourceDirectory="$(ProjectDir)/Output" />
-      <RemoveDir Directories="$(ProjectDir)/Output" />
+  <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
+	  <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
+	  <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
 
-      <GetFileHash Files="$(ProjectDir)/$(TargetName).zip" Algorithm="SHA256">
-        <Output TaskParameter="Items" ItemName="FilesWithHashes" />
-      </GetFileHash>
-      <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
-        <Output TaskParameter="Assemblies" ItemName="Targets" />
-      </GetAssemblyIdentity>
-      <ItemGroup>
-        <VersionNumber Include="@(Targets->'%(Version)')" />
-      </ItemGroup>
-      <Message Importance="High" Text="@(FilesWithHashes->'%(Identity): %(FileHash)')" />
-      <WriteLinesToFile File="$(ProjectDir)/SHA.txt" Lines="@(FilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8" />
-      <WriteLinesToFile File="$(ProjectDir)/VERSION.txt" Lines="@(VersionNumber)" Overwrite="true" Encoding="UTF-8" />
+	  <PropertyGroup>
+		<ModlistVersion>v0.1.0</ModlistVersion>
+		<ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/$(ModlistVersion)/Silksong.Modlist.zip</ModlistUrl>
+	  </PropertyGroup>
+      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)"/>
+      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist"/>
+
+	  <PropertyGroup>
+		<ExportFolder>bin/Publish</ExportFolder>
+	  </PropertyGroup>
+	  <MakeDir Directories="$(ExportFolder)" />
+	  <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName).zip" Overwrite="True" />
   </Target>
     
 </Project>
