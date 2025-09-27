@@ -19,9 +19,10 @@ The mod is still in early development, and some features are missing or broken. 
 * Draw collision boxes for enemies
 * Clone or delete any enemy
 * Set an enemy's health to 9999
-* Give unlimited rosaries
+* Give unlimited rosaries and shell shards
 * Damage the player anywhere/anytime
 * Change the camera zoom level
+* Disable the in game HUD
 * Make the player invisible
 * Disable the lighting around the player
 * Disable the vignette drawn around the player

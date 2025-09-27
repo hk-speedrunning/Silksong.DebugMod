@@ -25,11 +25,18 @@
         }
         */
 
-        [BindableMethod(name = "Give Geo", category = "Consumables")]
+        [BindableMethod(name = "Give Rosaries", category = "Consumables")]
         public static void GiveGeo()
         {
             HeroController.instance.AddGeo(1000);
-            Console.AddLine("Giving player 1000 geo");
+            Console.AddLine("Giving player 1000 rosaries");
+        }
+
+        [BindableMethod(name = "Give Shell Shards", category = "Consumables")]
+        public static void GiveShellShards()
+        {
+            HeroController.instance.AddShards(100);
+            Console.AddLine("Giving player 100 shell shards");
         }
 
         /*
