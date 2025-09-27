@@ -189,6 +189,7 @@ namespace DebugMod
 
         private static void CursorDisplayActive()
         {
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
