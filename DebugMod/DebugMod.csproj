@@ -11,7 +11,7 @@
 
     <RootNamespace>DebugMod</RootNamespace>
     <AssemblyTitle>DebugMod</AssemblyTitle>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <AssemblyVersion>0.1.1</AssemblyVersion>
     <Deterministic>true</Deterministic>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LangVersion>latest</LangVersion>
