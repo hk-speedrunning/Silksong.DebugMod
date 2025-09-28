@@ -222,7 +222,7 @@ namespace DebugMod
                 case SaveStateType.File:
                     if (quickState == null || !quickState.IsSet())
                     {
-                        quickState.SaveTempState();
+                        if (!quickState.SaveTempState()) break;
                     }
                     if (saveStateFiles.ContainsKey(currentStateSlot))
                     {

@@ -330,6 +330,11 @@ namespace DebugMod
             return sceneName;
         }
 
+        public static float GetLoadTime()
+        {
+            return (float)Math.Round(_loadTime - _unloadTime, 2);
+        }
+
         [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Getter)]
         [HarmonyPostfix]
         public static int Get_NailDamage(int nailDamage)
@@ -358,9 +363,25 @@ namespace DebugMod
             lastScaling = __instance.damageScaling.GetMultFromLevel(scaleLevel);
         }
 
-        public static float GetLoadTime()
+        // Prevents clipping through water when invincible
+        [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
+        [HarmonyPrefix]
+        public static void OnTriggerEnter2D_Prefix(Collider2D collision)
         {
-            return (float)Math.Round(_loadTime - _unloadTime, 2);
+            if (collision.gameObject.GetComponent<HeroController>() && playerInvincible)
+            {
+                PlayerData.instance.isInvincible = false;
+            }
+        }
+
+        [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
+        [HarmonyPostfix]
+        public static void OnTriggerEnter2D_Postfix()
+        {
+            if (playerInvincible)
+            {
+                PlayerData.instance.isInvincible = true;
+            }
         }
 
         /// <summary>

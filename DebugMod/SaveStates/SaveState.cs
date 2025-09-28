@@ -96,8 +96,14 @@ namespace DebugMod
 
         #region saving
 
-        public void SaveTempState()
+        public bool SaveTempState()
         {
+            if (HeroController.instance.cState.swimming)
+            {
+                Console.AddLine("Savestates cannot be created while swimming");
+                return false;
+            }
+
             //save level state before savestates so levers and dead enemies persist properly
             GameManager.instance.SaveLevelState();
             data.saveScene = GameManager.instance.GetSceneNameString();
@@ -125,12 +131,15 @@ namespace DebugMod
             data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
 
             Console.AddLine("Saved temp state");
+            return true;
         }
 
         public void NewSaveStateToFile(int paramSlot)
         {
-            SaveTempState();
-            SaveStateToFile(paramSlot);
+            if (SaveTempState())
+            {
+                SaveStateToFile(paramSlot);
+            }
         }
 
         public void SaveStateToFile(int paramSlot)
@@ -167,6 +176,7 @@ namespace DebugMod
             if (!PlayerDeathWatcher.playerDead && 
                 !HeroController.instance.cState.transitioning && 
                 HeroController.instance.transform.parent == null && // checks if in elevator/conveyor
+                !HeroController.instance.cState.swimming &&
                 loadingSavestate == null)
             {
                 GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
@@ -178,7 +188,7 @@ namespace DebugMod
             }
             else
             {
-                Console.AddLine("SaveStates cannot be loaded when dead, transitioning, or on elevators");
+                Console.AddLine("SaveStates cannot be loaded when dead, transitioning, swimming, or on elevators");
             }
         }
 

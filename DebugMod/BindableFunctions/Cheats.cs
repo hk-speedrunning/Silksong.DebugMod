@@ -44,10 +44,10 @@ namespace DebugMod
         [BindableMethod(name = "Invincibility", category = "Cheats")]
         public static void ToggleInvincibility()
         {
-            PlayerData.instance.isInvincible = !PlayerData.instance.isInvincible;
-            Console.AddLine("Invincibility set to " + PlayerData.instance.isInvincible.ToString().ToUpper());
+            DebugMod.playerInvincible = !DebugMod.playerInvincible;
+            Console.AddLine("Invincibility set to " + DebugMod.playerInvincible.ToString().ToUpper());
 
-            DebugMod.playerInvincible = PlayerData.instance.isInvincible;
+            PlayerData.instance.isInvincible = DebugMod.playerInvincible;
         }
 
         [BindableMethod(name = "Noclip", category = "Cheats")]
