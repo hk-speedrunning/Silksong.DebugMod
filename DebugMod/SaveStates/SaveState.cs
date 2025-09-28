@@ -176,7 +176,6 @@ namespace DebugMod
             if (!PlayerDeathWatcher.playerDead && 
                 !HeroController.instance.cState.transitioning && 
                 HeroController.instance.transform.parent == null && // checks if in elevator/conveyor
-                !HeroController.instance.cState.swimming &&
                 loadingSavestate == null)
             {
                 GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
@@ -188,7 +187,7 @@ namespace DebugMod
             }
             else
             {
-                Console.AddLine("SaveStates cannot be loaded when dead, transitioning, swimming, or on elevators");
+                Console.AddLine("SaveStates cannot be loaded when dead, transitioning, or on elevators");
             }
         }
 

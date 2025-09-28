@@ -384,6 +384,17 @@ namespace DebugMod
             }
         }
 
+        // Prevents savestates loaded while in water from warping to the wrong point.
+        [HarmonyPatch(typeof(HeroWaterController), nameof(HeroWaterController.TumbleOut))]
+        [HarmonyPrefix]
+        public static bool HeroWaterController_TumbleOut_Prefix(HeroWaterController __instance)
+        {
+            if (SaveState.loadingSavestate == null) return true;
+            
+            __instance.ExitedWater();
+            return false;
+        }
+
         /// <summary>
         /// Adds a menu to the top menu, with the provided name and button list.
         /// </summary>
