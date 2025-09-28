@@ -68,16 +68,12 @@ namespace DebugMod
             skillsPanel.AddButton("Elegy of the Deep", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 300f), Vector2.zero, BindableFunctions.ToggleElegyOfTheDeep, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Elegy", 10);
             skillsPanel.AddButton("Needle Strike", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 330f), Vector2.zero, BindableFunctions.ToggleNeedleStrike, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Needle Strike", 10);
 
-            //Charms panel
-            toolsPanel.AddButton("All Crests", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, InventoryHandler.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Crests", 10);
-            toolsPanel.AddButton("All Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, InventoryHandler.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Tools", 10);
+            //Tools panel
+            toolsPanel.AddButton("All Crests", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Crests", 10);
+            toolsPanel.AddButton("All Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Tools", 10);
             toolsPanel.AddButton("Craft Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.CraftTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Craft Tools", 10);
-            toolsPanel.AddButton("Tool Pouches", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, InventoryHandler.IncrementPouches, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
-            toolsPanel.AddButton("Crafting Kits", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, InventoryHandler.IncrementKits, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
-            // toolsPanel.AddButton("fGreed fix", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, FragileGreedFixClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "fGreed fix", 10);
-            // toolsPanel.AddButton("fStrength fix", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, FragileStrengthFixClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "fStrength fix", 10);
-            // toolsPanel.AddButton("Overcharm", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, OvercharmClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Overcharm", 10);
-            // toolsPanel.AddButton("Remove All Charms", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 240f), Vector2.zero, RemoveAllCharmsClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Remove All Charms", 10);
+            toolsPanel.AddButton("Tool Pouches", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementPouches, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
+            toolsPanel.AddButton("Crafting Kits", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.IncrementKits, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
 
             //Items panel
             itemsPanel.AddButton("Rosaries", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Rosaries", 10);
@@ -185,7 +181,6 @@ namespace DebugMod
             {
                 panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
                 panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
-                // panel.GetButton("Overcharm", "Tools Panel").SetTextColor(PlayerData.instance.overcharmed ? SelectedColor : Color.white);
                 
             }
 

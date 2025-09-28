@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using MonoMod.ModInterop;
 
 namespace DebugMod
@@ -35,17 +32,5 @@ namespace DebugMod
         
         public static void SetLockKeyBinds(bool value)
             => DebugMod.KeyBindLock = value;
-
-        public static void AddToOnGiveAllCharm(Action onGiveCharms)
-            => BindableFunctions.OnGiveAllCharms += onGiveCharms;
-        
-        public static void RemoveFromOnGiveAllCharm(Action onGiveCharms)
-            => BindableFunctions.OnGiveAllCharms -= onGiveCharms;
-        
-        public static void AddToOnRemoveAllCharm(Action onRemoveCharms)
-            => BindableFunctions.OnRemoveAllCharms += onRemoveCharms;
-        
-        public static void RemoveFromOnRemoveAllCharm(Action onRemoveCharms)
-            => BindableFunctions.OnRemoveAllCharms -= onRemoveCharms;
     }
 }

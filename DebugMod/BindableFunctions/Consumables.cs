@@ -38,12 +38,6 @@
             HeroController.instance.AddShards(100);
             Console.AddLine("Giving player 100 shell shards");
         }
-        
-        [BindableMethod(name = "Craft Tools", category = "Consumables")]
-        public static void CraftTools()
-        {
-            ToolItemManager.TryReplenishTools(true, ToolItemManager.ReplenishMethod.Bench);
-        }
 
         /*
         [BindableMethod(name = "Give Essence", category = "Consumables")]
