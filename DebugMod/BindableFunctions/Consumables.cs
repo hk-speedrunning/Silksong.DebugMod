@@ -26,7 +26,7 @@
         */
 
         [BindableMethod(name = "Give Rosaries", category = "Consumables")]
-        public static void GiveGeo()
+        public static void GiveRosaries()
         {
             HeroController.instance.AddGeo(1000);
             Console.AddLine("Giving player 1000 rosaries");
@@ -37,6 +37,12 @@
         {
             HeroController.instance.AddShards(100);
             Console.AddLine("Giving player 100 shell shards");
+        }
+        
+        [BindableMethod(name = "Craft Tools", category = "Consumables")]
+        public static void CraftTools()
+        {
+            ToolItemManager.TryReplenishTools(true, ToolItemManager.ReplenishMethod.Bench);
         }
 
         /*

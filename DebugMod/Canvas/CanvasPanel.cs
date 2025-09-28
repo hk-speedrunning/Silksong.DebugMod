@@ -57,11 +57,12 @@ namespace DebugMod.Canvas
             AddButton(name, tex, pos, sz, _ => func(), bgSubSection, font, text, fontSize);
         }
 
-        public void AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect bgSubSection)
+        public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect bgSubSection)
         {
             CanvasPanel panel = new CanvasPanel(canvas, tex, position + pos, sz, bgSubSection);
 
             panels.Add(name, panel);
+            return panel;
         }
 
         public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 size, Rect subSprite)
