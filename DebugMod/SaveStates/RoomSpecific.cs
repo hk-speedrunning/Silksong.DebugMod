@@ -52,7 +52,6 @@ namespace DebugMod
             {
                 GameManager.instance.OnLoadedBoss -= StartBattle;
 
-                DebugMod.instance.LogDebug($"{objectName} {GameObject.Find(objectName)} {GameObject.FindWithTag("Battle Scene")}");
                 BattleScene battleScene = GameObject.Find(objectName).GetComponent<BattleScene>();
                 battleScene.currentWave = wave;
                 battleScene.StartBattle();
