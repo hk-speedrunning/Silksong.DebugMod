@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace DebugMod
 {
@@ -49,6 +50,8 @@ namespace DebugMod
         [BindableMethod(name = "Next Save Page", category = "Savestates")]
         public static void NextStatePage()
         {
+            if (!SaveStateManager.inSelectSlotState) return;
+            
             SaveStateManager.currentStateFolder++;
             if (SaveStateManager.currentStateFolder >= SaveStateManager.savePages)
             {
@@ -64,6 +67,8 @@ namespace DebugMod
         [BindableMethod(name = "Prev Save Page", category = "Savestates")]
         public static void PrevStatePage()
         {
+            if (!SaveStateManager.inSelectSlotState) return;
+            
             SaveStateManager.currentStateFolder--;
             if (SaveStateManager.currentStateFolder < 0)
             {
