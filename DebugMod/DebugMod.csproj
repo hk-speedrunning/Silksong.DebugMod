@@ -8,10 +8,7 @@
 
   <PropertyGroup>
     <ProjectGuid>{932ED497-4C09-461E-B198-8B44FD9B288F}</ProjectGuid>
-
     <RootNamespace>DebugMod</RootNamespace>
-    <AssemblyTitle>DebugMod</AssemblyTitle>
-    <AssemblyVersion>0.1.1</AssemblyVersion>
     <Deterministic>true</Deterministic>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LangVersion>latest</LangVersion>
@@ -22,6 +19,12 @@
         https://nuget.bepinex.dev/v3/index.json
     </RestoreAdditionalProjectSources>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+    
+  <PropertyGroup>
+    <!--These properties will control the generated plugin info. Version is also used by various parts of the build system.-->
+    <AssemblyTitle>DebugMod</AssemblyTitle>
+    <Version>0.1.2</Version>
   </PropertyGroup>
   
   <ItemGroup>
