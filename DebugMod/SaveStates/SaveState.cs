@@ -362,6 +362,7 @@ namespace DebugMod
             }
 
             HeroController.instance.FinishedEnteringScene(true, false);
+            HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
 
             if (!string.IsNullOrEmpty(data.roomSpecificOptions))
             {
