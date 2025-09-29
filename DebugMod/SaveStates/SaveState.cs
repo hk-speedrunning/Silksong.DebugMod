@@ -353,9 +353,6 @@ namespace DebugMod
             HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
             HeroController.instance.GetComponent<Rigidbody2D>().isKinematic = data.isKinematized;
 
-            loadingStateTimer.Stop();
-            loadingSavestate = null;
-
             if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
             {
                 int cs = DebugMod.settings.ShowHitBoxes;
@@ -394,9 +391,13 @@ namespace DebugMod
             Time.timeScale = DebugMod.CurrentTimeScale;
             DebugMod.stateOnDeath = stateondeath;
 
+            loadingStateTimer.Stop();
+            loadingSavestate = null;
+
             Console.AddLine("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
 
             yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+            yield return null; // Not all HUD elements are ready immediately, wait one more frame
             HUDFixes();
         }
         
@@ -459,6 +460,8 @@ namespace DebugMod
             HeroController.instance.AddHealth(1);
             // PlayerData.instance.hasXunFlower = data.savedPd.hasXunFlower;
             DebugMod.infiniteHP = isInfiniteHp;
+
+            HeroController.instance.ClearEffects();
 
             int healthBlue = data.savedPd.healthBlue;
             for (int i = 0; i < healthBlue; i++)
