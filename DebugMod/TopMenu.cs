@@ -46,11 +46,11 @@ namespace DebugMod
             var saveStatesPanel = panel.AddPanel("SaveStates Panel", GUIController.Instance.images["DropdownBG"], new Vector2(545f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 170f));
 
             //Cheats panel
-            cheatsPanel.AddButton("Infinite Jump", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.ToggleInfiniteJump, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Jump", 10);
+            cheatsPanel.AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.ToggleInfiniteHP, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
             cheatsPanel.AddButton("Infinite Silk", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.ToggleInfiniteSilk, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Silk", 10);
-            cheatsPanel.AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.ToggleInfiniteHP, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
-            cheatsPanel.AddButton("Invincibility", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.ToggleInvincibility, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Invincibility", 10);
-            cheatsPanel.AddButton("Noclip", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleNoclip, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Noclip", 10);
+            cheatsPanel.AddButton("Invincibility", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.ToggleInvincibility, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Invincibility", 10);
+            cheatsPanel.AddButton("Noclip", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.ToggleNoclip, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Noclip", 10);
+            cheatsPanel.AddButton("Infinite Jump", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleInfiniteJump, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Jump", 10);
             cheatsPanel.AddButton("Kill Self", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.KillSelf, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kill Self", 10);
             cheatsPanel.AddButton("Lock KeyBinds", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, BindableFunctions.ToggleLockKeyBinds, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Lock KeyBinds", 9);
 
@@ -69,11 +69,12 @@ namespace DebugMod
             skillsPanel.AddButton("Needle Strike", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 330f), Vector2.zero, BindableFunctions.ToggleNeedleStrike, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Needle Strike", 10);
 
             //Tools panel
-            toolsPanel.AddButton("All Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Tools", 10);
-            toolsPanel.AddButton("All Crests", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Crests", 10);
-            toolsPanel.AddButton("Tool Pouches", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementPouches, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
-            toolsPanel.AddButton("Crafting Kits", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.IncrementKits, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
-            toolsPanel.AddButton("Craft Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.CraftTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Craft Tools", 10);
+            toolsPanel.AddButton("All Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Tools", 10);
+            toolsPanel.AddButton("All Crests", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "All Crests", 10);
+            toolsPanel.AddButton("Tool Pouches", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.IncrementPouches, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
+            toolsPanel.AddButton("Crafting Kits", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementKits, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
+            toolsPanel.AddButton("Infinite Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleInfiniteTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite Uses", 10);
+            toolsPanel.AddButton("Craft Tools", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.CraftTools, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Craft Tools", 10);
 
             //Items panel
             itemsPanel.AddButton("Rosaries", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Rosaries", 10);
@@ -181,16 +182,17 @@ namespace DebugMod
             {
                 panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
                 panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
-                
+                panel.GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? SelectedColor : Color.white);
+
             }
 
             if (panel.GetPanel("Cheats Panel").active)
             {
-                panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? SelectedColor : Color.white);
-                panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? SelectedColor : Color.white);
                 panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? SelectedColor : Color.white);
+                panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? SelectedColor : Color.white);
                 panel.GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? SelectedColor : Color.white);
                 panel.GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? SelectedColor : Color.white);
+                panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? SelectedColor : Color.white);
                 panel.GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? SelectedColor : Color.white);
 
             }

@@ -59,6 +59,7 @@ namespace DebugMod
         internal static bool stateOnDeath;
         internal static bool infiniteHP;
         internal static bool infiniteSilk;
+        internal static bool infiniteTools;
         internal static bool playerInvincible;
         internal static bool noclip;
         internal static Vector3 noclipPos;

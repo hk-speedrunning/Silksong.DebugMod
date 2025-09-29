@@ -279,6 +279,26 @@ namespace DebugMod
                 HeroController.instance.AddSilk(1, false);
             }
 
+            if (DebugMod.infiniteTools && ToolItemManager.Instance && ToolItemManager.Instance.toolItems)
+            {
+                foreach (ToolItem tool in ToolItemManager.Instance.toolItems)
+                {
+                    if (tool)
+                    {
+                        ToolItemsData.Data data = tool.SavedData;
+                        int oldAmount = data.AmountLeft;
+                        data.AmountLeft = ToolItemManager.GetToolStorageAmount(tool);
+                        tool.SavedData = data;
+
+                        AttackToolBinding? binding = ToolItemManager.GetAttackToolBinding(tool);
+                        if (binding.HasValue && oldAmount != data.AmountLeft)
+                        {
+                            ToolItemManager.ReportBoundAttackToolUpdated(binding.Value);
+                        }
+                    }
+                }
+            }
+
             if (DebugMod.playerInvincible && PlayerData.instance != null)
             {
                 PlayerData.instance.isInvincible = true;

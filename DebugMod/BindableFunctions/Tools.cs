@@ -46,6 +46,12 @@
             }
         }
 
+        [BindableMethod(name = "Infinite Tools", category = "Tools")]
+        public static void ToggleInfiniteTools()
+        {
+            DebugMod.infiniteTools = !DebugMod.infiniteTools;
+            Console.AddLine("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
+        }
 
         [BindableMethod(name = "Craft Tools", category = "Tools")]
         public static void CraftTools()
