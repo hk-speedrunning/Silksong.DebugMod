@@ -84,7 +84,8 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hero State", () => HeroController.instance.hero_state.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Velocity", () => HeroController.instance.current_velocity.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.silkMax);
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.silkMax
+                + (PlayerData.instance.silkMax > 9 && PlayerData.instance.IsSilkSpoolBroken ? ", broken" : ""));
             y += 30f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
