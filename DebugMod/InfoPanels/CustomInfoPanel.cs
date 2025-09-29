@@ -86,22 +86,23 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "HP", () => PlayerData.instance.health + " / " + PlayerData.instance.maxHealth);
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.silkMax
                 + (PlayerData.instance.silkMax > 9 && PlayerData.instance.IsSilkSpoolBroken ? ", broken" : ""));
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
-            y += 30f;
+            MainInfoPanel.AddInfo(10, 150f, y += 20, "Quest Points", () => QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0].CurrentValueCount + " / 17");
+            y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Needle Base", () => PlayerData.instance.nailDamage.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Damage", () => DebugMod.lastHit != null ?
                 $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Type", () => DebugMod.lastHit?.AttackType.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "");
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "isInvuln", () => GetStringForBool(HeroController.instance.cState.Invulnerable));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Invincible", () => GetStringForBool(PlayerData.instance.isInvincible));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Damage State", () => HeroController.instance.damageMode.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Dead State", () => GetStringForBool(HeroController.instance.cState.dead));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hazard Death", () => HeroController.instance.cState.hazardDeath.ToString());
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Scene Name", () => DebugMod.GetSceneName());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Transition", () => GetStringForBool(HeroController.instance.cState.transitioning));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Trans State", () => GetTransState());
@@ -116,7 +117,7 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Accept Input", () => GetStringForBool(HeroController.instance.acceptingInput));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Relinquished", () => GetStringForBool(HeroController.instance.controlReqlinquished));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "atBench", () => GetStringForBool(PlayerData.instance.atBench));
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Dashing", () => GetStringForBool(HeroController.instance.cState.dashing));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Jumping", () => GetStringForBool((HeroController.instance.cState.jumping || HeroController.instance.cState.doubleJumping)));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Superdashing", () => GetStringForBool(HeroController.instance.cState.superDashing));
@@ -124,14 +125,14 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Hardland", () => GetStringForBool(HeroController.instance.cState.willHardLand));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Swimming", () => GetStringForBool(HeroController.instance.cState.swimming));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Recoiling", () => GetStringForBool(HeroController.instance.cState.recoiling));
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall lock", () => GetStringForBool(HeroController.instance.wallLocked));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall jumping", () => GetStringForBool(HeroController.instance.cState.wallJumping));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall touching", () => GetStringForBool(HeroController.instance.cState.touchingWall));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall sliding", () => GetStringForBool(HeroController.instance.cState.wallSliding));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall left", () => GetStringForBool(HeroController.instance.touchingWallL));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Wall right", () => GetStringForBool(HeroController.instance.touchingWallR));
-            y += 30f;
+            y += 25f;
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Attacking", () => GetStringForBool(HeroController.instance.cState.attacking));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canCast", () => GetStringForBool(HeroController.instance.CanCast()));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "canSuperjump", () => GetStringForBool(HeroController.instance.CanSuperJump()));
