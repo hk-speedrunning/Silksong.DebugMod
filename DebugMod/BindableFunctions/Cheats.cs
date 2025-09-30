@@ -1,4 +1,5 @@
-﻿using Object = UnityEngine.Object;
+﻿using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DebugMod
 {
@@ -63,6 +64,7 @@ namespace DebugMod
             else
             {
                 Console.AddLine("Disabled noclip");
+                DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
             }
         }
 

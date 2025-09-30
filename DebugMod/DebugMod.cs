@@ -338,7 +338,7 @@ namespace DebugMod
 
         [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Getter)]
         [HarmonyPostfix]
-        public static int Get_NailDamage(int nailDamage)
+        private static int Get_NailDamage(int nailDamage)
         {
             return nailDamage + extraNailDamage;
         }
@@ -346,7 +346,7 @@ namespace DebugMod
 
         [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.TakeDamage))]
         [HarmonyPrefix]
-        public static void TakeDamage(HealthManager __instance, HitInstance hitInstance)
+        private static void TakeDamage(HealthManager __instance, HitInstance hitInstance)
         {
             HitInstance scaled = __instance.ApplyDamageScaling(hitInstance);
             lastHit = scaled;
@@ -367,7 +367,7 @@ namespace DebugMod
         // Prevents clipping through water when invincible
         [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
         [HarmonyPrefix]
-        public static void OnTriggerEnter2D_Prefix(Collider2D collision)
+        private static void OnTriggerEnter2D_Prefix(Collider2D collision)
         {
             if (collision.gameObject.GetComponent<HeroController>() && playerInvincible)
             {
@@ -377,7 +377,7 @@ namespace DebugMod
 
         [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
         [HarmonyPostfix]
-        public static void OnTriggerEnter2D_Postfix()
+        private static void OnTriggerEnter2D_Postfix()
         {
             if (playerInvincible)
             {
@@ -388,7 +388,7 @@ namespace DebugMod
         // Prevents savestates loaded while in water from warping to the wrong point.
         [HarmonyPatch(typeof(HeroWaterController), nameof(HeroWaterController.TumbleOut))]
         [HarmonyPrefix]
-        public static bool HeroWaterController_TumbleOut_Prefix(HeroWaterController __instance)
+        private static bool HeroWaterController_TumbleOut_Prefix(HeroWaterController __instance)
         {
             if (SaveState.loadingSavestate == null) return true;
             

@@ -329,10 +329,12 @@ namespace DebugMod
                 if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
                 {
                     DebugMod.RefKnight.transform.position = DebugMod.noclipPos;
+                    DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints |= RigidbodyConstraints2D.FreezePosition;
                 }
                 else
                 {
                     DebugMod.noclipPos = DebugMod.RefKnight.transform.position;
+                    DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
                 }
             }
 
