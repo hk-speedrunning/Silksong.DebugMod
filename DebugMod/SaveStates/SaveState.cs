@@ -11,6 +11,7 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod
@@ -406,6 +407,13 @@ namespace DebugMod
             yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
             yield return null; // Not all HUD elements are ready immediately, wait one more frame
             HUDFixes();
+
+            // Fix bench interactions
+            foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
+            {
+                bench.gameObject.SetActive(false);
+                bench.gameObject.SetActive(true);
+            }
         }
         
         //these are toggleable, as they will prevent glitches from persisting
