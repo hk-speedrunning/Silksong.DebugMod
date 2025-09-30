@@ -396,6 +396,13 @@ namespace DebugMod
             return false;
         }
 
+        [HarmonyPatch(typeof(HeroController), nameof(HeroController.DoSpecialDamage))]
+        [HarmonyPrefix]
+        private static bool HeroController_DoSpecialDamage()
+        {
+            return !playerInvincible;
+        }
+
         /// <summary>
         /// Adds a menu to the top menu, with the provided name and button list.
         /// </summary>
