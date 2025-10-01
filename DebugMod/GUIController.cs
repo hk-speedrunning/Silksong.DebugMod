@@ -70,6 +70,7 @@ namespace DebugMod
             CanvasScaler scaler = canvas.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Shrink;
             canvas.AddComponent<GraphicRaycaster>();
 
             SaveStatesPanel.BuildMenu(canvas);

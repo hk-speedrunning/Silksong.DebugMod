@@ -39,7 +39,8 @@ namespace DebugMod.Canvas
 
             textObj.transform.SetParent(parent.transform, false);
 
-            Vector2 position = new Vector2((pos.x + size.x / 2f) / 1920f, (1080f - (pos.y + size.y / 2f)) / 1080f);
+            Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
+            textTransform.pivot = new Vector2(0f, 1f);
             textTransform.anchorMin = position;
             textTransform.anchorMax = position;
 
@@ -54,7 +55,7 @@ namespace DebugMod.Canvas
             {
                 RectTransform textTransform = textObj.GetComponent<RectTransform>();
 
-                Vector2 position = new Vector2((pos.x + size.x / 2f) / 1920f, (1080f - (pos.y + size.y / 2f)) / 1080f);
+                Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
                 textTransform.anchorMin = position;
                 textTransform.anchorMax = position;
             }
@@ -66,7 +67,7 @@ namespace DebugMod.Canvas
             {
                 Vector2 anchor = textObj.GetComponent<RectTransform>().anchorMin;
 
-                return new Vector2(anchor.x * 1920f - size.x / 2f, 1080f - anchor.y * 1080f - size.y / 2f);
+                return new Vector2(anchor.x * 1920f, 1080f - anchor.y * 1080f);
             }
 
             return Vector2.zero;

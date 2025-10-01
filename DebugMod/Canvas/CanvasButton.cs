@@ -35,7 +35,8 @@ namespace DebugMod.Canvas
             buttonTransform.SetScaleX(size.x / bgSubSection.width);
             buttonTransform.SetScaleY(size.y / bgSubSection.height);
 
-            Vector2 position = new Vector2((pos.x + ((size.x / bgSubSection.width) * bgSubSection.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / bgSubSection.height) * bgSubSection.height) / 2f)) / 1080f);
+            Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
+            buttonTransform.pivot = new Vector2(0f, 1f);
             buttonTransform.anchorMin = position;
             buttonTransform.anchorMax = position;
 
@@ -109,7 +110,7 @@ namespace DebugMod.Canvas
             if (buttonObj != null)
             {
                 Vector2 sz = buttonObj.GetComponent<RectTransform>().sizeDelta;
-                Vector2 position = new Vector2((pos.x + sz.x / 2f) / 1920f, (1080f - (pos.y + sz.y / 2f)) / 1080f);
+                Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
                 buttonObj.GetComponent<RectTransform>().anchorMin = position;
                 buttonObj.GetComponent<RectTransform>().anchorMax = position;
             }
@@ -137,7 +138,7 @@ namespace DebugMod.Canvas
                 Vector2 anchor = buttonObj.GetComponent<RectTransform>().anchorMin;
                 Vector2 sz = buttonObj.GetComponent<RectTransform>().sizeDelta;
 
-                return new Vector2(anchor.x * 1920f - sz.x / 2f, 1080f - anchor.y * 1080f - sz.y / 2f);
+                return new Vector2(anchor.x * 1920f - sz.x / 2f, 1080f - anchor.y * 1080f);
             }
 
             return Vector2.zero;

@@ -95,13 +95,13 @@ namespace DebugMod
         public const int ItemsPerPage = 11;
 
         private static CanvasPanel panel;
-        
+
         public static KeyCode keyWarning = KeyCode.None;
 
         // TODO: Refactor to allow rotating images
         public static void BuildMenu(GameObject canvas)
         {
-            panel = new CanvasPanel(canvas, GUIController.Instance.images["HelpBG"], new Vector2(1123, 456),
+            panel = new CanvasPanel(canvas, GUIController.Instance.images["HelpBG"], new Vector2(1123f, 300f),
                 Vector2.zero,
                 new Rect(0, 0, GUIController.Instance.images["HelpBG"].width,
                     GUIController.Instance.images["HelpBG"].height));
