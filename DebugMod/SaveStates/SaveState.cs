@@ -411,8 +411,11 @@ namespace DebugMod
             // Fix bench interactions
             foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
             {
-                bench.gameObject.SetActive(false);
-                bench.gameObject.SetActive(true);
+                if (!bench.GetComponent<HeroController>()) // Why, Team Cherry?
+                {
+                    bench.gameObject.SetActive(false);
+                    bench.gameObject.SetActive(true);
+                }
             }
         }
         
