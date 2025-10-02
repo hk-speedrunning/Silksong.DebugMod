@@ -18,6 +18,8 @@ namespace DebugMod.Canvas
                 size = new Vector2(subSprite.width, subSprite.height);
             }
 
+            size = StretchSizeIfNecessary(size);
+
             sz = size;
             sub = subSprite;
 
@@ -43,6 +45,14 @@ namespace DebugMod.Canvas
             Object.DontDestroyOnLoad(imageObj);
 
             active = true;
+        }
+
+        private Vector2 StretchSizeIfNecessary(Vector2 size)
+        {
+            var standardAspectRatio = 1920f / 1080f;
+            var resolutionAspectRatio = (float)Screen.width / Screen.height;
+            var widthScalar = resolutionAspectRatio / standardAspectRatio;
+            return new Vector2(size.x * widthScalar, size.y);
         }
 
         public void UpdateImage(Texture2D tex, Rect subSection)
