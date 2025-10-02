@@ -321,8 +321,7 @@ namespace DebugMod
                 for (int i = 1; i < sceneData.Length; i++)
                 {
                     SceneWatcher.LoadedSceneInfo.activeInfo = sceneData[i];
-                    AsyncOperation loadop = USceneManager.LoadSceneAsync(sceneData[i].name, LoadSceneMode.Additive);
-                    loadop.allowSceneActivation = true;
+                    var loadop = Addressables.LoadSceneAsync($"Scenes/{sceneData[i].name}", LoadSceneMode.Additive);
                     yield return loadop;
                     SceneWatcher.LoadedSceneInfo.activeInfo = null;
                     GameManager.instance.RefreshTilemapInfo(sceneData[i].name);
