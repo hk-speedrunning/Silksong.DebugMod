@@ -101,7 +101,7 @@ namespace DebugMod
         // TODO: Refactor to allow rotating images
         public static void BuildMenu(GameObject canvas)
         {
-            panel = new CanvasPanel(canvas, GUIController.Instance.images["HelpBG"], new Vector2(1123f, 300f),
+            panel = new CanvasPanel(canvas, GUIController.Instance.images["HelpBG"], new Vector2(1123, 456),
                 Vector2.zero,
                 new Rect(0, 0, GUIController.Instance.images["HelpBG"].width,
                     GUIController.Instance.images["HelpBG"].height));
