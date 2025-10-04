@@ -20,6 +20,8 @@ The mod is still in early development, and some features are missing or broken. 
 * Visualize and color-code hitboxes
 * Change the player's respawn point to anywhere in the current scene
 * Recall to the set respawn point
+* Preview where the player's cocoon will spawn if they die
+* Unlock all tools, crests, crest upgrades, and crest slots
 * Kill all enemies
 * Add HP bars to enemies
 * Draw collision boxes for enemies
