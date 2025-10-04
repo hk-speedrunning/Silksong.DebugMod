@@ -14,54 +14,23 @@ namespace DebugMod
             Console.AddLine("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
         }
 
-        /*
-        [BindableMethod(name = "Shade Spawn Points", category = "Visual")]
-        public static void ShadeSpawnPoint()
+        [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
+        public static void PreviewCocoonPosition()
         {
-            if (DebugMod.HC == null)
+            CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
+                ?? GameManager.instance.gameObject.AddComponent<CocoonPreviewer>();
+
+            if (!component.previewEnabled)
             {
-                Console.AddLine("Player isn't in scene. How did you reach here?");
-                return;
+                component.previewEnabled = true;
+                Console.AddLine("Enabled cocoon spawn point preview");
             }
-
-            var component = HeroController.instance.gameObject.GetComponent<ShadeSpawnLocation>();
-            if (component == null) HeroController.instance.gameObject.AddComponent<ShadeSpawnLocation>();
-            //not gonna delete component if disabled to not break something if someone spams
-
-            ShadeSpawnLocation.EnabledCompass = !ShadeSpawnLocation.EnabledCompass;
-            Console.AddLine("Shade spawn point toggled " + (ShadeSpawnLocation.EnabledCompass ? "On" : "Off"));
+            else
+            {
+                component.previewEnabled = false;
+                Console.AddLine("Disabled cocoon spawn point preview");
+            }
         }
-
-        [BindableMethod(name = "Shade Retreat Border", category = "Visual")]
-        public static void ShowShadeRetreatBorder()
-        {
-            if (DebugMod.HC == null)
-            {
-                Console.AddLine("Player isn't in scene. How did you reach here?");
-                return;
-            }
-
-            var component = HeroController.instance.gameObject.GetComponent<ShadeSpawnLocation>();
-            if (component == null) HeroController.instance.gameObject.AddComponent<ShadeSpawnLocation>();
-            //not gonna delete component if disabled to not break something if someone spams
-
-            if (!ShadeSpawnLocation.EnabledCompass)
-            {
-                Console.AddLine("Please Enable Shade compass first");
-                return;
-            }
-
-            if (++ShadeSpawnLocation.ShowShadeRetreatBorder > 2) ShadeSpawnLocation.ShowShadeRetreatBorder = 0;
-
-            string displaytext = ShadeSpawnLocation.ShowShadeRetreatBorder switch
-            {
-                1 => "Closest",
-                2 => "All",
-                _ => "None"
-            };
-            Console.AddLine($"Shade Reach Showing {displaytext}");
-        }
-        */
 
         [BindableMethod(name = "Toggle Vignette", category = "Visual")]
         public static void ToggleVignette()
