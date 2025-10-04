@@ -169,9 +169,7 @@ namespace DebugMod
             }
             GC.tk2dCam.ZoomFactor = 1f;
             HC.vignette.enabled = false;
-            EnemiesPanel.hitboxes = false;
             EnemiesPanel.hpBars = false;
-            EnemiesPanel.autoUpdate = false;
             pd.infiniteAirJump=false;
             DebugMod.infiniteSilk = false;
             DebugMod.infiniteHP = false; 

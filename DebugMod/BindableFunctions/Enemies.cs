@@ -6,28 +6,10 @@ namespace DebugMod
     public static partial class BindableFunctions
     {
 
-        //probably should delete this as it has become obsolete becuase of the new Show Hitboxes in the visuals page
-        [BindableMethod(name = "Toggle Enemy Hitboxes (Redundant)", category = "Enemy Panel")]
-        public static void ToggleEnemyCollision()
-        {
-            EnemiesPanel.hitboxes = !EnemiesPanel.hitboxes;
-
-            if (EnemiesPanel.hitboxes)
-            {
-                Console.AddLine("Enabled hitboxes");
-            }
-            else
-            {
-                Console.AddLine("Disabled hitboxes");
-            }
-        }
-
         [BindableMethod(name = "Toggle HP Bars", category = "Enemy Panel")]
         public static void ToggleEnemyHPBars()
         {
             EnemiesPanel.hpBars = !EnemiesPanel.hpBars;
-
-            if (EnemiesPanel.hpBars) EnemiesPanel.autoUpdate = true;
 
             if (EnemiesPanel.hpBars)
             {
@@ -39,26 +21,11 @@ namespace DebugMod
             }
         }
 
-        [BindableMethod(name = "Toggle Enemy Scan", category = "Enemy Panel")]
-        public static void ToggleEnemyAutoScan()
-        {
-            EnemiesPanel.autoUpdate = !EnemiesPanel.autoUpdate;
-
-            if (EnemiesPanel.autoUpdate)
-            {
-                Console.AddLine("Enabled auto-scan (May impact performance)");
-            }
-            else
-            {
-                Console.AddLine("Disabled auto-scan");
-            }
-        }
-
         [BindableMethod(name = "Enemy Scan", category = "Enemy Panel")]
         public static void EnemyScan()
         {
-            EnemiesPanel.EnemyUpdate(200f);
-            Console.AddLine("Refreshing collider data...");
+            EnemiesPanel.EnemyUpdate();
+            Console.AddLine("Scanning for enemies...");
         }
 
         [BindableMethod(name = "Self Damage", category = "Enemy Panel")]

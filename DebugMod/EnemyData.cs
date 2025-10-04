@@ -6,7 +6,7 @@ namespace DebugMod
     public struct EnemyData
     {
         public int HP;
-        public int maxHP;
+        public int MaxHP;
         // public PlayMakerFSM FSM;
         public HealthManager HM;
         public tk2dSprite Spr;
@@ -15,13 +15,13 @@ namespace DebugMod
         public GameObject gameObject;
         public BoxCollider2D boxCollider2D;
 
-        public EnemyData(int hp, HealthManager hm, tk2dSprite spr, GameObject parent, GameObject go)
+        public EnemyData(GameObject go, GameObject parent)
         {
-            HP = hp;
-            maxHP = hp;
-            HM = hm;
-            Spr = spr;
             gameObject = go;
+            HM = gameObject.GetComponent<HealthManager>();
+            HP = HM.hp;
+            MaxHP = HP;
+            Spr = gameObject.GetComponent<tk2dSprite>();
             boxCollider2D = Spr?.boxCollider2D ?? gameObject?.GetComponent<BoxCollider2D>();
 
             Texture2D tex = new Texture2D(120, 40);

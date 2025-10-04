@@ -21,7 +21,7 @@
 
             if (DebugMod.settings.EnemiesPanelVisible)
             {
-                EnemiesPanel.RefreshEnemyList();
+                EnemiesPanel.EnemyUpdate();
             }
         }
 
@@ -55,7 +55,7 @@
             DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
             if (DebugMod.settings.EnemiesPanelVisible)
             {
-                EnemiesPanel.RefreshEnemyList();
+                EnemiesPanel.EnemyUpdate();
             }
         }
 

@@ -351,7 +351,7 @@ namespace DebugMod
 
                 if (DebugMod.settings.EnemiesPanelVisible)
                 {
-                    EnemiesPanel.EnemyUpdate(200f);
+                    EnemiesPanel.EnemyUpdate();
                 }
             }
             if (!string.IsNullOrEmpty(respawnSceneWatch) && respawnSceneWatch != PlayerData.instance.respawnScene)

@@ -1,25 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using DebugMod.Canvas;
-using UnityEngine;
 using GlobalEnums;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DebugMod
 {
     public static class EnemiesPanel
     {
         private static CanvasPanel panel;
-        public static bool autoUpdate;
         private static float lastTime;
         public static List<EnemyData> enemyPool = new List<EnemyData>();
 
         public static GameObject parent { get; private set; }
         public static bool hpBars;
-        public static bool hitboxes;
-        public static readonly MethodInfo takeDamage = typeof(HeroController).GetMethod("TakeDamage");
-        public static readonly ParameterInfo[] parameters = takeDamage.GetParameters();
 
         public static void BuildMenu(GameObject canvas)
         {
@@ -42,10 +38,7 @@ namespace DebugMod
                 panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), InfClicked, new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
             }
 
-            panel.GetPanel("Pause").AddButton("Collision", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, CollisionClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "Collision");
-            panel.GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(125f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
-            panel.GetPanel("Pause").AddButton("Auto", GUIController.Instance.images["ButtonRect"], new Vector2(220f, 250f), Vector2.zero, AutoClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "Auto");
-            panel.GetPanel("Pause").AddButton("Scan", GUIController.Instance.images["ButtonRect"], new Vector2(315f, 250f), Vector2.zero, ScanClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "Scan");
+            panel.GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
 
             panel.FixRenderOrder();
         }
@@ -56,7 +49,7 @@ namespace DebugMod
             EnemyData dat = enemyPool.FindAll(ed => ed.gameObject?.activeSelf == true)[num - 1];
 
             Console.AddLine("Destroying enemy: " + dat.gameObject.name);
-            UnityEngine.Object.DestroyImmediate(dat.gameObject);
+            Object.DestroyImmediate(dat.gameObject);
         }
 
         private static void CloneClicked(string buttonName)
@@ -64,11 +57,8 @@ namespace DebugMod
             int num = Convert.ToInt32(buttonName.Substring(5));
             EnemyData dat = enemyPool.FindAll(ed => ed.gameObject?.activeSelf == true)[num - 1];
 
-            GameObject gameObject2 = UnityEngine.Object.Instantiate(dat.gameObject, dat.gameObject.transform.position, dat.gameObject.transform.rotation) as GameObject;
-            tk2dSprite spr = gameObject2.GetComponent<tk2dSprite>();
-            HealthManager HM2 = gameObject2.GetComponent<HealthManager>();
-            int value8 = HM2.hp;
-            enemyPool.Add(new EnemyData(value8, HM2, spr, parent, gameObject2));
+            GameObject gameObject2 = Object.Instantiate(dat.gameObject, dat.gameObject.transform.position, dat.gameObject.transform.rotation);
+            enemyPool.Add(new EnemyData(gameObject2, parent));
             Console.AddLine("Cloning enemy as: " + gameObject2.name);
         }
 
@@ -81,14 +71,8 @@ namespace DebugMod
             Console.AddLine("HP for enemy: " + dat.gameObject.name + " is now 9999");
         }
 
-        private static void CollisionClicked(string buttonName) => BindableFunctions.ToggleEnemyCollision();
         private static void HPBarsClicked(string buttonName) => BindableFunctions.ToggleEnemyHPBars();
-
-        private static void AutoClicked(string buttonName) => BindableFunctions.ToggleEnemyAutoScan();
-
-        private static void ScanClicked(string buttonName) => BindableFunctions.EnemyScan();
         
-
         public static void Update()
         {
             if (panel == null)
@@ -182,7 +166,7 @@ namespace DebugMod
                                         }
                                         else
                                         {
-                                            if ((float) hp / (float) dat.maxHP >= (x - 2f) / 117f)
+                                            if ((float) hp / (float) dat.MaxHP >= (x - 2f) / 117f)
                                             {
                                                 tex.SetPixel(x, y, Color.red);
                                             }
@@ -200,55 +184,6 @@ namespace DebugMod
                             }
                         }
 
-                        if (hitboxes)
-                        {
-                            if (dat.boxCollider2D is BoxCollider2D boxCollider2D && boxCollider2D != null)
-                            {
-                                Bounds bounds2 = boxCollider2D.bounds;
-
-                                float width = Math.Abs(bounds2.max.x - bounds2.min.x);
-                                float height = Math.Abs(bounds2.max.y - bounds2.min.y);
-                                Vector2 position = Camera.main.WorldToScreenPoint(boxCollider2D.transform.position +
-                                    new Vector3(boxCollider2D.offset.x, boxCollider2D.offset.y, 0f));
-                                Vector2 size = Camera.main.WorldToScreenPoint(boxCollider2D.transform.position +
-                                                                              new Vector3(width, height, 0));
-                                size -= position;
-
-                                Quaternion rot = boxCollider2D.transform.rotation;
-                                rot.eulerAngles = new Vector3(Mathf.Round(rot.eulerAngles.x / 90) * 90,
-                                    Mathf.Round(rot.eulerAngles.y / 90) * 90, Mathf.Round(rot.eulerAngles.z / 90) * 90);
-                                Vector2 pivot = Camera.main.WorldToScreenPoint(boxCollider2D.transform.position);
-                                Vector2 pointA =
-                                    Camera.main.WorldToScreenPoint((Vector2) boxCollider2D.transform.position +
-                                                                   boxCollider2D.offset);
-                                pointA.x -= size.x / 2f;
-                                pointA.y -= size.y / 2f;
-                                Vector2 pointB = pointA + size;
-
-                                pointA = (Vector2) (rot * (pointA - pivot)) + pivot;
-                                pointB = (Vector2) (rot * (pointB - pivot)) + pivot;
-
-                                position = new Vector2(pointA.x < pointB.x ? pointA.x : pointB.x,
-                                    pointA.y > pointB.y ? pointA.y : pointB.y);
-                                size = new Vector2(Math.Abs(pointA.x - pointB.x), Math.Abs(pointA.y - pointB.y));
-
-                                size.x *= 1920f / Screen.width;
-                                size.y *= 1080f / Screen.height;
-
-                                position.x *= 1920f / Screen.width;
-                                position.y *= 1080f / Screen.height;
-                                position.y = 1080f - position.y;
-
-                                dat.hitbox.SetPosition(position);
-                                dat.hitbox.ResizeBG(size);
-                            }
-
-                            if (!dat.hitbox.active)
-                            {
-                                dat.hitbox.SetActive(true, true);
-                            }
-                        }
-
                         if (hpBars)
                         {
                             Vector2 enemyPos = Camera.main.WorldToScreenPoint(obj.transform.position);
@@ -263,7 +198,7 @@ namespace DebugMod
                             enemyPos.x -= 60;
 
                             dat.hpBar.SetPosition(enemyPos);
-                            dat.hpBar.GetText("HP").UpdateText(dat.HM.hp + "/" + dat.maxHP);
+                            dat.hpBar.GetText("HP").UpdateText(dat.HM.hp + "/" + dat.MaxHP);
 
                             if (!dat.hpBar.active)
                             {
@@ -276,15 +211,10 @@ namespace DebugMod
                             dat.hpBar.SetActive(false, true);
                         }
 
-                        if (!hitboxes && dat.hitbox.active)
-                        {
-                            dat.hitbox.SetActive(false, true);
-                        }
-
                         if (++enemyCount <= 14)
                         {
                             enemyNames += obj.name + "\n";
-                            enemyHP += dat.HM.hp + "/" + dat.maxHP + "\n";
+                            enemyHP += dat.HM.hp + "/" + dat.MaxHP + "\n";
                         }
                     }
                 }
@@ -307,12 +237,8 @@ namespace DebugMod
                         }
                     }
 
-                    panel.GetPanel("Pause").GetButton("Collision")
-                        .SetTextColor(hitboxes ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                     panel.GetPanel("Pause").GetButton("HP Bars")
                         .SetTextColor(hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
-                    panel.GetPanel("Pause").GetButton("Auto")
-                        .SetTextColor(autoUpdate ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
                 }
 
                 if (enemyCount > 14)
@@ -346,141 +272,35 @@ namespace DebugMod
             return false;
         }
 
-        public static void RefreshEnemyList()
-        {
-            if (DebugMod.settings.EnemiesPanelVisible || hpBars)
-            {
-                GameObject[] rootGameObjects = null;
-                try
-                {
-                    rootGameObjects = UnityEngine.SceneManagement.SceneManager
-                        .GetSceneByName(DebugMod.GetSceneName()).GetRootGameObjects();
-                }
-                catch
-                {
-                    return;
-                }
-
-                if (rootGameObjects != null)
-                {
-                    foreach (GameObject gameObject in rootGameObjects)
-                    {
-                        if ((gameObject.layer == 11 || gameObject.layer == 17 || gameObject.tag == "Boss") && !Ignore(gameObject.name))
-                        {
-                            HealthManager healthManager = gameObject.GetComponent<HealthManager>();
-                            tk2dSprite spr = gameObject.GetComponent<tk2dSprite>();
-                            int num3 = gameObject.name.IndexOf("grass", StringComparison.OrdinalIgnoreCase);
-                            int num2 = gameObject.name.IndexOf("hopper", StringComparison.OrdinalIgnoreCase);
-                            if (num3 >= 0 && num2 >= 0)
-                            {
-                                spr = gameObject.transform.Find("Sprite").gameObject.gameObject.GetComponent<tk2dSprite>();
-                            }
-                            if (healthManager != null)
-                            {
-                                int value = healthManager.hp;
-                                enemyPool.Add(new EnemyData(value, healthManager, spr, parent, gameObject));
-                            }
-                        }
-                        EnemyDescendants(gameObject.transform);
-                    }
-                }
-                if (enemyPool.Count > 0)
-                {
-                    Console.AddLine("Enemy data filled, entries added: " + enemyPool.Count);
-                }
-                EnemyUpdate(200f);
-            }
-        }
-
         private static void CheckForAutoUpdate()
         {
-            if (!autoUpdate) return;
-
             float deltaTime = Time.realtimeSinceStartup - lastTime;
 
             if (deltaTime >= 2f)
             {
                 lastTime = Time.realtimeSinceStartup;
-                EnemyUpdate(0f);
+                EnemyUpdate();
             }
         }
 
-        public static void EnemyUpdate(float boxSize)
+        public static void EnemyUpdate()
         {
-            if (autoUpdate)
-            {
-                boxSize = 50f;
-            }
-
             if (DebugMod.settings.EnemiesPanelVisible && HeroController.instance != null && !HeroController.instance.cState.transitioning && DebugMod.GM.IsGameplayScene())
             {
                 int count = enemyPool.Count;
-                int layerMask = 1 << (int) PhysLayers.ENEMIES;
-                Collider2D[] array = Physics2D.OverlapBoxAll(DebugMod.RefKnight.transform.position, new Vector2(boxSize, boxSize), 1f, layerMask);
-                if (array == null) return;
                 
-                foreach (Collider2D t in array)
+                foreach (HealthManager healthManager in Object.FindObjectsByType<HealthManager>(FindObjectsSortMode.None))
                 {
-                    HealthManager healthManager = t.gameObject.GetComponent<HealthManager>();
-                    if (healthManager && enemyPool.All(ed => ed.gameObject != t.gameObject) && !Ignore(t.gameObject.name))
+                    if (healthManager.gameObject.layer == (int)PhysLayers.ENEMIES &&
+                        enemyPool.All(ed => ed.gameObject != healthManager.gameObject) && !Ignore(healthManager.gameObject.name))
                     {
-                        tk2dSprite spr = t.gameObject.GetComponent<tk2dSprite>();
-                        int value = healthManager.hp;
-                        enemyPool.Add(new EnemyData(value, healthManager, spr, parent, t.gameObject));
+                        enemyPool.Add(new EnemyData(healthManager.gameObject, parent));
                     }
                 }
 
                 if (enemyPool.Count > count)
                 {
                     Console.AddLine("EnemyList updated: +" + (enemyPool.Count - count));
-                }
-            }
-            else if (autoUpdate && (
-                //!DebugMod.settings.EnemiesPanelVisible ||
-                !GameManager.instance.IsGameplayScene() || HeroController.instance == null))
-            {
-                autoUpdate = false;
-                Console.AddLine("Cancelling enemy auto-scan due to weird conditions");
-            }
-        }
-
-        private static void EnemyDescendants(Transform transform)
-        {
-            List<Transform> list = new List<Transform>();
-            foreach (object obj in transform)
-            {
-                Transform transform2 = (Transform)obj;
-                if ((transform2.gameObject.layer == 11 || transform2.gameObject.layer == 17) && !enemyPool.Any(ed => ed.gameObject == transform2.gameObject) && !Ignore(transform2.gameObject.name))
-                {
-                    HealthManager healthManager = transform2.gameObject.GetComponent<HealthManager>();
-                    tk2dSprite spr = transform2.gameObject.GetComponent<tk2dSprite>();
-                    if (healthManager)
-                    {
-                        int value = healthManager.hp;
-                        enemyPool.Add(new EnemyData(value, healthManager, spr, parent, transform2.gameObject));
-                    }
-                }
-                list.Add(transform2);
-            }
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].childCount > 0)
-                {
-                    foreach (object obj2 in list[i])
-                    {
-                        Transform transform3 = (Transform)obj2;
-                        if ((transform3.gameObject.layer == 11 || transform3.gameObject.layer == 17) && !enemyPool.Any(ed => ed.gameObject == transform3.gameObject) && !Ignore(transform3.gameObject.name))
-                        {
-                            HealthManager healthManager2 = transform3.gameObject.GetComponent<HealthManager>();
-                            tk2dSprite spr2 = transform3.gameObject.GetComponent<tk2dSprite>();
-                            if (healthManager2)
-                            {
-                                int value2 = healthManager2.hp;
-                                enemyPool.Add(new EnemyData(value2, healthManager2, spr2, parent, transform3.gameObject));
-                            }
-                        }
-                        list.Add(transform3);
-                    }
                 }
             }
         }
