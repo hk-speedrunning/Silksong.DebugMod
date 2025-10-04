@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Reflection;
 using DebugMod.MonoBehaviours;
+using HarmonyLib;
 using UnityEngine;
 
 namespace DebugMod
 {
+    [HarmonyPatch]
     public static partial class BindableFunctions
     {
         private static readonly FieldInfo TimeSlowed = typeof(GameManager).GetField("timeSlowed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
@@ -111,47 +113,48 @@ namespace DebugMod
             HeroController.instance.EnableRenderer();
         }
 
-        /*
-        internal static Action ClearSceneDataHook;
+        private static string saveLevelStateAction;
 
-        [BindableMethod(name = "Refresh Scene Data", category = "Misc")]
-        public static void HookResetCurrentScene()
+        [BindableMethod(name = "Reset Scene Data", category = "Misc")]
+        public static void ResetCurrentScene()
         {
-            string scene = GameManager.instance.sceneName;
-            Console.AddLine("Clearing scene data from this scene, re-enter scene or warp");
-            ClearSceneDataHook?.Invoke();
-            On.GameManager.SaveLevelState += GameManager_SaveLevelState;
-            ClearSceneDataHook = () => On.GameManager.SaveLevelState -= GameManager_SaveLevelState;
-
-            void GameManager_SaveLevelState(On.GameManager.orig_SaveLevelState orig, GameManager self)
-            {
-                orig(self);
-                SceneData.instance.persistentBoolItems =
-                    SceneData.instance.persistentBoolItems.Where(x => x.sceneName != scene).ToList();
-                SceneData.instance.persistentIntItems =
-                    SceneData.instance.persistentIntItems.Where(x => x.sceneName != scene).ToList();
-                SceneData.instance.geoRocks = SceneData.instance.geoRocks.Where(x => x.sceneName != scene).ToList();
-
-                On.GameManager.SaveLevelState -= GameManager_SaveLevelState;
-                ClearSceneDataHook = null;
-            }
+            saveLevelStateAction = GameManager.instance.GetSceneNameString();
+            Console.AddLine("Clearing scene data from this scene, re-enter scene or warp to apply changes");
         }
 
         [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
-        public static void HookBlockCurrentSceneChanges()
+        public static void BlockCurrentSceneChanges()
         {
+            saveLevelStateAction = "block";
             Console.AddLine("Scene data changes made since entering this scene will not be saved");
-            ClearSceneDataHook?.Invoke();
-            On.GameManager.SaveLevelState += GameManager_BlockLevelChanges;
-            ClearSceneDataHook = () => On.GameManager.SaveLevelState -= GameManager_BlockLevelChanges;
+        }
 
-            void GameManager_BlockLevelChanges(On.GameManager.orig_SaveLevelState orig, GameManager self)
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+        [HarmonyPrefix]
+        private static bool GameManager_SaveLevelState_Prefix()
+        {
+            if (saveLevelStateAction == "block")
             {
-                On.GameManager.SaveLevelState -= GameManager_BlockLevelChanges;
-                ClearSceneDataHook = null;
+                saveLevelStateAction = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+        [HarmonyPostfix]
+        private static void GameManager_SaveLevelState_Postfix()
+        {
+            if (saveLevelStateAction != null && saveLevelStateAction != "block")
+            {
+                SceneData.instance.persistentBools.scenes.Remove(saveLevelStateAction);
+                SceneData.instance.persistentInts.scenes.Remove(saveLevelStateAction);
+                SceneData.instance.geoRocks.scenes.Remove(saveLevelStateAction);
+
+                saveLevelStateAction = null;
             }
         }
-        */
 
         [BindableMethod(name = "Break Cocoon", category = "Misc")]
         public static void BreakCocoon()
