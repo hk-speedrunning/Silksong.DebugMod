@@ -95,7 +95,7 @@ namespace DebugMod
         public const int ItemsPerPage = 11;
 
         private static CanvasPanel panel;
-        
+
         public static KeyCode keyWarning = KeyCode.None;
 
         // TODO: Refactor to allow rotating images
