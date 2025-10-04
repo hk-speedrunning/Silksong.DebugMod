@@ -306,25 +306,31 @@ namespace DebugMod
 
             if (DebugMod.noclip)
             {
+                Vector3 offset = Vector3.zero;
+                float baseSpeed = Input.GetKey(KeyCode.LeftShift) ? 40f : 20f;
+                float distance = baseSpeed * DebugMod.settings.NoClipSpeedModifier * Time.deltaTime;
+
                 if (DebugMod.IH.inputActions.Left.IsPressed)
                 {
-                    DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x - Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.y, DebugMod.noclipPos.z);
+                    offset += Vector3.left * distance;
                 }
 
                 if (DebugMod.IH.inputActions.Right.IsPressed)
                 {
-                    DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x + Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.y, DebugMod.noclipPos.z);
+                    offset += Vector3.right * distance;
                 }
 
                 if (DebugMod.IH.inputActions.Up.IsPressed)
                 {
-                    DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x, DebugMod.noclipPos.y + Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.z);
+                    offset += Vector3.up * distance;
                 }
 
                 if (DebugMod.IH.inputActions.Down.IsPressed)
                 {
-                    DebugMod.noclipPos = new Vector3(DebugMod.noclipPos.x, DebugMod.noclipPos.y - Time.deltaTime * 20f * DebugMod.settings.NoClipSpeedModifier, DebugMod.noclipPos.z);
+                    offset += Vector3.down * distance;
                 }
+
+                DebugMod.noclipPos += offset;
 
                 if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
                 {
