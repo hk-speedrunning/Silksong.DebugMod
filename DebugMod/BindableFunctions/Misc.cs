@@ -14,35 +14,6 @@ namespace DebugMod
         private static float TimeScaleDuringFrameAdvance = 0f;
         internal static int frameCounter = 0;
 
-
-        /*[BindableMethod(name = "Nail Damage +4 Temp", category = "Misc")]
-        public static void IncreaseNailDamageTemp()
-        {
-            int num = 4;
-            if (DebugMod.NailDamage == 0)
-            {
-                num = 5;
-            }
-            DebugMod.NailDamage += num;
-            Console.AddLine($"Increased base nailDamage to {DebugMod.NailDamage}");
-        }
-
-        [BindableMethod(name = "Nail Damage -4 Temp", category = "Misc")]
-        public static void DecreaseNailDamageTemp()
-        {
-            int num2 = DebugMod.NailDamage - 4;
-            if (num2 >= 0)
-            {
-                DebugMod.NailDamage = num2;
-                Console.AddLine($"Decreased base nailDamage to {DebugMod.NailDamage}");
-            }
-            else
-            {
-                Console.AddLine("Cannot set base nailDamage less than 0 therefore forcing 0 value");
-                DebugMod.NailDamage = 0;
-            }
-        }*/
-
         [BindableMethod(name = "Force Pause", category = "Misc")]
         public static void ForcePause()
         {
@@ -70,15 +41,6 @@ namespace DebugMod
                 DebugMod.instance.Log("Error while attempting force pause:\n" + e);
             }
         }
-
-        [BindableMethod(name = "Reset Encounters", category = "Misc")]
-        public static void ResetProxyFSMEncounters()
-        {
-            HeroController.instance.proxyFSM.FsmVariables.FindFsmBool("Faced Nightmare").Value = false;
-            HeroController.instance.proxyFSM.FsmVariables.FindFsmBool("Faced Zote").Value = false;
-            HeroController.instance.proxyFSM.FsmVariables.FindFsmBool("Faced Radiance").Value = false;
-        }
-
 
         [BindableMethod(name = "Hazard Respawn", category = "Misc")]
         public static void Respawn()
@@ -115,14 +77,12 @@ namespace DebugMod
             Console.AddLine("Manual respawn point on this map set to" + manualRespawn);
         }
 
-        /*
-        [BindableMethod(name = "Toggle Infected Crossroads", category = "Misc")]
-        public static void ToggleInfection()
+        [BindableMethod(name = "Toggle Act 3", category = "Misc")]
+        public static void ToggleAct3()
         {
-            PlayerData.instance.crossroadsInfected = !PlayerData.instance.crossroadsInfected;
-            Console.AddLine($"Crossroads are now " + (PlayerData.instance.crossroadsInfected ? "enabled" : "disabled"));
+            PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
+            Console.AddLine("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
         }
-        */
 
         [BindableMethod(name = "Force Camera Follow", category = "Misc")]
         public static void ForceCameraFollow()
@@ -191,27 +151,14 @@ namespace DebugMod
                 ClearSceneDataHook = null;
             }
         }
-
-        [BindableMethod(name = "Recover Shade", category = "Misc")]
-        public static void RecoverShade()
-        {
-            PlayerData.instance.EndSoulLimiter();
-            if (PlayerData.instance.geoPool > 0)
-            {
-                HeroController.instance.AddGeo(PlayerData.instance.geoPool);
-                PlayerData.instance.geoPool = 0;
-            }
-
-            PlayerData.instance.shadeScene = "None";
-            foreach (PlayMakerFSM fsm in GameCameras.instance.hudCanvas.transform.Find("Soul Orb")
-                .GetComponentsInChildren<PlayMakerFSM>())
-            {
-                fsm.SendEvent("SOUL LIMITER DOWN");
-            }
-
-            PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
-        }
         */
+
+        [BindableMethod(name = "Break Cocoon", category = "Misc")]
+        public static void BreakCocoon()
+        {
+            HeroController.instance?.CocoonBroken();
+            EventRegister.SendEvent("BREAK HERO CORPSE");
+        }
 
         [BindableMethod(name = "Start/End Frame Advance", category = "Misc")]
         public static void ToggleFrameAdvance()
