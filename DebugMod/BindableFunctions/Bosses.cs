@@ -2,14 +2,13 @@
 {
     public static partial class BindableFunctions
     {
-
+        /*
         [BindableMethod(name = "Respawn Boss", category = "Bosses")]
         public static void RespawnBoss()
         {
             BossHandler.RespawnBoss();
         }
 
-        /*
         [BindableMethod(name = "Respawn Failed Champ", category = "Bosses")]
         public static void ToggleFailedChamp()
         {

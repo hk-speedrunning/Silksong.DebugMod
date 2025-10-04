@@ -174,6 +174,14 @@ namespace DebugMod.Canvas
             if (active && panels.ContainsKey(name))
             {
                 panels[name].ToggleActive();
+
+                foreach (CanvasPanel panel in panels.Values)
+                {
+                    if (panel != panels[name] && panel.active && panel.position == panels[name].position)
+                    {
+                        panel.SetActive(false, false);
+                    }
+                }
             }
         }
 
