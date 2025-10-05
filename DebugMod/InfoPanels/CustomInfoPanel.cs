@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DebugMod.Canvas;
+using GlobalSettings;
 using UnityEngine;
 
 namespace DebugMod.InfoPanels
@@ -87,7 +88,7 @@ namespace DebugMod.InfoPanels
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "MP", () => PlayerData.instance.silk + " / " + PlayerData.instance.CurrentSilkMaxBasic);
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => Gameplay.FleasCollectedCount + " / 30");
             MainInfoPanel.AddInfo(10, 150f, y += 20, "Quest Points", () => QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0].CurrentValueCount + " / 17");
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Needle Base", () => PlayerData.instance.nailDamage.ToString());
