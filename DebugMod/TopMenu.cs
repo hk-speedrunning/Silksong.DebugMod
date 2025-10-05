@@ -40,7 +40,7 @@ namespace DebugMod
             var cheatsPanel = panel.AddPanel("Cheats Panel", GUIController.Instance.images["DropdownBG"], new Vector2(45f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 240f));
             var toolsPanel = panel.AddPanel("Tools Panel", GUIController.Instance.images["DropdownBG"], new Vector2(145f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 210f));
             var skillsPanel = panel.AddPanel("Skills Panel", GUIController.Instance.images["DropdownBG"], new Vector2(245f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, GUIController.Instance.images["DropdownBG"].height));
-            var itemsPanel = panel.AddPanel("Items Panel", GUIController.Instance.images["DropdownBG"], new Vector2(345f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 90f));
+            var itemsPanel = panel.AddPanel("Items Panel", GUIController.Instance.images["DropdownBG"], new Vector2(345f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 180f));
             // var bossesPanel = panel.AddPanel("Bosses Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 200f));
             var otherPanel = panel.AddPanel("Other Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 120f));
             var saveStatesPanel = panel.AddPanel("SaveStates Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 170f));
@@ -79,7 +79,10 @@ namespace DebugMod
             //Items panel
             itemsPanel.AddButton("Rosaries", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Rosaries", 10);
             itemsPanel.AddButton("Shell Shards", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.GiveShellShards, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Shards", 10);
-            
+            itemsPanel.AddButton("Memory Locket", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.GiveMemoryLockets, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Locket", 10);
+            itemsPanel.AddButton("Craftmetal", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.GiveCraftmetal, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Craftmetal", 10);
+            itemsPanel.AddButton("Silkeater", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.GiveSilkeater, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Silkeater", 10);
+
             // itemsPanel.AddButton("Pale Ore", GUIController.Instance.images["PaleOre"], new Vector2(5f, 30f), new Vector2(23f, 22f), PaleOreClicked, new Rect(0, 0, GUIController.Instance.images["PaleOre"].width, GUIController.Instance.images["PaleOre"].height));
             // itemsPanel.AddButton("Simple Key", GUIController.Instance.images["SimpleKey"], new Vector2(33f, 30f), new Vector2(23f, 23f), SimpleKeyClicked, new Rect(0, 0, GUIController.Instance.images["SimpleKey"].width, GUIController.Instance.images["SimpleKey"].height));
             // itemsPanel.AddButton("Rancid Egg", GUIController.Instance.images["RancidEgg"], new Vector2(61f, 30f), new Vector2(23f, 30f), RancidEggClicked, new Rect(0, 0, GUIController.Instance.images["RancidEgg"].width, GUIController.Instance.images["RancidEgg"].height));

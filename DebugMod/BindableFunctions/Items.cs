@@ -3,35 +3,29 @@
     public static partial class BindableFunctions
     {
         /*
-        [BindableMethod(name = "Give Lantern", category = "Items")]
-        public static void ToggleLantern()
+        [BindableMethod(name = "Give Pale Ore", category = "Consumables")]
+        public static void GivePaleOre()
         {
-            if (!PlayerData.instance.hasLantern)
-            {
-                PlayerData.instance.hasLantern = true;
-                Console.AddLine("Giving player lantern");
-            }
-            else
-            {
-                PlayerData.instance.hasLantern = false;
-                Console.AddLine("Taking away lantern");
-            }
+            PlayerData.instance.ore = 6;
+            Console.AddLine("Set player pale ore to 6");
         }
 
-        [BindableMethod(name = "Give Tram Pass", category = "Items")]
-        public static void ToggleTramPass()
+        [BindableMethod(name = "Give Simple Keys", category = "Consumables")]
+        public static void GiveSimpleKey()
         {
-            if (!PlayerData.instance.hasTramPass)
-            {
-                PlayerData.instance.hasTramPass = true;
-                Console.AddLine("Giving player tram pass");
-            }
-            else
-            {
-                PlayerData.instance.hasTramPass = false;
-                Console.AddLine("Taking away tram pass");
-            }
+            PlayerData.instance.simpleKeys = 3;
+            Console.AddLine("Set player simple keys to 3");
         }
+
+        // slab keys
+
+        // white key, surgeon's key, architect's key, diving bell key, craw summons
+
+        // melodies
+
+        // memory hearts
+
+        // everbloom
 
         [BindableMethod(name = "Give Map & Quill", category = "Items")]
         public static void ToggleMapQuill()
@@ -51,96 +45,24 @@
             }
         }
 
-        [BindableMethod(name = "Give City Crest", category = "Items")]
-        public static void ToggleCityKey()
+        [BindableMethod(name = "Give All Maps", category = "Consumables")]
+        public static void GiveAllMaps()
         {
-            if (!PlayerData.instance.hasCityKey)
-            {
-                PlayerData.instance.hasCityKey = true;
-                Console.AddLine("Giving player city crest");
-            }
-            else
-            {
-                PlayerData.instance.hasCityKey = false;
-                Console.AddLine("Taking away city crest");
-            }
-        }
-
-        [BindableMethod(name = "Give Shopkeeper's Key", category = "Items")]
-        public static void ToggleSlyKey()
-        {
-            if (!PlayerData.instance.hasSlykey)
-            {
-                PlayerData.instance.hasSlykey = true;
-                Console.AddLine("Giving player shopkeeper's key");
-            }
-            else
-            {
-                PlayerData.instance.hasSlykey = false;
-                Console.AddLine("Taking away shopkeeper's key");
-            }
-        }
-
-        [BindableMethod(name = "Give Elegant Key", category = "Items")]
-        public static void ToggleElegantKey()
-        {
-            if (!PlayerData.instance.hasWhiteKey)
-            {
-                PlayerData.instance.hasWhiteKey = true;
-                PlayerData.instance.usedWhiteKey = false;
-                Console.AddLine("Giving player elegant key");
-            }
-            else
-            {
-                PlayerData.instance.hasWhiteKey = false;
-                Console.AddLine("Taking away elegant key");
-            }
-        }
-
-        [BindableMethod(name = "Give Love Key", category = "Items")]
-        public static void ToggleLoveKey()
-        {
-            if (!PlayerData.instance.hasLoveKey)
-            {
-                PlayerData.instance.hasLoveKey = true;
-                Console.AddLine("Giving player love key");
-            }
-            else
-            {
-                PlayerData.instance.hasLoveKey = false;
-                Console.AddLine("Taking away love key");
-            }
-        }
-
-        [BindableMethod(name = "Give Kingsbrand", category = "Items")]
-        public static void ToggleKingsbrand()
-        {
-            if (!PlayerData.instance.hasKingsBrand)
-            {
-                PlayerData.instance.hasKingsBrand = true;
-                Console.AddLine("Giving player kingsbrand");
-            }
-            else
-            {
-                PlayerData.instance.hasKingsBrand = false;
-                Console.AddLine("Taking away kingsbrand");
-            }
-        }
-
-        [BindableMethod(name = "Give Delicate Flower", category = "Items")]
-        public static void ToggleXunFlower()
-        {
-            if (!PlayerData.instance.hasXunFlower || PlayerData.instance.xunFlowerBroken)
-            {
-                PlayerData.instance.hasXunFlower = true;
-                PlayerData.instance.xunFlowerBroken = false;
-                Console.AddLine("Giving player delicate flower");
-            }
-            else
-            {
-                PlayerData.instance.hasXunFlower = false;
-                Console.AddLine("Taking away delicate flower");
-            }
+            PlayerData.instance.hasMap = true;
+            PlayerData.instance.mapAllRooms = true;
+            PlayerData.instance.mapCrossroads = true;
+            PlayerData.instance.mapGreenpath = true;
+            PlayerData.instance.mapFogCanyon = true;
+            PlayerData.instance.mapRoyalGardens = true;
+            PlayerData.instance.mapFungalWastes = true;
+            PlayerData.instance.mapCity = true;
+            PlayerData.instance.mapWaterways = true;
+            PlayerData.instance.mapMines = true;
+            PlayerData.instance.mapDeepnest = true;
+            PlayerData.instance.mapCliffs = true;
+            PlayerData.instance.mapOutskirts = true;
+            PlayerData.instance.mapRestingGrounds = true;
+            PlayerData.instance.mapAbyss = true;
         }
 
         [BindableMethod(name = "Open All Stags", category = "Items")]

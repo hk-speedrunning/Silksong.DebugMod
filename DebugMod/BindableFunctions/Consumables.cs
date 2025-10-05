@@ -2,29 +2,6 @@
 {
     public static partial class BindableFunctions
     {
-        /*
-        [BindableMethod(name = "Give Pale Ore", category = "Consumables")]
-        public static void GivePaleOre()
-        {
-            PlayerData.instance.ore = 6;
-            Console.AddLine("Set player pale ore to 6");
-        }
-
-        [BindableMethod(name = "Give Simple Keys", category = "Consumables")]
-        public static void GiveSimpleKey()
-        {
-            PlayerData.instance.simpleKeys = 3;
-            Console.AddLine("Set player simple keys to 3");
-        }
-
-        [BindableMethod(name = "Give Rancid Eggs", category = "Consumables")]
-        public static void GiveRancidEgg()
-        {
-            PlayerData.instance.rancidEggs += 10;
-            Console.AddLine("Giving player 10 rancid eggs");
-        }
-        */
-
         [BindableMethod(name = "Give Rosaries", category = "Consumables")]
         public static void GiveRosaries()
         {
@@ -39,130 +16,27 @@
             Console.AddLine("Giving player 100 shell shards");
         }
 
-        /*
-        [BindableMethod(name = "Give Essence", category = "Consumables")]
-        public static void GiveEssence()
+        [BindableMethod(name = "Give Memory Lockets", category = "Consumables")]
+        public static void GiveMemoryLockets()
         {
-            PlayerData.instance.dreamOrbs += 100;
-            Console.AddLine("Giving player 100 essence");
-        }
-        
-        //yes i added dreamers here because its funny
-        [BindableMethod(name = "Give Lurien", category = "Consumables")]
-        public static void GiveLurien()
-        {
-            if (!PlayerData.instance.lurienDefeated)
-            {
-                PlayerData.instance.lurienDefeated = true;
-                MakeDreamersWork("WATCHER");
-                
-            }
-            Console.AddLine("Giving Lurien");
-        }
-        
-        [BindableMethod(name = "Give Monomon", category = "Consumables")]
-        public static void GiveMonomon()
-        {
-            if (!PlayerData.instance.monomonDefeated)
-            {
-                PlayerData.instance.monomonDefeated = true;
-                MakeDreamersWork("TEACHER");
-            }
-            Console.AddLine("Giving Monomon");
-        }
-        
-        [BindableMethod(name = "Give Herrah", category = "Consumables")]
-        public static void GiveHerrah()
-        {
-            if (!PlayerData.instance.hegemolDefeated)
-            {
-                PlayerData.instance.hegemolDefeated = true;
-                MakeDreamersWork("BEAST");
-            }
-            Console.AddLine("Giving Herrah");
+            CollectableItemManager.GetItemByName("Crest Socket Unlocker").AddAmount(10);
+            Console.AddLine("Giving player 10 memory lockets");
         }
 
-        private static void MakeDreamersWork(string AchievementToGive)
+        [BindableMethod(name = "Give Craftmetal", category = "Consumables")]
+        public static void GiveCraftmetal()
         {
-            var pd = PlayerData.instance;
-            
-            pd.guardiansDefeated += 1;
-            if (!pd.crossroadsInfected)
-            {
-                pd.crossroadsInfected = true;
-                pd.visitedCrossroads = false;
-            }
-
-            if (pd.guardiansDefeated == 3)
-            {
-                pd.brettaState += 1;
-                pd.mrMushroomState = 1;
-                pd.corniferAtHome = true;
-                pd.iseldaConvo1 = true;
-                pd.dungDefenderSleeping = true;
-                pd.corn_crossroadsLeft = true;
-                
-                pd.corn_fogCanyonLeft = true;
-                pd.corn_fungalWastesLeft = true;
-                pd.corn_cityLeft = true;
-                pd.corn_waterwaysLeft = true;
-                pd.corn_minesLeft = true;
-                pd.corn_cliffsLeft = true;
-                pd.corn_deepnestLeft = true;
-                pd.corn_outskirtsLeft = true;
-                pd.corn_royalGardensLeft = true;
-                pd.corn_abyssLeft = true;
-                pd.metIselda = true;
-            }
-            
-            GameManager.instance.AwardAchievement(AchievementToGive);
+            CollectableItemManager.GetItemByName("Tool Metal").AddAmount(8);
+            Console.AddLine("Giving player 8 craftmetal");
         }
 
-        [BindableMethod(name = "Add GrimmKin Flames", category = "Consumables")]
-        public static void GrimmKinFlames()
+        [BindableMethod(name = "Give Silkeater", category = "Consumables")]
+        public static void GiveSilkeater()
         {
-            if (PlayerData.instance.flamesCollected == 3) PlayerData.instance.flamesCollected = 0;
-            else PlayerData.instance.flamesCollected += 1;
-            Console.AddLine("Grimm kin flames incremented");
-        } 
-        
-        
-        private static string[] AllMapBools = new[]
-        {
-            "mapCrossroads",
-            "mapGreenpath",
-            "mapFogCanyon",
-            "mapRoyalGardens",
-            "mapFungalWastes",
-            "mapCity",
-            "mapWaterways",
-            "mapMines",
-            "mapDeepnest",
-            "mapCliffs",
-            "mapOutskirts",
-            "mapRestingGrounds",
-            "mapAbyss"
-        };
-        
-        [BindableMethod(name = "Give All Maps", category = "Consumables")]
-        public static void GiveAllMaps()
-        {
-            PlayerData.instance.hasMap = true;
-            PlayerData.instance.mapAllRooms = true;
-            PlayerData.instance.mapCrossroads = true;
-            PlayerData.instance.mapGreenpath = true;
-            PlayerData.instance.mapFogCanyon = true;
-            PlayerData.instance.mapRoyalGardens = true;
-            PlayerData.instance.mapFungalWastes = true;
-            PlayerData.instance.mapCity = true;
-            PlayerData.instance.mapWaterways = true;
-            PlayerData.instance.mapMines = true;
-            PlayerData.instance.mapDeepnest = true;
-            PlayerData.instance.mapCliffs = true;
-            PlayerData.instance.mapOutskirts = true;
-            PlayerData.instance.mapRestingGrounds = true;
-            PlayerData.instance.mapAbyss = true;
+            CollectableItemManager.GetItemByName("Silk Grub").AddAmount(1);
+            Console.AddLine("Giving player a silkeater");
         }
-        */
+
+        // TODO: add bind to give all items needed for the active quest(s)
     }
 }
