@@ -18,7 +18,14 @@
 
         private static void SetCollectable(string name, int amount)
         {
-            CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.Amount = amount);
+            if (CollectableItemManager.IsInHiddenMode())
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.AmountWhileHidden = amount);
+            }
+            else
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.Amount = amount);
+            }
         }
 
         [BindableMethod(name = "Give Memory Lockets", category = "Consumables")]
