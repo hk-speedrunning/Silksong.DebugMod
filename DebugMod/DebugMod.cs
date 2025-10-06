@@ -195,8 +195,8 @@ namespace DebugMod
             settings.binds.Add("Force Camera Follow", KeyCode.F8);
             settings.binds.Add("Toggle Enemy Panel", KeyCode.F9);
             settings.binds.Add("Toggle Binds", KeyCode.BackQuote);
-            settings.binds.Add("Nail Damage +4", KeyCode.Equals);
-            settings.binds.Add("Nail Damage -4", KeyCode.Minus);
+            settings.binds.Add("Increase Needle Damage", KeyCode.Equals);
+            settings.binds.Add("Decrease Needle Damage", KeyCode.Minus);
             settings.binds.Add("Increase Timescale", KeyCode.KeypadPlus);
             settings.binds.Add("Decrease Timescale", KeyCode.KeypadMinus);
             settings.binds.Add("Zoom In", KeyCode.PageUp);
