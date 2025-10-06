@@ -36,6 +36,9 @@ namespace DebugMod
             {
                 Console.AddLine("You have the maximum number of spools");
             }
+
+            PlayerData.instance.IsSilkSpoolBroken = false;
+            EventRegister.SendEvent("SPOOL UNBROKEN");
         }
         
         [BindableMethod(name = "Take Away Mask", category = "Masks & Spools")]
