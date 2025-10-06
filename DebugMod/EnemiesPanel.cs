@@ -86,35 +86,30 @@ namespace DebugMod
                 {
                     panel.SetActive(false, true);
                 }
+            }
+            else
+            {
+                if (DebugMod.settings.EnemiesPanelVisible && !panel.active)
+                {
+                    panel.SetActive(true, false);
+                }
+                else if (!DebugMod.settings.EnemiesPanelVisible && panel.active)
+                {
+                    panel.SetActive(false, true);
+                }
 
-                return;
-            }
-
-            if (DebugMod.settings.EnemiesPanelVisible && !panel.active)
-            {
-                panel.SetActive(true, false);
-            }
-            else if (!DebugMod.settings.EnemiesPanelVisible && panel.active)
-            {
-                panel.SetActive(false, true);
-            }
-
-            if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING &&
-                (panel.GetPanel("Pause").active || !panel.GetPanel("Play").active))
-            {
-                panel.GetPanel("Pause").SetActive(false, true);
-                panel.GetPanel("Play").SetActive(true, false);
-            }
-            else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED &&
-                     (!panel.GetPanel("Pause").active || panel.GetPanel("Play").active))
-            {
-                panel.GetPanel("Pause").SetActive(true, false);
-                panel.GetPanel("Play").SetActive(false, true);
-            }
-
-            if ((!panel.active && enemyPool.Count > 0))
-            {
-                if (hpBars == false) Reset();
+                if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING &&
+                    (panel.GetPanel("Pause").active || !panel.GetPanel("Play").active))
+                {
+                    panel.GetPanel("Pause").SetActive(false, true);
+                    panel.GetPanel("Play").SetActive(true, false);
+                }
+                else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED &&
+                         (!panel.GetPanel("Pause").active || panel.GetPanel("Play").active))
+                {
+                    panel.GetPanel("Pause").SetActive(true, false);
+                    panel.GetPanel("Play").SetActive(false, true);
+                }
             }
 
             if (panel.active || hpBars)
@@ -249,6 +244,10 @@ namespace DebugMod
                 panel.GetText("Enemy Names").UpdateText(enemyNames);
                 panel.GetText("Enemy HP").UpdateText(enemyHP);
             }
+            else
+            {
+                Reset();
+            }
         }
 
         public static void Reset()
@@ -278,14 +277,15 @@ namespace DebugMod
 
             if (deltaTime >= 2f)
             {
-                lastTime = Time.realtimeSinceStartup;
                 EnemyUpdate();
             }
         }
 
         public static void EnemyUpdate()
         {
-            if (DebugMod.settings.EnemiesPanelVisible && HeroController.instance != null && !HeroController.instance.cState.transitioning && DebugMod.GM.IsGameplayScene())
+            lastTime = Time.realtimeSinceStartup;
+
+            if (HeroController.instance != null && !HeroController.instance.cState.transitioning && DebugMod.GM.IsGameplayScene())
             {
                 int count = enemyPool.Count;
                 

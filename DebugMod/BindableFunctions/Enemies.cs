@@ -10,6 +10,7 @@ namespace DebugMod
         public static void ToggleEnemyHPBars()
         {
             EnemiesPanel.hpBars = !EnemiesPanel.hpBars;
+            EnemiesPanel.EnemyUpdate();
 
             if (EnemiesPanel.hpBars)
             {
@@ -19,13 +20,6 @@ namespace DebugMod
             {
                 Console.AddLine("Disabled HP bars");
             }
-        }
-
-        [BindableMethod(name = "Enemy Scan", category = "Enemy Panel")]
-        public static void EnemyScan()
-        {
-            EnemiesPanel.EnemyUpdate();
-            Console.AddLine("Scanning for enemies...");
         }
 
         [BindableMethod(name = "Self Damage", category = "Enemy Panel")]
