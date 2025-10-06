@@ -79,7 +79,7 @@ namespace DebugMod
             //Items panel
             itemsPanel.AddButton("Rosaries", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Rosaries", 10);
             itemsPanel.AddButton("Shell Shards", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.GiveShellShards, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Shards", 10);
-            itemsPanel.AddButton("Memory Locket", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.GiveMemoryLockets, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Locket", 10);
+            itemsPanel.AddButton("Memory Lockets", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.GiveMemoryLockets, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Lockets", 10);
             itemsPanel.AddButton("Craftmetal", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.GiveCraftmetal, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Craftmetal", 10);
             itemsPanel.AddButton("Silkeater", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.GiveSilkeater, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Silkeater", 10);
 
