@@ -33,21 +33,20 @@ namespace DebugMod
 
             public static List<string> Categories = new()
             {
-                "GamePlay Altering",
+                "Gameplay Altering",
                 "Savestates",
                 "Misc",
                 "Visual",
                 "Mod UI",
                 "Enemy Panel",
                 "Cheats",
-                "Charms",
+                "Tools",
                 "Skills",
                 "Spells",
                 "Bosses",
                 "Items",
                 "Masks & Spools",
                 "Consumables",
-                "Dreamgate",
             };
             public static Dictionary<string, CategoryInfo> CategoryInfos = new();
             public static int TotalPages => CategoryInfos.Select(x => x.Value.NumPages).Sum();

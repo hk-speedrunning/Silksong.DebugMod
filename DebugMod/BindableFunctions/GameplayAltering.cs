@@ -8,39 +8,55 @@ namespace DebugMod
 {
     public static partial class BindableFunctions
     {
-        [BindableMethod(name = "Nail Damage +4", category = "GamePlay Altering")]
-        public static void IncreaseNailDamage()
+        [BindableMethod(name = "Increase Needle Damage", category = "Gameplay Altering")]
+        public static void IncreaseNeedleDamage()
         {
-            int num = 4;
             if (PlayerData.instance.nailDamage == 0)
             {
-                num = 5;
+                PlayerData.instance.nailUpgrades = 0;
+                DebugMod.extraNailDamage = 0;
+                Console.AddLine("Resetting needle damage to 5");
             }
-            DebugMod.extraNailDamage += num;
-            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
-            Console.AddLine("Increased base nailDamage by " + num);
-        }
-
-        [BindableMethod(name = "Nail Damage -4", category = "GamePlay Altering")]
-        public static void DecreaseNailDamage()
-        {
-            int num2 = PlayerData.instance.nailDamage - 4;
-            if (num2 >= 0)
+            else if (PlayerData.instance.nailUpgrades == 4 || DebugMod.extraNailDamage < 0)
             {
-                DebugMod.extraNailDamage -= 4;
-                PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
-                Console.AddLine("Decreased base nailDamage by 4");
+                DebugMod.extraNailDamage += 4;
+                Console.AddLine("Adding 4 extra needle damage");
             }
             else
             {
-                Console.AddLine("Cannot set base nailDamage less than 0 therefore forcing 0 value");
-                DebugMod.extraNailDamage = 0;
-                DebugMod.extraNailDamage = -PlayerData.instance.nailDamage;
-                PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+                PlayerData.instance.nailUpgrades++;
+                Console.AddLine("Adding needle upgrade");
             }
+
+            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+        }
+
+        [BindableMethod(name = "Decrease Needle Damage", category = "Gameplay Altering")]
+        public static void DecreaseNeedleDamage()
+        {
+            if (PlayerData.instance.nailUpgrades == 0 || DebugMod.extraNailDamage > 0)
+            {
+                DebugMod.extraNailDamage -= 4;
+                if (DebugMod.extraNailDamage < -5)
+                {
+                    DebugMod.extraNailDamage = -5;
+                    Console.AddLine("Setting needle damage to 0");
+                }
+                else
+                {
+                    Console.AddLine("Reducing nail damage by 4");
+                }
+            }
+            else
+            {
+                PlayerData.instance.nailUpgrades--;
+                Console.AddLine("Removing needle upgrade");
+            }
+
+            PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
         }
         
-        [BindableMethod(name = "Decrease Timescale", category = "GamePlay Altering")]
+        [BindableMethod(name = "Decrease Timescale", category = "Gameplay Altering")]
         public static void TimescaleDown()
         {
             //This needs to be added because the game sets timescale to 0 when paused to pause the game if this is changed to a 
@@ -74,7 +90,7 @@ namespace DebugMod
 
         }
 
-        [BindableMethod(name = "Increase Timescale", category = "GamePlay Altering")]
+        [BindableMethod(name = "Increase Timescale", category = "Gameplay Altering")]
         public static void TimescaleUp()
         {
             if (DebugMod.GM.IsGamePaused())
@@ -105,7 +121,7 @@ namespace DebugMod
             Console.AddLine("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
         }
 
-        [BindableMethod(name = "Freeze Game", category = "GamePlay Altering")]
+        [BindableMethod(name = "Freeze Game", category = "Gameplay Altering")]
         public static void PauseGameNoUI()
         {
             DebugMod.PauseGameNoUIActive = !DebugMod.PauseGameNoUIActive;
@@ -136,7 +152,7 @@ namespace DebugMod
             }
         }
 
-        [BindableMethod(name = "Reset settings", category = "GamePlay Altering")]
+        [BindableMethod(name = "Reset settings", category = "Gameplay Altering")]
         public static void Reset()
         {
             var pd = PlayerData.instance;

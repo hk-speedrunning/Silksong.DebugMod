@@ -89,20 +89,21 @@ namespace DebugMod.InfoPanels
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Completion", () => PlayerData.instance.completionPercentage + "%");
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Fleas", () => Gameplay.FleasCollectedCount + " / 30");
-            MainInfoPanel.AddInfo(10, 150f, y += 20, "Quest Points", () => QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0].CurrentValueCount + " / 17");
+            MainInfoPanel.AddInfo(10, 150f, y += 20, "Quest Points", () => QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0].CurrentValueCount
+                + " / " + QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0].target);
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Needle Base", () => PlayerData.instance.nailDamage.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Damage", () => DebugMod.lastHit != null ?
-                $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "");
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Type", () => DebugMod.lastHit?.AttackType.ToString());
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "");
+                $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "None");
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Type", () => DebugMod.lastHit?.AttackType.ToString() ?? "None");
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "None");
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Invulnerable", () => GetStringForBool(HeroController.instance.cState.Invulnerable));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Invincible", () => GetStringForBool(PlayerData.instance.isInvincible));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Damage State", () => HeroController.instance.damageMode.ToString());
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Dead State", () => GetStringForBool(HeroController.instance.cState.dead));
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Hazard Death", () => GetStringForBool(HeroController.instance.cState.hazardDeath));
-            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Cocoon Scene", () => string.IsNullOrEmpty(PlayerData.instance.HeroCorpseScene) ? "None" : PlayerData.instance.HeroCorpseScene.ToString());
+            MainInfoPanel.AddInfo(10f, 150f, y += 20, "Cocoon Scene", () => string.IsNullOrEmpty(PlayerData.instance.HeroCorpseScene) ? "None" : PlayerData.instance.HeroCorpseScene);
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Cocoon Position", () => string.IsNullOrEmpty(PlayerData.instance.HeroCorpseScene) ? "None" : PlayerData.instance.HeroDeathScenePos.ToString());
             y += 25f;
             MainInfoPanel.AddInfo(10f, 150f, y += 20, "Scene Name", () => DebugMod.GetSceneName());
@@ -158,7 +159,7 @@ namespace DebugMod.InfoPanels
             MinimalInfoPanel.AddInfo(10, 100, 50, "NailDmg", () => PlayerData.instance.nailDamage.ToString());
             
             MinimalInfoPanel.AddInfo(10, 95, 70, "Completion", () => PlayerData.instance.completionPercentage + "%");
-            MinimalInfoPanel.AddInfo(140, 195, 70, "Fleas", () => PlayerData.instance.SavedFleasCount + " / 30");
+            MinimalInfoPanel.AddInfo(140, 195, 70, "Fleas", () => Gameplay.FleasCollectedCount + " / 30");
             
             MinimalInfoPanel.AddInfo(10, 140, 90, "Scene Name", () => DebugMod.GetSceneName());
             MinimalInfoPanel.AddInfo(10, 140, 110, "Current SaveState", () => SaveStateManager.quickState.IsSet() ? SaveStateManager.quickState.GetSaveStateID() : "No savestate");
