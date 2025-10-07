@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
 using MonoMod.ModInterop;
@@ -394,6 +395,20 @@ namespace DebugMod
             
             __instance.ExitedWater();
             return false;
+        }
+
+        // Hazard respawn on lava so the player doesn't just fall through the map
+        [HarmonyPatch(typeof(HeroController), nameof(HeroController.TakeDamage))]
+        [HarmonyPrefix]
+        private static bool HeroController_TakeDamage(GameObject go, HazardType hazardType)
+        {
+            if (playerInvincible && !noclip && hazardType == HazardType.LAVA && go.name.Contains("Lava Box"))
+            {
+                BindableFunctions.Respawn();
+                return false;
+            }
+
+            return true;
         }
 
         [HarmonyPatch(typeof(HeroController), nameof(HeroController.DoSpecialDamage))]
