@@ -91,13 +91,11 @@ namespace DebugMod
         [BindableMethod(name = "Kill Self", category = "Cheats")]
         public static void KillSelf()
         {
-            if (DebugMod.GM.isPaused) UIManager.instance.TogglePauseGame();
-            HeroController.instance.TakeHealth(9999);
-
-            HeroController.instance.heroDeathPrefab.SetActive(true);
-            DebugMod.GM.ReadyForRespawn(false);
+            if (!HeroController.instance.cState.dead && !HeroController.instance.cState.transitioning)
+            {
+                HeroController.instance.StartCoroutine(HeroController.instance.Die(false, false));
+                Console.AddLine("Killed player");
+            }
         }
-
-
     }
 }
