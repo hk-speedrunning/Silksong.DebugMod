@@ -25,7 +25,7 @@ namespace DebugMod
         // Some mods (ItemChanger) check type to detect vanilla scene loads.
         private class DebugModSaveStateSceneLoadInfo : GameManager.SceneLoadInfo { }
 
-        //used to stop double loads/saves
+        //used to stop double loads
         public static SaveState loadingSavestate { get; private set; }
 
         [Serializable]
@@ -174,22 +174,43 @@ namespace DebugMod
         //loadDuped is used by external mods
         public void LoadTempState(bool loadDuped = false)
         {
-            if (!PlayerDeathWatcher.playerDead && 
-                !HeroController.instance.cState.transitioning && 
-                HeroController.instance.transform.parent == null && // checks if in elevator/conveyor
-                loadingSavestate == null)
+            if (CanLoadState())
             {
                 GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
             }
             else if (DebugMod.overrideLoadLockout)
             {
-                Console.AddLine("Attempting Savestate Load Override");
+                Console.AddLine("Attempting savestate load override");
                 GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
             }
-            else
+        }
+
+        private bool CanLoadState()
+        {
+            if (PlayerDeathWatcher.playerDead)
             {
-                Console.AddLine("SaveStates cannot be loaded when dead, transitioning, or on elevators");
+                Console.AddLine("Savestates cannot be loaded when dead");
+                return false;
             }
+
+            if (HeroController.instance.cState.transitioning)
+            {
+                Console.AddLine("Savestates cannot be loaded when transitioning");
+                return false;
+            }
+
+            if (HeroController.instance.transform.parent != null)
+            {
+                Console.AddLine("Savestates cannot be loaded when on elevators");
+                return false;
+            }
+
+            if (loadingSavestate != null)
+            {
+                Console.AddLine("Savestates cannot be loaded when another savestate is loading");
+            }
+
+            return true;
         }
 
         //loadDuped is used by external mods
@@ -231,8 +252,15 @@ namespace DebugMod
         //loadDuped is used by external mods
         private IEnumerator LoadStateCoro(bool loadDuped)
         {
-            //var used to prevent saves/loads, double save/loads softlock in temp scene, double load, black screen, etc
+            // Second check is probably not necessary since it's already checked at the call sites the frame before,
+            // but might as well be defensive and rule out any frame-perfect nonsense
+            if (loadingSavestate != null && !DebugMod.overrideLoadLockout)
+            {
+                Console.AddLine($"Attempted to load savestate in {data.saveScene} while another is already loading, cancelling");
+                yield break;
+            }
             loadingSavestate = this;
+
             bool stateondeath = DebugMod.stateOnDeath;
             DebugMod.stateOnDeath = false;
 
@@ -352,6 +380,7 @@ namespace DebugMod
             HeroController.instance.gameObject.transform.position = data.savePos;
             HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
             HeroController.instance.GetComponent<Rigidbody2D>().isKinematic = data.isKinematized;
+            DebugMod.noclipPos = data.savePos;
 
             if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
             {
