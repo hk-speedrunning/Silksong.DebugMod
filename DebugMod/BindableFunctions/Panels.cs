@@ -10,7 +10,8 @@
                 DebugMod.settings.InfoPanelVisible ||
                 DebugMod.settings.EnemiesPanelVisible ||
                 DebugMod.settings.TopMenuVisible ||
-                DebugMod.settings.ConsoleVisible
+                DebugMod.settings.ConsoleVisible ||
+                DebugMod.settings.SaveStatePanelVisible
                 );
 
             DebugMod.settings.InfoPanelVisible = active;
@@ -18,6 +19,11 @@
             DebugMod.settings.EnemiesPanelVisible = active;
             DebugMod.settings.ConsoleVisible = active;
             DebugMod.settings.HelpPanelVisible = active;
+
+            if (!active)
+            {
+                DebugMod.settings.ClearSaveStatePanel = true;
+            }
 
             if (DebugMod.settings.EnemiesPanelVisible)
             {
@@ -57,14 +63,6 @@
             {
                 EnemiesPanel.EnemyUpdate();
             }
-        }
-
-        //TODO: fix this function once theres an actual Clear Panel method
-        [BindableMethod(name = "Toggle SaveState Panel", category = "Mod UI")]
-        public static void ToggleSaveStatesPanel()
-        {
-            if (!DebugMod.settings.SaveStatePanelVisible) DebugMod.settings.SaveStatePanelVisible = true;
-            else DebugMod.settings.ClearSaveStatePanel = true;
         }
 
         // View handled in the InfoPanel classes
