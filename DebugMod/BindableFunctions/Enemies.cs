@@ -1,7 +1,4 @@
-﻿using GlobalEnums;
-using UnityEngine;
-
-namespace DebugMod
+﻿namespace DebugMod
 {
     public static partial class BindableFunctions
     {
@@ -25,15 +22,31 @@ namespace DebugMod
         [BindableMethod(name = "Self Damage", category = "Enemy Panel")]
         public static void SelfDamage()
         {
-            if (PlayerData.instance.health <= 0 || HeroController.instance.cState.dead || !GameManager.instance.IsGameplayScene() || GameManager.instance.IsGamePaused() || HeroController.instance.cState.recoiling || HeroController.instance.cState.invulnerable)
+            if (PlayerData.instance.health <= 0)
             {
-                Console.AddLine("Unacceptable conditions for selfDamage(" + PlayerData.instance.health + "," + DebugMod.HC.cState.dead + "," + DebugMod.GM.IsGameplayScene() + "," + DebugMod.HC.cState.recoiling + "," + DebugMod.GM.IsGamePaused() + "," + DebugMod.HC.cState.invulnerable + ")." + " Pressed too many times at once?");
-                return;
+                Console.AddLine("Cannot damage self: health <= 0");
             }
-            //GameManager.instance.gameObject.AddComponent<SelfDamage>();
-            HeroController.instance.TakeDamage(new GameObject(),CollisionSide.left,1,(int)HazardType.NON_HAZARD);
-
-            Console.AddLine("Attempting self damage");
+            else if (HeroController.instance.cState.dead)
+            {
+                Console.AddLine("Cannot damage self: player is dead");
+            }
+            else if (!GameManager.instance.IsGameplayScene())
+            {
+                Console.AddLine("Cannot damage self: not a gameplay scene");
+            }
+            else if (HeroController.instance.cState.recoiling)
+            {
+                Console.AddLine("Cannot damage self: player is recoiling");
+            }
+            else if (HeroController.instance.cState.invulnerable)
+            {
+                Console.AddLine("Cannot damage self: player is invulnerable");
+            }
+            else
+            {
+                HeroController.instance.DamageSelf(1);
+                Console.AddLine("Attempting self damage");
+            }
         }
     }
 }
