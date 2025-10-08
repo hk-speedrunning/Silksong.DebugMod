@@ -367,7 +367,7 @@ namespace DebugMod
                 GameManager.instance.cameraCtrl.LockToArea(data.lockArea as CameraLockArea);
             }
 
-            GameManager.instance.cameraCtrl.FadeSceneIn();
+            GameManager.instance.FadeSceneIn();
 
             HeroController.instance.CharmUpdate();
             QuestManager.IncrementVersion(); // invalidates quest caches
