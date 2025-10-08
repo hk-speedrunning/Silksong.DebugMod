@@ -292,9 +292,12 @@ namespace DebugMod
 
             if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
 
-            //remove dialogues if exists
-            PlayMakerFSM.BroadcastEvent("BOX DOWN DREAM");
-            PlayMakerFSM.BroadcastEvent("CONVO CANCEL");
+            // Close inventory and dialogue
+            EventRegister.SendEvent("INVENTORY CANCEL");
+            DialogueBox.EndConversation();
+            DialogueBox.HideInstant();
+            DialogueYesNoBox.ForceClose();
+            QuestYesNoBox.ForceClose();
 
             GameManager.instance.entryGateName = "dreamGate";
             GameManager.instance.startedOnThisScene = true;
@@ -485,6 +488,8 @@ namespace DebugMod
         //Moving all HUD related code to here for clarity
         private void HUDFixes()
         {
+            Object.FindAnyObjectByType<InventoryPaneList>()?.gameObject?.LocateMyFSM("Inventory Control")?.SetState("Close");
+
             if (CurrencyCounter._currencyCounters.TryGetValue(CurrencyType.Money, out List<CurrencyCounter> list))
             {
                 foreach (CurrencyCounter counter in list)
