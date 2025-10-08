@@ -307,6 +307,7 @@ namespace DebugMod
 
             JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
             GameManager.instance.ResetSemiPersistentItems();
+            StaticVariableList.ClearSceneTransitions(); // clears cached data like quest board contents
 
             yield return null;
 
@@ -366,6 +367,7 @@ namespace DebugMod
             GameManager.instance.cameraCtrl.FadeSceneIn();
 
             HeroController.instance.CharmUpdate();
+            QuestManager.IncrementVersion(); // invalidates quest caches
 
             PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
             PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
