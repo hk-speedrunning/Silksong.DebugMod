@@ -397,14 +397,14 @@ namespace DebugMod
             return false;
         }
 
-        // Hazard respawn on lava so the player doesn't just fall through the map
+        // Bounce off lava when invincible so the player doesn't just fall through the map
         [HarmonyPatch(typeof(HeroController), nameof(HeroController.TakeDamage))]
         [HarmonyPrefix]
         private static bool HeroController_TakeDamage(GameObject go, HazardType hazardType)
         {
             if (playerInvincible && !noclip && hazardType == HazardType.LAVA && go.name.Contains("Lava Box"))
             {
-                BindableFunctions.Respawn();
+                HeroController.instance.ShroomBounce();
                 return false;
             }
 
