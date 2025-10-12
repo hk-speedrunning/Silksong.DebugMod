@@ -370,7 +370,10 @@ namespace DebugMod
             GameManager.instance.FadeSceneIn();
 
             HeroController.instance.CharmUpdate();
-            QuestManager.IncrementVersion(); // invalidates quest caches
+
+            // invalidates caches
+            QuestManager.IncrementVersion();
+            CollectableItemManager.IncrementVersion();
 
             PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
             PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
