@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
@@ -8,6 +9,11 @@ namespace DebugMod
     [HarmonyPatch]
     public static class RoomSpecific
     {
+        private static readonly List<string> scenesWithSpecialHandling =
+        [
+            "Bone_East_08" // Fourth Chorus room
+        ];
+
         internal static string SaveRoomSpecific(string scene)
         {
             foreach (BattleScene battleScene in Object.FindObjectsByType<BattleScene>(FindObjectsSortMode.None))
@@ -16,6 +22,11 @@ namespace DebugMod
                 {
                     return SaveBattleScene(battleScene);
                 }
+            }
+
+            if (scenesWithSpecialHandling.Contains(scene))
+            {
+                return scene;
             }
 
             return "";
@@ -27,19 +38,22 @@ namespace DebugMod
             return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
         }
 
-        internal static void DoRoomSpecific(string scene, string options)
+        internal static IEnumerator DoRoomSpecific(string scene, string options)
         {
             string[] parts = options.Split('|');
             switch (parts[0])
             {
                 case "BattleScene":
                     DoBattleScene(scene, parts[1], int.Parse(parts[2]));
-                    return;
+                    yield break;
             }
 
             switch (scene)
             {
-                // TODO: add cases
+                case "Bone_East_08":
+                    // Wait for lava platforms to load in so we don't fall through them
+                    yield return new WaitUntil(() => !GameManager.instance.isLoading);
+                    break;
                 default:
                     Console.AddLine("No Room Specific Function Found In: " + scene);
                     break;
