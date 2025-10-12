@@ -161,6 +161,7 @@ namespace DebugMod
             
             //nail damage
             DebugMod.extraNailDamage = 0;
+            PlayerData.instance.nailUpgrades = 0;
             PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
             //Hero Light

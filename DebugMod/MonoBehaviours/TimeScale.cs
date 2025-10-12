@@ -46,7 +46,7 @@ namespace DebugMod.MonoBehaviours
          
         private readonly MethodInfo[] FreezeCoroutines = (
             from method in typeof(GameManager).GetMethods()
-            where method.Name.StartsWith("FreezeMoment")
+            where method.Name.StartsWith("FreezeMoment") || method.Name.StartsWith("SetTimeScale")
             where method.ReturnType == typeof(IEnumerator)
             select method.GetCustomAttribute<IteratorStateMachineAttribute>() into attr
             select attr.StateMachineType into type

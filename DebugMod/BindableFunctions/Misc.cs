@@ -195,10 +195,10 @@ namespace DebugMod
 
         private static IEnumerator AdvanceMyFrame()
         {
-            Time.timeScale = 1f;
+            DebugMod.CurrentTimeScale = Time.timeScale = 1f;
             yield return new WaitForFixedUpdate();
 
-            Time.timeScale = 0;
+            DebugMod.CurrentTimeScale = Time.timeScale = 0f;
         }
 
         [BindableMethod(name = "Reset Counter", category = "Misc")]
