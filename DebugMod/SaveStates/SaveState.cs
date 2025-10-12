@@ -410,11 +410,7 @@ namespace DebugMod
             HeroController.instance.FinishedEnteringScene(true, false);
             // Fixes invisible player when loading out of certain boss attacks
             HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
-            // Disable pogo hitbox if pogoing
-            if (HeroController.instance.currentDownspike)
-            {
-                HeroController.instance.currentDownspike.CancelAttack();
-            }
+            
 
             if (!string.IsNullOrEmpty(data.roomSpecificOptions))
             {
@@ -494,6 +490,12 @@ namespace DebugMod
                 }
 
                 HeroController.instance.cState.nearBench = false;
+            }
+
+            // Pogo storage
+            if (HeroController.instance.currentDownspike)
+            {
+                HeroController.instance.currentDownspike.CancelAttack();
             }
         }
 
