@@ -299,6 +299,15 @@ namespace DebugMod
             DialogueYesNoBox.ForceClose();
             QuestYesNoBox.ForceClose();
 
+            // Fix slopes
+            foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
+            {
+                if (surface.isHeroAttached)
+                {
+                    surface.Detach(false);
+                }
+            }
+
             GameManager.instance.entryGateName = "dreamGate";
             GameManager.instance.startedOnThisScene = true;
 
