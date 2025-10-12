@@ -20,6 +20,10 @@ public static class HudHelper
             }
         }
 
+        health.LocateMyFSM("Low Health FX").FsmVariables.FindFsmGameObject("Health 1").Value.transform.localPosition =
+            health.LocateMyFSM("Low Health FX").FsmVariables.FindFsmVector3("H1 Initial Pos").Value;
+        health.LocateMyFSM("Low Health FX").SetState("Check Health");
+
         foreach (PlayMakerFSM fsm in health.GetComponentsInChildren<PlayMakerFSM>())
         {
             if (fsm.FsmName == "health_display")

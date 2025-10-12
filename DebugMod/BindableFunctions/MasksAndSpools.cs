@@ -76,30 +76,51 @@ namespace DebugMod
             }
         }
 
+        private static bool CanModifyHealth(int health)
+        {
+            if (health <= 0)
+            {
+                Console.AddLine("Cannot add/take health: health is too low");
+                return false;
+            }
+
+            if (HeroController.instance.cState.dead)
+            {
+                Console.AddLine("Cannot add/take health: player is dead");
+                return false;
+            }
+
+            if (!GameManager.instance.IsGameplayScene())
+            {
+                Console.AddLine("Cannot add/take health: not a gameplay scene");
+                return false;
+            }
+
+            return true;
+        }
+
         [BindableMethod(name = "Add Health", category = "Masks & Spools")]
         public static void AddHealth()
         {
-            if (PlayerData.instance.health <= 0 || HeroController.instance.cState.dead || !GameManager.instance.IsGameplayScene())
+            if (CanModifyHealth(PlayerData.instance.health + 1))
             {
-                Console.AddLine("Unacceptable conditions for adding health" + PlayerData.instance.health + "," + DebugMod.HC.cState.dead + "," + DebugMod.GM.IsGameplayScene() + "," + DebugMod.HC.cState.recoiling + "," + DebugMod.GM.IsGamePaused() + "," + DebugMod.HC.cState.invulnerable + ")." + " Pressed too many times at once?");
-                return;
-            }
-            HeroController.instance.AddHealth(1);
+                HeroController.instance.AddHealth(1);
+                HudHelper.RefreshMasks();
 
-            Console.AddLine("Added Health");
+                Console.AddLine("Added Health");
+            }
         }
 
         [BindableMethod(name = "Take Health", category = "Masks & Spools")]
         public static void TakeHealth()
         {
-            if (PlayerData.instance.health <= 0 || HeroController.instance.cState.dead || !GameManager.instance.IsGameplayScene())
+            if (CanModifyHealth(PlayerData.instance.health - 1))
             {
-                Console.AddLine("Unacceptable conditions for taking health" + PlayerData.instance.health + "," + DebugMod.HC.cState.dead + "," + DebugMod.GM.IsGameplayScene() + "," + DebugMod.HC.cState.recoiling + "," + DebugMod.GM.IsGamePaused() + "," + DebugMod.HC.cState.invulnerable + ")." + " Pressed too many times at once?");
-                return;
-            }
-            HeroController.instance.TakeHealth(1);
+                HeroController.instance.TakeHealth(1);
+                HudHelper.RefreshMasks();
 
-            Console.AddLine("Attempting to take health");
+                Console.AddLine("Took health");
+            }
         }
         
         [BindableMethod(name = "Add Silk", category = "Masks & Spools")]
