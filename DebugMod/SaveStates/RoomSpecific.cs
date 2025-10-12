@@ -33,7 +33,7 @@ namespace DebugMod
             switch (parts[0])
             {
                 case "BattleScene":
-                    DoBattleScene(parts[1], int.Parse(parts[2]));
+                    DoBattleScene(scene, parts[1], int.Parse(parts[2]));
                     return;
             }
 
@@ -46,7 +46,7 @@ namespace DebugMod
             }
         }
 
-        internal static void DoBattleScene(string objectName, int wave)
+        internal static void DoBattleScene(string scene, string objectName, int wave)
         {
             void StartBattle()
             {
@@ -54,7 +54,17 @@ namespace DebugMod
 
                 BattleScene battleScene = GameObject.Find(objectName).GetComponent<BattleScene>();
                 battleScene.currentWave = wave;
-                battleScene.StartBattle();
+
+                // Sometimes the FSM that calls StartBattle() does a (not just first time) roar/scream that needs to be played first
+                switch (scene)
+                {
+                    case "Library_02":
+                        PlayMakerFSM.BroadcastEvent("DO BATTLE START");
+                        break;
+                    default:
+                        battleScene.StartBattle();
+                        break;
+                }
             }
 
             if (SceneAdditiveLoadConditional.ShouldLoadBoss)
