@@ -208,6 +208,7 @@ namespace DebugMod
             if (loadingSavestate != null)
             {
                 Console.AddLine("Savestates cannot be loaded when another savestate is loading");
+                return false;
             }
 
             return true;
