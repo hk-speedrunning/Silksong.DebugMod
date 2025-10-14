@@ -99,12 +99,6 @@ namespace DebugMod
 
         public bool SaveTempState()
         {
-            if (HeroController.instance.cState.swimming)
-            {
-                Console.AddLine("Savestates cannot be created while swimming");
-                return false;
-            }
-
             //save level state before savestates so levers and dead enemies persist properly
             GameManager.instance.SaveLevelState();
             data.saveScene = GameManager.instance.GetSceneNameString();
@@ -457,6 +451,19 @@ namespace DebugMod
                 {
                     bench.gameObject.SetActive(false);
                     bench.gameObject.SetActive(true);
+                }
+            }
+
+            // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
+            foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
+            {
+                if (Physics2D.IsTouching(HeroController.instance.GetComponent<Collider2D>(), water.GetComponent<Collider2D>()))
+                {
+                    yield return new WaitUntil(() => GameManager.instance.sceneLoad == null);
+                    HeroController.instance.transform.position = data.savePos;
+                    HeroController.instance.GetComponent<BoxCollider2D>().enabled = false;
+                    HeroController.instance.GetComponent<BoxCollider2D>().enabled = true;
+                    break;
                 }
             }
         }
