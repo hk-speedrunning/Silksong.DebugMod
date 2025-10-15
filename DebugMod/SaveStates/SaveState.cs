@@ -548,6 +548,8 @@ namespace DebugMod
             HudHelper.RefreshMasks();
             HudHelper.RefreshSpool();
 
+            // Update active crest behind health display
+            Object.FindAnyObjectByType<BindOrbHudFrame>().AlreadyAppeared();
         }
         #endregion
 
