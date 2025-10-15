@@ -124,7 +124,9 @@ namespace DebugMod
                 Log("First run detected, setting default binds");
 
                 settings.FirstRun = false;
-                ResetKeyBinds();
+
+                settings.binds = [];
+                settings.binds.Add("Toggle All UI", KeyCode.F2);
             }
 
             if (settings.NumPadForSaveStates)
@@ -182,26 +184,6 @@ namespace DebugMod
             instance = this;
             // Register exports early so other mods can use them when initializing
             typeof(DebugExport).ModInterop();
-        }
-
-        internal static void ResetKeyBinds()
-        {
-            settings.binds.Clear();
-
-            settings.binds.Add("Toggle All UI", KeyCode.F1);
-            settings.binds.Add("Toggle Info", KeyCode.F2);
-            settings.binds.Add("Toggle Menu", KeyCode.F3);
-            settings.binds.Add("Toggle Console", KeyCode.F4);
-            settings.binds.Add("Full/Min Info Switch", KeyCode.F6);
-            settings.binds.Add("Force Camera Follow", KeyCode.F8);
-            settings.binds.Add("Toggle Enemy Panel", KeyCode.F9);
-            settings.binds.Add("Toggle Binds", KeyCode.BackQuote);
-            settings.binds.Add("Increase Needle Damage", KeyCode.Equals);
-            settings.binds.Add("Decrease Needle Damage", KeyCode.Minus);
-            settings.binds.Add("Increase Timescale", KeyCode.KeypadPlus);
-            settings.binds.Add("Decrease Timescale", KeyCode.KeypadMinus);
-            settings.binds.Add("Zoom In", KeyCode.PageUp);
-            settings.binds.Add("Zoom Out", KeyCode.PageDown);
         }
 
         private void LoadSettings()

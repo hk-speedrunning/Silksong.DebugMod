@@ -183,12 +183,11 @@ namespace DebugMod
                             {
                                 if (KeyBindPanel.keyWarning != kc)
                                 {
-                                    foreach (KeyValuePair<string, KeyCode> kvp in DebugMod.settings.binds)
+                                    foreach (string method in DebugMod.bindMethods.Keys.Concat(DebugMod.AdditionalBindMethods.Keys))
                                     {
-                                        if (kvp.Value == kc)
+                                        if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
                                         {
-                                            Console.AddLine(kc.ToString() + " already bound to " + kvp.Key +
-                                                            ", press again to confirm");
+                                            Console.AddLine($"{kc} already bound to {method}, press again to confirm");
                                             KeyBindPanel.keyWarning = kc;
                                         }
                                     }
