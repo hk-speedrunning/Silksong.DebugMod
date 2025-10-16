@@ -18,6 +18,8 @@ namespace DebugMod.Canvas
                 size = new Vector2(subSprite.width, subSprite.height);
             }
 
+            size = StretchSizeIfNecessary(size);
+
             sz = size;
             sub = subSprite;
 
@@ -33,7 +35,8 @@ namespace DebugMod.Canvas
 
             imageObj.transform.SetParent(parent.transform, false);
 
-            Vector2 position = new Vector2((pos.x + ((size.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
+            Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
+            imageTransform.pivot = new Vector2(0f, 1f);
             imageTransform.anchorMin = position;
             imageTransform.anchorMax = position;
             imageTransform.SetScaleX(size.x / subSprite.width);
@@ -42,6 +45,14 @@ namespace DebugMod.Canvas
             Object.DontDestroyOnLoad(imageObj);
 
             active = true;
+        }
+
+        private Vector2 StretchSizeIfNecessary(Vector2 size)
+        {
+            var standardAspectRatio = 1920f / 1080f;
+            var resolutionAspectRatio = (float)Screen.width / Screen.height;
+            var widthScalar = resolutionAspectRatio / standardAspectRatio;
+            return new Vector2(size.x * widthScalar, size.y);
         }
 
         public void UpdateImage(Texture2D tex, Rect subSection)
@@ -74,7 +85,7 @@ namespace DebugMod.Canvas
         {
             if (imageObj != null)
             {
-                Vector2 position = new Vector2((pos.x + ((sz.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / sub.height) * sub.height) / 2f)) / 1080f);
+                Vector2 position = new Vector2(pos.x / 1920f, (1080f - pos.y) / 1080f);
                 imageObj.GetComponent<RectTransform>().anchorMin = position;
                 imageObj.GetComponent<RectTransform>().anchorMax = position;
             }
