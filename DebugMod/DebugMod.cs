@@ -45,7 +45,7 @@ namespace DebugMod
 
 
         internal static DebugMod instance;
-        
+        internal static Harmony harmony;
         public static Settings settings { get; set; } = new Settings();
         public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
@@ -151,7 +151,7 @@ namespace DebugMod
             
             saveStateManager = new SaveStateManager();
 
-            Harmony harmony = new(Id);
+            harmony = new(Id);
             harmony.PatchAll();
 
             SceneManager.activeSceneChanged += LevelActivated;
@@ -160,25 +160,34 @@ namespace DebugMod
             ModHooks.BeforeSceneLoadHook += OnLevelUnload;
             ModHooks.TakeHealthHook += PlayerDamaged;
             ModHooks.ApplicationQuitHook += SaveSettings;
+            ModHooks.FinishedLoadingModsHook += StartControllers;
 
             if (settings.ShowCursorWhileUnpaused)
             {
                 BindableFunctions.SetAlwaysShowCursor();
             }
-
-            ModHooks.FinishedLoadingModsHook += () =>
-            {
-                BossHandler.PopulateBossLists();
-                GUIController.Instance.BuildMenus();
-                SceneWatcher.Init();
-
-                Console.AddLine("New session started " + DateTime.Now);
-            };
-
+            #if HOTRELOAD
+            StartControllers();
+            #endif
             KeyBindLock = false;
             TimeScaleActive = false;
         }
 
+        public void OnDestroy()
+        {
+            harmony.UnpatchSelf();
+            saveStateManager = null;
+            DestroyImmediate(GUIController.Instance.canvas);
+            Destroy(GUIController.Instance.gameObject);
+        }
+        void StartControllers()
+        {
+            BossHandler.PopulateBossLists();
+            GUIController.Instance.BuildMenus();
+            SceneWatcher.Init();
+
+            Console.AddLine("New session started " + DateTime.Now);
+        }
         public DebugMod()
         {
             instance = this;

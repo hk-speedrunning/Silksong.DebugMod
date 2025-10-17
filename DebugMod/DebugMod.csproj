@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+	<PropertyGroup>
+		<HotReload>false</HotReload>
+	</PropertyGroup>
     <!-- 
       Imports silksong path properties only if present in order to allow CI builds. The file should be gitignored.
       If you are checking out from git and need to create a new one, you can use `dotnet new silksongpath` to generate one.
@@ -26,6 +28,10 @@
     <AssemblyTitle>DebugMod</AssemblyTitle>
     <Version>0.2.2</Version>
   </PropertyGroup>
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);HOTRELOAD</DefineConstants>
+	</PropertyGroup>
   
   <ItemGroup>
     <None Remove="Images\**\*.png" />
@@ -48,11 +54,23 @@
     <Binaries Include="$(TargetDir)/$(TargetName).pdb" />
   </ItemGroup>
 
-  <Target Name="CopyMod" AfterTargets="PostBuildEvent" Condition="'$(SilksongFolder)' != ''">
-      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongFolder)/BepInEx/plugins/$(TargetName)" />
-  </Target>
-    
-  <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
+	<Target Name="CopyMod" AfterTargets="PostBuildEvent" Condition="'$(SilksongFolder)' != ''">
+		<PropertyGroup>
+			<!--If no hot reload, copy to plugins-->
+			<ModOutputDir>$(SilksongFolder)\BepInEx\plugins\$(TargetName)</ModOutputDir>
+			<!-- Otherwise copy to scripts, there's compatibility issues with being in both/ -->
+			<ModOutputDir Condition="'$(HotReload)' == 'true'">$(SilksongFolder)\BepInEx\scripts</ModOutputDir>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(ModOutputDir)" />
+
+		<Copy
+		  SourceFiles="@(Binaries)"
+		  DestinationFiles="@(Binaries->'$(ModOutputDir)\%(Filename)%(Extension)')"/>
+	</Target>
+
+
+	<Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
       <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
       <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
 
