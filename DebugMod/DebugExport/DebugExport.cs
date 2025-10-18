@@ -1,4 +1,5 @@
 ﻿using System;
+using DebugMod.UI;
 using MonoMod.ModInterop;
 
 namespace DebugMod

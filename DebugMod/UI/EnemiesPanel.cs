@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DebugMod.Canvas;
 using GlobalEnums;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace DebugMod
+namespace DebugMod.UI
 {
     public static class EnemiesPanel
     {
@@ -161,7 +160,7 @@ namespace DebugMod
                                         }
                                         else
                                         {
-                                            if ((float) hp / (float) dat.MaxHP >= (x - 2f) / 117f)
+                                            if ( hp / (float) dat.MaxHP >= (x - 2f) / 117f)
                                             {
                                                 tex.SetPixel(x, y, Color.red);
                                             }

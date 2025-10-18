@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DebugMod.Canvas;
 using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod.UI
 {
     public static class KeyBindPanel
     {
@@ -20,7 +19,7 @@ namespace DebugMod
 
             public void Add(string method) => Functions.Add(method);
 
-            public int NumPages => (Functions.Count + ItemsPerPage - 1) / (ItemsPerPage); // Ceiling division
+            public int NumPages => (Functions.Count + ItemsPerPage - 1) / ItemsPerPage; // Ceiling division
 
             public IEnumerable<string> ItemsOnPage(int index)
             {
@@ -170,7 +169,7 @@ namespace DebugMod
             CategoryInfo.GeneratePageData();
 
             panel.GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-            panel.GetButton("Page").UpdateText((CategoryInfo.currentPage + 1) + " / " + CategoryInfo.TotalPages);
+            panel.GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
             UpdateHelpText();
         }
         
@@ -236,7 +235,7 @@ namespace DebugMod
             }
 
             panel.GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-            panel.GetButton("Page").UpdateText((CategoryInfo.currentPage + 1) + " / " + CategoryInfo.TotalPages);
+            panel.GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
             UpdateHelpText();
         }
 

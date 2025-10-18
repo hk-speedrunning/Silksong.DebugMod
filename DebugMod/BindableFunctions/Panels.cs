@@ -1,4 +1,6 @@
-﻿namespace DebugMod
+﻿using DebugMod.UI;
+
+namespace DebugMod
 {
     public static partial class BindableFunctions
     {

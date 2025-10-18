@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using DebugMod.Canvas;
 using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod.UI
 {
     public static class TopMenu
     {
@@ -275,28 +272,6 @@ namespace DebugMod
             // text.CrossFadeAlpha(1f, 0f, false);
             // text.CrossFadeAlpha(0f, 6f, false);
             BindableFunctions.ToggleAllPanels();
-        }
-
-        internal static void AddTopMenuContent(string MenuName, List<TopMenuButton> ButtonList)
-        {
-            if (panel.GetPanel(MenuName) == null)
-            {
-                Rect buttonRect = new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height);
-                Action action = () => panel.TogglePanel(MenuName);
-
-                Vector2 Pos = AllPossibleLocations.First();
-                AllPossibleLocations.Remove(Pos);
-
-                panel.AddButton(MenuName, GUIController.Instance.images["ButtonRect"], Pos, Vector2.zero, action, buttonRect, GUIController.Instance.trajanBold, MenuName);
-                panel.AddPanel(MenuName, GUIController.Instance.images["DropdownBG"], new Vector2(Pos.x, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, GUIController.Instance.images["DropdownBG"].height));
-            }
-
-            CanvasPanel MyPanel = panel.GetPanel(MenuName);
-
-            foreach (var button in ButtonList)
-            {
-                button.CreateButton(MyPanel);
-            }
         }
     }
 }

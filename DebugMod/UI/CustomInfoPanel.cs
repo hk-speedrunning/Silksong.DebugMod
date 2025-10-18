@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using DebugMod.Canvas;
 using GlobalSettings;
 using UnityEngine;
 
-namespace DebugMod.InfoPanels
+namespace DebugMod.UI
 {
     public class CustomInfoPanel : TogglableInfoPanel
     {
@@ -78,7 +77,7 @@ namespace DebugMod.InfoPanels
 
         internal static CustomInfoPanel GetMainInfoPanel()
         {
-            CustomInfoPanel MainInfoPanel = new CustomInfoPanel(InfoPanel.MainInfoPanelName, true);
+            CustomInfoPanel MainInfoPanel = new CustomInfoPanel(MainInfoPanelName, true);
 
             float y = 0f;
 
@@ -121,7 +120,7 @@ namespace DebugMod.InfoPanels
             y += 20f;
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Dashing", () => GetStringForBool(HeroController.instance.cState.dashing));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Sprinting", () => GetStringForBool(HeroController.instance.cState.isSprinting));
-            MainInfoPanel.AddInfo(300f, 440f, y += 20, "Jumping", () => GetStringForBool((HeroController.instance.cState.jumping || HeroController.instance.cState.doubleJumping)));
+            MainInfoPanel.AddInfo(300f, 440f, y += 20, "Jumping", () => GetStringForBool(HeroController.instance.cState.jumping || HeroController.instance.cState.doubleJumping));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Super Jumping", () => GetStringForBool(HeroController.instance.cState.superDashing));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Falling", () => GetStringForBool(HeroController.instance.cState.falling));
             MainInfoPanel.AddInfo(300f, 440f, y += 20, "Hardland", () => GetStringForBool(HeroController.instance.cState.willHardLand));
@@ -149,12 +148,12 @@ namespace DebugMod.InfoPanels
 
         internal static CustomInfoPanel GetMinimalInfoPanel()
         {
-            CustomInfoPanel MinimalInfoPanel = new CustomInfoPanel(InfoPanel.MinimalInfoPanelName, false);
+            CustomInfoPanel MinimalInfoPanel = new CustomInfoPanel(MinimalInfoPanelName, false);
 
             MinimalInfoPanel.AddInfo(10, 40, 10, "Vel", () => HeroController.instance.current_velocity.ToString());
             MinimalInfoPanel.AddInfo(110, 140, 10, "Pos", () => GetHeroPos());
             
-            MinimalInfoPanel.AddInfo(10, 40, 30, "MP", () => (PlayerData.instance.silk).ToString());
+            MinimalInfoPanel.AddInfo(10, 40, 30, "MP", () => PlayerData.instance.silk.ToString());
             
             MinimalInfoPanel.AddInfo(10, 100, 50, "NailDmg", () => PlayerData.instance.nailDamage.ToString());
             

@@ -60,8 +60,8 @@
         <ModlistVersion>v0.1.0</ModlistVersion>
         <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/$(ModlistVersion)/Silksong.Modlist.zip</ModlistUrl>
       </PropertyGroup>
-      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)"/>
-      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist"/>
+      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" />
+      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
 
       <PropertyGroup>
         <ExportFolder>bin/Publish</ExportFolder>

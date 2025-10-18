@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DebugMod.InfoPanels
+namespace DebugMod.UI
 {
     /// <summary>
     /// Represents an info panel which is part of the toggle rotation.
@@ -18,6 +18,6 @@ namespace DebugMod.InfoPanels
             this.Name = Name;
         }
 
-        public override bool Active => DebugMod.settings.CurrentInfoPanelName == this.Name;
+        public override bool Active => DebugMod.settings.CurrentInfoPanelName == Name;
     }
 }

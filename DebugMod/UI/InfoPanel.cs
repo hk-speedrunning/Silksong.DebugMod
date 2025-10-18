@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using DebugMod.Canvas;
-using DebugMod.InfoPanels;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod.UI
 {
     /// <summary>
     /// Represents an info panel in the style of the standard info panel
@@ -164,7 +162,7 @@ namespace DebugMod
         {
             if (DebugMod.RefKnight == null)
             {
-                return String.Empty;
+                return string.Empty;
             }
             float HeroX = DebugMod.RefKnight.transform.position.x;
             float HeroY = DebugMod.RefKnight.transform.position.y;

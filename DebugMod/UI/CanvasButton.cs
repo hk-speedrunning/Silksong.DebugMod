@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
-namespace DebugMod.Canvas
+namespace DebugMod.UI
 {
     public class CanvasButton
     {

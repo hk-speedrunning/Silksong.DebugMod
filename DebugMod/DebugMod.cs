@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -399,12 +400,6 @@ namespace DebugMod
         {
             return !playerInvincible;
         }
-
-        /// <summary>
-        /// Adds a menu to the top menu, with the provided name and button list.
-        /// </summary>
-        [PublicAPI]
-        public static void AddTopMenuContent(string MenuName, List<TopMenuButton> ButtonList) => TopMenu.AddTopMenuContent(MenuName, ButtonList);
         
         /// <summary>
         /// Add all public static methods on a type to the keybinds list. Methods must be decorated with the BindableMethod attribute.

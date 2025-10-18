@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using DebugMod.Hitbox;
+using DebugMod.UI;
 using UnityEngine;
 using UnityEngine.UI;
 

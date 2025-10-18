@@ -1,5 +1,6 @@
 ﻿using System;
 using DebugMod.MonoBehaviours;
+using DebugMod.UI;
 using GlobalEnums;
 using UnityEngine;
 using Object = UnityEngine.Object;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DebugMod.InfoPanels
+namespace DebugMod.UI
 {
     /// <summary>
     /// Creates an input panel which is a single column of info.

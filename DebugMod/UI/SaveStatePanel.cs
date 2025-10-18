@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using DebugMod.Canvas;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod.UI
 {
     public static class SaveStatesPanel
     {
