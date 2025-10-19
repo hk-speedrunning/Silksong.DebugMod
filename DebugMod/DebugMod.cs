@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using DebugMod.Helpers;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -289,7 +290,7 @@ namespace DebugMod
                 Console.AddLine("New scene loaded: " + sceneName);
                 PlayerDeathWatcher.Reset();
                 BossHandler.LookForBoss(sceneName);
-                MethodHelpers.VisualMaskHelper.OnSceneChange(sceneTo);
+                VisualMaskHelper.OnSceneChange(sceneTo);
             }
         }
 

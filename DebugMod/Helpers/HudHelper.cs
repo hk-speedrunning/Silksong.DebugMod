@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DebugMod.MethodHelpers;
+namespace DebugMod.Helpers;
 
 public static class HudHelper
 {

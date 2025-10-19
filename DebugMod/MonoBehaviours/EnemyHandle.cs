@@ -1,8 +1,9 @@
-﻿using GlobalEnums;
+﻿using DebugMod.UI;
+using GlobalEnums;
 using HarmonyLib;
 using UnityEngine;
 
-namespace DebugMod.UI;
+namespace DebugMod.MonoBehaviours;
 
 [HarmonyPatch]
 public class EnemyHandle : MonoBehaviour

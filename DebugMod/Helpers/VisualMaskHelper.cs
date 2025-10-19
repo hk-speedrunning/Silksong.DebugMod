@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
-namespace DebugMod.MethodHelpers
+namespace DebugMod.Helpers
 {
     public static class VisualMaskHelper
     {

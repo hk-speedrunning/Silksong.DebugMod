@@ -1,5 +1,5 @@
 ﻿using System;
-using DebugMod.MethodHelpers;
+using DebugMod.Helpers;
 using UnityEngine;
 
 namespace DebugMod
@@ -41,7 +41,7 @@ namespace DebugMod
         [BindableMethod(name = "Deactivate Visual Masks", category = "Visual")]
         public static void DoDeactivateVisualMasks()
         {
-            MethodHelpers.VisualMaskHelper.ToggleAllMasks();
+            VisualMaskHelper.ToggleAllMasks();
         }
 
         [BindableMethod(name = "Toggle Hero Light", category = "Visual")]

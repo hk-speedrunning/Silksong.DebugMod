@@ -1,5 +1,5 @@
 ﻿using System;
-using DebugMod.MethodHelpers;
+using DebugMod.Helpers;
 
 namespace DebugMod
 {
