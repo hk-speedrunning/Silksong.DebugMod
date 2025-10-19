@@ -173,7 +173,7 @@ namespace DebugMod
                 string bindName = bind.Key;
                 KeyCode bindKeyCode  = bind.Value;
                 
-                if (DebugMod.bindMethods.ContainsKey(bindName) || DebugMod.AdditionalBindMethods.ContainsKey(bindName))
+                if (DebugMod.bindActions.ContainsKey(bindName))
                 {
                     //check for keys that are waiting to be bound
                     if (bindKeyCode == KeyCode.None)
@@ -184,7 +184,7 @@ namespace DebugMod
                             {
                                 if (KeyBindPanel.keyWarning != kc)
                                 {
-                                    foreach (string method in DebugMod.bindMethods.Keys.Concat(DebugMod.AdditionalBindMethods.Keys))
+                                    foreach (string method in DebugMod.bindActions.Keys)
                                     {
                                         if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
                                         {
@@ -221,16 +221,14 @@ namespace DebugMod
                         //Im sure theres a better way to do this but idk. 
                         try
                         {
-                            //cat, allowLock, the method
-                            (string, bool, Action) methodData;
+                            BindAction action;
                             
-                            if (DebugMod.bindMethods.TryGetValue(bindName, out methodData) 
-                                || DebugMod.AdditionalBindMethods.TryGetValue(bindName, out methodData))
+                            if (DebugMod.bindActions.TryGetValue(bindName, out action))
                             {
                                 //run if not locked or locked but bind doesnt allow locks
-                                if (!DebugMod.KeyBindLock || DebugMod.KeyBindLock && !methodData.Item2)
+                                if (!DebugMod.KeyBindLock || DebugMod.KeyBindLock && !action.AllowLock)
                                 {
-                                    methodData.Item3.Invoke();
+                                   action.Action.Invoke();
                                 }
                             }
 

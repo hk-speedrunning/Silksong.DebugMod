@@ -152,19 +152,9 @@ namespace DebugMod.UI
             }
         
             //Build pages based on categories
-            foreach (var bindable in DebugMod.bindMethods)
+            foreach (var action in DebugMod.bindActions)
             {
-                string name = bindable.Key;
-                string cat = bindable.Value.category;
-
-                CategoryInfo.AddFunction(cat, name);
-            }
-            foreach (var bindable in DebugMod.AdditionalBindMethods)
-            {
-                string name = bindable.Key;
-                string cat = bindable.Value.category;
-
-                CategoryInfo.AddFunction(cat, name);
+                CategoryInfo.AddFunction(action.Key, action.Value.Category);
             }
             CategoryInfo.GeneratePageData();
 
@@ -177,11 +167,14 @@ namespace DebugMod.UI
             int bindIndex = Convert.ToInt32(buttonName.Substring(3)); // strip leading "run"
             string bindName = CategoryInfo.FunctionsOnCurrentPage()[bindIndex];
 
-            if (!DebugMod.bindMethods.TryGetValue(bindName, out var pair) && !DebugMod.AdditionalBindMethods.TryGetValue(bindName, out pair))
+            if (DebugMod.bindActions.TryGetValue(bindName, out var action))
+            {
+                action.Action.Invoke();
+            }
+            else
             {
                 DebugMod.instance.LogError("Error running bind: not found");
             }
-            pair.method.Invoke();
         }
 
         public static void UpdateHelpText()

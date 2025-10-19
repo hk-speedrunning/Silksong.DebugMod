@@ -75,17 +75,11 @@ namespace DebugMod
         public static bool overrideLoadLockout = false;
         internal static int extraNailDamage;
 
-        internal static Dictionary<string, (string category, bool allowLock, Action method)> bindMethods = new();
-        internal static Dictionary<string, (string category, bool allowLock, Action method)> AdditionalBindMethods = new();
-
-        internal static Dictionary<KeyCode, int> alphaKeyDict = new Dictionary<KeyCode, int>();
-
-        static int alphaStart;
-        static int alphaEnd;
+        internal static readonly Dictionary<string, BindAction> bindActions = new();
+        internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
         
         public void Awake()
         {
-            Log("Initializing");
             float startTime = Time.realtimeSinceStartup;
 
             // Add Unity errors to main log
@@ -97,10 +91,8 @@ namespace DebugMod
                     LogError(message.Trim());
                 }
             };
-
-            Log("Building MethodInfo dict...");
             
-            bindMethods.Clear();
+            bindActions.Clear();
             foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
             {
                 object[] attributes = method.GetCustomAttributes(typeof(BindableMethod), false);
@@ -108,15 +100,9 @@ namespace DebugMod
                 if (attributes.Any())
                 {
                     BindableMethod attr = (BindableMethod)attributes[0];
-                    string name = attr.name;
-                    string cat = attr.category;
-                    bool allowLock = attr.allowLock;
-
-                    bindMethods.Add(name, (cat, allowLock, (Action)Delegate.CreateDelegate(typeof(Action), method)));
+                    bindActions.Add(attr.name, new BindAction(attr, method));
                 }
             }
-            
-            Log("Done! Time taken: " + (Time.realtimeSinceStartup - startTime) + "s. Found " + bindMethods.Count + " methods");
 
             LoadSettings();
 
@@ -130,24 +116,12 @@ namespace DebugMod
                 settings.binds.Add("Toggle All UI", KeyCode.F2);
             }
 
-            if (settings.NumPadForSaveStates)
-            {
-                alphaStart = (int)KeyCode.Keypad0;
-                alphaEnd = (int)KeyCode.Keypad9;
-            }
-            else
-            {
-                alphaStart = (int)KeyCode.Alpha0;
-                alphaEnd = (int)KeyCode.Alpha9;
-            }
+            int alphaStart = (int)(settings.NumPadForSaveStates ? KeyCode.Keypad0 : KeyCode.Alpha0);
 
-            int alphaInt = 0;
             alphaKeyDict.Clear();
-                
-            for (int i = alphaStart; i <= alphaEnd; i++)
+            for (int i = 0; i < 10; i++)
             {
-                KeyCode tmpKeyCode = (KeyCode)i;
-                alphaKeyDict.Add(tmpKeyCode, alphaInt++);
+                alphaKeyDict.Add((KeyCode)(alphaStart + i), i);
             }
             
             saveStateManager = new SaveStateManager();
@@ -178,6 +152,8 @@ namespace DebugMod
 
             KeyBindLock = false;
             TimeScaleActive = false;
+
+            Log("Initialized");
         }
 
         public DebugMod()
@@ -409,12 +385,8 @@ namespace DebugMod
             {
                 if (method.GetCustomAttribute<BindableMethod>(false) is BindableMethod attr)
                 {
-                    string name = attr.name;
-                    string cat = attr.category;
-                    bool allowLock = attr.allowLock;
-
-                    instance.Log($"Recieved Action: {name} (from {BindableFunctionsClass.Name})");
-                    AdditionalBindMethods.Add(name, (cat, allowLock, (Action)Delegate.CreateDelegate(typeof(Action), method)));
+                    instance.Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
+                    bindActions.Add(attr.name, new BindAction(attr, method));
                 } 
             }
         }
@@ -435,7 +407,7 @@ namespace DebugMod
         public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
         {
             instance.Log($"Received Action: {name}");
-            AdditionalBindMethods.Add(name, (category, allowLock, method));
+            bindActions.Add(name, new BindAction(name, category, allowLock, method));
         }
 
         public void LogDebug(string message)
