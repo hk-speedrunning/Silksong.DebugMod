@@ -9,7 +9,6 @@ namespace DebugMod
         public static void ToggleEnemyHPBars()
         {
             EnemiesPanel.hpBars = !EnemiesPanel.hpBars;
-            EnemiesPanel.EnemyUpdate();
 
             if (EnemiesPanel.hpBars)
             {

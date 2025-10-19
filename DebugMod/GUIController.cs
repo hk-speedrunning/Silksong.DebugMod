@@ -354,11 +354,6 @@ namespace DebugMod
             {
                 hazardLocation = PlayerData.instance.hazardRespawnLocation;
                 Console.AddLine("Hazard Respawn location updated: " + hazardLocation.ToString());
-
-                if (DebugMod.settings.EnemiesPanelVisible)
-                {
-                    EnemiesPanel.EnemyUpdate();
-                }
             }
             if (!string.IsNullOrEmpty(respawnSceneWatch) && respawnSceneWatch != PlayerData.instance.respawnScene)
             {

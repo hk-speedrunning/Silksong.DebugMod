@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
-using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -257,7 +256,6 @@ namespace DebugMod
         private void LoadCharacter(SaveGameData saveGameData)
         {
             Console.Reset();
-            EnemiesPanel.Reset();
 
             playerInvincible = false;
             infiniteHP = false;
@@ -289,7 +287,6 @@ namespace DebugMod
             {
                 _loadTime = Time.realtimeSinceStartup;
                 Console.AddLine("New scene loaded: " + sceneName);
-                EnemiesPanel.Reset();
                 PlayerDeathWatcher.Reset();
                 BossHandler.LookForBoss(sceneName);
                 MethodHelpers.VisualMaskHelper.OnSceneChange(sceneTo);

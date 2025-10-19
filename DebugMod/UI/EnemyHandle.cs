@@ -1,0 +1,132 @@
+﻿using GlobalEnums;
+using HarmonyLib;
+using UnityEngine;
+
+namespace DebugMod.UI;
+
+[HarmonyPatch]
+public class EnemyHandle : MonoBehaviour
+{
+    private const int HPBAR_WIDTH = 120;
+    private const int HPBAR_HEIGHT = 40;
+    private const int HPBAR_BORDER = 3;
+
+    private HealthManager hm;
+    private tk2dSprite sprite;
+    private BoxCollider2D collider;
+    private CanvasPanel hpBar;
+    private int lastHP = -1;
+
+    public int HP
+    {
+        get => hm.hp;
+        set => hm.hp = value;
+    }
+
+    public int MaxHP => hm.initHp;
+
+    public void Awake()
+    {
+        hm = GetComponent<HealthManager>();
+        sprite = GetComponent<tk2dSprite>();
+        collider = GetComponent<BoxCollider2D>();
+
+        if (!EnemiesPanel.enemyPool.Contains(this))
+        {
+            EnemiesPanel.enemyPool.Add(this);
+        }
+    }
+
+    public void OnDestroy()
+    {
+        EnemiesPanel.enemyPool.Remove(this);
+        hpBar?.Destroy();
+    }
+
+    public void OnEnable() => Awake();
+    public void OnDisable() => OnDestroy();
+
+    public void Update()
+    {
+        if (!EnemiesPanel.IsActive())
+        {
+            hpBar?.SetActive(false, true);
+            return;
+        }
+
+        if (EnemiesPanel.hpBars)
+        {
+            if (hpBar == null)
+            {
+                hpBar = new CanvasPanel(GUIController.Instance.canvas, DrawTexture(), Vector2.zero, Vector2.zero, new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
+                hpBar.AddText("HP", "", Vector2.zero, new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT), GUIController.Instance.arial, 20, FontStyle.Normal, TextAnchor.MiddleCenter);
+                hpBar.FixRenderOrder();
+            }
+
+            if (HP != lastHP)
+            {
+                hpBar.UpdateBackground(DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
+                lastHP = HP;
+            }
+
+            Vector2 barPos = transform.position;
+
+            Bounds bounds = sprite?.GetBounds() ?? collider?.bounds ?? new(transform.position, new Vector3(1, 1, 0));
+            barPos.y += (bounds.max.y - bounds.min.y) / 2f;
+
+            barPos = Camera.main.WorldToScreenPoint(barPos);
+            barPos.x = barPos.x / Screen.width * 1920f;
+            barPos.y = (1 - barPos.y / Screen.height) * 1080f;
+
+            barPos.x -= HPBAR_WIDTH / 2f;
+
+            hpBar.SetPosition(barPos);
+            hpBar.GetText("HP").UpdateText($"{HP}/{MaxHP}");
+        }
+
+        if (hpBar != null && hpBar.active != EnemiesPanel.hpBars)
+        {
+            hpBar.SetActive(EnemiesPanel.hpBars, true);
+        }
+    }
+
+    private Texture2D DrawTexture()
+    {
+        Texture2D tex = new Texture2D(HPBAR_WIDTH, HPBAR_HEIGHT);
+
+        for (int x = 0; x < HPBAR_WIDTH; x++)
+        {
+            for (int y = 0; y < HPBAR_HEIGHT; y++)
+            {
+                Color color;
+                if (x < HPBAR_BORDER || x >= HPBAR_WIDTH - HPBAR_BORDER || y < HPBAR_BORDER || y >= HPBAR_HEIGHT - HPBAR_BORDER)
+                {
+                    color = Color.black;
+                }
+                else if (HP / (float)MaxHP >= (x - HPBAR_BORDER) / (float)(HPBAR_WIDTH - HPBAR_BORDER))
+                {
+                    color = Color.red;
+                }
+                else
+                {
+                    color = Color.clear;
+                }
+
+                tex.SetPixel(x, y, color);
+            }
+        }
+
+        tex.Apply();
+        return tex;
+    }
+
+    [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Start))]
+    [HarmonyPostfix]
+    private static void HealthManager_Start(HealthManager __instance)
+    {
+        if (__instance.gameObject.layer == (int)PhysLayers.ENEMIES && !__instance.GetComponent<EnemyHandle>())
+        {
+            __instance.gameObject.AddComponent<EnemyHandle>();
+        }
+    }
+}

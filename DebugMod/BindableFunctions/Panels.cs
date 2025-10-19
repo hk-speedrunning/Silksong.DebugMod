@@ -26,11 +26,6 @@ namespace DebugMod
             {
                 DebugMod.settings.ClearSaveStatePanel = true;
             }
-
-            if (DebugMod.settings.EnemiesPanelVisible)
-            {
-                EnemiesPanel.EnemyUpdate();
-            }
         }
 
         [BindableMethod(name = "Toggle Binds", category = "Mod UI")]
@@ -61,10 +56,6 @@ namespace DebugMod
         public static void ToggleEnemyPanel()
         {
             DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
-            if (DebugMod.settings.EnemiesPanelVisible)
-            {
-                EnemiesPanel.EnemyUpdate();
-            }
         }
 
         // View handled in the InfoPanel classes
