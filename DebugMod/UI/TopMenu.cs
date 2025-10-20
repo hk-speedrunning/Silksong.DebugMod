@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
@@ -9,13 +8,10 @@ namespace DebugMod.UI
     {
         private static CanvasPanel panel;
 
-        private static List<Vector2> AllPossibleLocations = new();
-
-        private static readonly Color SelectedColor = new Color(244f / 255f, 127f / 255f, 32f / 255f);
+        private static readonly Color selectedColor = new(244f / 255f, 127f / 255f, 32f / 255f);
 
         public static void BuildMenu(GameObject canvas)
         {
-            MakeList();
             panel = new CanvasPanel(canvas, GUIController.Instance.images["ButtonsMenuBG"], new Vector2(1070f , 25f), Vector2.zero, new Rect(0f, 0f, GUIController.Instance.images["ButtonsMenuBG"].width, GUIController.Instance.images["ButtonsMenuBG"].height));
 
             Rect buttonRect = new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height);
@@ -136,17 +132,6 @@ namespace DebugMod.UI
             panel.FixRenderOrder();
         }
 
-        private static void MakeList()
-        {
-            //currently only 5 slots available
-            AllPossibleLocations.Add(new Vector2(546,68f));
-            AllPossibleLocations.Add(new Vector2(646,28f));
-            AllPossibleLocations.Add(new Vector2(646,68f));
-            AllPossibleLocations.Add(new Vector2(746,28f));
-            AllPossibleLocations.Add(new Vector2(746,68f));
-        }
-
-        //TODO: Set A Color Variable for highlighted so its easier to add new buttons
         public static void Update()
         {
             if (panel == null)
@@ -181,27 +166,27 @@ namespace DebugMod.UI
             {
                 panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
                 panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
-                panel.GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? SelectedColor : Color.white);
+                panel.GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? selectedColor : Color.white);
 
             }
 
             if (panel.GetPanel("Cheats Panel").active)
             {
-                panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? SelectedColor : Color.white);
-                panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? SelectedColor : Color.white);
-                panel.GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? SelectedColor : Color.white);
-                panel.GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? SelectedColor : Color.white);
-                panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? SelectedColor : Color.white);
-                panel.GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? SelectedColor : Color.white);
+                panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
+                panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
+                panel.GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? selectedColor : Color.white);
+                panel.GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? selectedColor : Color.white);
+                panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? selectedColor : Color.white);
+                panel.GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? selectedColor : Color.white);
 
             }
 
             // if (panel.GetPanel("Bosses Panel").active)
             // {
-            //     panel.GetButton("Failed Champ", "Bosses Panel").SetTextColor(PlayerData.instance.falseKnightDreamDefeated ? SelectedColor : Color.white);
-            //     panel.GetButton("Soul Tyrant", "Bosses Panel").SetTextColor(PlayerData.instance.mageLordDreamDefeated ? SelectedColor : Color.white);
-            //     panel.GetButton("Lost Kin", "Bosses Panel").SetTextColor(PlayerData.instance.infectedKnightDreamDefeated ? SelectedColor : Color.white);
-            //     panel.GetButton("NK Grimm", "Bosses Panel").SetTextColor((PlayerData.instance.GetBoolInternal("killedNightmareGrimm") || PlayerData.instance.GetBoolInternal("destroyedNightmareLantern")) ? SelectedColor : Color.white);
+            //     panel.GetButton("Failed Champ", "Bosses Panel").SetTextColor(PlayerData.instance.falseKnightDreamDefeated ? selectedColor : Color.white);
+            //     panel.GetButton("Soul Tyrant", "Bosses Panel").SetTextColor(PlayerData.instance.mageLordDreamDefeated ? selectedColor : Color.white);
+            //     panel.GetButton("Lost Kin", "Bosses Panel").SetTextColor(PlayerData.instance.infectedKnightDreamDefeated ? selectedColor : Color.white);
+            //     panel.GetButton("NK Grimm", "Bosses Panel").SetTextColor((PlayerData.instance.GetBoolInternal("killedNightmareGrimm") || PlayerData.instance.GetBoolInternal("destroyedNightmareLantern")) ? selectedColor : Color.white);
             // }
             
             //TODO fix naming so this doesnt require it to be setup like this (currently page panel is savestate panel so CC thinks its throwing errors not sure)
@@ -210,9 +195,9 @@ namespace DebugMod.UI
                 CanvasPanel savepanel = panel.GetPanel("SaveStates Panel");
                 savepanel.GetButton("Scroll Left").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
                 savepanel.GetButton("Scroll Right").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
-                savepanel.GetButton("File Save").SetTextColor(SaveStateManager.currentStateOperation == "Save new state to file" ? SelectedColor : Color.white);
-                savepanel.GetButton("File Load").SetTextColor(SaveStateManager.currentStateOperation == "Load new state from file" ? SelectedColor : Color.white);
-                savepanel.GetButton("Load State On Death").SetTextColor(DebugMod.stateOnDeath ? SelectedColor : Color.white);
+                savepanel.GetButton("File Save").SetTextColor(SaveStateManager.currentStateOperation == "Save new state to file" ? selectedColor : Color.white);
+                savepanel.GetButton("File Load").SetTextColor(SaveStateManager.currentStateOperation == "Load new state from file" ? selectedColor : Color.white);
+                savepanel.GetButton("Load State On Death").SetTextColor(DebugMod.stateOnDeath ? selectedColor : Color.white);
             }
         }
 
@@ -243,18 +228,18 @@ namespace DebugMod.UI
         {
             panel.GetButton("Silk Heart", "Skills Panel").UpdateText("Silk Hearts: " + PlayerData.instance.silkRegenMax);
 
-            panel.GetButton("Cloak", "Skills Panel").SetTextColor(PlayerData.instance.hasBrolly ? SelectedColor : Color.white);
+            panel.GetButton("Cloak", "Skills Panel").SetTextColor(PlayerData.instance.hasBrolly ? selectedColor : Color.white);
             if (PlayerData.instance.hasDoubleJump) panel.GetButton("Cloak", "Skills Panel").UpdateText("Faydown");
             else panel.GetButton("Cloak", "Skills Panel").UpdateText("Drifter's");
 
-            panel.GetButton("Swift Step", "Skills Panel").SetTextColor(PlayerData.instance.hasDash ? SelectedColor : Color.white);
-            panel.GetButton("Cling Grip", "Skills Panel").SetTextColor(PlayerData.instance.hasWalljump ? SelectedColor : Color.white);
-            panel.GetButton("Needolin", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolin ? SelectedColor : Color.white);
-            panel.GetButton("Clawline", "Skills Panel").SetTextColor(PlayerData.instance.hasHarpoonDash ? SelectedColor : Color.white);
-            panel.GetButton("Silk Soar", "Skills Panel").SetTextColor(PlayerData.instance.hasSuperJump ? SelectedColor : Color.white);
-            panel.GetButton("Beastling Call", "Skills Panel").SetTextColor(PlayerData.instance.UnlockedFastTravelTeleport ? SelectedColor : Color.white);
-            panel.GetButton("Elegy of the Deep", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolinMemoryPowerup ? SelectedColor : Color.white);
-            panel.GetButton("Needle Strike", "Skills Panel").SetTextColor(PlayerData.instance.hasChargeSlash ? SelectedColor : Color.white);
+            panel.GetButton("Swift Step", "Skills Panel").SetTextColor(PlayerData.instance.hasDash ? selectedColor : Color.white);
+            panel.GetButton("Cling Grip", "Skills Panel").SetTextColor(PlayerData.instance.hasWalljump ? selectedColor : Color.white);
+            panel.GetButton("Needolin", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolin ? selectedColor : Color.white);
+            panel.GetButton("Clawline", "Skills Panel").SetTextColor(PlayerData.instance.hasHarpoonDash ? selectedColor : Color.white);
+            panel.GetButton("Silk Soar", "Skills Panel").SetTextColor(PlayerData.instance.hasSuperJump ? selectedColor : Color.white);
+            panel.GetButton("Beastling Call", "Skills Panel").SetTextColor(PlayerData.instance.UnlockedFastTravelTeleport ? selectedColor : Color.white);
+            panel.GetButton("Elegy of the Deep", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolinMemoryPowerup ? selectedColor : Color.white);
+            panel.GetButton("Needle Strike", "Skills Panel").SetTextColor(PlayerData.instance.hasChargeSlash ? selectedColor : Color.white);
         }
 
         private static void HideMenuClicked()

@@ -7,14 +7,13 @@ namespace DebugMod.UI
 {
     public class CanvasPanel
     {
-        private CanvasImage background;
-        private GameObject canvas;
+        private readonly GameObject canvas;
+        private readonly Dictionary<string, CanvasButton> buttons = new();
+        private readonly Dictionary<string, CanvasPanel> panels = new();
+        private readonly Dictionary<string, CanvasImage> images = new();
+        private readonly Dictionary<string, CanvasText> texts = new();
         private Vector2 position;
         private Vector2 size;
-        private Dictionary<string, CanvasButton> buttons = new Dictionary<string, CanvasButton>();
-        private Dictionary<string, CanvasPanel> panels = new Dictionary<string, CanvasPanel>();
-        private Dictionary<string, CanvasImage> images = new Dictionary<string, CanvasImage>();
-        private Dictionary<string, CanvasText> texts = new Dictionary<string, CanvasText>();
 
         public enum MenuItems
         {
@@ -39,7 +38,11 @@ namespace DebugMod.UI
             position = pos;
             size = sz;
             canvas = parent;
-            background = new CanvasImage(parent, tex, pos, sz, bgSubSection);
+
+            if (tex != null)
+            {
+                AddImage("Background", tex, Vector2.zero, sz, bgSubSection);
+            }
 
             active = true;
         }
@@ -134,38 +137,29 @@ namespace DebugMod.UI
             return null;
         }
 
-        public void UpdateBackground(Texture2D tex, Rect subSection)
-        {
-            background.UpdateImage(tex, subSection);
-        }
-
-        public void ResizeBG(Vector2 sz)
-        {
-            background.SetWidth(sz.x);
-            background.SetHeight(sz.y);
-            background.SetPosition(position);
-        }
-
         public void SetPosition(Vector2 pos)
         {
-            background.SetPosition(pos);
-
-            Vector2 deltaPos = position - pos;
+            Vector2 deltaPos = pos - position;
             position = pos;
 
             foreach (CanvasButton button in buttons.Values)
             {
-                button.SetPosition(button.GetPosition() - deltaPos);
+                button.SetPosition(button.GetPosition() + deltaPos);
+            }
+
+            foreach (CanvasImage image in images.Values)
+            {
+                image.SetPosition(image.GetPosition() + deltaPos);
             }
 
             foreach (CanvasText text in texts.Values)
             {
-                text.SetPosition(text.GetPosition() - deltaPos);
+                text.SetPosition(text.GetPosition() + deltaPos);
             }
 
             foreach (CanvasPanel panel in panels.Values)
             {
-                panel.SetPosition(panel.GetPosition() - deltaPos);
+                panel.SetPosition(panel.GetPosition() + deltaPos);
             }
         }
 
@@ -193,8 +187,6 @@ namespace DebugMod.UI
 
         public void SetActive(bool b, bool panel)
         {
-            background.SetActive(b);
-
             foreach (CanvasButton button in buttons.Values)
             {
                 button.SetActive(b);
@@ -247,14 +239,10 @@ namespace DebugMod.UI
             {
                 panel.FixRenderOrder();
             }
-
-            background.SetRenderIndex(0);
         }
 
         public void Destroy()
         {
-            background.Destroy();
-
             foreach (CanvasButton button in buttons.Values)
             {
                 button.Destroy();

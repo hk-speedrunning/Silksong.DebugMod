@@ -66,7 +66,7 @@ public class EnemyHandle : MonoBehaviour
 
             if (HP != lastHP)
             {
-                hpBar.UpdateBackground(DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
+                hpBar.GetImage("Background").UpdateImage(DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
                 lastHP = HP;
             }
 

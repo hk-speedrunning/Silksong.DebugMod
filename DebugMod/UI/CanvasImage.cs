@@ -6,6 +6,7 @@ namespace DebugMod.UI
     public class CanvasImage
     {
         private GameObject imageObj;
+        private Vector2 position;
         private Vector2 sz;
         private Rect sub;
 
@@ -18,6 +19,7 @@ namespace DebugMod.UI
                 size = new Vector2(subSprite.width, subSprite.height);
             }
 
+            position = pos;
             sz = size;
             sub = subSprite;
 
@@ -33,15 +35,20 @@ namespace DebugMod.UI
 
             imageObj.transform.SetParent(parent.transform, false);
 
-            Vector2 position = new Vector2((pos.x + ((size.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
-            imageTransform.anchorMin = position;
-            imageTransform.anchorMax = position;
+            Vector2 anchor = new Vector2((pos.x + ((size.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
+            imageTransform.anchorMin = anchor;
+            imageTransform.anchorMax = anchor;
             imageTransform.SetScaleX(size.x / subSprite.width);
             imageTransform.SetScaleY(size.y / subSprite.height);
 
             Object.DontDestroyOnLoad(imageObj);
 
             active = true;
+        }
+
+        public Vector2 GetPosition()
+        {
+            return position;
         }
 
         public void UpdateImage(Texture2D tex, Rect subSection)
@@ -72,11 +79,13 @@ namespace DebugMod.UI
 
         public void SetPosition(Vector2 pos)
         {
+            position = pos;
+
             if (imageObj != null)
             {
-                Vector2 position = new Vector2((pos.x + ((sz.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / sub.height) * sub.height) / 2f)) / 1080f);
-                imageObj.GetComponent<RectTransform>().anchorMin = position;
-                imageObj.GetComponent<RectTransform>().anchorMax = position;
+                Vector2 anchor = new Vector2((pos.x + ((sz.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / sub.height) * sub.height) / 2f)) / 1080f);
+                imageObj.GetComponent<RectTransform>().anchorMin = anchor;
+                imageObj.GetComponent<RectTransform>().anchorMax = anchor;
             }
         }
 
