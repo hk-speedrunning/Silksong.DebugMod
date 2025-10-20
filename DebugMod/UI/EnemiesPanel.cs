@@ -19,7 +19,7 @@ namespace DebugMod.UI
         {
             parent = canvas;
 
-            panel = new CanvasPanel(canvas, new Texture2D(1, 1), new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f), Vector2.zero, new Rect(0, 0, 1, 1));
+            panel = new CanvasPanel(new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f));
 
             panel.AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, GUIController.Instance.trajanBold, 30);
 

@@ -10,7 +10,7 @@ namespace DebugMod.UI
 
         public bool active;
 
-        public CanvasText(GameObject parent, Vector2 pos, Vector2 sz, Font font, string text, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+        public CanvasText(Vector2 pos, Vector2 sz, string text, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
         {
             if (sz.x == 0 || sz.y == 0)
             {
@@ -37,7 +37,7 @@ namespace DebugMod.UI
             t.fontStyle = style;
             t.alignment = alignment;
 
-            textObj.transform.SetParent(parent.transform, false);
+            textObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
             Vector2 position = new Vector2((pos.x + size.x / 2f) / 1920f, (1080f - (pos.y + size.y / 2f)) / 1080f);
             textTransform.anchorMin = position;

@@ -99,8 +99,10 @@ namespace DebugMod.UI
         // TODO: Refactor to allow rotating images
         public static void BuildMenu(GameObject canvas)
         {
-            panel = new CanvasPanel(canvas, GUIController.Instance.images["HelpBG"], new Vector2(1123, 456),
+            panel = new CanvasPanel(
+                new Vector2(1123, 456),
                 Vector2.zero,
+                GUIController.Instance.images["HelpBG"],
                 new Rect(0, 0, GUIController.Instance.images["HelpBG"].width,
                     GUIController.Instance.images["HelpBG"].height));
             panel.AddText("Label", "Binds", new Vector2(130f, -25f), Vector2.zero, GUIController.Instance.trajanBold,
@@ -152,9 +154,9 @@ namespace DebugMod.UI
             }
         
             //Build pages based on categories
-            foreach (var action in DebugMod.bindActions)
+            foreach (var action in DebugMod.bindActions.Values)
             {
-                CategoryInfo.AddFunction(action.Key, action.Value.Category);
+                CategoryInfo.AddFunction(action.Category, action.Name);
             }
             CategoryInfo.GeneratePageData();
 

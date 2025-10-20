@@ -14,7 +14,7 @@ namespace DebugMod
 
         public static void BuildMenu(GameObject canvas)
         {
-            panel = new CanvasPanel(canvas, GUIController.Instance.images["ConsoleBg"], new Vector2(1275, 800), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height));
+            panel = new CanvasPanel(new Vector2(1275, 800), Vector2.zero, GUIController.Instance.images["ConsoleBg"], new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height));
             panel.AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
             panel.FixRenderOrder();
 

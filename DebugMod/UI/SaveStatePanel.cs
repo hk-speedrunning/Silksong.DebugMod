@@ -10,10 +10,9 @@ namespace DebugMod.UI
         public static void BuildMenu(GameObject canvas)
         {
             statePanel = new CanvasPanel(
-                canvas,
-                GUIController.Instance.images["BlankVertical"],
                 new Vector2(720f, 40f),
                 Vector2.zero,
+                GUIController.Instance.images["BlankVertical"],
                 new Rect(
                     0f,
                     0f,

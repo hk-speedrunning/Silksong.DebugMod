@@ -7,20 +7,20 @@ namespace DebugMod.UI
     {
         private GameObject imageObj;
         private Vector2 position;
-        private Vector2 sz;
+        private Vector2 size;
         private Rect sub;
 
         public bool active;
 
-        public CanvasImage(GameObject parent, Texture2D tex, Vector2 pos, Vector2 size, Rect subSprite)
+        public CanvasImage(Vector2 pos, Vector2 sz, Texture2D tex, Rect subSprite)
         {
-            if (size.x == 0 || size.y == 0)
+            if (sz.x == 0 || sz.y == 0)
             {
-                size = new Vector2(subSprite.width, subSprite.height);
+                sz = new Vector2(subSprite.width, subSprite.height);
             }
 
             position = pos;
-            sz = size;
+            size = sz;
             sub = subSprite;
 
             imageObj = new GameObject();
@@ -33,13 +33,13 @@ namespace DebugMod.UI
             group.interactable = false;
             group.blocksRaycasts = false;
 
-            imageObj.transform.SetParent(parent.transform, false);
+            imageObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
-            Vector2 anchor = new Vector2((pos.x + ((size.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
+            Vector2 anchor = new Vector2((pos.x + ((sz.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
             imageTransform.anchorMin = anchor;
             imageTransform.anchorMax = anchor;
-            imageTransform.SetScaleX(size.x / subSprite.width);
-            imageTransform.SetScaleY(size.y / subSprite.height);
+            imageTransform.SetScaleX(sz.x / subSprite.width);
+            imageTransform.SetScaleY(sz.y / subSprite.height);
 
             Object.DontDestroyOnLoad(imageObj);
 
@@ -63,7 +63,7 @@ namespace DebugMod.UI
         {
             if (imageObj != null)
             {
-                sz = new Vector2(width, sz.y);
+                size = new Vector2(width, size.y);
                 imageObj.GetComponent<RectTransform>().SetScaleX(width / imageObj.GetComponent<RectTransform>().sizeDelta.x);
             }
         }
@@ -72,7 +72,7 @@ namespace DebugMod.UI
         {
             if (imageObj != null)
             {
-                sz = new Vector2(sz.x, height);
+                size = new Vector2(size.x, height);
                 imageObj.GetComponent<RectTransform>().SetScaleY(height / imageObj.GetComponent<RectTransform>().sizeDelta.y);
             }
         }
@@ -83,7 +83,7 @@ namespace DebugMod.UI
 
             if (imageObj != null)
             {
-                Vector2 anchor = new Vector2((pos.x + ((sz.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / sub.height) * sub.height) / 2f)) / 1080f);
+                Vector2 anchor = new Vector2((pos.x + ((size.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / sub.height) * sub.height) / 2f)) / 1080f);
                 imageObj.GetComponent<RectTransform>().anchorMin = anchor;
                 imageObj.GetComponent<RectTransform>().anchorMax = anchor;
             }
@@ -105,7 +105,7 @@ namespace DebugMod.UI
 
         public void Destroy()
         {
-            Object.Destroy(imageObj); ;
+            Object.Destroy(imageObj);
         }
     }
 }

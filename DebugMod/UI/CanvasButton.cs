@@ -14,11 +14,11 @@ namespace DebugMod.UI
 
         public bool active;
 
-        public CanvasButton(GameObject parent, string name, Texture2D tex, Vector2 pos, Vector2 size, Rect bgSubSection, Font font = null, string text = null, int fontSize = 13)
+        public CanvasButton(string name, Vector2 pos, Vector2 size, Texture2D tex, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
         {
             if (size.x == 0 || size.y == 0)
             {
-                size = new Vector2(bgSubSection.width, bgSubSection.height);
+                size = new Vector2(subSprite.width, subSprite.height);
             }
 
             buttonName = name;
@@ -26,16 +26,16 @@ namespace DebugMod.UI
             buttonObj = new GameObject();
             buttonObj.AddComponent<CanvasRenderer>();
             RectTransform buttonTransform = buttonObj.AddComponent<RectTransform>();
-            buttonTransform.sizeDelta = new Vector2(bgSubSection.width, bgSubSection.height);
-            buttonObj.AddComponent<Image>().sprite = Sprite.Create(tex, new Rect(bgSubSection.x, tex.height - bgSubSection.height, bgSubSection.width, bgSubSection.height), Vector2.zero);
+            buttonTransform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
+            buttonObj.AddComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
             button = buttonObj.AddComponent<Button>();
 
-            buttonObj.transform.SetParent(parent.transform, false);
+            buttonObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
-            buttonTransform.SetScaleX(size.x / bgSubSection.width);
-            buttonTransform.SetScaleY(size.y / bgSubSection.height);
+            buttonTransform.SetScaleX(size.x / subSprite.width);
+            buttonTransform.SetScaleY(size.y / subSprite.height);
 
-            Vector2 position = new Vector2((pos.x + ((size.x / bgSubSection.width) * bgSubSection.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / bgSubSection.height) * bgSubSection.height) / 2f)) / 1080f);
+            Vector2 position = new Vector2((pos.x + ((size.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
             buttonTransform.anchorMin = position;
             buttonTransform.anchorMax = position;
 
@@ -44,7 +44,7 @@ namespace DebugMod.UI
             if (font != null && text != null)
             {
                 textObj = new GameObject();
-                textObj.AddComponent<RectTransform>().sizeDelta = new Vector2(bgSubSection.width, bgSubSection.height);
+                textObj.AddComponent<RectTransform>().sizeDelta = new Vector2(subSprite.width, subSprite.height);
                 Text t = textObj.AddComponent<Text>();
                 t.text = text;
                 t.font = font;

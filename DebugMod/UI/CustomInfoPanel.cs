@@ -20,10 +20,9 @@ namespace DebugMod.UI
             if (ShowSprite)
             {
                 panel = new CanvasPanel(
-                    canvas,
-                    GUIController.Instance.images["StatusPanelBG"],
                     new Vector2(0f, 223f),
                     Vector2.zero,
+                    GUIController.Instance.images["StatusPanelBG"],
                     new Rect(
                         0f,
                         0f,
@@ -38,10 +37,9 @@ namespace DebugMod.UI
 
                 // Puke
                 panel = new CanvasPanel(
-                    canvas,
-                    tex,
                     new Vector2(130f, 230f),
                     Vector2.zero,
+                    tex,
                     new Rect(
                         0f,
                         0f,
