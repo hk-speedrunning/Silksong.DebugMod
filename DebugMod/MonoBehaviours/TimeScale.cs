@@ -9,95 +9,94 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
 
-namespace DebugMod.MonoBehaviours
+namespace DebugMod.MonoBehaviours;
+
+[HarmonyPatch]
+public class TimeScale:MonoBehaviour
 {
-    [HarmonyPatch]
-    public class TimeScale:MonoBehaviour
+    private static bool hooksActive;
+
+    public void Awake()
     {
-        private static bool hooksActive;
+        DebugMod.TimeScaleActive = true;
+        Time.timeScale = DebugMod.CurrentTimeScale;
 
-        public void Awake()
+        hooksActive = true;
+
+        _coroutineHooks = new ILHook[FreezeCoroutines.Length];
+
+        foreach ((MethodInfo coro, int idx) in FreezeCoroutines.Select((mi, idx) => (mi, idx)))
         {
-            DebugMod.TimeScaleActive = true;
-            Time.timeScale = DebugMod.CurrentTimeScale;
-
-            hooksActive = true;
-
-            _coroutineHooks = new ILHook[FreezeCoroutines.Length];
-
-            foreach ((MethodInfo coro, int idx) in FreezeCoroutines.Select((mi, idx) => (mi, idx)))
-            {
-                _coroutineHooks[idx] = new ILHook(coro, ScaleFreeze);
-            }
-            
+            _coroutineHooks[idx] = new ILHook(coro, ScaleFreeze);
         }
         
-        public void OnDestroy()
+    }
+    
+    public void OnDestroy()
+    {
+        
+        foreach (ILHook hook in _coroutineHooks)
+            hook.Dispose();
+
+        Time.timeScale = 1;
+        DebugMod.CurrentTimeScale = 1f;
+
+        hooksActive = false;
+    }
+     
+    private readonly MethodInfo[] FreezeCoroutines = (
+        from method in typeof(GameManager).GetMethods()
+        where method.Name.StartsWith("FreezeMoment") || method.Name.StartsWith("SetTimeScale")
+        where method.ReturnType == typeof(IEnumerator)
+        select method.GetCustomAttribute<IteratorStateMachineAttribute>() into attr
+        select attr.StateMachineType into type
+        select type.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance)
+    ).ToArray();
+
+    private ILHook[] _coroutineHooks;
+    private void ScaleFreeze(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+
+        cursor.GotoNext
+        (
+            MoveType.After,
+            x => x.MatchLdfld(out _),
+            x => x.MatchCall<Time>("get_unscaledDeltaTime")
+        );
+
+        cursor.EmitDelegate<Func<float>>(() => DebugMod.CurrentTimeScale);
+
+        cursor.Emit(OpCodes.Mul);
+    }
+
+    [HarmonyPatch(typeof(QuitToMenu), nameof(QuitToMenu.Start))]
+    [HarmonyPostfix]
+    private static IEnumerator QuitToMenu_Start(IEnumerator orig)
+    {
+        bool shouldRun = hooksActive;
+        yield return orig;
+
+        if (shouldRun)
         {
-            
-            foreach (ILHook hook in _coroutineHooks)
-                hook.Dispose();
-
-            Time.timeScale = 1;
-            DebugMod.CurrentTimeScale = 1f;
-
-            hooksActive = false;
+            TimeManager.TimeScale = DebugMod.CurrentTimeScale;
         }
-         
-        private readonly MethodInfo[] FreezeCoroutines = (
-            from method in typeof(GameManager).GetMethods()
-            where method.Name.StartsWith("FreezeMoment") || method.Name.StartsWith("SetTimeScale")
-            where method.ReturnType == typeof(IEnumerator)
-            select method.GetCustomAttribute<IteratorStateMachineAttribute>() into attr
-            select attr.StateMachineType into type
-            select type.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance)
-        ).ToArray();
+    }
 
-        private ILHook[] _coroutineHooks;
-        private void ScaleFreeze(ILContext il)
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetTimeScale), typeof(float))]
+    [HarmonyPrefix]
+    private static bool GameManager_SetTimeScale_1(GameManager __instance, float newTimeScale)
+    {
+        if (!hooksActive)
         {
-            var cursor = new ILCursor(il);
-
-            cursor.GotoNext
-            (
-                MoveType.After,
-                x => x.MatchLdfld(out _),
-                x => x.MatchCall<Time>("get_unscaledDeltaTime")
-            );
-
-            cursor.EmitDelegate<Func<float>>(() => DebugMod.CurrentTimeScale);
-
-            cursor.Emit(OpCodes.Mul);
+            return true;
         }
 
-        [HarmonyPatch(typeof(QuitToMenu), nameof(QuitToMenu.Start))]
-        [HarmonyPostfix]
-        private static IEnumerator QuitToMenu_Start(IEnumerator orig)
-        {
-            bool shouldRun = hooksActive;
-            yield return orig;
-
-            if (shouldRun)
-            {
-                TimeManager.TimeScale = DebugMod.CurrentTimeScale;
-            }
-        }
-
-        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetTimeScale), typeof(float))]
-        [HarmonyPrefix]
-        private static bool GameManager_SetTimeScale_1(GameManager __instance, float newTimeScale)
-        {
-            if (!hooksActive)
-            {
-                return true;
-            }
-
-            float temp = newTimeScale;
-            if (__instance.timeSlowedCount > 1)
-                temp = Math.Min(temp, TimeManager.TimeScale);
-            
-            TimeManager.TimeScale = (temp <= 0.01f ? 0f : temp) * DebugMod.CurrentTimeScale;
-            return false;
-        }
+        float temp = newTimeScale;
+        if (__instance.timeSlowedCount > 1)
+            temp = Math.Min(temp, TimeManager.TimeScale);
+        
+        TimeManager.TimeScale = (temp <= 0.01f ? 0f : temp) * DebugMod.CurrentTimeScale;
+        return false;
     }
 }

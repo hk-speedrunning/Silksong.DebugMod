@@ -1,166 +1,165 @@
 ﻿using System;
 using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
 using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod;
+
+public static partial class BindableFunctions
 {
-    public static partial class BindableFunctions
+
+    [BindableMethod(name = "Show Hitboxes", category = "Visual")]
+    public static void ShowHitboxes()
     {
+        if (++DebugMod.settings.ShowHitBoxes > 2) DebugMod.settings.ShowHitBoxes = 0;
+        Console.AddLine("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
+    }
 
-        [BindableMethod(name = "Show Hitboxes", category = "Visual")]
-        public static void ShowHitboxes()
+    [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
+    public static void PreviewCocoonPosition()
+    {
+        CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
+            ?? GameManager.instance.gameObject.AddComponent<CocoonPreviewer>();
+
+        if (!component.previewEnabled)
         {
-            if (++DebugMod.settings.ShowHitBoxes > 2) DebugMod.settings.ShowHitBoxes = 0;
-            Console.AddLine("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
+            component.previewEnabled = true;
+            Console.AddLine("Enabled cocoon spawn point preview");
         }
-
-        [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
-        public static void PreviewCocoonPosition()
+        else
         {
-            CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
-                ?? GameManager.instance.gameObject.AddComponent<CocoonPreviewer>();
-
-            if (!component.previewEnabled)
-            {
-                component.previewEnabled = true;
-                Console.AddLine("Enabled cocoon spawn point preview");
-            }
-            else
-            {
-                component.previewEnabled = false;
-                Console.AddLine("Disabled cocoon spawn point preview");
-            }
+            component.previewEnabled = false;
+            Console.AddLine("Disabled cocoon spawn point preview");
         }
+    }
 
-        [BindableMethod(name = "Toggle Vignette", category = "Visual")]
-        public static void ToggleVignette()
+    [BindableMethod(name = "Toggle Vignette", category = "Visual")]
+    public static void ToggleVignette()
+    {
+        VisualMaskHelper.ToggleVignette();
+    }
+
+    [BindableMethod(name = "Deactivate Visual Masks", category = "Visual")]
+    public static void DoDeactivateVisualMasks()
+    {
+        VisualMaskHelper.ToggleAllMasks();
+    }
+
+    [BindableMethod(name = "Toggle Hero Light", category = "Visual")]
+    public static void ToggleHeroLight()
+    {
+        GameObject gameObject = DebugMod.RefKnight.transform.Find("HeroLight").gameObject;
+        Color color = gameObject.GetComponent<SpriteRenderer>().color;
+        if (Math.Abs(color.a) > 0f)
         {
-            VisualMaskHelper.ToggleVignette();
+            color.a = 0f;
+            gameObject.GetComponent<SpriteRenderer>().color = color;
+            Console.AddLine("Rendering HeroLight invisible...");
         }
-
-        [BindableMethod(name = "Deactivate Visual Masks", category = "Visual")]
-        public static void DoDeactivateVisualMasks()
+        else
         {
-            VisualMaskHelper.ToggleAllMasks();
+            color.a = 0.7f;
+            gameObject.GetComponent<SpriteRenderer>().color = color;
+            Console.AddLine("Rendering HeroLight visible...");
         }
+    }
 
-        [BindableMethod(name = "Toggle Hero Light", category = "Visual")]
-        public static void ToggleHeroLight()
+    [BindableMethod(name = "Toggle HUD", category = "Visual")]
+    public static void ToggleHUD()
+    {
+        if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
         {
-            GameObject gameObject = DebugMod.RefKnight.transform.Find("HeroLight").gameObject;
-            Color color = gameObject.GetComponent<SpriteRenderer>().color;
-            if (Math.Abs(color.a) > 0f)
-            {
-                color.a = 0f;
-                gameObject.GetComponent<SpriteRenderer>().color = color;
-                Console.AddLine("Rendering HeroLight invisible...");
-            }
-            else
-            {
-                color.a = 0.7f;
-                gameObject.GetComponent<SpriteRenderer>().color = color;
-                Console.AddLine("Rendering HeroLight visible...");
-            }
+            GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(false);
+            Console.AddLine("Disabling HUD...");
         }
-
-        [BindableMethod(name = "Toggle HUD", category = "Visual")]
-        public static void ToggleHUD()
+        else
         {
-            if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
-            {
-                GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(false);
-                Console.AddLine("Disabling HUD...");
-            }
-            else
-            {
-                GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
-                Console.AddLine("Enabling HUD...");
-            }
+            GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
+            Console.AddLine("Enabling HUD...");
         }
+    }
 
-        [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
-        public static void ResetZoom()
+    [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
+    public static void ResetZoom()
+    {
+        GameCameras.instance.tk2dCam.ZoomFactor = 1f;
+        Console.AddLine("Zoom factor was reset");
+    }
+
+    [BindableMethod(name = "Zoom In", category = "Visual")]
+    public static void ZoomIn()
+    {
+        float zoomFactor = GameCameras.instance.tk2dCam.ZoomFactor;
+        GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor + zoomFactor * 0.05f;
+        Console.AddLine("Zoom level increased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+    }
+
+    [BindableMethod(name = "Zoom Out", category = "Visual")]
+    public static void ZoomOut()
+    {
+        float zoomFactor2 = GameCameras.instance.tk2dCam.ZoomFactor;
+        GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor2 - zoomFactor2 * 0.05f;
+        Console.AddLine("Zoom level decreased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+    }
+
+    [BindableMethod(name = "Hide Hero", category = "Visual")]
+    public static void HideHero()
+    {
+        tk2dSprite component = DebugMod.RefKnight.GetComponent<tk2dSprite>();
+        Color color = component.color;
+        if (Math.Abs(color.a) > 0f)
         {
-            GameCameras.instance.tk2dCam.ZoomFactor = 1f;
-            Console.AddLine("Zoom factor was reset");
+            color.a = 0f;
+            component.color = color;
+            Console.AddLine("Rendering Hero sprite invisible...");
         }
-
-        [BindableMethod(name = "Zoom In", category = "Visual")]
-        public static void ZoomIn()
+        else
         {
-            float zoomFactor = GameCameras.instance.tk2dCam.ZoomFactor;
-            GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor + zoomFactor * 0.05f;
-            Console.AddLine("Zoom level increased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+            color.a = 1f;
+            component.color = color;
+            Console.AddLine("Rendering Hero sprite visible...");
         }
+    }
 
-        [BindableMethod(name = "Zoom Out", category = "Visual")]
-        public static void ZoomOut()
+    [BindableMethod(name = "Toggle Camera Shake", category = "Visual")]
+    public static void ToggleCameraShake()
+    {
+        bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;
+        GameCameras.instance.cameraShakeFSM.enabled = newValue;
+        Console.AddLine($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
+    }
+
+    [BindableMethod(name = "Toggle Cursor", category = "Visual")]
+    public static void ToggleAlwaysShowCursor()
+    {
+        DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;
+
+        if (DebugMod.settings.ShowCursorWhileUnpaused)
         {
-            float zoomFactor2 = GameCameras.instance.tk2dCam.ZoomFactor;
-            GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor2 - zoomFactor2 * 0.05f;
-            Console.AddLine("Zoom level decreased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+            SetAlwaysShowCursor();
+            Console.AddLine("Showing cursor while unpaused");
         }
-
-        [BindableMethod(name = "Hide Hero", category = "Visual")]
-        public static void HideHero()
+        else
         {
-            tk2dSprite component = DebugMod.RefKnight.GetComponent<tk2dSprite>();
-            Color color = component.color;
-            if (Math.Abs(color.a) > 0f)
-            {
-                color.a = 0f;
-                component.color = color;
-                Console.AddLine("Rendering Hero sprite invisible...");
-            }
-            else
-            {
-                color.a = 1f;
-                component.color = color;
-                Console.AddLine("Rendering Hero sprite visible...");
-            }
+            UnsetAlwaysShowCursor();
+            Console.AddLine("Not showing cursor while unpaused");
         }
+    }
 
-        [BindableMethod(name = "Toggle Camera Shake", category = "Visual")]
-        public static void ToggleCameraShake()
-        {
-            bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;
-            GameCameras.instance.cameraShakeFSM.enabled = newValue;
-            Console.AddLine($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
-        }
+    internal static void SetAlwaysShowCursor()
+    {
+        ModHooks.CursorHook -= CursorDisplayActive;
+        ModHooks.CursorHook += CursorDisplayActive;
+    }
 
-        [BindableMethod(name = "Toggle Cursor", category = "Visual")]
-        public static void ToggleAlwaysShowCursor()
-        {
-            DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;
+    internal static void UnsetAlwaysShowCursor()
+    {
+        ModHooks.CursorHook -= CursorDisplayActive;
+    }
 
-            if (DebugMod.settings.ShowCursorWhileUnpaused)
-            {
-                SetAlwaysShowCursor();
-                Console.AddLine("Showing cursor while unpaused");
-            }
-            else
-            {
-                UnsetAlwaysShowCursor();
-                Console.AddLine("Not showing cursor while unpaused");
-            }
-        }
-
-        internal static void SetAlwaysShowCursor()
-        {
-            ModHooks.CursorHook -= CursorDisplayActive;
-            ModHooks.CursorHook += CursorDisplayActive;
-        }
-
-        internal static void UnsetAlwaysShowCursor()
-        {
-            ModHooks.CursorHook -= CursorDisplayActive;
-        }
-
-        private static void CursorDisplayActive()
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-
+    private static void CursorDisplayActive()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DebugMod;
+namespace DebugMod.MonoBehaviours;
 
 public class CocoonPreviewer : MonoBehaviour
 {

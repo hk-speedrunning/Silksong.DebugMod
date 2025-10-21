@@ -5,214 +5,212 @@ using DebugMod.MonoBehaviours;
 using HarmonyLib;
 using UnityEngine;
 
-namespace DebugMod
+namespace DebugMod;
+
+[HarmonyPatch]
+public static partial class BindableFunctions
 {
-    [HarmonyPatch]
-    public static partial class BindableFunctions
+    private static readonly FieldInfo TimeSlowed = typeof(GameManager).GetField("timeSlowed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+    private static readonly FieldInfo IgnoreUnpause = typeof(UIManager).GetField("ignoreUnpause", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+    internal static readonly FieldInfo cameraGameplayScene = typeof(CameraController).GetField("isGameplayScene", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static float TimeScaleDuringFrameAdvance = 0f;
+    internal static int frameCounter = 0;
+
+    [BindableMethod(name = "Force Pause", category = "Misc")]
+    public static void ForcePause()
     {
-        private static readonly FieldInfo TimeSlowed = typeof(GameManager).GetField("timeSlowed", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-        private static readonly FieldInfo IgnoreUnpause = typeof(UIManager).GetField("ignoreUnpause", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-        internal static readonly FieldInfo cameraGameplayScene = typeof(CameraController).GetField("isGameplayScene", BindingFlags.Instance | BindingFlags.NonPublic);
-        private static float TimeScaleDuringFrameAdvance = 0f;
-        internal static int frameCounter = 0;
-
-        [BindableMethod(name = "Force Pause", category = "Misc")]
-        public static void ForcePause()
+        try
         {
-            try
+            if ((PlayerData.instance.disablePause || (bool) TimeSlowed.GetValue(GameManager.instance) ||
+                 (bool) IgnoreUnpause.GetValue(UIManager.instance)) && DebugMod.GetSceneName() != "Menu_Title" &&
+                DebugMod.GM.IsGameplayScene())
             {
-                if ((PlayerData.instance.disablePause || (bool) TimeSlowed.GetValue(GameManager.instance) ||
-                     (bool) IgnoreUnpause.GetValue(UIManager.instance)) && DebugMod.GetSceneName() != "Menu_Title" &&
-                    DebugMod.GM.IsGameplayScene())
-                {
-                    TimeSlowed.SetValue(GameManager.instance, false);
-                    IgnoreUnpause.SetValue(UIManager.instance, false);
-                    PlayerData.instance.disablePause = false;
-                    UIManager.instance.TogglePauseGame();
-                    Console.AddLine("Forcing Pause Menu because pause is disabled");
-                }
-                else
-                {
-                    Console.AddLine("Game does not report that Pause is disabled, requesting it normally.");
-                    UIManager.instance.TogglePauseGame();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.AddLine("Error while attempting to pause, check ModLog.txt");
-                DebugMod.instance.Log("Error while attempting force pause:\n" + e);
-            }
-        }
-
-        [BindableMethod(name = "Hazard Respawn", category = "Misc")]
-        public static void Respawn()
-        {
-            if (GameManager.instance.IsGameplayScene() && !HeroController.instance.cState.dead &&
-                PlayerData.instance.health > 0)
-            {
-                if (UIManager.instance.uiState.ToString() == "PAUSED")
-                {
-                    InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle(false));
-                    GameManager.instance.HazardRespawn();
-                    Console.AddLine("Closing Pause Menu and respawning...");
-                    return;
-                }
-
-                if (UIManager.instance.uiState.ToString() == "PLAYING")
-                {
-                    HeroController.instance.RelinquishControl();
-                    GameManager.instance.HazardRespawn();
-                    HeroController.instance.RegainControl();
-                    Console.AddLine("Respawn signal sent");
-                    return;
-                }
-
-                Console.AddLine("Respawn requested in some weird conditions, abort, ABORT");
-            }
-        }
-
-        [BindableMethod(name = "Set Respawn", category = "Misc")]
-        public static void SetHazardRespawn()
-        {
-            Vector3 manualRespawn = DebugMod.RefKnight.transform.position;
-            HeroController.instance.SetHazardRespawn(manualRespawn, false);
-            Console.AddLine("Manual respawn point on this map set to" + manualRespawn);
-        }
-
-        [BindableMethod(name = "Toggle Act 3", category = "Misc")]
-        public static void ToggleAct3()
-        {
-            PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
-            Console.AddLine("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
-        }
-
-        [BindableMethod(name = "Force Camera Follow", category = "Misc")]
-        public static void ForceCameraFollow()
-        {
-            if (!DebugMod.cameraFollow)
-            {
-                Console.AddLine("Forcing camera follow");
-                DebugMod.cameraFollow = true;
+                TimeSlowed.SetValue(GameManager.instance, false);
+                IgnoreUnpause.SetValue(UIManager.instance, false);
+                PlayerData.instance.disablePause = false;
+                UIManager.instance.TogglePauseGame();
+                Console.AddLine("Forcing Pause Menu because pause is disabled");
             }
             else
             {
-                DebugMod.cameraFollow = false;
-                cameraGameplayScene.SetValue(DebugMod.RefCamera, true);
-                Console.AddLine("Returning camera to normal settings");
+                Console.AddLine("Game does not report that Pause is disabled, requesting it normally.");
+                UIManager.instance.TogglePauseGame();
             }
         }
-
-        [BindableMethod(name = "Clear White Screen", category = "Misc")]
-        public static void ClearWhiteScreen()
+        catch (Exception e)
         {
-            //fix white screen 
-            PlayMakerFSM wakeFSM = HeroController.instance.gameObject.LocateMyFSM("Dream Return");
-            wakeFSM.SetState("GET UP");
-            wakeFSM.SendEvent("FINISHED");
-            GameObject.Find("Blanker White").LocateMyFSM("Blanker Control").SendEvent("FADE OUT");
-            HeroController.instance.EnableRenderer();
+            Console.AddLine("Error while attempting to pause, check ModLog.txt");
+            DebugMod.instance.Log("Error while attempting force pause:\n" + e);
         }
+    }
 
-        private static string saveLevelStateAction;
-
-        [BindableMethod(name = "Reset Scene Data", category = "Misc")]
-        public static void ResetCurrentScene()
+    [BindableMethod(name = "Hazard Respawn", category = "Misc")]
+    public static void Respawn()
+    {
+        if (GameManager.instance.IsGameplayScene() && !HeroController.instance.cState.dead &&
+            PlayerData.instance.health > 0)
         {
-            saveLevelStateAction = GameManager.instance.GetSceneNameString();
-            Console.AddLine("Clearing scene data from this scene, re-enter scene or warp to apply changes");
-        }
-
-        [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
-        public static void BlockCurrentSceneChanges()
-        {
-            saveLevelStateAction = "block";
-            Console.AddLine("Scene data changes made since entering this scene will not be saved");
-        }
-
-        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
-        [HarmonyPrefix]
-        private static bool GameManager_SaveLevelState_Prefix()
-        {
-            if (saveLevelStateAction == "block")
+            if (UIManager.instance.uiState.ToString() == "PAUSED")
             {
-                saveLevelStateAction = null;
-                return false;
+                InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle(false));
+                GameManager.instance.HazardRespawn();
+                Console.AddLine("Closing Pause Menu and respawning...");
+                return;
             }
 
-            return true;
-        }
-
-        [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
-        [HarmonyPostfix]
-        private static void GameManager_SaveLevelState_Postfix()
-        {
-            if (saveLevelStateAction != null && saveLevelStateAction != "block")
+            if (UIManager.instance.uiState.ToString() == "PLAYING")
             {
-                SceneData.instance.persistentBools.scenes.Remove(saveLevelStateAction);
-                SceneData.instance.persistentInts.scenes.Remove(saveLevelStateAction);
-                SceneData.instance.geoRocks.scenes.Remove(saveLevelStateAction);
-
-                saveLevelStateAction = null;
+                HeroController.instance.RelinquishControl();
+                GameManager.instance.HazardRespawn();
+                HeroController.instance.RegainControl();
+                Console.AddLine("Respawn signal sent");
+                return;
             }
-        }
 
-        [BindableMethod(name = "Break Cocoon", category = "Misc")]
-        public static void BreakCocoon()
+            Console.AddLine("Respawn requested in some weird conditions, abort, ABORT");
+        }
+    }
+
+    [BindableMethod(name = "Set Respawn", category = "Misc")]
+    public static void SetHazardRespawn()
+    {
+        Vector3 manualRespawn = DebugMod.RefKnight.transform.position;
+        HeroController.instance.SetHazardRespawn(manualRespawn, false);
+        Console.AddLine("Manual respawn point on this map set to" + manualRespawn);
+    }
+
+    [BindableMethod(name = "Toggle Act 3", category = "Misc")]
+    public static void ToggleAct3()
+    {
+        PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
+        Console.AddLine("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
+    }
+
+    [BindableMethod(name = "Force Camera Follow", category = "Misc")]
+    public static void ForceCameraFollow()
+    {
+        if (!DebugMod.cameraFollow)
         {
-            HeroController.instance?.CocoonBroken();
-            EventRegister.SendEvent("BREAK HERO CORPSE");
+            Console.AddLine("Forcing camera follow");
+            DebugMod.cameraFollow = true;
         }
-
-        [BindableMethod(name = "Start/End Frame Advance", category = "Misc")]
-        public static void ToggleFrameAdvance()
+        else
         {
-            frameCounter = 0;
-            if (Time.timeScale != 0)
-            {
-                if (GameManager.instance.GetComponent<TimeScale>() == null)
-                    GameManager.instance.gameObject.AddComponent<TimeScale>();
-                Time.timeScale = 0f;
-                TimeScaleDuringFrameAdvance = DebugMod.CurrentTimeScale;
-                DebugMod.CurrentTimeScale = 0;
-                DebugMod.TimeScaleActive = true;
-                Console.AddLine("Starting frame by frame advance on keybind press");
-            }
-            else
-            {
-                DebugMod.CurrentTimeScale = TimeScaleDuringFrameAdvance;
-                Time.timeScale = DebugMod.CurrentTimeScale;
-                Console.AddLine("Stopping frame by frame advance on keybind press");
-            }
+            DebugMod.cameraFollow = false;
+            cameraGameplayScene.SetValue(DebugMod.RefCamera, true);
+            Console.AddLine("Returning camera to normal settings");
         }
+    }
 
-        [BindableMethod(name = "Advance Frame", category = "Misc")]
-        public static void AdvanceFrame()
+    [BindableMethod(name = "Clear White Screen", category = "Misc")]
+    public static void ClearWhiteScreen()
+    {
+        //fix white screen 
+        PlayMakerFSM wakeFSM = HeroController.instance.gameObject.LocateMyFSM("Dream Return");
+        wakeFSM.SetState("GET UP");
+        wakeFSM.SendEvent("FINISHED");
+        GameObject.Find("Blanker White").LocateMyFSM("Blanker Control").SendEvent("FADE OUT");
+        HeroController.instance.EnableRenderer();
+    }
+
+    private static string saveLevelStateAction;
+
+    [BindableMethod(name = "Reset Scene Data", category = "Misc")]
+    public static void ResetCurrentScene()
+    {
+        saveLevelStateAction = GameManager.instance.GetSceneNameString();
+        Console.AddLine("Clearing scene data from this scene, re-enter scene or warp to apply changes");
+    }
+
+    [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
+    public static void BlockCurrentSceneChanges()
+    {
+        saveLevelStateAction = "block";
+        Console.AddLine("Scene data changes made since entering this scene will not be saved");
+    }
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+    [HarmonyPrefix]
+    private static bool GameManager_SaveLevelState_Prefix()
+    {
+        if (saveLevelStateAction == "block")
         {
-            if (Time.timeScale != 0) ToggleFrameAdvance();
-            frameCounter++;
-            GameManager.instance.StartCoroutine(AdvanceMyFrame());
+            saveLevelStateAction = null;
+            return false;
         }
 
-        private static IEnumerator AdvanceMyFrame()
+        return true;
+    }
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+    [HarmonyPostfix]
+    private static void GameManager_SaveLevelState_Postfix()
+    {
+        if (saveLevelStateAction != null && saveLevelStateAction != "block")
         {
-            DebugMod.CurrentTimeScale = Time.timeScale = 1f;
-            yield return new WaitForFixedUpdate();
+            SceneData.instance.persistentBools.scenes.Remove(saveLevelStateAction);
+            SceneData.instance.persistentInts.scenes.Remove(saveLevelStateAction);
+            SceneData.instance.geoRocks.scenes.Remove(saveLevelStateAction);
 
-            DebugMod.CurrentTimeScale = Time.timeScale = 0f;
+            saveLevelStateAction = null;
         }
+    }
 
-        [BindableMethod(name = "Reset Counter", category = "Misc")]
-        public static void ResetCounter()
+    [BindableMethod(name = "Break Cocoon", category = "Misc")]
+    public static void BreakCocoon()
+    {
+        HeroController.instance?.CocoonBroken();
+        EventRegister.SendEvent("BREAK HERO CORPSE");
+    }
+
+    [BindableMethod(name = "Start/End Frame Advance", category = "Misc")]
+    public static void ToggleFrameAdvance()
+    {
+        frameCounter = 0;
+        if (Time.timeScale != 0)
         {
-            frameCounter = 0;
+            if (GameManager.instance.GetComponent<TimeScale>() == null)
+                GameManager.instance.gameObject.AddComponent<TimeScale>();
+            Time.timeScale = 0f;
+            TimeScaleDuringFrameAdvance = DebugMod.CurrentTimeScale;
+            DebugMod.CurrentTimeScale = 0;
+            DebugMod.TimeScaleActive = true;
+            Console.AddLine("Starting frame by frame advance on keybind press");
         }
-
-        [BindableMethod(name = "Lock KeyBinds", category = "Misc")]
-        public static void ToggleLockKeyBinds()
+        else
         {
-            DebugMod.KeyBindLock = !DebugMod.KeyBindLock;
-            Console.AddLine($"{(DebugMod.KeyBindLock ? "Removing" : "Adding")} the ability to use keybinds");
+            DebugMod.CurrentTimeScale = TimeScaleDuringFrameAdvance;
+            Time.timeScale = DebugMod.CurrentTimeScale;
+            Console.AddLine("Stopping frame by frame advance on keybind press");
         }
+    }
 
+    [BindableMethod(name = "Advance Frame", category = "Misc")]
+    public static void AdvanceFrame()
+    {
+        if (Time.timeScale != 0) ToggleFrameAdvance();
+        frameCounter++;
+        GameManager.instance.StartCoroutine(AdvanceMyFrame());
+    }
+
+    private static IEnumerator AdvanceMyFrame()
+    {
+        DebugMod.CurrentTimeScale = Time.timeScale = 1f;
+        yield return new WaitForFixedUpdate();
+
+        DebugMod.CurrentTimeScale = Time.timeScale = 0f;
+    }
+
+    [BindableMethod(name = "Reset Counter", category = "Misc")]
+    public static void ResetCounter()
+    {
+        frameCounter = 0;
+    }
+
+    [BindableMethod(name = "Lock KeyBinds", category = "Misc")]
+    public static void ToggleLockKeyBinds()
+    {
+        DebugMod.KeyBindLock = !DebugMod.KeyBindLock;
+        Console.AddLine($"{(DebugMod.KeyBindLock ? "Removing" : "Adding")} the ability to use keybinds");
     }
 }

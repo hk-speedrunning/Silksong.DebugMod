@@ -6,103 +6,102 @@ using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
-namespace DebugMod
+namespace DebugMod.SaveStates;
+
+[HarmonyPatch]
+public static class SceneWatcher
 {
-    [HarmonyPatch]
-    public static class SceneWatcher
+    private static List<LoadedSceneInfo> scenes;
+    public static ReadOnlyCollection<LoadedSceneInfo> LoadedScenes => scenes.AsReadOnly();
+
+    private static Dictionary<Scene, int> scenesWithManager;
+
+    private static void AddScene(Scene scene, LoadSceneMode mode, bool checkSceneManager = true)
     {
-        private static List<LoadedSceneInfo> scenes;
-        public static ReadOnlyCollection<LoadedSceneInfo> LoadedScenes => scenes.AsReadOnly();
+        if (mode == LoadSceneMode.Single)
+            scenes.Clear();
 
-        private static Dictionary<Scene, int> scenesWithManager;
+        LoadedSceneInfo d = new LoadedSceneInfo(scene.name, scene.name);
+        scenes.Add(d);
 
-        private static void AddScene(Scene scene, LoadSceneMode mode, bool checkSceneManager = true)
+        if (checkSceneManager && Object.FindObjectsOfType<CustomSceneManager>().Any(m => m.gameObject.scene == scene))
+            scenesWithManager.Add(scene, d.id);
+    }
+
+    public static void Init()
+    {
+        scenesWithManager = new();
+        scenes = new();
+
+        for (int i = 0; i < USceneManager.sceneCount; i++)
+            AddScene(USceneManager.GetSceneAt(i), LoadSceneMode.Additive, false);
+        
+        USceneManager.sceneLoaded += (scene, mode) => AddScene(scene, mode);
+        USceneManager.sceneUnloaded += s => scenes.RemoveAt(scenes.FindIndex(d => d.name == s.name));
+    }
+
+    [HarmonyPatch(typeof(CustomSceneManager), nameof(CustomSceneManager.Start))]
+    [HarmonyPostfix]
+    private static void OnCustomSceneManagerStart(CustomSceneManager __instance)
+    {
+        if (scenesWithManager == null || !scenesWithManager.ContainsKey(__instance.gameObject.scene))
+            return;
+
+        int id = scenesWithManager[__instance.gameObject.scene];
+        LoadedSceneInfo lsi = scenes.FirstOrDefault(i => i.id == id);
+        scenesWithManager.Remove(__instance.gameObject.scene);
+
+        if (lsi != null)
+            lsi.activeSceneWhenLoaded = GameManager.instance.sceneName;
+    }
+
+    [HarmonyPatch]
+    public class LoadedSceneInfo
+    {
+        private static int counter = 0;
+        public static LoadedSceneInfo activeInfo;
+        
+        public readonly string name;
+        public string activeSceneWhenLoaded { get; internal set; }
+        public readonly int id;
+
+        public LoadedSceneInfo(string name, string activeSceneName)
         {
-            if (mode == LoadSceneMode.Single)
-                scenes.Clear();
-
-            LoadedSceneInfo d = new LoadedSceneInfo(scene.name, scene.name);
-            scenes.Add(d);
-
-            if (checkSceneManager && Object.FindObjectsOfType<CustomSceneManager>().Any(m => m.gameObject.scene == scene))
-                scenesWithManager.Add(scene, d.id);
+            this.name = name;
+            this.id = counter++;
+            this.activeSceneWhenLoaded = activeSceneName;
         }
 
-        public static void Init()
+        public void LoadHook()
         {
-            scenesWithManager = new();
-            scenes = new();
-
-            for (int i = 0; i < USceneManager.sceneCount; i++)
-                AddScene(USceneManager.GetSceneAt(i), LoadSceneMode.Additive, false);
-            
-            USceneManager.sceneLoaded += (scene, mode) => AddScene(scene, mode);
-            USceneManager.sceneUnloaded += s => scenes.RemoveAt(scenes.FindIndex(d => d.name == s.name));
+            activeInfo = this;
+            GameManager.instance.OnFinishedSceneTransition += FinishedSceneTransitionHook;
         }
 
-        [HarmonyPatch(typeof(CustomSceneManager), nameof(CustomSceneManager.Start))]
-        [HarmonyPostfix]
-        private static void OnCustomSceneManagerStart(CustomSceneManager __instance)
+        private void FinishedSceneTransitionHook()
         {
-            if (scenesWithManager == null || !scenesWithManager.ContainsKey(__instance.gameObject.scene))
-                return;
-
-            int id = scenesWithManager[__instance.gameObject.scene];
-            LoadedSceneInfo lsi = scenes.FirstOrDefault(i => i.id == id);
-            scenesWithManager.Remove(__instance.gameObject.scene);
-
-            if (lsi != null)
-                lsi.activeSceneWhenLoaded = GameManager.instance.sceneName;
+            GameManager.instance.OnFinishedSceneTransition -= FinishedSceneTransitionHook;
+            activeInfo = null;
         }
 
-        [HarmonyPatch]
-        public class LoadedSceneInfo
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.UpdateSceneName))]
+        [HarmonyPrefix]
+        public static bool UpdateSceneNameOverride(GameManager __instance)
         {
-            private static int counter = 0;
-            public static LoadedSceneInfo activeInfo;
-            
-            public readonly string name;
-            public string activeSceneWhenLoaded { get; internal set; }
-            public readonly int id;
-
-            public LoadedSceneInfo(string name, string activeSceneName)
+            if (activeInfo != null)
             {
-                this.name = name;
-                this.id = counter++;
-                this.activeSceneWhenLoaded = activeSceneName;
-            }
-
-            public void LoadHook()
-            {
-                activeInfo = this;
-                GameManager.instance.OnFinishedSceneTransition += FinishedSceneTransitionHook;
-            }
-
-            private void FinishedSceneTransitionHook()
-            {
-                GameManager.instance.OnFinishedSceneTransition -= FinishedSceneTransitionHook;
-                activeInfo = null;
-            }
-
-            [HarmonyPatch(typeof(GameManager), nameof(GameManager.UpdateSceneName))]
-            [HarmonyPrefix]
-            public static bool UpdateSceneNameOverride(GameManager __instance)
-            {
-                if (activeInfo != null)
+                if (activeInfo.activeSceneWhenLoaded != __instance.sceneName)
                 {
-                    if (activeInfo.activeSceneWhenLoaded != __instance.sceneName)
-                    {
-                        __instance.lastSceneName = __instance.sceneName;
-                    }
-                    __instance.sceneName = activeInfo.activeSceneWhenLoaded;
-                    __instance.rawSceneName = activeInfo.activeSceneWhenLoaded;
-                    __instance.sceneNameHash = activeInfo.activeSceneWhenLoaded.GetHashCode();
-
-                    return false;
+                    __instance.lastSceneName = __instance.sceneName;
                 }
+                __instance.sceneName = activeInfo.activeSceneWhenLoaded;
+                __instance.rawSceneName = activeInfo.activeSceneWhenLoaded;
+                __instance.sceneNameHash = activeInfo.activeSceneWhenLoaded.GetHashCode();
 
-                return true;
+                return false;
             }
+
+            return true;
         }
     }
 }

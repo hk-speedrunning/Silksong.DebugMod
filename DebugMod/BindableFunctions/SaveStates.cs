@@ -1,113 +1,112 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using DebugMod.SaveStates;
 
-namespace DebugMod
+namespace DebugMod;
+
+public static partial class BindableFunctions
 {
-    public static partial class BindableFunctions
+     [BindableMethod(name = "Quickslot (save)", category = "Savestates")]
+    public static void SaveState()
     {
-         [BindableMethod(name = "Quickslot (save)", category = "Savestates")]
-        public static void SaveState()
-        {
-            DebugMod.saveStateManager.SaveSaveState(SaveStateType.Memory);
-        }
-
-        [BindableMethod(name = "Quickslot (load)", category = "Savestates")]
-        public static void LoadState()
-        {
-            DebugMod.saveStateManager.LoadSaveState(SaveStateType.Memory);
-        }
-
-        //TODO: Allow these binds to override each other properly
-        [BindableMethod(name = "Quickslot save to file", category = "Savestates")]
-        public static void CurrentSaveStateToFile()
-        {
-            if (SaveStateManager.currentStateOperation != "Quickslot save to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.File);
-            else DebugMod.settings.ClearSaveStatePanel = true;
-        }
-
-        [BindableMethod(name = "Load file to quickslot", category = "Savestates")]
-        public static void CurrentSlotToSaveMemory()
-        {
-            if (SaveStateManager.currentStateOperation != "Load file to quickslot") DebugMod.saveStateManager.LoadSaveState(SaveStateType.File);
-            else DebugMod.settings.ClearSaveStatePanel = true;
-        }
-
-        [BindableMethod(name = "Save new state to file", category = "Savestates")]
-        public static void NewSaveStateToFile()
-        {
-            if (SaveStateManager.currentStateOperation != "Save new state to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.SkipOne);
-            else DebugMod.settings.ClearSaveStatePanel = true;
-        }
-
-        [BindableMethod(name = "Load new state from file", category = "Savestates")]
-        public static void LoadFromFile()
-        {
-            if (SaveStateManager.currentStateOperation != "Load new state from file") DebugMod.saveStateManager.LoadSaveState(SaveStateType.SkipOne);
-            else DebugMod.settings.ClearSaveStatePanel = true;
-
-        }
-
-        [BindableMethod(name = "Next Save Page", category = "Savestates")]
-        public static void NextStatePage()
-        {
-            if (!SaveStateManager.inSelectSlotState) return;
-            
-            SaveStateManager.currentStateFolder++;
-            if (SaveStateManager.currentStateFolder >= SaveStateManager.savePages)
-            {
-                SaveStateManager.currentStateFolder = 0;
-            } //rollback to 0 if higher than max
-
-            SaveStateManager.path = Path.Combine(
-                SaveStateManager.saveStatesBaseDirectory,
-                SaveStateManager.currentStateFolder.ToString()); //change path
-            DebugMod.saveStateManager.RefreshStateMenu(); // update menu
-        }
-
-        [BindableMethod(name = "Prev Save Page", category = "Savestates")]
-        public static void PrevStatePage()
-        {
-            if (!SaveStateManager.inSelectSlotState) return;
-            
-            SaveStateManager.currentStateFolder--;
-            if (SaveStateManager.currentStateFolder < 0)
-            {
-                SaveStateManager.currentStateFolder = SaveStateManager.savePages - 1;
-            } //rollback to max if we go below page 0
-
-            SaveStateManager.path = Path.Combine(
-                SaveStateManager.saveStatesBaseDirectory,
-                SaveStateManager.currentStateFolder.ToString()); //change path
-            DebugMod.saveStateManager.RefreshStateMenu(); // update menu
-        }
-
-        [BindableMethod(name = "Load Savestate On Death", category = "Savestates")]
-        public static void LoadStateOnDeath()
-        {
-            DebugMod.stateOnDeath = !DebugMod.stateOnDeath;
-            Console.AddLine("Quickslot SaveState will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
-        }
-
-        [BindableMethod(name = "Override Lockout", category = "Savestates")]
-        public static void OverrideLoadLockout()
-        {
-            DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
-            Console.AddLine("SaveState Lockout set to " + DebugMod.overrideLoadLockout);
-        }
-
-        /*
-        [BindableMethod(name = "Toggle auto slot", category = "Savestates")]
-        public static void ToggleAutoSlot()
-        {
-            DebugMod.saveStateManager.ToggleAutoSlot();
-        }
-        
-        
-        [BindableMethod(name = "Refresh state menu", category = "Savestates")]
-        public static void RefreshSaveStates()
-        {
-            DebugMod.saveStateManager.RefreshStateMenu();
-        }
-        */
+        DebugMod.saveStateManager.SaveSaveState(SaveStateType.Memory);
     }
+
+    [BindableMethod(name = "Quickslot (load)", category = "Savestates")]
+    public static void LoadState()
+    {
+        DebugMod.saveStateManager.LoadSaveState(SaveStateType.Memory);
+    }
+
+    //TODO: Allow these binds to override each other properly
+    [BindableMethod(name = "Quickslot save to file", category = "Savestates")]
+    public static void CurrentSaveStateToFile()
+    {
+        if (SaveStateManager.currentStateOperation != "Quickslot save to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.File);
+        else DebugMod.settings.ClearSaveStatePanel = true;
+    }
+
+    [BindableMethod(name = "Load file to quickslot", category = "Savestates")]
+    public static void CurrentSlotToSaveMemory()
+    {
+        if (SaveStateManager.currentStateOperation != "Load file to quickslot") DebugMod.saveStateManager.LoadSaveState(SaveStateType.File);
+        else DebugMod.settings.ClearSaveStatePanel = true;
+    }
+
+    [BindableMethod(name = "Save new state to file", category = "Savestates")]
+    public static void NewSaveStateToFile()
+    {
+        if (SaveStateManager.currentStateOperation != "Save new state to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.SkipOne);
+        else DebugMod.settings.ClearSaveStatePanel = true;
+    }
+
+    [BindableMethod(name = "Load new state from file", category = "Savestates")]
+    public static void LoadFromFile()
+    {
+        if (SaveStateManager.currentStateOperation != "Load new state from file") DebugMod.saveStateManager.LoadSaveState(SaveStateType.SkipOne);
+        else DebugMod.settings.ClearSaveStatePanel = true;
+
+    }
+
+    [BindableMethod(name = "Next Save Page", category = "Savestates")]
+    public static void NextStatePage()
+    {
+        if (!SaveStateManager.inSelectSlotState) return;
+        
+        SaveStateManager.currentStateFolder++;
+        if (SaveStateManager.currentStateFolder >= SaveStateManager.savePages)
+        {
+            SaveStateManager.currentStateFolder = 0;
+        } //rollback to 0 if higher than max
+
+        SaveStateManager.path = Path.Combine(
+            SaveStateManager.saveStatesBaseDirectory,
+            SaveStateManager.currentStateFolder.ToString()); //change path
+        DebugMod.saveStateManager.RefreshStateMenu(); // update menu
+    }
+
+    [BindableMethod(name = "Prev Save Page", category = "Savestates")]
+    public static void PrevStatePage()
+    {
+        if (!SaveStateManager.inSelectSlotState) return;
+        
+        SaveStateManager.currentStateFolder--;
+        if (SaveStateManager.currentStateFolder < 0)
+        {
+            SaveStateManager.currentStateFolder = SaveStateManager.savePages - 1;
+        } //rollback to max if we go below page 0
+
+        SaveStateManager.path = Path.Combine(
+            SaveStateManager.saveStatesBaseDirectory,
+            SaveStateManager.currentStateFolder.ToString()); //change path
+        DebugMod.saveStateManager.RefreshStateMenu(); // update menu
+    }
+
+    [BindableMethod(name = "Load Savestate On Death", category = "Savestates")]
+    public static void LoadStateOnDeath()
+    {
+        DebugMod.stateOnDeath = !DebugMod.stateOnDeath;
+        Console.AddLine("Quickslot SaveState will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
+    }
+
+    [BindableMethod(name = "Override Lockout", category = "Savestates")]
+    public static void OverrideLoadLockout()
+    {
+        DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
+        Console.AddLine("SaveState Lockout set to " + DebugMod.overrideLoadLockout);
+    }
+
+    /*
+    [BindableMethod(name = "Toggle auto slot", category = "Savestates")]
+    public static void ToggleAutoSlot()
+    {
+        DebugMod.saveStateManager.ToggleAutoSlot();
+    }
+    
+    
+    [BindableMethod(name = "Refresh state menu", category = "Savestates")]
+    public static void RefreshSaveStates()
+    {
+        DebugMod.saveStateManager.RefreshStateMenu();
+    }
+    */
 }

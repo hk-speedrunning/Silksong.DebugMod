@@ -1,150 +1,149 @@
 ﻿using System;
 using DebugMod.Helpers;
 
-namespace DebugMod
+namespace DebugMod;
+
+public static partial class BindableFunctions
 {
-    public static partial class BindableFunctions
+    [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
+    public static void GiveMask()
     {
-        [BindableMethod(name = "Give Mask", category = "Masks & Spools")]
-        public static void GiveMask()
+        if (PlayerData.instance.maxHealthBase < 10)
         {
-            if (PlayerData.instance.maxHealthBase < 10)
-            {
-                HeroController.instance.MaxHealth();
-                HeroController.instance.AddToMaxHealth(1);
-                HudHelper.RefreshMasks();
+            HeroController.instance.MaxHealth();
+            HeroController.instance.AddToMaxHealth(1);
+            HudHelper.RefreshMasks();
 
-                Console.AddLine("Added Mask");
-            }
-            else
-            {
-                Console.AddLine("You have the maximum number of masks");
-            }
+            Console.AddLine("Added Mask");
         }
-        
-        [BindableMethod(name = "Give Spool", category = "Masks & Spools")]
-        public static void GiveSpool()
+        else
         {
-            if (PlayerData.instance.silkMax < 18)
-            {
-                HeroController.instance.AddToMaxSilk(1);
-                HudHelper.RefreshSpool();
-
-                Console.AddLine("Added Spool");
-            }
-            else
-            {
-                Console.AddLine("You have the maximum number of spools");
-            }
-
-            PlayerData.instance.IsSilkSpoolBroken = false;
-            EventRegister.SendEvent("SPOOL UNBROKEN");
+            Console.AddLine("You have the maximum number of masks");
         }
-        
-        [BindableMethod(name = "Take Away Mask", category = "Masks & Spools")]
-        public static void TakeAwayMask()
+    }
+    
+    [BindableMethod(name = "Give Spool", category = "Masks & Spools")]
+    public static void GiveSpool()
+    {
+        if (PlayerData.instance.silkMax < 18)
         {
-            if (PlayerData.instance.maxHealthBase > 1)
-            {
-                PlayerData.instance.maxHealth -= 1;
-                PlayerData.instance.maxHealthBase -= 1;
-                PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
-                HudHelper.RefreshMasks();
+            HeroController.instance.AddToMaxSilk(1);
+            HudHelper.RefreshSpool();
 
-                Console.AddLine("Took Away Mask");
-            }
-            else
-            {
-                Console.AddLine("You have the minimum number of masks");
-            }
+            Console.AddLine("Added Spool");
+        }
+        else
+        {
+            Console.AddLine("You have the maximum number of spools");
         }
 
-        [BindableMethod(name = "Take Away Spool", category = "Masks & Spools")]
-        public static void TakeAwaySpool()
+        PlayerData.instance.IsSilkSpoolBroken = false;
+        EventRegister.SendEvent("SPOOL UNBROKEN");
+    }
+    
+    [BindableMethod(name = "Take Away Mask", category = "Masks & Spools")]
+    public static void TakeAwayMask()
+    {
+        if (PlayerData.instance.maxHealthBase > 1)
         {
-            if (PlayerData.instance.silkMax > 9)
-            {
-                PlayerData.instance.silkMax--;
-                PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
-                HudHelper.RefreshSpool();
+            PlayerData.instance.maxHealth -= 1;
+            PlayerData.instance.maxHealthBase -= 1;
+            PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
+            HudHelper.RefreshMasks();
 
-                Console.AddLine("Removed Spool");
-            }
-            else
-            {
-                Console.AddLine("You have the minimum number of spools");
-            }
+            Console.AddLine("Took Away Mask");
+        }
+        else
+        {
+            Console.AddLine("You have the minimum number of masks");
+        }
+    }
+
+    [BindableMethod(name = "Take Away Spool", category = "Masks & Spools")]
+    public static void TakeAwaySpool()
+    {
+        if (PlayerData.instance.silkMax > 9)
+        {
+            PlayerData.instance.silkMax--;
+            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+            HudHelper.RefreshSpool();
+
+            Console.AddLine("Removed Spool");
+        }
+        else
+        {
+            Console.AddLine("You have the minimum number of spools");
+        }
+    }
+
+    private static bool CanModifyHealth(int health)
+    {
+        if (health <= 0)
+        {
+            Console.AddLine("Cannot add/take health: health is too low");
+            return false;
         }
 
-        private static bool CanModifyHealth(int health)
+        if (HeroController.instance.cState.dead)
         {
-            if (health <= 0)
-            {
-                Console.AddLine("Cannot add/take health: health is too low");
-                return false;
-            }
-
-            if (HeroController.instance.cState.dead)
-            {
-                Console.AddLine("Cannot add/take health: player is dead");
-                return false;
-            }
-
-            if (!GameManager.instance.IsGameplayScene())
-            {
-                Console.AddLine("Cannot add/take health: not a gameplay scene");
-                return false;
-            }
-
-            return true;
+            Console.AddLine("Cannot add/take health: player is dead");
+            return false;
         }
 
-        [BindableMethod(name = "Add Health", category = "Masks & Spools")]
-        public static void AddHealth()
+        if (!GameManager.instance.IsGameplayScene())
         {
-            if (CanModifyHealth(PlayerData.instance.health + 1))
-            {
-                HeroController.instance.AddHealth(1);
-                HudHelper.RefreshMasks();
-
-                Console.AddLine("Added Health");
-            }
+            Console.AddLine("Cannot add/take health: not a gameplay scene");
+            return false;
         }
 
-        [BindableMethod(name = "Take Health", category = "Masks & Spools")]
-        public static void TakeHealth()
+        return true;
+    }
+
+    [BindableMethod(name = "Add Health", category = "Masks & Spools")]
+    public static void AddHealth()
+    {
+        if (CanModifyHealth(PlayerData.instance.health + 1))
         {
-            if (CanModifyHealth(PlayerData.instance.health - 1))
-            {
-                HeroController.instance.TakeHealth(1);
-                HudHelper.RefreshMasks();
+            HeroController.instance.AddHealth(1);
+            HudHelper.RefreshMasks();
 
-                Console.AddLine("Took health");
-            }
+            Console.AddLine("Added Health");
         }
-        
-        [BindableMethod(name = "Add Silk", category = "Masks & Spools")]
-        public static void AddSilk()
+    }
+
+    [BindableMethod(name = "Take Health", category = "Masks & Spools")]
+    public static void TakeHealth()
+    {
+        if (CanModifyHealth(PlayerData.instance.health - 1))
         {
-            HeroController.instance.AddSilk(1, true);
+            HeroController.instance.TakeHealth(1);
+            HudHelper.RefreshMasks();
 
-            Console.AddLine("Added Silk");
+            Console.AddLine("Took health");
         }
+    }
+    
+    [BindableMethod(name = "Add Silk", category = "Masks & Spools")]
+    public static void AddSilk()
+    {
+        HeroController.instance.AddSilk(1, true);
 
-        [BindableMethod(name = "Take Silk", category = "Masks & Spools")]
-        public static void TakeSilk()
-        {
-            HeroController.instance.TakeSilk(1);
+        Console.AddLine("Added Silk");
+    }
 
-            Console.AddLine("Attempting to take silk");
-        }
+    [BindableMethod(name = "Take Silk", category = "Masks & Spools")]
+    public static void TakeSilk()
+    {
+        HeroController.instance.TakeSilk(1);
 
-        [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
-        public static void Lifeblood()
-        {
-            EventRegister.SendEvent("ADD BLUE HEALTH");
+        Console.AddLine("Attempting to take silk");
+    }
 
-            Console.AddLine("Attempting to add lifeblood");
-        }
+    [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
+    public static void Lifeblood()
+    {
+        EventRegister.SendEvent("ADD BLUE HEALTH");
+
+        Console.AddLine("Attempting to add lifeblood");
     }
 }
