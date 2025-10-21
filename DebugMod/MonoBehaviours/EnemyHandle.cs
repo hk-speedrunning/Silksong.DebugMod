@@ -85,7 +85,7 @@ public class EnemyHandle : MonoBehaviour
 
             barPos.x -= HPBAR_WIDTH / 2f;
 
-            hpBar.Position = barPos;
+            hpBar.LocalPosition = barPos;
             hpBar.GetText("HP").UpdateText($"{HP}/{MaxHP}");
         }
 

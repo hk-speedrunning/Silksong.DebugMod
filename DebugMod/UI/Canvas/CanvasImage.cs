@@ -7,8 +7,8 @@ public sealed class CanvasImage : CanvasElement
 {
     private Rect subSprite;
 
-    public CanvasImage(string name, CanvasElement parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
-        : base(name, parent, position, size)
+    public CanvasImage(string name, CanvasElement parent, Vector2 position, Texture2D tex, Rect subSprite)
+        : base(name, parent, position, new Vector2(subSprite.width, subSprite.height))
     {
         this.subSprite = subSprite;
 
@@ -19,21 +19,9 @@ public sealed class CanvasImage : CanvasElement
         SizeUpdate();
     }
 
-    public CanvasImage(string name, CanvasElement parent, Vector2 position, Texture2D tex, Rect subSprite)
-        : this(name, parent, position, new Vector2(subSprite.width, subSprite.height), tex, subSprite) {}
-
     public void UpdateImage(Texture2D tex, Rect subSection)
     {
         obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSection.x, tex.height - subSection.height, subSection.width, subSection.height), Vector2.zero);
-    }
-
-    public override void PositionUpdate()
-    {
-        Vector2 anchor = new Vector2(
-            (Position.x + Size.x / subSprite.width * subSprite.width / 2f) / 1920f,
-            (1080f - (Position.y + Size.y / subSprite.height * subSprite.height / 2f)) / 1080f);
-        obj.GetComponent<RectTransform>().anchorMin = anchor;
-        obj.GetComponent<RectTransform>().anchorMax = anchor;
     }
 
     public override void SizeUpdate()

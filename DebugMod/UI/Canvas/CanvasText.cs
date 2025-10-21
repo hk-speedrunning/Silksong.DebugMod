@@ -23,13 +23,6 @@ public sealed class CanvasText : CanvasElement
         int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
         : this(name, parent, position, new Vector2(1920f, 1080f), text, font, fontSize, style, alignment) {}
 
-    public override void PositionUpdate()
-    {
-        Vector2 anchor = new Vector2((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
-        obj.GetComponent<RectTransform>().anchorMin = anchor;
-        obj.GetComponent<RectTransform>().anchorMax = anchor;
-    }
-
     public void UpdateText(string text)
     {
         obj.GetComponent<Text>().text = text;

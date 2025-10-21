@@ -5,41 +5,34 @@ namespace DebugMod.UI.Canvas;
 public abstract class CanvasElement
 {
     protected readonly GameObject obj;
+    protected readonly RectTransform transform;
 
     private Vector2 size;
-    private CanvasElement parent;
 
     public string Name { get; }
 
-    public CanvasElement Parent
-    {
-        get => parent;
-        set
-        {
-            parent = value;
-            obj.transform.parent = value.obj.transform;
-        }
-    }
+    public CanvasElement Parent { get; }
 
     public Vector2 LocalPosition
     {
-        get => obj.transform.localPosition;
+        get => FromUnityCoords(transform.anchoredPosition);
         set
         {
-            obj.transform.localPosition = value;
+            transform.anchoredPosition = ToUnityCoords(value);
             PositionUpdate();
         }
     }
 
-    public Vector2 Position
+    public Vector2 Position => LocalPosition + (Parent?.Position ?? Vector2.zero);
+
+    // uGUI has (0, 0) in the bottom left, we have it in the top left
+    private Vector2 ToUnityCoords(Vector2 v)
     {
-        get => obj.transform.position;
-        set
-        {
-            obj.transform.position = value;
-            PositionUpdate();
-        }
+        float parentSize = Parent?.Size.y ?? 1080f;
+        return new Vector2(v.x, parentSize - v.y - Size.y);
     }
+
+    private Vector2 FromUnityCoords(Vector2 v) => ToUnityCoords(v);
 
     public Vector2 Size
     {
@@ -57,6 +50,8 @@ public abstract class CanvasElement
         set => obj.SetActive(value);
     }
 
+    public bool ActiveInHierarchy => Active && (Parent?.ActiveInHierarchy ?? true);
+
     public float Width
     {
         get => Size.x;
@@ -72,16 +67,20 @@ public abstract class CanvasElement
     protected CanvasElement(string name, CanvasElement parent, Vector2 position, Vector2 size)
     {
         Name = name;
-        this.parent = parent;
+        Parent = parent;
         this.size = size;
 
         obj = new GameObject($"{GetType().Name} {name}");
-        obj.transform.SetParent((parent?.obj ?? GUIController.Instance.canvas).transform, false);
-        obj.transform.localPosition = position;
+        obj.transform.SetParent((parent?.obj ?? GUIController.Instance.canvas).transform, true);
 
         obj.AddComponent<CanvasRenderer>();
-        RectTransform imageTransform = obj.AddComponent<RectTransform>();
-        imageTransform.sizeDelta = new Vector2(size.x, size.y);
+
+        transform = obj.AddComponent<RectTransform>();
+        transform.sizeDelta = new Vector2(size.x, size.y);
+        transform.anchorMin = Vector2.zero;
+        transform.anchorMax = Vector2.zero;
+        transform.pivot = Vector2.zero;
+        LocalPosition = position;
 
         CanvasGroup group = obj.AddComponent<CanvasGroup>();
         group.interactable = false;
@@ -94,6 +93,5 @@ public abstract class CanvasElement
     public virtual void SizeUpdate() {}
 
     public void ToggleActive() => Active = !Active;
-    public bool ActiveInHierarchy() => Active && (Parent == null || Parent.ActiveInHierarchy());
     public void Destroy() => Object.Destroy(obj);
 }

@@ -18,17 +18,13 @@ public sealed class CanvasButton : CanvasElement
 
     public override void PositionUpdate()
     {
-        Vector2 anchor = new Vector2((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
-        obj.GetComponent<RectTransform>().anchorMin = anchor;
-        obj.GetComponent<RectTransform>().anchorMax = anchor;
-
         image?.PositionUpdate();
         text?.PositionUpdate();
     }
 
     public void SetImage(Texture2D tex, Rect subSprite)
     {
-        image = new CanvasImage(Name, this, Vector2.zero, Size, tex, subSprite);
+        image = new CanvasImage(Name, this, Vector2.zero, tex, subSprite);
     }
 
     public void SetText(string t, Font font, int fontSize = 13,

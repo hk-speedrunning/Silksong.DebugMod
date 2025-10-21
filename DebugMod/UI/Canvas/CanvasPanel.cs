@@ -17,7 +17,7 @@ public sealed class CanvasPanel : CanvasElement
     public CanvasPanel(string name, CanvasElement parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
         : this(name, parent, position, size)
     {
-        AddImage("Background", tex, Vector2.zero, size, subSprite);
+        AddImage("Background", tex, Vector2.zero, subSprite);
     }
 
     public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
@@ -37,9 +37,9 @@ public sealed class CanvasPanel : CanvasElement
         return panel;
     }
 
-    public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
+    public void AddImage(string name, Texture2D tex, Vector2 pos, Rect subSprite)
     {
-        CanvasImage image = new CanvasImage(name, this, pos, sz, tex, subSprite);
+        CanvasImage image = new CanvasImage(name, this, pos, tex, subSprite);
         images.Add(name, image);
     }
 
