@@ -51,6 +51,11 @@ namespace DebugMod.UI
             return position;
         }
 
+        public Vector2 GetSize()
+        {
+            return size;
+        }
+
         public void UpdateImage(Texture2D tex, Rect subSection)
         {
             if (imageObj != null)

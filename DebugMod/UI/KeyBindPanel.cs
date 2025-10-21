@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -111,7 +110,7 @@ namespace DebugMod.UI
             panel.AddText("Category", "", new Vector2(25f, 25f), Vector2.zero, GUIController.Instance.trajanNormal, 20);
             panel.AddText("Help", "", new Vector2(25f, 50f), Vector2.zero, GUIController.Instance.arial, 15);
             panel.AddButton("Page", GUIController.Instance.images["ButtonRect"], new Vector2(125, 250), Vector2.zero,
-                NextClicked,
+                () => NextClicked(false),
                 new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width,
                     GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "# / #");
 
@@ -121,7 +120,7 @@ namespace DebugMod.UI
                 GUIController.Instance.images["ScrollBarArrowRight"],
                 new Vector2(223, 254),
                 Vector2.zero,
-                NextClicked,
+                () => NextClicked(false),
                 new Rect(
                     0,
                     0,
@@ -133,7 +132,7 @@ namespace DebugMod.UI
                 GUIController.Instance.images["ScrollBarArrowLeft"],
                 new Vector2(95, 254),
                 Vector2.zero,
-                NextClicked,
+                () => NextClicked(true),
                 new Rect(
                     0,
                     0,
@@ -143,12 +142,14 @@ namespace DebugMod.UI
 
             for (int i = 0; i < ItemsPerPage; i++)
             {
+                int index = i; // so that the for loop doesn't mutate the captured variable
+
                 panel.AddButton(i.ToString(), GUIController.Instance.images["Scrollbar_point"],
-                    new Vector2(290f, 45f + 17.5f * i), Vector2.zero, ChangeBind,
+                    new Vector2(290f, 45f + 17.5f * i), Vector2.zero, () => ChangeBind(index),
                     new Rect(0, 0, GUIController.Instance.images["Scrollbar_point"].width,
                         GUIController.Instance.images["Scrollbar_point"].height));
                 panel.AddButton($"run{i}", GUIController.Instance.images["ButtonRun"],
-                    new Vector2(308f, 51f + 17.5f * i), new Vector2(12f, 12f), RunBind,
+                    new Vector2(308f, 51f + 17.5f * i), new Vector2(12f, 12f), () => RunBind(index),
                     new Rect(0, 0, GUIController.Instance.images["ButtonRun"].width,
                         GUIController.Instance.images["ButtonRun"].height));
             }
@@ -165,9 +166,8 @@ namespace DebugMod.UI
             UpdateHelpText();
         }
         
-        private static void RunBind(string buttonName) {
-            int bindIndex = Convert.ToInt32(buttonName.Substring(3)); // strip leading "run"
-            string bindName = CategoryInfo.FunctionsOnCurrentPage()[bindIndex];
+        private static void RunBind(int index) {
+            string bindName = CategoryInfo.FunctionsOnCurrentPage()[index];
 
             if (DebugMod.bindActions.TryGetValue(bindName, out var action))
             {
@@ -216,9 +216,9 @@ namespace DebugMod.UI
             panel.GetText("Help").UpdateText(updatedText);
         }
 
-        private static void NextClicked(string buttonName)
+        private static void NextClicked(bool previous)
         {
-            if (buttonName.StartsWith("Prev"))
+            if (previous)
             {
                 CategoryInfo.currentPage--;
                 if (CategoryInfo.currentPage < 0) CategoryInfo.currentPage = CategoryInfo.TotalPages - 1;
@@ -234,17 +234,15 @@ namespace DebugMod.UI
             UpdateHelpText();
         }
 
-        private static void ChangeBind(string buttonName)
+        private static void ChangeBind(int index)
         {
-            int num = Convert.ToInt32(buttonName);
-
-            if (num < 0 || num >= CategoryInfo.FunctionsOnCurrentPage().Count)
+            if (index < 0 || index >= CategoryInfo.FunctionsOnCurrentPage().Count)
             {
                 DebugMod.instance.LogWarn("Invalid bind change button clicked. Should not be possible");
                 return;
             }
 
-            string bindName = CategoryInfo.FunctionsOnCurrentPage()[num];
+            string bindName = CategoryInfo.FunctionsOnCurrentPage()[index];
 
             if (DebugMod.settings.binds.ContainsKey(bindName))
             {

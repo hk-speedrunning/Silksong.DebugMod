@@ -6,12 +6,14 @@ namespace DebugMod.UI
     public class CanvasText
     {
         private GameObject textObj;
+        private Vector2 position;
         private Vector2 size;
 
         public bool active;
 
         public CanvasText(Vector2 pos, Vector2 sz, string text, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
         {
+            position = pos;
             if (sz.x == 0 || sz.y == 0)
             {
                 size = new Vector2(1920f, 1080f);
@@ -38,38 +40,34 @@ namespace DebugMod.UI
             t.alignment = alignment;
 
             textObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
-
-            Vector2 position = new Vector2((pos.x + size.x / 2f) / 1920f, (1080f - (pos.y + size.y / 2f)) / 1080f);
-            textTransform.anchorMin = position;
-            textTransform.anchorMax = position;
+            UpdateAnchor();
 
             Object.DontDestroyOnLoad(textObj);
 
             active = true;
         }
 
-        public void SetPosition(Vector2 pos)
-        {
-            if (textObj != null)
-            {
-                RectTransform textTransform = textObj.GetComponent<RectTransform>();
-
-                Vector2 position = new Vector2((pos.x + size.x / 2f) / 1920f, (1080f - (pos.y + size.y / 2f)) / 1080f);
-                textTransform.anchorMin = position;
-                textTransform.anchorMax = position;
-            }
-        }
-
         public Vector2 GetPosition()
         {
-            if (textObj != null)
+            return position;
+        }
+
+        public void SetPosition(Vector2 pos)
+        {
+            position = pos;
+            UpdateAnchor();
+        }
+
+        private void UpdateAnchor()
+        {
+            if (textObj)
             {
-                Vector2 anchor = textObj.GetComponent<RectTransform>().anchorMin;
+                Vector2 anchor = new Vector2((position.x + size.x / 2f) / 1920f, (1080f - (position.y + size.y / 2f)) / 1080f);
 
-                return new Vector2(anchor.x * 1920f - size.x / 2f, 1080f - anchor.y * 1080f - size.y / 2f);
+                RectTransform textTransform = textObj.GetComponent<RectTransform>();
+                textTransform.anchorMin = anchor;
+                textTransform.anchorMax = anchor;
             }
-
-            return Vector2.zero;
         }
 
         public void UpdateText(string text)

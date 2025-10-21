@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DebugMod.MonoBehaviours;
 using GlobalEnums;
@@ -31,9 +30,9 @@ namespace DebugMod.UI
 
             for (int i = 1; i <= 14; i++)
             {
-                panel.GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), DelClicked, new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
-                panel.GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), CloneClicked, new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
-                panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), InfClicked, new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
+                panel.GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
+                panel.GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
+                panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
             }
 
             panel.GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
@@ -41,43 +40,40 @@ namespace DebugMod.UI
             panel.FixRenderOrder();
         }
 
-        private static void DelClicked(string buttonName)
+        private static void DelClicked(int index)
         {
-            int num = Convert.ToInt32(buttonName.Substring(3));
-            if (num <= enemyPool.Count)
+            if (index <= enemyPool.Count)
             {
-                EnemyHandle handle = enemyPool[num - 1];
+                EnemyHandle handle = enemyPool[index - 1];
                 Object.DestroyImmediate(handle.gameObject);
 
                 Console.AddLine($"Destroying enemy: {handle.gameObject.name}");
             }
         }
 
-        private static void CloneClicked(string buttonName)
+        private static void CloneClicked(int index)
         {
-            int num = Convert.ToInt32(buttonName.Substring(5));
-            if (num <= enemyPool.Count)
+            if (index <= enemyPool.Count)
             {
-                EnemyHandle handle = enemyPool[num - 1];
+                EnemyHandle handle = enemyPool[index - 1];
                 GameObject gameObject2 = Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
 
                 Console.AddLine($"Cloning enemy as: {gameObject2.name}");
             }
         }
 
-        private static void InfClicked(string buttonName)
+        private static void InfClicked(int index)
         {
-            int num = Convert.ToInt32(buttonName.Substring(3));
-            if (num <= enemyPool.Count)
+            if (index <= enemyPool.Count)
             {
-                EnemyHandle handle = enemyPool[num - 1];
+                EnemyHandle handle = enemyPool[index - 1];
                 handle.HP = 9999;
 
                 Console.AddLine($"HP for enemy: {handle.gameObject.name} is now 9999");
             }
         }
 
-        private static void HPBarsClicked(string buttonName) => BindableFunctions.ToggleEnemyHPBars();
+        private static void HPBarsClicked() => BindableFunctions.ToggleEnemyHPBars();
         
         public static void Update()
         {

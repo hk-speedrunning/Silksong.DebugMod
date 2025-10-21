@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace DebugMod.UI
 {
@@ -28,17 +27,13 @@ namespace DebugMod.UI
             AddImage("Background", tex, Vector2.zero, sz, subSprite);
         }
 
-        public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, UnityAction<string> func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
-        {
-            CanvasButton button = new CanvasButton(name, position + pos, size + sz, tex, subSprite, font, text, fontSize);
-            button.AddClickEvent(func);
-
-            buttons.Add(name, button);
-        }
-
         public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
         {
-            AddButton(name, tex, pos, sz, _ => func(), subSprite, font, text, fontSize);
+            CanvasText t = new CanvasText(position + pos, sz, text, font, fontSize, alignment: TextAnchor.MiddleCenter);
+            CanvasImage image = new CanvasImage(position + pos, sz, tex, subSprite);
+
+            CanvasButton button = new CanvasButton(position + pos, sz, func, t, image);
+            buttons.Add(name, button);
         }
 
         public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)

@@ -115,9 +115,9 @@ namespace DebugMod.UI
             // bossesPanel.AddButton("NK Grimm", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, NKGrimmClicked, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "NK Grimm", 10);
 
             //Other Panel
-            otherPanel.AddButton("Join Discord", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, _ => Application.OpenURL("https://discord.gg/VDsg3HmWuB"), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Join Discord", 10);
-            otherPanel.AddButton("Open Saves", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, _ => Process.Start(Application.persistentDataPath), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Open Saves Files", 10);
-            otherPanel.AddButton("Open Mods", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, _ => Process.Start(Directory.GetParent(Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location)).ToString()), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Open Mods Folder", 10);
+            otherPanel.AddButton("Join Discord", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, () => Application.OpenURL("https://discord.gg/VDsg3HmWuB"), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Join Discord", 10);
+            otherPanel.AddButton("Open Saves", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, () => Process.Start(Application.persistentDataPath), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Open Saves Files", 10);
+            otherPanel.AddButton("Open Mods", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, () => Process.Start(Directory.GetParent(Path.GetDirectoryName(System.Reflection.Assembly.GetCallingAssembly().Location)).ToString()), new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Open Mods Folder", 10);
 
             //SaveStates Panel
             //TODO: Make the left/right page arrows, make them hidden when an option isn't up, integrate this into its own menu instead of top menu and combine it with the file panel itself
