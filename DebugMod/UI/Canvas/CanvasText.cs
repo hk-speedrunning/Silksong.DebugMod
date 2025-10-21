@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace DebugMod.UI
+namespace DebugMod.UI.Canvas
 {
     public class CanvasText
     {

@@ -1,4 +1,5 @@
 ﻿using DebugMod.UI;
+using DebugMod.UI.Canvas;
 using GlobalEnums;
 using HarmonyLib;
 using UnityEngine;

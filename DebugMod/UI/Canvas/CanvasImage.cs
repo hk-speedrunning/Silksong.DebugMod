@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace DebugMod.UI
+namespace DebugMod.UI.Canvas
 {
     public class CanvasImage
     {
@@ -35,7 +35,7 @@ namespace DebugMod.UI
 
             imageObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
-            Vector2 anchor = new Vector2((pos.x + ((sz.x / subSprite.width) * subSprite.width) / 2f) / 1920f, (1080f - (pos.y + ((sz.y / subSprite.height) * subSprite.height) / 2f)) / 1080f);
+            Vector2 anchor = new Vector2((pos.x + sz.x / subSprite.width * subSprite.width / 2f) / 1920f, (1080f - (pos.y + sz.y / subSprite.height * subSprite.height / 2f)) / 1080f);
             imageTransform.anchorMin = anchor;
             imageTransform.anchorMax = anchor;
             imageTransform.SetScaleX(sz.x / subSprite.width);
@@ -88,7 +88,7 @@ namespace DebugMod.UI
 
             if (imageObj != null)
             {
-                Vector2 anchor = new Vector2((pos.x + ((size.x / sub.width) * sub.width) / 2f) / 1920f, (1080f - (pos.y + ((size.y / sub.height) * sub.height) / 2f)) / 1080f);
+                Vector2 anchor = new Vector2((pos.x + size.x / sub.width * sub.width / 2f) / 1920f, (1080f - (pos.y + size.y / sub.height * sub.height / 2f)) / 1080f);
                 imageObj.GetComponent<RectTransform>().anchorMin = anchor;
                 imageObj.GetComponent<RectTransform>().anchorMax = anchor;
             }

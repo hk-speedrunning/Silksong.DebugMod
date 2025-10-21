@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace DebugMod.UI
+namespace DebugMod.UI.Canvas
 {
     public class CanvasButton
     {

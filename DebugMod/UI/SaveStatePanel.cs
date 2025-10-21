@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using DebugMod.UI;
+using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod

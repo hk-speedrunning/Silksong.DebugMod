@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI

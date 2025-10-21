@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DebugMod.UI.Canvas;
 using JetBrains.Annotations;
 using UnityEngine;
 

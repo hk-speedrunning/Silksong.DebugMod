@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DebugMod.MonoBehaviours;
+using DebugMod.UI.Canvas;
 using GlobalEnums;
 using UnityEngine;
 using Object = UnityEngine.Object;
