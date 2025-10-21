@@ -14,7 +14,14 @@ public static class Console
 
     public static void BuildMenu(GameObject canvas)
     {
-        panel = new CanvasPanel(new Vector2(1275, 800), Vector2.zero, GUIController.Instance.images["ConsoleBg"], new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height));
+        panel = new CanvasPanel(
+            nameof(Console),
+            null,
+            new Vector2(1275, 800),
+            Vector2.zero,
+            GUIController.Instance.images["ConsoleBg"],
+            new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height)
+        );
         panel.AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
         panel.FixRenderOrder();
 
@@ -30,24 +37,13 @@ public static class Console
 
         if (GUIController.ForceHideUI())
         {
-            if (panel.active)
-            {
-                panel.SetActive(false, true);
-            }
-
+            panel.Active = false;
             return;
         }
 
-        if (DebugMod.settings.ConsoleVisible && !panel.active)
-        {
-            panel.SetActive(true, false);
-        }
-        else if (!DebugMod.settings.ConsoleVisible && panel.active)
-        {
-            panel.SetActive(false, true);
-        }
+        panel.Active = DebugMod.settings.ConsoleVisible;
 
-        if (panel.active)
+        if (panel.Active)
         {
             string consoleString = "";
             int lineCount = 0;

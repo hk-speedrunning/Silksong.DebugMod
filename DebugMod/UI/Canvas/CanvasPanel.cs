@@ -4,41 +4,34 @@ using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasPanel
+public sealed class CanvasPanel : CanvasElement
 {
     private readonly Dictionary<string, CanvasButton> buttons = new();
     private readonly Dictionary<string, CanvasPanel> panels = new();
     private readonly Dictionary<string, CanvasImage> images = new();
     private readonly Dictionary<string, CanvasText> texts = new();
-    private Vector2 position;
-    private Vector2 size;
 
-    public bool active;
+    public CanvasPanel(string name, CanvasElement parent, Vector2 position, Vector2 size)
+        : base(name, parent, position, size) {}
 
-    public CanvasPanel(Vector2 pos, Vector2 sz = default)
+    public CanvasPanel(string name, CanvasElement parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
+        : this(name, parent, position, size)
     {
-        position = pos;
-        size = sz;
-        active = true;
-    }
-
-    public CanvasPanel(Vector2 pos, Vector2 sz, Texture2D tex, Rect subSprite) : this(pos, sz)
-    {
-        AddImage("Background", tex, Vector2.zero, sz, subSprite);
+        AddImage("Background", tex, Vector2.zero, size, subSprite);
     }
 
     public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
     {
-        CanvasText t = new CanvasText(position + pos, sz, text, font, fontSize, alignment: TextAnchor.MiddleCenter);
-        CanvasImage image = new CanvasImage(position + pos, sz, tex, subSprite);
+        CanvasButton button = new CanvasButton(name, this, pos, sz, func);
+        button.SetImage(tex, subSprite);
+        button.SetText(text, font, fontSize, alignment: TextAnchor.MiddleCenter);
 
-        CanvasButton button = new CanvasButton(position + pos, sz, func, t, image);
         buttons.Add(name, button);
     }
 
     public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
     {
-        CanvasPanel panel = new CanvasPanel(position + pos, sz, tex, subSprite);
+        CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite);
 
         panels.Add(name, panel);
         return panel;
@@ -46,15 +39,13 @@ public class CanvasPanel
 
     public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
     {
-        CanvasImage image = new CanvasImage(position + pos, sz, tex, subSprite);
-
+        CanvasImage image = new CanvasImage(name, this, pos, sz, tex, subSprite);
         images.Add(name, image);
     }
 
     public void AddText(string name, string text, Vector2 pos, Vector2 sz, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
     {
-        CanvasText t = new CanvasText(position + pos, sz, text, font, fontSize, style, alignment);
-
+        CanvasText t = new CanvasText(name, this, pos, sz, text, font, fontSize, style, alignment);
         texts.Add(name, t);
     }
 
@@ -113,85 +104,44 @@ public class CanvasPanel
         return null;
     }
 
-    public void SetPosition(Vector2 pos)
+    public override void PositionUpdate()
     {
-        Vector2 deltaPos = pos - position;
-        position = pos;
-
         foreach (CanvasButton button in buttons.Values)
         {
-            button.SetPosition(button.GetPosition() + deltaPos);
+            button.PositionUpdate();
         }
 
         foreach (CanvasImage image in images.Values)
         {
-            image.SetPosition(image.GetPosition() + deltaPos);
+            image.PositionUpdate();
         }
 
         foreach (CanvasText text in texts.Values)
         {
-            text.SetPosition(text.GetPosition() + deltaPos);
+            text.PositionUpdate();
         }
 
         foreach (CanvasPanel panel in panels.Values)
         {
-            panel.SetPosition(panel.GetPosition() + deltaPos);
+            panel.PositionUpdate();
         }
     }
 
     public void TogglePanel(string name)
     {
-        if (active && panels.ContainsKey(name))
+        if (Active && panels.ContainsKey(name))
         {
             panels[name].ToggleActive();
 
+            // Hide any other panels with the same position
             foreach (CanvasPanel panel in panels.Values)
             {
-                if (panel != panels[name] && panel.active && panel.position == panels[name].position)
+                if (panel != panels[name] && panel.Active && panel.Position == panels[name].Position)
                 {
-                    panel.SetActive(false, false);
+                    panel.Active = false;
                 }
             }
         }
-    }
-
-    public void ToggleActive()
-    {
-        active = !active;
-        SetActive(active, false);
-    }
-
-    public void SetActive(bool b, bool panel)
-    {
-        foreach (CanvasButton button in buttons.Values)
-        {
-            button.SetActive(b);
-        }
-
-        foreach (CanvasImage image in images.Values)
-        {
-            image.SetActive(b);
-        }
-
-        foreach (CanvasText t in texts.Values)
-        {
-            t.SetActive(b);
-        }
-
-        if (panel)
-        {
-            foreach (CanvasPanel p in panels.Values)
-            {
-                p.SetActive(b, false);
-            }
-        }
-
-        active = b;
-    }
-
-    public Vector2 GetPosition()
-    {
-        return position;
     }
 
     public void FixRenderOrder()
@@ -214,29 +164,6 @@ public class CanvasPanel
         foreach (CanvasPanel panel in panels.Values)
         {
             panel.FixRenderOrder();
-        }
-    }
-
-    public void Destroy()
-    {
-        foreach (CanvasButton button in buttons.Values)
-        {
-            button.Destroy();
-        }
-
-        foreach (CanvasImage image in images.Values)
-        {
-            image.Destroy();
-        }
-
-        foreach (CanvasText t in texts.Values)
-        {
-            t.Destroy();
-        }
-
-        foreach (CanvasPanel p in panels.Values)
-        {
-            p.Destroy();
         }
     }
 }

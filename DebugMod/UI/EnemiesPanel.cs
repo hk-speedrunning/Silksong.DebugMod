@@ -19,7 +19,7 @@ public static class EnemiesPanel
     {
         parent = canvas;
 
-        panel = new CanvasPanel(new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f));
+        panel = new CanvasPanel(nameof(EnemiesPanel), null, new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f), Vector2.zero);
 
         panel.AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, GUIController.Instance.trajanBold, 30);
 
@@ -85,39 +85,29 @@ public static class EnemiesPanel
 
         if (GUIController.ForceHideUI())
         {
-            if (panel.active)
-            {
-                panel.SetActive(false, true);
-            }
+            panel.Active = false;
         }
         else
         {
-            if (DebugMod.settings.EnemiesPanelVisible && !panel.active)
-            {
-                panel.SetActive(true, false);
-            }
-            else if (!DebugMod.settings.EnemiesPanelVisible && panel.active)
-            {
-                panel.SetActive(false, true);
-            }
+            panel.Active = DebugMod.settings.EnemiesPanelVisible;
 
             if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING &&
-                (panel.GetPanel("Pause").active || !panel.GetPanel("Play").active))
+                (panel.GetPanel("Pause").Active || !panel.GetPanel("Play").Active))
             {
-                panel.GetPanel("Pause").SetActive(false, true);
-                panel.GetPanel("Play").SetActive(true, false);
+                panel.GetPanel("Pause").Active = false;
+                panel.GetPanel("Play").Active = true;
             }
             else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED &&
-                     (!panel.GetPanel("Pause").active || panel.GetPanel("Play").active))
+                     (!panel.GetPanel("Pause").Active || panel.GetPanel("Play").Active))
             {
-                panel.GetPanel("Pause").SetActive(true, false);
-                panel.GetPanel("Play").SetActive(false, true);
+                panel.GetPanel("Pause").Active = true;
+                panel.GetPanel("Play").Active = false;
             }
         }
 
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
-        if (panel.active)
+        if (panel.Active)
         {
             string enemyNames = "";
             string enemyHP = "";
@@ -135,21 +125,21 @@ public static class EnemiesPanel
                 }
             }
 
-            if (panel.GetPanel("Pause").active)
+            if (panel.GetPanel("Pause").Active)
             {
                 for (int i = 1; i <= 14; i++)
                 {
                     if (i <= enemyCount)
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).SetActive(true);
-                        panel.GetPanel("Pause").GetButton("Clone" + i).SetActive(true);
-                        panel.GetPanel("Pause").GetButton("Inf" + i).SetActive(true);
+                        panel.GetPanel("Pause").GetButton("Del" + i).Active = true;
+                        panel.GetPanel("Pause").GetButton("Clone" + i).Active = true;
+                        panel.GetPanel("Pause").GetButton("Inf" + i).Active = true;
                     }
                     else
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).SetActive(false);
-                        panel.GetPanel("Pause").GetButton("Clone" + i).SetActive(false);
-                        panel.GetPanel("Pause").GetButton("Inf" + i).SetActive(false);
+                        panel.GetPanel("Pause").GetButton("Del" + i).Active = false;
+                        panel.GetPanel("Pause").GetButton("Clone" + i).Active = false;
+                        panel.GetPanel("Pause").GetButton("Inf" + i).Active = false;
                     }
                 }
 

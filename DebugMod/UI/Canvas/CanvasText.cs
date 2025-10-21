@@ -3,110 +3,45 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasText
+public sealed class CanvasText : CanvasElement
 {
-    private GameObject textObj;
-    private Vector2 position;
-    private Vector2 size;
-
-    public bool active;
-
-    public CanvasText(Vector2 pos, Vector2 sz, string text, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+    public CanvasText(string name, CanvasElement parent, Vector2 position, Vector2 size, string text, Font font,
+        int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+        : base(name, parent, position, size)
     {
-        position = pos;
-        if (sz.x == 0 || sz.y == 0)
-        {
-            size = new Vector2(1920f, 1080f);
-        }
-        else
-        {
-            size = sz;
-        }
-
-        textObj = new GameObject();
-        textObj.AddComponent<CanvasRenderer>();
-        RectTransform textTransform = textObj.AddComponent<RectTransform>();
-        textTransform.sizeDelta = size;
-
-        CanvasGroup group = textObj.AddComponent<CanvasGroup>();
-        group.interactable = false;
-        group.blocksRaycasts = false;
-
-        Text t = textObj.AddComponent<Text>();
+        Text t = obj.AddComponent<Text>();
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;
         t.fontStyle = style;
         t.alignment = alignment;
 
-        textObj.transform.SetParent(GUIController.Instance.canvas.transform, false);
-        UpdateAnchor();
-
-        Object.DontDestroyOnLoad(textObj);
-
-        active = true;
+        PositionUpdate();
     }
 
-    public Vector2 GetPosition()
-    {
-        return position;
-    }
+    public CanvasText(string name, CanvasElement parent, Vector2 position, string text, Font font,
+        int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+        : this(name, parent, position, new Vector2(1920f, 1080f), text, font, fontSize, style, alignment) {}
 
-    public void SetPosition(Vector2 pos)
+    public override void PositionUpdate()
     {
-        position = pos;
-        UpdateAnchor();
-    }
-
-    private void UpdateAnchor()
-    {
-        if (textObj)
-        {
-            Vector2 anchor = new Vector2((position.x + size.x / 2f) / 1920f, (1080f - (position.y + size.y / 2f)) / 1080f);
-
-            RectTransform textTransform = textObj.GetComponent<RectTransform>();
-            textTransform.anchorMin = anchor;
-            textTransform.anchorMax = anchor;
-        }
+        Vector2 anchor = new Vector2((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
+        obj.GetComponent<RectTransform>().anchorMin = anchor;
+        obj.GetComponent<RectTransform>().anchorMax = anchor;
     }
 
     public void UpdateText(string text)
     {
-        if (textObj != null)
-        {
-            textObj.GetComponent<Text>().text = text;
-        }
-    }
-
-    public void SetActive(bool a)
-    {
-        active = a;
-
-        if (textObj != null)
-        {
-            textObj.SetActive(active);
-        }
+        obj.GetComponent<Text>().text = text;
     }
 
     public void MoveToTop()
     {
-        if (textObj != null)
-        {
-            textObj.transform.SetAsLastSibling();
-        }
+        obj.transform.SetAsLastSibling();
     }
 
     public void SetTextColor(Color color)
     {
-        if (textObj != null)
-        {
-            Text t = textObj.GetComponent<Text>();
-            t.color = color;
-        }
-    }
-
-    public void Destroy()
-    {
-        Object.Destroy(textObj);
+        obj.GetComponent<Text>().color = color;
     }
 }

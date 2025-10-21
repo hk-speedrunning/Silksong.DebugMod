@@ -64,16 +64,19 @@ public abstract class InfoPanel
         {
             foreach (InfoPanel infoPanel in AllPanels.Values)
             {
-                infoPanel.panel?.SetActive(false, true);
+                if (infoPanel.panel != null)
+                {
+                    infoPanel.panel.Active = false;
+                }
             }
             return;
         }
 
         foreach (InfoPanel infoPanel in AllPanels.Values)
         {
-            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.active)
+            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.Active)
             {
-                infoPanel.panel?.SetActive(infoPanel.Active, !infoPanel.Active);
+                infoPanel.panel.Active = infoPanel.Active;
             }
 
             if (infoPanel.Active)

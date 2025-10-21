@@ -15,6 +15,8 @@ public class BottomRightInfoPanel : InfoPanel
 
         // Puke
         panel = new CanvasPanel(
+            nameof(BottomRightInfoPanel),
+            null,
             new Vector2(0f, 223f),
             Vector2.zero,
             tex,

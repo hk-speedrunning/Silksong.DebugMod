@@ -14,7 +14,14 @@ public static class TopMenu
 
     public static void BuildMenu(GameObject canvas)
     {
-        panel = new CanvasPanel(new Vector2(1070f , 25f), Vector2.zero, GUIController.Instance.images["ButtonsMenuBG"], new Rect(0f, 0f, GUIController.Instance.images["ButtonsMenuBG"].width, GUIController.Instance.images["ButtonsMenuBG"].height));
+        panel = new CanvasPanel(
+            nameof(TopMenu),
+            null,
+            new Vector2(1070f , 25f),
+            Vector2.zero,
+            GUIController.Instance.images["ButtonsMenuBG"],
+            new Rect(0f, 0f, GUIController.Instance.images["ButtonsMenuBG"].width, GUIController.Instance.images["ButtonsMenuBG"].height)
+        );
 
         Rect buttonRect = new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height);
         
@@ -143,28 +150,17 @@ public static class TopMenu
 
         if (GUIController.ForceHideUI())
         {
-            if (panel.active)
-            {
-                panel.SetActive(false, true);
-            }
-
+            panel.Active = false;
             return;
         }
 
-        if (DebugMod.settings.TopMenuVisible && !panel.active)
-        {
-            panel.SetActive(true, false);
-        }
-        else if (!DebugMod.settings.TopMenuVisible && panel.active)
-        {
-            panel.SetActive(false, true);
-        }
+        panel.Active = DebugMod.settings.TopMenuVisible;
 
-        if (panel.GetPanel("Skills Panel").active) RefreshSkillsMenu();
+        if (panel.GetPanel("Skills Panel").Active) RefreshSkillsMenu();
 
-        if (panel.GetPanel("Items Panel").active) RefreshItemsMenu();
+        if (panel.GetPanel("Items Panel").Active) RefreshItemsMenu();
 
-        if (panel.GetPanel("Tools Panel").active)
+        if (panel.GetPanel("Tools Panel").Active)
         {
             panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
             panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
@@ -172,7 +168,7 @@ public static class TopMenu
 
         }
 
-        if (panel.GetPanel("Cheats Panel").active)
+        if (panel.GetPanel("Cheats Panel").Active)
         {
             panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
             panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
@@ -192,7 +188,7 @@ public static class TopMenu
         // }
         
         //TODO fix naming so this doesnt require it to be setup like this (currently page panel is savestate panel so CC thinks its throwing errors not sure)
-        if (panel.GetPanel("SaveStates Panel").active)
+        if (panel.GetPanel("SaveStates Panel").Active)
         {
             CanvasPanel savepanel = panel.GetPanel("SaveStates Panel");
             savepanel.GetButton("Scroll Left").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));

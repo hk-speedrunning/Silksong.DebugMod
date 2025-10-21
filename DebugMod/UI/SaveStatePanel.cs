@@ -12,6 +12,8 @@ public static class SaveStatesPanel
     public static void BuildMenu(GameObject canvas)
     {
         statePanel = new CanvasPanel(
+            nameof(SaveStatesPanel),
+            null,
             new Vector2(720f, 40f),
             Vector2.zero,
             GUIController.Instance.images["BlankVertical"],
@@ -45,24 +47,13 @@ public static class SaveStatesPanel
 
         if (GUIController.ForceHideUI())
         {
-            if (statePanel.active)
-            {
-                statePanel.SetActive(false, true);
-            }
-
+            statePanel.Active = false;
             return;
         }
 
-        if (DebugMod.settings.SaveStatePanelVisible && !statePanel.active)
-        {
-            statePanel.SetActive(true, false);
-        }
-        else if (!DebugMod.settings.SaveStatePanelVisible && statePanel.active)
-        {
-            statePanel.SetActive(false, true);
-        }
+        statePanel.Active = DebugMod.settings.SaveStatePanelVisible;
 
-        if (statePanel.active)
+        if (statePanel.Active)
         {
             statePanel.GetText("currentmode").UpdateText(SaveStateManager.currentStateOperation);
             statePanel.GetText("CurrentFolder").UpdateText($"Page: {SaveStateManager.currentStateFolder+1}/{SaveStateManager.savePages}");

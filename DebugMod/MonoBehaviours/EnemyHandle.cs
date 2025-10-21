@@ -52,7 +52,10 @@ public class EnemyHandle : MonoBehaviour
     {
         if (!EnemiesPanel.IsActive())
         {
-            hpBar?.SetActive(false, true);
+            if (hpBar != null)
+            {
+                hpBar.Active = false;
+            }
             return;
         }
 
@@ -60,7 +63,7 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar == null)
             {
-                hpBar = new CanvasPanel(Vector2.zero, Vector2.zero, DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
+                hpBar = new CanvasPanel($"{gameObject.name} HP Bar", null, Vector2.zero, Vector2.zero, DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
                 hpBar.AddText("HP", "", Vector2.zero, new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT), GUIController.Instance.arial, 20, FontStyle.Normal, TextAnchor.MiddleCenter);
                 hpBar.FixRenderOrder();
             }
@@ -82,13 +85,13 @@ public class EnemyHandle : MonoBehaviour
 
             barPos.x -= HPBAR_WIDTH / 2f;
 
-            hpBar.SetPosition(barPos);
+            hpBar.Position = barPos;
             hpBar.GetText("HP").UpdateText($"{HP}/{MaxHP}");
         }
 
-        if (hpBar != null && hpBar.active != EnemiesPanel.hpBars)
+        if (hpBar != null)
         {
-            hpBar.SetActive(EnemiesPanel.hpBars, true);
+            hpBar.Active = EnemiesPanel.hpBars;
         }
     }
 

@@ -100,6 +100,8 @@ public static class KeyBindPanel
     public static void BuildMenu(GameObject canvas)
     {
         panel = new CanvasPanel(
+            nameof(KeyBindPanel),
+            null,
             new Vector2(1123, 456),
             Vector2.zero,
             GUIController.Instance.images["HelpBG"],
@@ -266,29 +268,18 @@ public static class KeyBindPanel
 
         if (GUIController.ForceHideUI())
         {
-            if (panel.active)
-            {
-                panel.SetActive(false, true);
-            }
-
+            panel.Active = false;
             return;
         }
 
-        if (DebugMod.settings.HelpPanelVisible && !panel.active)
-        {
-            panel.SetActive(true, false);
-        }
-        else if (!DebugMod.settings.HelpPanelVisible && panel.active)
-        {
-            panel.SetActive(false, true);
-        }
+        panel.Active = DebugMod.settings.HelpPanelVisible;
 
-        if (panel.active && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
+        if (panel.Active && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
         {
             for (int i = 0; i < ItemsPerPage; i++)
             {
-                panel.GetButton(i.ToString()).SetActive(CategoryInfo.FunctionsOnCurrentPage().Count > i);
-                panel.GetButton($"run{i}").SetActive(CategoryInfo.FunctionsOnCurrentPage().Count > i);
+                panel.GetButton(i.ToString()).Active = CategoryInfo.FunctionsOnCurrentPage().Count > i;
+                panel.GetButton($"run{i}").Active = CategoryInfo.FunctionsOnCurrentPage().Count > i;
             }
         }
     }

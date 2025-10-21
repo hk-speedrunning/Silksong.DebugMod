@@ -22,6 +22,8 @@ public class CustomInfoPanel : TogglableInfoPanel
         if (ShowSprite)
         {
             panel = new CanvasPanel(
+                nameof(CustomInfoPanel),
+                null,
                 new Vector2(0f, 223f),
                 Vector2.zero,
                 GUIController.Instance.images["StatusPanelBG"],
@@ -39,6 +41,8 @@ public class CustomInfoPanel : TogglableInfoPanel
 
             // Puke
             panel = new CanvasPanel(
+                nameof(CustomInfoPanel),
+                null,
                 new Vector2(130f, 230f),
                 Vector2.zero,
                 tex,
