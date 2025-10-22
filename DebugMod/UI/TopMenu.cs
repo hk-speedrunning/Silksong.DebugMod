@@ -150,17 +150,17 @@ public static class TopMenu
 
         if (GUIController.ForceHideUI())
         {
-            panel.Active = false;
+            panel.ActiveSelf = false;
             return;
         }
 
-        panel.Active = DebugMod.settings.TopMenuVisible;
+        panel.ActiveSelf = DebugMod.settings.TopMenuVisible;
 
-        if (panel.GetPanel("Skills Panel").Active) RefreshSkillsMenu();
+        if (panel.GetPanel("Skills Panel").ActiveInHierarchy) RefreshSkillsMenu();
 
-        if (panel.GetPanel("Items Panel").Active) RefreshItemsMenu();
+        if (panel.GetPanel("Items Panel").ActiveInHierarchy) RefreshItemsMenu();
 
-        if (panel.GetPanel("Tools Panel").Active)
+        if (panel.GetPanel("Tools Panel").ActiveInHierarchy)
         {
             panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
             panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
@@ -168,7 +168,7 @@ public static class TopMenu
 
         }
 
-        if (panel.GetPanel("Cheats Panel").Active)
+        if (panel.GetPanel("Cheats Panel").ActiveInHierarchy)
         {
             panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
             panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
@@ -188,7 +188,7 @@ public static class TopMenu
         // }
         
         //TODO fix naming so this doesnt require it to be setup like this (currently page panel is savestate panel so CC thinks its throwing errors not sure)
-        if (panel.GetPanel("SaveStates Panel").Active)
+        if (panel.GetPanel("SaveStates Panel").ActiveInHierarchy)
         {
             CanvasPanel savepanel = panel.GetPanel("SaveStates Panel");
             savepanel.GetButton("Scroll Left").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));

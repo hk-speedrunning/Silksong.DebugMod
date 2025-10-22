@@ -268,18 +268,18 @@ public static class KeyBindPanel
 
         if (GUIController.ForceHideUI())
         {
-            panel.Active = false;
+            panel.ActiveSelf = false;
             return;
         }
 
-        panel.Active = DebugMod.settings.HelpPanelVisible;
+        panel.ActiveSelf = DebugMod.settings.HelpPanelVisible;
 
-        if (panel.Active && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
+        if (panel.ActiveInHierarchy && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
         {
             for (int i = 0; i < ItemsPerPage; i++)
             {
-                panel.GetButton(i.ToString()).Active = CategoryInfo.FunctionsOnCurrentPage().Count > i;
-                panel.GetButton($"run{i}").Active = CategoryInfo.FunctionsOnCurrentPage().Count > i;
+                panel.GetButton(i.ToString()).ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
+                panel.GetButton($"run{i}").ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
             }
         }
     }

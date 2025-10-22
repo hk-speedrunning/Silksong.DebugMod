@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,24 +14,23 @@ public sealed class CanvasButton : CanvasElement
         : base(name, parent, position, size)
     {
         obj.AddComponent<Button>().onClick.AddListener(() => clicked());
-        PositionUpdate();
     }
 
-    public override void PositionUpdate()
+    protected override IEnumerable<CanvasElement> ChildList()
     {
-        image?.PositionUpdate();
-        text?.PositionUpdate();
+        if (image != null) yield return image;
+        if (text != null) yield return text;
     }
 
     public void SetImage(Texture2D tex, Rect subSprite)
     {
-        image = new CanvasImage(Name, this, Vector2.zero, tex, subSprite);
+        image = new CanvasImage("ButtonImage", this, Vector2.zero, tex, subSprite);
     }
 
     public void SetText(string t, Font font, int fontSize = 13,
         FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
     {
-        text = new CanvasText(Name, this, Vector2.zero, Size, t, font, fontSize, style, alignment);
+        text = new CanvasText("ButtonText", this, Vector2.zero, Size, t, font, fontSize, style, alignment);
     }
 
     public void UpdateText(string t) => text.UpdateText(t);

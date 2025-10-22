@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
@@ -7,7 +8,8 @@ public abstract class CanvasElement
     protected readonly GameObject obj;
     protected readonly RectTransform transform;
 
-    private Vector2 size;
+    private Vector2 localPosition;
+    private bool activeSelf = true;
 
     public string Name { get; }
 
@@ -15,83 +17,87 @@ public abstract class CanvasElement
 
     public Vector2 LocalPosition
     {
-        get => FromUnityCoords(transform.anchoredPosition);
+        get => localPosition;
         set
         {
-            transform.anchoredPosition = ToUnityCoords(value);
-            PositionUpdate();
+            localPosition = value;
+            OnUpdatePosition();
         }
     }
 
     public Vector2 Position => LocalPosition + (Parent?.Position ?? Vector2.zero);
 
-    // uGUI has (0, 0) in the bottom left, we have it in the top left
-    private Vector2 ToUnityCoords(Vector2 v)
-    {
-        float parentSize = Parent?.Size.y ?? 1080f;
-        return new Vector2(v.x, parentSize - v.y - Size.y);
-    }
+    public Vector2 Size { get; }
 
-    private Vector2 FromUnityCoords(Vector2 v) => ToUnityCoords(v);
-
-    public Vector2 Size
+    public bool ActiveSelf
     {
-        get => size;
+        get => activeSelf;
         set
         {
-            size = value;
-            SizeUpdate();
+            activeSelf = value;
+            OnUpdateActive();
         }
     }
 
-    public bool Active
-    {
-        get => obj.activeSelf;
-        set => obj.SetActive(value);
-    }
-
-    public bool ActiveInHierarchy => Active && (Parent?.ActiveInHierarchy ?? true);
-
-    public float Width
-    {
-        get => Size.x;
-        set => Size = new Vector2(value, Size.y);
-    }
-
-    public float Height
-    {
-        get => Size.y;
-        set => Size = new Vector2(Size.x, value);
-    }
+    public bool ActiveInHierarchy => ActiveSelf && (Parent?.ActiveInHierarchy ?? true);
 
     protected CanvasElement(string name, CanvasElement parent, Vector2 position, Vector2 size)
     {
         Name = name;
         Parent = parent;
-        this.size = size;
+        Size = size;
 
-        obj = new GameObject($"{GetType().Name} {name}");
-        obj.transform.SetParent((parent?.obj ?? GUIController.Instance.canvas).transform, true);
+        obj = new GameObject(GetObjectName());
+        obj.transform.SetParent(GUIController.Instance.canvas.transform, true);
 
         obj.AddComponent<CanvasRenderer>();
 
         transform = obj.AddComponent<RectTransform>();
         transform.sizeDelta = new Vector2(size.x, size.y);
-        transform.anchorMin = Vector2.zero;
-        transform.anchorMax = Vector2.zero;
-        transform.pivot = Vector2.zero;
         LocalPosition = position;
 
         CanvasGroup group = obj.AddComponent<CanvasGroup>();
         group.interactable = false;
         group.blocksRaycasts = false;
-
-        Object.DontDestroyOnLoad(obj);
     }
 
-    public virtual void PositionUpdate() {}
-    public virtual void SizeUpdate() {}
+    protected virtual IEnumerable<CanvasElement> ChildList()
+    {
+        yield break;
+    }
 
-    public void ToggleActive() => Active = !Active;
-    public void Destroy() => Object.Destroy(obj);
+    private void OnUpdatePosition()
+    {
+        Vector2 anchor = new((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
+        transform.anchorMin = transform.anchorMax = anchor;
+
+        foreach (CanvasElement child in ChildList())
+        {
+            child.OnUpdatePosition();
+        }
+    }
+
+    private void OnUpdateActive()
+    {
+        obj.SetActive(ActiveInHierarchy);
+
+        foreach (CanvasElement child in ChildList())
+        {
+            child.OnUpdateActive();
+        }
+    }
+
+    private string GetObjectName() => $"{Parent?.GetObjectName()}:{Name}";
+
+    public void ToggleActive() => ActiveSelf = !ActiveSelf;
+
+    public void Destroy()
+    {
+        foreach (CanvasElement element in ChildList())
+        {
+            element.Destroy();
+        }
+
+        Object.Destroy(obj);
+    }
 }

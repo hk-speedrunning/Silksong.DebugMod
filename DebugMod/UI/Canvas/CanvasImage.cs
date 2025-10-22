@@ -15,19 +15,13 @@ public sealed class CanvasImage : CanvasElement
         obj.AddComponent<Image>();
         UpdateImage(tex, subSprite);
 
-        PositionUpdate();
-        SizeUpdate();
+        obj.GetComponent<RectTransform>().SetScaleX(Size.x / subSprite.width);
+        obj.GetComponent<RectTransform>().SetScaleY(Size.y / subSprite.height);
     }
 
     public void UpdateImage(Texture2D tex, Rect subSection)
     {
         obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSection.x, tex.height - subSection.height, subSection.width, subSection.height), Vector2.zero);
-    }
-
-    public override void SizeUpdate()
-    {
-        obj.GetComponent<RectTransform>().SetScaleX(Size.x / subSprite.width);
-        obj.GetComponent<RectTransform>().SetScaleY(Size.y / subSprite.height);
     }
 
     public void SetRenderIndex(int idx)

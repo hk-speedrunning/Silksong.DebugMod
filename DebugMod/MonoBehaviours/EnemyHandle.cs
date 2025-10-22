@@ -54,7 +54,7 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar != null)
             {
-                hpBar.Active = false;
+                hpBar.ActiveSelf = false;
             }
             return;
         }
@@ -91,7 +91,7 @@ public class EnemyHandle : MonoBehaviour
 
         if (hpBar != null)
         {
-            hpBar.Active = EnemiesPanel.hpBars;
+            hpBar.ActiveSelf = EnemiesPanel.hpBars;
         }
     }
 

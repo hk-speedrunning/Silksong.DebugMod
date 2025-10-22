@@ -85,29 +85,29 @@ public static class EnemiesPanel
 
         if (GUIController.ForceHideUI())
         {
-            panel.Active = false;
+            panel.ActiveSelf = false;
         }
         else
         {
-            panel.Active = DebugMod.settings.EnemiesPanelVisible;
+            panel.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
 
             if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING &&
-                (panel.GetPanel("Pause").Active || !panel.GetPanel("Play").Active))
+                (panel.GetPanel("Pause").ActiveInHierarchy || !panel.GetPanel("Play").ActiveInHierarchy))
             {
-                panel.GetPanel("Pause").Active = false;
-                panel.GetPanel("Play").Active = true;
+                panel.GetPanel("Pause").ActiveSelf = false;
+                panel.GetPanel("Play").ActiveSelf = true;
             }
             else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED &&
-                     (!panel.GetPanel("Pause").Active || panel.GetPanel("Play").Active))
+                     (!panel.GetPanel("Pause").ActiveInHierarchy || panel.GetPanel("Play").ActiveInHierarchy))
             {
-                panel.GetPanel("Pause").Active = true;
-                panel.GetPanel("Play").Active = false;
+                panel.GetPanel("Pause").ActiveSelf = true;
+                panel.GetPanel("Play").ActiveSelf = false;
             }
         }
 
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
-        if (panel.Active)
+        if (panel.ActiveInHierarchy)
         {
             string enemyNames = "";
             string enemyHP = "";
@@ -125,21 +125,21 @@ public static class EnemiesPanel
                 }
             }
 
-            if (panel.GetPanel("Pause").Active)
+            if (panel.GetPanel("Pause").ActiveInHierarchy)
             {
                 for (int i = 1; i <= 14; i++)
                 {
                     if (i <= enemyCount)
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).Active = true;
-                        panel.GetPanel("Pause").GetButton("Clone" + i).Active = true;
-                        panel.GetPanel("Pause").GetButton("Inf" + i).Active = true;
+                        panel.GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
+                        panel.GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
+                        panel.GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
                     }
                     else
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).Active = false;
-                        panel.GetPanel("Pause").GetButton("Clone" + i).Active = false;
-                        panel.GetPanel("Pause").GetButton("Inf" + i).Active = false;
+                        panel.GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
+                        panel.GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
+                        panel.GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
                     }
                 }
 

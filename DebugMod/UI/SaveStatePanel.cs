@@ -47,13 +47,13 @@ public static class SaveStatesPanel
 
         if (GUIController.ForceHideUI())
         {
-            statePanel.Active = false;
+            statePanel.ActiveSelf = false;
             return;
         }
 
-        statePanel.Active = DebugMod.settings.SaveStatePanelVisible;
+        statePanel.ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
 
-        if (statePanel.Active)
+        if (statePanel.ActiveInHierarchy)
         {
             statePanel.GetText("currentmode").UpdateText(SaveStateManager.currentStateOperation);
             statePanel.GetText("CurrentFolder").UpdateText($"Page: {SaveStateManager.currentStateFolder+1}/{SaveStateManager.savePages}");

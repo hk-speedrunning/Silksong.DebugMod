@@ -20,6 +20,29 @@ public sealed class CanvasPanel : CanvasElement
         AddImage("Background", tex, Vector2.zero, subSprite);
     }
 
+    protected override IEnumerable<CanvasElement> ChildList()
+    {
+        foreach (CanvasButton button in buttons.Values)
+        {
+            yield return button;
+        }
+
+        foreach (CanvasPanel panel in panels.Values)
+        {
+            yield return panel;
+        }
+
+        foreach (CanvasImage image in images.Values)
+        {
+            yield return image;
+        }
+
+        foreach (CanvasText text in texts.Values)
+        {
+            yield return text;
+        }
+    }
+
     public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
     {
         CanvasButton button = new CanvasButton(name, this, pos, sz, func);
@@ -45,6 +68,11 @@ public sealed class CanvasPanel : CanvasElement
 
     public void AddText(string name, string text, Vector2 pos, Vector2 sz, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
     {
+        if (sz.x == 0 || sz.y == 0)
+        {
+            sz = new Vector2(1920f, 1080f);
+        }
+
         CanvasText t = new CanvasText(name, this, pos, sz, text, font, fontSize, style, alignment);
         texts.Add(name, t);
     }
@@ -104,41 +132,18 @@ public sealed class CanvasPanel : CanvasElement
         return null;
     }
 
-    public override void PositionUpdate()
-    {
-        foreach (CanvasButton button in buttons.Values)
-        {
-            button.PositionUpdate();
-        }
-
-        foreach (CanvasImage image in images.Values)
-        {
-            image.PositionUpdate();
-        }
-
-        foreach (CanvasText text in texts.Values)
-        {
-            text.PositionUpdate();
-        }
-
-        foreach (CanvasPanel panel in panels.Values)
-        {
-            panel.PositionUpdate();
-        }
-    }
-
     public void TogglePanel(string name)
     {
-        if (Active && panels.ContainsKey(name))
+        if (ActiveInHierarchy && panels.ContainsKey(name))
         {
             panels[name].ToggleActive();
 
             // Hide any other panels with the same position
             foreach (CanvasPanel panel in panels.Values)
             {
-                if (panel != panels[name] && panel.Active && panel.Position == panels[name].Position)
+                if (panel != panels[name] && panel.ActiveInHierarchy && panel.Position == panels[name].Position)
                 {
-                    panel.Active = false;
+                    panel.ActiveSelf = false;
                 }
             }
         }

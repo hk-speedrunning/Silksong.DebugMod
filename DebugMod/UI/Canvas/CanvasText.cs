@@ -15,13 +15,7 @@ public sealed class CanvasText : CanvasElement
         t.fontSize = fontSize;
         t.fontStyle = style;
         t.alignment = alignment;
-
-        PositionUpdate();
     }
-
-    public CanvasText(string name, CanvasElement parent, Vector2 position, string text, Font font,
-        int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
-        : this(name, parent, position, new Vector2(1920f, 1080f), text, font, fontSize, style, alignment) {}
 
     public void UpdateText(string text)
     {

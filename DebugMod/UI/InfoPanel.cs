@@ -66,7 +66,7 @@ public abstract class InfoPanel
             {
                 if (infoPanel.panel != null)
                 {
-                    infoPanel.panel.Active = false;
+                    infoPanel.panel.ActiveSelf = false;
                 }
             }
             return;
@@ -74,9 +74,9 @@ public abstract class InfoPanel
 
         foreach (InfoPanel infoPanel in AllPanels.Values)
         {
-            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.Active)
+            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.ActiveSelf)
             {
-                infoPanel.panel.Active = infoPanel.Active;
+                infoPanel.panel.ActiveSelf = infoPanel.Active;
             }
 
             if (infoPanel.Active)

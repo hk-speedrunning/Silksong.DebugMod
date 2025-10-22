@@ -37,13 +37,13 @@ public static class Console
 
         if (GUIController.ForceHideUI())
         {
-            panel.Active = false;
+            panel.ActiveSelf = false;
             return;
         }
 
-        panel.Active = DebugMod.settings.ConsoleVisible;
+        panel.ActiveSelf = DebugMod.settings.ConsoleVisible;
 
-        if (panel.Active)
+        if (panel.ActiveInHierarchy)
         {
             string consoleString = "";
             int lineCount = 0;
