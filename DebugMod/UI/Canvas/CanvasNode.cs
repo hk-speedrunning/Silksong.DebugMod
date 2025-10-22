@@ -18,9 +18,11 @@ public abstract class CanvasNode
         get => localPosition;
         set
         {
-            bool update = localPosition != value;
-            localPosition = value;
-            if (update) OnUpdatePosition();
+            if (localPosition != value)
+            {
+                localPosition = value;
+                OnUpdatePosition();
+            }
         }
     }
 
@@ -33,9 +35,11 @@ public abstract class CanvasNode
         get => activeSelf;
         set
         {
-            bool update = activeSelf != value;
-            activeSelf = value;
-            if (update) OnUpdateActive();
+            if (activeSelf != value)
+            {
+                activeSelf = value;
+                OnUpdateActive();
+            }
         }
     }
 
