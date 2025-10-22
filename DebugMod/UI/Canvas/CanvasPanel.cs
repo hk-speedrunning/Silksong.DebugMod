@@ -51,8 +51,7 @@ public class CanvasPanel : CanvasNode
             sz = new Vector2(subSprite.width, subSprite.height);
         }
 
-        CanvasButton button = new CanvasButton(name, this, pos, sz, func);
-        button.SetImage(tex, subSprite);
+        CanvasButton button = new CanvasButton(name, this, pos, sz, func, tex, subSprite);
 
         if (text != null && font != null)
         {

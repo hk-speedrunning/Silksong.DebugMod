@@ -8,11 +8,10 @@ public class CanvasImage : CanvasObject
     public CanvasImage(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
         : base(name, parent, position, size)
     {
-        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-
         obj.AddComponent<Image>();
         UpdateImage(tex, subSprite);
 
+        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
         transform.SetScaleX(Size.x / subSprite.width);
         transform.SetScaleY(Size.y / subSprite.height);
     }
