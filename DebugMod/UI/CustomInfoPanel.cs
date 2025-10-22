@@ -35,22 +35,11 @@ public class CustomInfoPanel : TogglableInfoPanel
         }
         else
         {
-            Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(new byte[] { 0x00, 0x00, 0x00, 0x00 });
-            tex.Apply();
-
-            // Puke
             panel = new CanvasPanel(
                 nameof(CustomInfoPanel),
                 null,
                 new Vector2(130f, 230f),
-                Vector2.zero,
-                tex,
-                new Rect(
-                    0f,
-                    0f,
-                    1f,
-                    1f));
+                Vector2.zero);
         }
 
 

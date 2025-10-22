@@ -10,12 +10,20 @@ public class CanvasPanel : CanvasNode
     private readonly Dictionary<string, CanvasPanel> panels = new();
     private readonly Dictionary<string, CanvasImage> images = new();
     private readonly Dictionary<string, CanvasText> texts = new();
+    private readonly bool contextual;
 
-    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
-        : base(name, parent, position, size) {}
+    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, bool contextual = false)
+        : base(name, parent, position, size)
+    {
+        this.contextual = contextual;
+        if (contextual)
+        {
+            ActiveSelf = false;
+        }
+    }
 
-    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
-        : this(name, parent, position, size)
+    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite, bool contextual = false)
+        : this(name, parent, position, size, contextual)
     {
         AddImage("Background", tex, Vector2.zero, size, subSprite);
     }
@@ -61,9 +69,9 @@ public class CanvasPanel : CanvasNode
         buttons.Add(name, button);
     }
 
-    public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
+    public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite, bool contextual = false)
     {
-        CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite);
+        CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite, contextual);
 
         panels.Add(name, panel);
         return panel;
@@ -156,6 +164,23 @@ public class CanvasPanel : CanvasNode
             foreach (CanvasPanel panel in panels.Values)
             {
                 if (panel != panels[name] && panel.ActiveInHierarchy && panel.Position == panels[name].Position)
+                {
+                    panel.ActiveSelf = false;
+                }
+            }
+        }
+    }
+
+    protected override void OnUpdateActive()
+    {
+        base.OnUpdateActive();
+
+        if (!ActiveSelf)
+        {
+            // Hide contextual panels
+            foreach (CanvasPanel panel in panels.Values)
+            {
+                if (panel.contextual)
                 {
                     panel.ActiveSelf = false;
                 }

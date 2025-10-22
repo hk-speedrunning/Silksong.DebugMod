@@ -41,8 +41,6 @@ public abstract class CanvasObject : CanvasNode
         base.OnUpdateActive();
     }
 
-    protected virtual bool UseParentObject(CanvasObject child) => false;
-
     private void AnchorToCenter()
     {
         Vector2 anchor = new((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
