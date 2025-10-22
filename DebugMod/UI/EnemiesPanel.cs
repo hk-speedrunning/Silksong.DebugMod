@@ -48,7 +48,7 @@ public static class EnemiesPanel
             EnemyHandle handle = enemyPool[index - 1];
             Object.DestroyImmediate(handle.gameObject);
 
-            Console.AddLine($"Destroying enemy: {handle.gameObject.name}");
+            DebugMod.LogConsole($"Destroying enemy: {handle.gameObject.name}");
         }
     }
 
@@ -59,7 +59,7 @@ public static class EnemiesPanel
             EnemyHandle handle = enemyPool[index - 1];
             GameObject gameObject2 = Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
 
-            Console.AddLine($"Cloning enemy as: {gameObject2.name}");
+            DebugMod.LogConsole($"Cloning enemy as: {gameObject2.name}");
         }
     }
 
@@ -70,7 +70,7 @@ public static class EnemiesPanel
             EnemyHandle handle = enemyPool[index - 1];
             handle.HP = 9999;
 
-            Console.AddLine($"HP for enemy: {handle.gameObject.name} is now 9999");
+            DebugMod.LogConsole($"HP for enemy: {handle.gameObject.name} is now 9999");
         }
     }
 

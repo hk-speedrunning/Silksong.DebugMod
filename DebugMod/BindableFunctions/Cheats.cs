@@ -18,35 +18,35 @@ public static partial class BindableFunctions
                 ctr++;
             }
         }
-        Console.AddLine($"Killing {ctr} HealthManagers in scene!");
+        DebugMod.LogConsole($"Killing {ctr} HealthManagers in scene!");
     }
 
     [BindableMethod(name = "Infinite Jump", category = "Cheats")]
     public static void ToggleInfiniteJump()
     {
         PlayerData.instance.infiniteAirJump = !PlayerData.instance.infiniteAirJump;
-        Console.AddLine("Infinite Jump set to " + PlayerData.instance.infiniteAirJump.ToString().ToUpper());
+        DebugMod.LogConsole("Infinite Jump set to " + PlayerData.instance.infiniteAirJump.ToString().ToUpper());
     }
 
     [BindableMethod(name = "Infinite Silk", category = "Cheats")]
     public static void ToggleInfiniteSilk()
     {
         DebugMod.infiniteSilk = !DebugMod.infiniteSilk;
-        Console.AddLine("Infinite Silk set to " + DebugMod.infiniteSilk.ToString().ToUpper());
+        DebugMod.LogConsole("Infinite Silk set to " + DebugMod.infiniteSilk.ToString().ToUpper());
     }
 
     [BindableMethod(name = "Infinite HP", category = "Cheats")]
     public static void ToggleInfiniteHP()
     {
         DebugMod.infiniteHP = !DebugMod.infiniteHP;
-        Console.AddLine("Infinite HP set to " + DebugMod.infiniteHP.ToString().ToUpper());
+        DebugMod.LogConsole("Infinite HP set to " + DebugMod.infiniteHP.ToString().ToUpper());
     }
 
     [BindableMethod(name = "Invincibility", category = "Cheats")]
     public static void ToggleInvincibility()
     {
         DebugMod.playerInvincible = !DebugMod.playerInvincible;
-        Console.AddLine("Invincibility set to " + DebugMod.playerInvincible.ToString().ToUpper());
+        DebugMod.LogConsole("Invincibility set to " + DebugMod.playerInvincible.ToString().ToUpper());
 
         PlayerData.instance.isInvincible = DebugMod.playerInvincible;
     }
@@ -58,12 +58,12 @@ public static partial class BindableFunctions
 
         if (DebugMod.noclip)
         {
-            Console.AddLine("Enabled noclip");
+            DebugMod.LogConsole("Enabled noclip");
             DebugMod.noclipPos = DebugMod.RefKnight.transform.position;
         }
         else
         {
-            Console.AddLine("Disabled noclip");
+            DebugMod.LogConsole("Disabled noclip");
             DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
         }
     }
@@ -75,14 +75,14 @@ public static partial class BindableFunctions
         {
             DebugMod.RefHeroCollider.enabled = true;
             DebugMod.RefHeroBox.enabled = true;
-            Console.AddLine("Enabled hero collider" + (DebugMod.noclip ? " and disabled noclip" : ""));
+            DebugMod.LogConsole("Enabled hero collider" + (DebugMod.noclip ? " and disabled noclip" : ""));
             DebugMod.noclip = false;
         }
         else
         {
             DebugMod.RefHeroCollider.enabled = false;
             DebugMod.RefHeroBox.enabled = false;
-            Console.AddLine("Disabled hero collider" + (DebugMod.noclip ? "" : " and enabled noclip"));
+            DebugMod.LogConsole("Disabled hero collider" + (DebugMod.noclip ? "" : " and enabled noclip"));
             DebugMod.noclip = true;
             DebugMod.noclipPos = DebugMod.RefKnight.transform.position;
         }
@@ -94,7 +94,7 @@ public static partial class BindableFunctions
         if (!HeroController.instance.cState.dead && !HeroController.instance.cState.transitioning)
         {
             HeroController.instance.StartCoroutine(HeroController.instance.Die(false, false));
-            Console.AddLine("Killed player");
+            DebugMod.LogConsole("Killed player");
         }
     }
 }

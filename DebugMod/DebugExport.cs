@@ -14,7 +14,7 @@ public static class DebugExport
         => DebugMod.AddActionToKeyBindList(method, name, category, allowLock);
 
     public static void LogToConsole(string msg)
-        => Console.AddLine(msg);
+        => DebugMod.LogConsole(msg);
 
     public static string GetStringForBool(bool b)
         => InfoPanel.GetStringForBool(b);

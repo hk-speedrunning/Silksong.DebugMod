@@ -100,7 +100,7 @@ internal class SaveStateManager
         }
         else if (DebugMod.overrideLoadLockout)
         {
-            Console.AddLine("Attempting Savestate Load Override");
+            DebugMod.LogConsole("Attempting Savestate Load Override");
             switch (stateType)
             {
                 case SaveStateType.Memory:
@@ -117,7 +117,7 @@ internal class SaveStateManager
         }
         else
         {
-            Console.AddLine("Cannot save new states while loading");
+            DebugMod.LogConsole("Cannot save new states while loading");
         }
     }
 
@@ -137,7 +137,7 @@ internal class SaveStateManager
                 }
                 else
                 {
-                    Console.AddLine("No save state active");
+                    DebugMod.LogConsole("No save state active");
                 }
                 break;
             case SaveStateType.File or SaveStateType.SkipOne:
@@ -171,7 +171,7 @@ internal class SaveStateManager
                     currentStateOperation = save ? "Save new state to file" : "Load new state from file";
                     break;
                 default:
-                    //DebugMod.instance.LogError("SelectSlot ended started");
+                    //DebugMod.LogError("SelectSlot ended started");
                     throw new ArgumentException(
                         "Helper func SelectSlot requires `bool` and `SaveStateType` to proceed the savestate process");
             }
@@ -204,9 +204,9 @@ internal class SaveStateManager
         }
         else
         {
-            if (GUIController.didInput) Console.AddLine("Savestate action cancelled");
+            if (GUIController.didInput) DebugMod.LogConsole("Savestate action cancelled");
             else if (DebugMod.settings.ClearSaveStatePanel) DebugMod.settings.ClearSaveStatePanel = false;
-            else Console.AddLine("Timeout (" + timeoutAmount.ToString() + ")s was reached");
+            else DebugMod.LogConsole("Timeout (" + timeoutAmount.ToString() + ")s was reached");
         }
         
         currentStateOperation = null;
@@ -351,7 +351,7 @@ internal class SaveStateManager
             foreach (string file in files)
             {
                 shortFileName = Path.GetFileName(file);
-                //DebugMod.instance.Log("file: " + shortFileName);
+                //DebugMod.Log("file: " + shortFileName);
                 var digits = shortFileName.SkipWhile(c => !Char.IsDigit(c)).TakeWhile(Char.IsDigit).ToArray();
                 int slot = int.Parse(new string(digits));
 
@@ -364,13 +364,13 @@ internal class SaveStateManager
                     saveStateFiles.Add(slot, new SaveState());
                     saveStateFiles[slot].LoadStateFromFile(slot);
 
-                    //DebugMod.instance.LogError(saveStateFiles[slot].GetSaveStateID());
+                    //DebugMod.LogError(saveStateFiles[slot].GetSaveStateID());
                 }
             }
         }
         catch (Exception ex)
         {
-            DebugMod.instance.LogError(ex.Message);
+            DebugMod.LogError(ex.Message);
             //throw ex;
         }
     }

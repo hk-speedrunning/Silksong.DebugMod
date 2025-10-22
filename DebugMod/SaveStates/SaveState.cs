@@ -111,7 +111,7 @@ internal class SaveState
         }
         catch (Exception e)
         {
-            DebugMod.instance.LogError(e.Message);
+            DebugMod.LogError(e.Message);
         }
 
         data.savedPd = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(PlayerData.instance));
@@ -125,7 +125,7 @@ internal class SaveState
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
         data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
 
-        Console.AddLine("Saved temp state");
+        DebugMod.LogConsole("Saved temp state");
         return true;
     }
 
@@ -157,7 +157,7 @@ internal class SaveState
         }
         catch (Exception ex)
         {
-            DebugMod.instance.LogDebug(ex.Message);
+            DebugMod.LogDebug(ex.Message);
             throw ex;
         }
     }
@@ -174,7 +174,7 @@ internal class SaveState
         }
         else if (DebugMod.overrideLoadLockout)
         {
-            Console.AddLine("Attempting savestate load override");
+            DebugMod.LogConsole("Attempting savestate load override");
             GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
         }
     }
@@ -183,25 +183,25 @@ internal class SaveState
     {
         if (PlayerDeathWatcher.playerDead)
         {
-            Console.AddLine("Savestates cannot be loaded when dead");
+            DebugMod.LogConsole("Savestates cannot be loaded when dead");
             return false;
         }
 
         if (HeroController.instance.cState.transitioning)
         {
-            Console.AddLine("Savestates cannot be loaded when transitioning");
+            DebugMod.LogConsole("Savestates cannot be loaded when transitioning");
             return false;
         }
 
         if (HeroController.instance.transform.parent != null)
         {
-            Console.AddLine("Savestates cannot be loaded when on elevators");
+            DebugMod.LogConsole("Savestates cannot be loaded when on elevators");
             return false;
         }
 
         if (loadingSavestate != null)
         {
-            Console.AddLine("Savestates cannot be loaded when another savestate is loading");
+            DebugMod.LogConsole("Savestates cannot be loaded when another savestate is loading");
             return false;
         }
 
@@ -223,23 +223,23 @@ internal class SaveState
 
             if (File.Exists(data.filePath))
             {
-                //DebugMod.instance.Log("checked filepath: " + data.filePath);
+                //DebugMod.Log("checked filepath: " + data.filePath);
                 SaveStateData tmpData = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(data.filePath));
                 try
                 {
                     data = new SaveStateData(tmpData);
 
-                    DebugMod.instance.Log("Load SaveState ready: " + data.saveStateIdentifier);
+                    DebugMod.Log("Load SaveState ready: " + data.saveStateIdentifier);
                 }
                 catch (Exception ex)
                 {
-                    DebugMod.instance.LogError("Error applying save state data: " + ex);
+                    DebugMod.LogError("Error applying save state data: " + ex);
                 }
             }
         }
         catch (Exception ex)
         {
-            DebugMod.instance.LogDebug(ex.Message);
+            DebugMod.LogDebug(ex.Message);
             throw;
         }
     }
@@ -251,7 +251,7 @@ internal class SaveState
         // but might as well be defensive and rule out any frame-perfect nonsense
         if (loadingSavestate != null && !DebugMod.overrideLoadLockout)
         {
-            Console.AddLine($"Attempted to load savestate in {data.saveScene} while another is already loading, cancelling");
+            DebugMod.LogConsole($"Attempted to load savestate in {data.saveScene} while another is already loading, cancelling");
             yield break;
         }
         loadingSavestate = this;
@@ -409,7 +409,7 @@ internal class SaveState
 
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
-            Console.AddLine("Performing Room Specific Option " + data.roomSpecificOptions);
+            DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);
             yield return RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
         }
         //removes things like bench storage no clip float etc
@@ -438,7 +438,7 @@ internal class SaveState
         loadingStateTimer.Stop();
         loadingSavestate = null;
 
-        Console.AddLine("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
+        DebugMod.LogConsole("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
 
         yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
         yield return null; // Not all HUD elements are ready immediately, wait one more frame

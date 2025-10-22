@@ -7,14 +7,14 @@ public static partial class BindableFunctions
     public static void GivePaleOre()
     {
         PlayerData.instance.ore = 6;
-        Console.AddLine("Set player pale ore to 6");
+        DebugMod.LogConsole("Set player pale ore to 6");
     }
 
     [BindableMethod(name = "Give Simple Keys", category = "Consumables")]
     public static void GiveSimpleKey()
     {
         PlayerData.instance.simpleKeys = 3;
-        Console.AddLine("Set player simple keys to 3");
+        DebugMod.LogConsole("Set player simple keys to 3");
     }
 
     // slab keys
@@ -35,13 +35,13 @@ public static partial class BindableFunctions
             PlayerData.instance.hasQuill = true;
             PlayerData.instance.hasMap = true;
             PlayerData.instance.mapDirtmouth = true;
-            Console.AddLine("Giving player map & quill");
+            DebugMod.LogConsole("Giving player map & quill");
         }
         else
         {
             PlayerData.instance.hasQuill = false;
             PlayerData.instance.hasMap = false;
-            Console.AddLine("Taking away map & quill");
+            DebugMod.LogConsole("Taking away map & quill");
         }
     }
 
@@ -84,7 +84,7 @@ public static partial class BindableFunctions
         playerData.SetBool("gladeDoorOpened", true);
         playerData.SetBool("troupeInTown", true);
         
-        Console.AddLine("Unlocked all stags");
+        DebugMod.LogConsole("Unlocked all stags");
     }
     */
 }

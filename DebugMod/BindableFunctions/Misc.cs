@@ -29,18 +29,18 @@ public static partial class BindableFunctions
                 IgnoreUnpause.SetValue(UIManager.instance, false);
                 PlayerData.instance.disablePause = false;
                 UIManager.instance.TogglePauseGame();
-                Console.AddLine("Forcing Pause Menu because pause is disabled");
+                DebugMod.LogConsole("Forcing Pause Menu because pause is disabled");
             }
             else
             {
-                Console.AddLine("Game does not report that Pause is disabled, requesting it normally.");
+                DebugMod.LogConsole("Game does not report that Pause is disabled, requesting it normally.");
                 UIManager.instance.TogglePauseGame();
             }
         }
         catch (Exception e)
         {
-            Console.AddLine("Error while attempting to pause, check ModLog.txt");
-            DebugMod.instance.Log("Error while attempting force pause:\n" + e);
+            DebugMod.LogConsole("Error while attempting to pause, check ModLog.txt");
+            DebugMod.Log("Error while attempting force pause:\n" + e);
         }
     }
 
@@ -54,7 +54,7 @@ public static partial class BindableFunctions
             {
                 InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle(false));
                 GameManager.instance.HazardRespawn();
-                Console.AddLine("Closing Pause Menu and respawning...");
+                DebugMod.LogConsole("Closing Pause Menu and respawning...");
                 return;
             }
 
@@ -63,11 +63,11 @@ public static partial class BindableFunctions
                 HeroController.instance.RelinquishControl();
                 GameManager.instance.HazardRespawn();
                 HeroController.instance.RegainControl();
-                Console.AddLine("Respawn signal sent");
+                DebugMod.LogConsole("Respawn signal sent");
                 return;
             }
 
-            Console.AddLine("Respawn requested in some weird conditions, abort, ABORT");
+            DebugMod.LogConsole("Respawn requested in some weird conditions, abort, ABORT");
         }
     }
 
@@ -76,14 +76,14 @@ public static partial class BindableFunctions
     {
         Vector3 manualRespawn = DebugMod.RefKnight.transform.position;
         HeroController.instance.SetHazardRespawn(manualRespawn, false);
-        Console.AddLine("Manual respawn point on this map set to" + manualRespawn);
+        DebugMod.LogConsole("Manual respawn point on this map set to" + manualRespawn);
     }
 
     [BindableMethod(name = "Toggle Act 3", category = "Misc")]
     public static void ToggleAct3()
     {
         PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
-        Console.AddLine("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
+        DebugMod.LogConsole("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
     }
 
     [BindableMethod(name = "Force Camera Follow", category = "Misc")]
@@ -91,14 +91,14 @@ public static partial class BindableFunctions
     {
         if (!DebugMod.cameraFollow)
         {
-            Console.AddLine("Forcing camera follow");
+            DebugMod.LogConsole("Forcing camera follow");
             DebugMod.cameraFollow = true;
         }
         else
         {
             DebugMod.cameraFollow = false;
             cameraGameplayScene.SetValue(DebugMod.RefCamera, true);
-            Console.AddLine("Returning camera to normal settings");
+            DebugMod.LogConsole("Returning camera to normal settings");
         }
     }
 
@@ -119,14 +119,14 @@ public static partial class BindableFunctions
     public static void ResetCurrentScene()
     {
         saveLevelStateAction = GameManager.instance.GetSceneNameString();
-        Console.AddLine("Clearing scene data from this scene, re-enter scene or warp to apply changes");
+        DebugMod.LogConsole("Clearing scene data from this scene, re-enter scene or warp to apply changes");
     }
 
     [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
     public static void BlockCurrentSceneChanges()
     {
         saveLevelStateAction = "block";
-        Console.AddLine("Scene data changes made since entering this scene will not be saved");
+        DebugMod.LogConsole("Scene data changes made since entering this scene will not be saved");
     }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
@@ -175,13 +175,13 @@ public static partial class BindableFunctions
             TimeScaleDuringFrameAdvance = DebugMod.CurrentTimeScale;
             DebugMod.CurrentTimeScale = 0;
             DebugMod.TimeScaleActive = true;
-            Console.AddLine("Starting frame by frame advance on keybind press");
+            DebugMod.LogConsole("Starting frame by frame advance on keybind press");
         }
         else
         {
             DebugMod.CurrentTimeScale = TimeScaleDuringFrameAdvance;
             Time.timeScale = DebugMod.CurrentTimeScale;
-            Console.AddLine("Stopping frame by frame advance on keybind press");
+            DebugMod.LogConsole("Stopping frame by frame advance on keybind press");
         }
     }
 
@@ -211,6 +211,6 @@ public static partial class BindableFunctions
     public static void ToggleLockKeyBinds()
     {
         DebugMod.KeyBindLock = !DebugMod.KeyBindLock;
-        Console.AddLine($"{(DebugMod.KeyBindLock ? "Removing" : "Adding")} the ability to use keybinds");
+        DebugMod.LogConsole($"{(DebugMod.KeyBindLock ? "Removing" : "Adding")} the ability to use keybinds");
     }
 }

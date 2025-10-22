@@ -12,7 +12,7 @@ public static partial class BindableFunctions
     public static void ShowHitboxes()
     {
         if (++DebugMod.settings.ShowHitBoxes > 2) DebugMod.settings.ShowHitBoxes = 0;
-        Console.AddLine("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
+        DebugMod.LogConsole("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
     }
 
     [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
@@ -24,12 +24,12 @@ public static partial class BindableFunctions
         if (!component.previewEnabled)
         {
             component.previewEnabled = true;
-            Console.AddLine("Enabled cocoon spawn point preview");
+            DebugMod.LogConsole("Enabled cocoon spawn point preview");
         }
         else
         {
             component.previewEnabled = false;
-            Console.AddLine("Disabled cocoon spawn point preview");
+            DebugMod.LogConsole("Disabled cocoon spawn point preview");
         }
     }
 
@@ -54,13 +54,13 @@ public static partial class BindableFunctions
         {
             color.a = 0f;
             gameObject.GetComponent<SpriteRenderer>().color = color;
-            Console.AddLine("Rendering HeroLight invisible...");
+            DebugMod.LogConsole("Rendering HeroLight invisible...");
         }
         else
         {
             color.a = 0.7f;
             gameObject.GetComponent<SpriteRenderer>().color = color;
-            Console.AddLine("Rendering HeroLight visible...");
+            DebugMod.LogConsole("Rendering HeroLight visible...");
         }
     }
 
@@ -70,12 +70,12 @@ public static partial class BindableFunctions
         if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(false);
-            Console.AddLine("Disabling HUD...");
+            DebugMod.LogConsole("Disabling HUD...");
         }
         else
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
-            Console.AddLine("Enabling HUD...");
+            DebugMod.LogConsole("Enabling HUD...");
         }
     }
 
@@ -83,7 +83,7 @@ public static partial class BindableFunctions
     public static void ResetZoom()
     {
         GameCameras.instance.tk2dCam.ZoomFactor = 1f;
-        Console.AddLine("Zoom factor was reset");
+        DebugMod.LogConsole("Zoom factor was reset");
     }
 
     [BindableMethod(name = "Zoom In", category = "Visual")]
@@ -91,7 +91,7 @@ public static partial class BindableFunctions
     {
         float zoomFactor = GameCameras.instance.tk2dCam.ZoomFactor;
         GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor + zoomFactor * 0.05f;
-        Console.AddLine("Zoom level increased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+        DebugMod.LogConsole("Zoom level increased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
     }
 
     [BindableMethod(name = "Zoom Out", category = "Visual")]
@@ -99,7 +99,7 @@ public static partial class BindableFunctions
     {
         float zoomFactor2 = GameCameras.instance.tk2dCam.ZoomFactor;
         GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor2 - zoomFactor2 * 0.05f;
-        Console.AddLine("Zoom level decreased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
+        DebugMod.LogConsole("Zoom level decreased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
     }
 
     [BindableMethod(name = "Hide Hero", category = "Visual")]
@@ -111,13 +111,13 @@ public static partial class BindableFunctions
         {
             color.a = 0f;
             component.color = color;
-            Console.AddLine("Rendering Hero sprite invisible...");
+            DebugMod.LogConsole("Rendering Hero sprite invisible...");
         }
         else
         {
             color.a = 1f;
             component.color = color;
-            Console.AddLine("Rendering Hero sprite visible...");
+            DebugMod.LogConsole("Rendering Hero sprite visible...");
         }
     }
 
@@ -126,7 +126,7 @@ public static partial class BindableFunctions
     {
         bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;
         GameCameras.instance.cameraShakeFSM.enabled = newValue;
-        Console.AddLine($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
+        DebugMod.LogConsole($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
     }
 
     [BindableMethod(name = "Toggle Cursor", category = "Visual")]
@@ -137,12 +137,12 @@ public static partial class BindableFunctions
         if (DebugMod.settings.ShowCursorWhileUnpaused)
         {
             SetAlwaysShowCursor();
-            Console.AddLine("Showing cursor while unpaused");
+            DebugMod.LogConsole("Showing cursor while unpaused");
         }
         else
         {
             UnsetAlwaysShowCursor();
-            Console.AddLine("Not showing cursor while unpaused");
+            DebugMod.LogConsole("Not showing cursor while unpaused");
         }
     }
 

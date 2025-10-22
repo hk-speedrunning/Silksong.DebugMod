@@ -55,7 +55,7 @@ public static class RoomSpecific
                 yield return new WaitUntil(() => !GameManager.instance.isLoading);
                 break;
             default:
-                Console.AddLine("No Room Specific Function Found In: " + scene);
+                DebugMod.LogConsole("No Room Specific Function Found In: " + scene);
                 break;
         }
     }

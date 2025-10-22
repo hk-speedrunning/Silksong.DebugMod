@@ -8,7 +8,7 @@ public static partial class BindableFunctions
     public static void UnlockAllTools()
     {
         ToolItemManager.UnlockAllTools();
-        Console.AddLine("Unlocked all tools");
+        DebugMod.LogConsole("Unlocked all tools");
     }
 
     [BindableMethod(name = "Unlock All Crests", category = "Tools")]
@@ -31,7 +31,7 @@ public static partial class BindableFunctions
             }
         }
 
-        Console.AddLine("Unlocked all crests");
+        DebugMod.LogConsole("Unlocked all crests");
     }
 
     [BindableMethod(name = "Increment Tool Pouch", category = "Tools")]
@@ -40,12 +40,12 @@ public static partial class BindableFunctions
         if (PlayerData.instance.ToolPouchUpgrades < 4)
         {
             PlayerData.instance.ToolPouchUpgrades++;
-            Console.AddLine($"Increasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
+            DebugMod.LogConsole($"Increasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
         }
         else
         {
             PlayerData.instance.ToolPouchUpgrades = 0;
-            Console.AddLine("Resetting tool pouch level");
+            DebugMod.LogConsole("Resetting tool pouch level");
         }
     }
 
@@ -55,12 +55,12 @@ public static partial class BindableFunctions
         if (PlayerData.instance.ToolKitUpgrades < 4)
         {
             PlayerData.instance.ToolKitUpgrades++;
-            Console.AddLine($"Increasing crafting kit level (now {PlayerData.instance.ToolKitUpgrades})");
+            DebugMod.LogConsole($"Increasing crafting kit level (now {PlayerData.instance.ToolKitUpgrades})");
         }
         else
         {
             PlayerData.instance.ToolKitUpgrades = 0;
-            Console.AddLine("Resetting crafting kit level");
+            DebugMod.LogConsole("Resetting crafting kit level");
         }
     }
 
@@ -68,13 +68,13 @@ public static partial class BindableFunctions
     public static void ToggleInfiniteTools()
     {
         DebugMod.infiniteTools = !DebugMod.infiniteTools;
-        Console.AddLine("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
+        DebugMod.LogConsole("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
     }
 
     [BindableMethod(name = "Craft Tools", category = "Tools")]
     public static void CraftTools()
     {
         ToolItemManager.TryReplenishTools(true, ToolItemManager.ReplenishMethod.Bench);
-        Console.AddLine("Crafted new tools");
+        DebugMod.LogConsole("Crafted new tools");
     }
 }

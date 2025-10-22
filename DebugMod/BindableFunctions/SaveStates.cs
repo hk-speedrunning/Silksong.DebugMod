@@ -85,14 +85,14 @@ public static partial class BindableFunctions
     public static void LoadStateOnDeath()
     {
         DebugMod.stateOnDeath = !DebugMod.stateOnDeath;
-        Console.AddLine("Quickslot SaveState will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
+        DebugMod.LogConsole("Quickslot SaveState will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
     }
 
     [BindableMethod(name = "Override Lockout", category = "Savestates")]
     public static void OverrideLoadLockout()
     {
         DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
-        Console.AddLine("SaveState Lockout set to " + DebugMod.overrideLoadLockout);
+        DebugMod.LogConsole("SaveState Lockout set to " + DebugMod.overrideLoadLockout);
     }
 
     /*

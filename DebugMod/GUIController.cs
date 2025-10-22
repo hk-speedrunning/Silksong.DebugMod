@@ -38,7 +38,7 @@ public class GUIController : MonoBehaviour
         {
             if (_instance == null)
             {
-                DebugMod.instance.Log("Creating new GUIController");
+                DebugMod.Log("Creating new GUIController");
 
                 GameObject GUIObj = new GameObject("GUIController");
                 _instance = GUIObj.AddComponent<GUIController>();
@@ -77,7 +77,7 @@ public class GUIController : MonoBehaviour
         SaveStatesPanel.BuildMenu(canvas);
         TopMenu.BuildMenu(canvas);
         EnemiesPanel.BuildMenu(canvas);
-        Console.BuildMenu(canvas);
+        ConsolePanel.BuildMenu(canvas);
 
         InfoPanel.BuildInfoPanels(canvas);
         KeyBindPanel.BuildMenu(canvas);
@@ -115,7 +115,7 @@ public class GUIController : MonoBehaviour
             }
         }
 
-        if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.instance.LogError("Could not find game fonts");
+        if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
 
         string[] resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
@@ -136,11 +136,11 @@ public class GUIController : MonoBehaviour
                     string internalName = split[split.Length - 2];
                     images.Add(internalName, tex);
 
-                    DebugMod.instance.LogDebug("Loaded image: " + internalName);
+                    DebugMod.LogDebug("Loaded image: " + internalName);
                 }
                 catch (Exception e)
                 {
-                    DebugMod.instance.LogError("Failed to load image: " + res + "\n" + e.ToString());
+                    DebugMod.LogError("Failed to load image: " + res + "\n" + e.ToString());
                 }
             }
         }
@@ -153,7 +153,7 @@ public class GUIController : MonoBehaviour
         SaveStatesPanel.Update();
         TopMenu.Update();
         EnemiesPanel.Update();
-        Console.Update();
+        ConsolePanel.Update();
         KeyBindPanel.Update();
         InfoPanel.Update();
         
@@ -189,7 +189,7 @@ public class GUIController : MonoBehaviour
                                 {
                                     if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
                                     {
-                                        Console.AddLine($"{kc} already bound to {method}, press again to confirm");
+                                        DebugMod.LogConsole($"{kc} already bound to {method}, press again to confirm");
                                         KeyBindPanel.keyWarning = kc;
                                     }
                                 }
@@ -204,7 +204,7 @@ public class GUIController : MonoBehaviour
                             {
                                 DebugMod.settings.binds.Remove(bindName);
                                 i--;
-                                DebugMod.instance.LogWarn($"The key {Enum.GetName(typeof(KeyCode),kc)} has been unbound from {bindName}");
+                                DebugMod.LogWarn($"The key {Enum.GetName(typeof(KeyCode),kc)} has been unbound from {bindName}");
                             }
                             else if (kc != KeyCode.Escape)
                             {
@@ -236,7 +236,7 @@ public class GUIController : MonoBehaviour
                     }
                     catch (Exception e)
                     {
-                        DebugMod.instance.LogError("Error running keybind method " + bindName + ":\n" +
+                        DebugMod.LogError("Error running keybind method " + bindName + ":\n" +
                                                    e.ToString());
                     }
                     
@@ -352,12 +352,12 @@ public class GUIController : MonoBehaviour
         if (PlayerData.instance.hazardRespawnLocation != hazardLocation)
         {
             hazardLocation = PlayerData.instance.hazardRespawnLocation;
-            Console.AddLine("Hazard Respawn location updated: " + hazardLocation.ToString());
+            DebugMod.LogConsole("Hazard Respawn location updated: " + hazardLocation.ToString());
         }
         if (!string.IsNullOrEmpty(respawnSceneWatch) && respawnSceneWatch != PlayerData.instance.respawnScene)
         {
             respawnSceneWatch = PlayerData.instance.respawnScene;
-            Console.AddLine(string.Concat(new string[]
+            DebugMod.LogConsole(string.Concat(new string[]
             {
                 "Save Respawn updated, new scene: ",
                 PlayerData.instance.respawnScene.ToString(),

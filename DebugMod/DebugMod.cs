@@ -7,6 +7,7 @@ using System.Reflection;
 using BepInEx;
 using DebugMod.Helpers;
 using DebugMod.SaveStates;
+using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -148,7 +149,7 @@ public partial class DebugMod : BaseUnityPlugin
             GUIController.Instance.BuildMenus();
             SceneWatcher.Init();
 
-            Console.AddLine("New session started " + DateTime.Now);
+            LogConsole("New session started " + DateTime.Now);
         };
 
         KeyBindLock = false;
@@ -208,7 +209,7 @@ public partial class DebugMod : BaseUnityPlugin
         if (stateOnDeath && (PlayerData.instance.health - damage <= 0))
         {
             saveStateManager.LoadSaveState(SaveStateType.Memory);
-            Console.AddLine("Lethal damage prevented, savestate loading");
+            LogConsole("Lethal damage prevented, savestate loading");
             return 0;
         }
         return damage;
@@ -233,7 +234,7 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void LoadCharacter(SaveGameData saveGameData)
     {
-        Console.Reset();
+        ConsolePanel.Reset();
 
         playerInvincible = false;
         infiniteHP = false;
@@ -257,14 +258,14 @@ public partial class DebugMod : BaseUnityPlugin
             TimeSpan timeSpan = TimeSpan.FromSeconds(PlayerData.instance.playTime);
             string text = string.Format("{0:00}.{1:00}", Math.Floor(timeSpan.TotalHours), timeSpan.Minutes);
             int profileID = PlayerData.instance.profileID;
-            Console.AddLine("New savegame loaded. Profile playtime " + text + " Completion: " + PlayerData.instance.completionPercentage + " Save slot: " + profileID + " Game Version: " + PlayerData.instance.version);
+            LogConsole("New savegame loaded. Profile playtime " + text + " Completion: " + PlayerData.instance.completionPercentage + " Save slot: " + profileID + " Game Version: " + PlayerData.instance.version);
             _loadingChar = false;
         }
 
         if (GM && GM.IsGameplayScene())
         {
             _loadTime = Time.realtimeSinceStartup;
-            Console.AddLine("New scene loaded: " + sceneName);
+            LogConsole("New scene loaded: " + sceneName);
             PlayerDeathWatcher.Reset();
             BossHandler.LookForBoss(sceneName);
             VisualMaskHelper.OnSceneChange(sceneTo);
@@ -282,7 +283,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
         if (GM == null)
         {
-            instance.LogWarn("GameManager reference is null in GetSceneName");
+           LogWarn("GameManager reference is null in GetSceneName");
             return "";
         }
 
@@ -386,7 +387,7 @@ public partial class DebugMod : BaseUnityPlugin
         {
             if (method.GetCustomAttribute<BindableMethod>(false) is BindableMethod attr)
             {
-                instance.Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
+                Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
                 bindActions.Add(attr.name, new BindAction(attr, method));
             } 
         }
@@ -407,27 +408,32 @@ public partial class DebugMod : BaseUnityPlugin
     [PublicAPI]
     public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
     {
-        instance.Log($"Received Action: {name}");
+        Log($"Received Action: {name}");
         bindActions.Add(name, new BindAction(name, category, allowLock, method));
     }
 
-    public void LogDebug(string message)
+    public static void LogDebug(string message)
     {
-        Logger.LogDebug(message);
+        instance.Logger.LogDebug(message);
     }
 
-    public void Log(string message)
+    public static void Log(string message)
     {
-        Logger.LogInfo(message);
+        instance.Logger.LogInfo(message);
     }
 
-    public void LogWarn(string message)
+    public static void LogWarn(string message)
     {
-        Logger.LogWarning(message);
+        instance.Logger.LogWarning(message);
     }
 
-    public void LogError(string message)
+    public static void LogError(string message)
     {
-        Logger.LogError(message);
+        instance.Logger.LogError(message);
+    }
+
+    public static void LogConsole(string message)
+    {
+        ConsolePanel.AddLine(message);
     }
 }

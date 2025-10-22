@@ -178,7 +178,7 @@ public static class KeyBindPanel
         }
         else
         {
-            DebugMod.instance.LogError("Error running bind: not found");
+            DebugMod.LogError("Error running bind: not found");
         }
     }
 
@@ -241,7 +241,7 @@ public static class KeyBindPanel
     {
         if (index < 0 || index >= CategoryInfo.FunctionsOnCurrentPage().Count)
         {
-            DebugMod.instance.LogWarn("Invalid bind change button clicked. Should not be possible");
+            DebugMod.LogWarn("Invalid bind change button clicked. Should not be possible");
             return;
         }
 

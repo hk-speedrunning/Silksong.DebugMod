@@ -14,11 +14,11 @@ public static partial class BindableFunctions
             HeroController.instance.AddToMaxHealth(1);
             HudHelper.RefreshMasks();
 
-            Console.AddLine("Added Mask");
+            DebugMod.LogConsole("Added Mask");
         }
         else
         {
-            Console.AddLine("You have the maximum number of masks");
+            DebugMod.LogConsole("You have the maximum number of masks");
         }
     }
     
@@ -30,11 +30,11 @@ public static partial class BindableFunctions
             HeroController.instance.AddToMaxSilk(1);
             HudHelper.RefreshSpool();
 
-            Console.AddLine("Added Spool");
+            DebugMod.LogConsole("Added Spool");
         }
         else
         {
-            Console.AddLine("You have the maximum number of spools");
+            DebugMod.LogConsole("You have the maximum number of spools");
         }
 
         PlayerData.instance.IsSilkSpoolBroken = false;
@@ -51,11 +51,11 @@ public static partial class BindableFunctions
             PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
             HudHelper.RefreshMasks();
 
-            Console.AddLine("Took Away Mask");
+            DebugMod.LogConsole("Took Away Mask");
         }
         else
         {
-            Console.AddLine("You have the minimum number of masks");
+            DebugMod.LogConsole("You have the minimum number of masks");
         }
     }
 
@@ -68,11 +68,11 @@ public static partial class BindableFunctions
             PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
             HudHelper.RefreshSpool();
 
-            Console.AddLine("Removed Spool");
+            DebugMod.LogConsole("Removed Spool");
         }
         else
         {
-            Console.AddLine("You have the minimum number of spools");
+            DebugMod.LogConsole("You have the minimum number of spools");
         }
     }
 
@@ -80,19 +80,19 @@ public static partial class BindableFunctions
     {
         if (health <= 0)
         {
-            Console.AddLine("Cannot add/take health: health is too low");
+            DebugMod.LogConsole("Cannot add/take health: health is too low");
             return false;
         }
 
         if (HeroController.instance.cState.dead)
         {
-            Console.AddLine("Cannot add/take health: player is dead");
+            DebugMod.LogConsole("Cannot add/take health: player is dead");
             return false;
         }
 
         if (!GameManager.instance.IsGameplayScene())
         {
-            Console.AddLine("Cannot add/take health: not a gameplay scene");
+            DebugMod.LogConsole("Cannot add/take health: not a gameplay scene");
             return false;
         }
 
@@ -107,7 +107,7 @@ public static partial class BindableFunctions
             HeroController.instance.AddHealth(1);
             HudHelper.RefreshMasks();
 
-            Console.AddLine("Added Health");
+            DebugMod.LogConsole("Added Health");
         }
     }
 
@@ -119,7 +119,7 @@ public static partial class BindableFunctions
             HeroController.instance.TakeHealth(1);
             HudHelper.RefreshMasks();
 
-            Console.AddLine("Took health");
+            DebugMod.LogConsole("Took health");
         }
     }
     
@@ -128,7 +128,7 @@ public static partial class BindableFunctions
     {
         HeroController.instance.AddSilk(1, true);
 
-        Console.AddLine("Added Silk");
+        DebugMod.LogConsole("Added Silk");
     }
 
     [BindableMethod(name = "Take Silk", category = "Masks & Spools")]
@@ -136,7 +136,7 @@ public static partial class BindableFunctions
     {
         HeroController.instance.TakeSilk(1);
 
-        Console.AddLine("Attempting to take silk");
+        DebugMod.LogConsole("Attempting to take silk");
     }
 
     [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
@@ -144,6 +144,6 @@ public static partial class BindableFunctions
     {
         EventRegister.SendEvent("ADD BLUE HEALTH");
 
-        Console.AddLine("Attempting to add lifeblood");
+        DebugMod.LogConsole("Attempting to add lifeblood");
     }
 }

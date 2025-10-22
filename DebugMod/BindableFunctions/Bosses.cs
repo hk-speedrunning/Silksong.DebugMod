@@ -14,7 +14,7 @@ public static partial class BindableFunctions
     {
         PlayerData.instance.falseKnightDreamDefeated = !PlayerData.instance.falseKnightDreamDefeated;
 
-        Console.AddLine("Set Failed Champion killed: " + PlayerData.instance.falseKnightDreamDefeated);
+        DebugMod.LogConsole("Set Failed Champion killed: " + PlayerData.instance.falseKnightDreamDefeated);
     }
 
     [BindableMethod(name = "Respawn Soul Tyrant", category = "Bosses")]
@@ -22,7 +22,7 @@ public static partial class BindableFunctions
     {
         PlayerData.instance.mageLordDreamDefeated = !PlayerData.instance.mageLordDreamDefeated;
 
-        Console.AddLine("Set Soul Tyrant killed: " + PlayerData.instance.mageLordDreamDefeated);
+        DebugMod.LogConsole("Set Soul Tyrant killed: " + PlayerData.instance.mageLordDreamDefeated);
     }
 
     [BindableMethod(name = "Respawn Lost Kin", category = "Bosses")]
@@ -30,7 +30,7 @@ public static partial class BindableFunctions
     {
         PlayerData.instance.infectedKnightDreamDefeated = !PlayerData.instance.infectedKnightDreamDefeated;
 
-        Console.AddLine("Set Lost Kin killed: " + PlayerData.instance.infectedKnightDreamDefeated);
+        DebugMod.LogConsole("Set Lost Kin killed: " + PlayerData.instance.infectedKnightDreamDefeated);
     }
 
     [BindableMethod(name = "Respawn NK Grimm", category = "Bosses")]
@@ -54,7 +54,7 @@ public static partial class BindableFunctions
             PlayerData.instance.SetBoolInternal("killedNightmareGrimm", true);
         }
 
-        Console.AddLine("Set Nightmare King Grimm killed: " + PlayerData.instance.GetBoolInternal("killedNightmareGrimm"));
+        DebugMod.LogConsole("Set Nightmare King Grimm killed: " + PlayerData.instance.GetBoolInternal("killedNightmareGrimm"));
     }
     */
 }

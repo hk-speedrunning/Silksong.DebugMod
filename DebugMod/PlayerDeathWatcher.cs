@@ -22,7 +22,7 @@ public static class PlayerDeathWatcher
 
     public static void LogDeathDetails()
     {
-        Console.AddLine(string.Concat(new string[]
+        DebugMod.LogConsole(string.Concat(new string[]
         {
             "Hero death detected. Game playtime: ",
             PlayerData.instance.playTime.ToString(),

@@ -20,11 +20,11 @@ public static class VisualMaskHelper
         if (MasksDisabled)
         {
             DeactivateVisualMasks(Object.FindObjectsOfType<GameObject>());
-            Console.AddLine("Disabled all visual masks");
+            DebugMod.LogConsole("Disabled all visual masks");
         }
         else
         {
-            Console.AddLine("No longer disabling all visual masks; reload the room to see changes");
+            DebugMod.LogConsole("No longer disabling all visual masks; reload the room to see changes");
             // Cannot reactivate most visual masks because it's impractical to find all that should be active;
             // Need to manually reenable the vignette, but do not do so immediately for consistency
             ReEnableVignette = true;
@@ -37,15 +37,15 @@ public static class VisualMaskHelper
         if (VignetteDisabled)
         {
             DisableVignette(false);
-            Console.AddLine("Disabled vignette");
+            DebugMod.LogConsole("Disabled vignette");
         }
         else
         {
-            Console.AddLine("Enabled vignette");
+            DebugMod.LogConsole("Enabled vignette");
             DebugMod.HC.vignette.enabled = true;
             if (MasksDisabled)
             {
-                Console.AddLine("All visual masks were disabled; re-enabling");
+                DebugMod.LogConsole("All visual masks were disabled; re-enabling");
                 MasksDisabled = false;
             }
         }
@@ -70,7 +70,7 @@ public static class VisualMaskHelper
             // Should not wait before reactivating these
             foreach (Renderer r in DebugMod.HC.vignette.GetComponentsInChildren<Renderer>())
             {
-                Console.AddLine(r.name);
+                DebugMod.LogConsole(r.name);
                 r.enabled = true;
             }
         }
@@ -152,7 +152,7 @@ public static class VisualMaskHelper
                 disableMask(go);
         }
 
-        Console.AddLine($"Deactivated {ctr} masks" + (HeroController.instance.vignette.enabled ? " and toggling vignette off" : string.Empty));
+        DebugMod.LogConsole($"Deactivated {ctr} masks" + (HeroController.instance.vignette.enabled ? " and toggling vignette off" : string.Empty));
 
         // The vignette counts as a visual mask :)
         DisableVignette(true);
@@ -176,7 +176,7 @@ public static class VisualMaskHelper
         // Not suitable for toggle vignette because not easily reversible
         foreach (Renderer r in DebugMod.HC.vignette.GetComponentsInChildren<Renderer>())
         {
-            Console.AddLine(r.name);
+            DebugMod.LogConsole(r.name);
             r.enabled = false;
         }
     }

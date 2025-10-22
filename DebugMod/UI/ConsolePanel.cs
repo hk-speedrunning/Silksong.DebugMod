@@ -4,9 +4,9 @@ using System.IO;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 
-namespace DebugMod;
+namespace DebugMod.UI;
 
-public static class Console
+public static class ConsolePanel
 {
     private static CanvasPanel panel;
     private static List<string> history = new List<string>();
@@ -15,7 +15,7 @@ public static class Console
     public static void BuildMenu(GameObject canvas)
     {
         panel = new CanvasPanel(
-            nameof(Console),
+            nameof(ConsolePanel),
             null,
             new Vector2(1275, 800),
             Vector2.zero,
@@ -104,7 +104,7 @@ public static class Console
         }
         catch (Exception arg)
         {
-            DebugMod.instance.LogError("[CONSOLE] Unable to write console history: " + arg);
+            DebugMod.LogError("[CONSOLE] Unable to write console history: " + arg);
             AddLine("Unable to write console history");
         }
     }

@@ -16,17 +16,17 @@ public static partial class BindableFunctions
         {
             PlayerData.instance.nailUpgrades = 0;
             DebugMod.extraNailDamage = 0;
-            Console.AddLine("Resetting needle damage to 5");
+            DebugMod.LogConsole("Resetting needle damage to 5");
         }
         else if (PlayerData.instance.nailUpgrades == 4 || DebugMod.extraNailDamage < 0)
         {
             DebugMod.extraNailDamage += 4;
-            Console.AddLine("Adding 4 extra needle damage");
+            DebugMod.LogConsole("Adding 4 extra needle damage");
         }
         else
         {
             PlayerData.instance.nailUpgrades++;
-            Console.AddLine("Adding needle upgrade");
+            DebugMod.LogConsole("Adding needle upgrade");
         }
 
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
@@ -41,17 +41,17 @@ public static partial class BindableFunctions
             if (DebugMod.extraNailDamage < -5)
             {
                 DebugMod.extraNailDamage = -5;
-                Console.AddLine("Setting needle damage to 0");
+                DebugMod.LogConsole("Setting needle damage to 0");
             }
             else
             {
-                Console.AddLine("Reducing nail damage by 4");
+                DebugMod.LogConsole("Reducing nail damage by 4");
             }
         }
         else
         {
             PlayerData.instance.nailUpgrades--;
-            Console.AddLine("Removing needle upgrade");
+            DebugMod.LogConsole("Removing needle upgrade");
         }
 
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
@@ -64,7 +64,7 @@ public static partial class BindableFunctions
         //non-zero value, the game continues to play even tho the pause menu is up which is scuffed so this makes it less skuffed
         if (DebugMod.GM.IsGamePaused())
         {
-            Console.AddLine("Cannot change timescale when paused");
+            DebugMod.LogConsole("Cannot change timescale when paused");
             return;
         }
         float oldScale = Time.timeScale;
@@ -87,7 +87,7 @@ public static partial class BindableFunctions
 
                 break;
         }
-        Console.AddLine("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
+        DebugMod.LogConsole("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
 
     }
 
@@ -96,7 +96,7 @@ public static partial class BindableFunctions
     {
         if (DebugMod.GM.IsGamePaused())
         {
-            Console.AddLine("Cannot change timescale when paused");
+            DebugMod.LogConsole("Cannot change timescale when paused");
             return;
         }
         float oldScale = Time.timeScale;
@@ -119,7 +119,7 @@ public static partial class BindableFunctions
 
                 break;
         }
-        Console.AddLine("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
+        DebugMod.LogConsole("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
     }
 
     [BindableMethod(name = "Freeze Game", category = "Gameplay Altering")]
@@ -132,7 +132,7 @@ public static partial class BindableFunctions
             Time.timeScale = 0;
             GameCameras.instance.StopCameraShake();
             SetAlwaysShowCursor();
-            Console.AddLine("Game was Frozen");
+            DebugMod.LogConsole("Game was Frozen");
         }
         else
         {
@@ -149,7 +149,7 @@ public static partial class BindableFunctions
                 UnsetAlwaysShowCursor();
             }
             
-            Console.AddLine("Game was Unfrozen");
+            DebugMod.LogConsole("Game was Unfrozen");
         }
     }
 

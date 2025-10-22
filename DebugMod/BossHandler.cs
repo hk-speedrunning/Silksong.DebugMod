@@ -20,13 +20,13 @@ public static class BossHandler
         ghostFound = false;
         if (bossData != null && bossData.ContainsKey(sceneName))
         {
-            Console.AddLine("Found stored Boss in this scene, respawn available");
+            DebugMod.LogConsole("Found stored Boss in this scene, respawn available");
             bossFound = true;
         }
 
         if (ghostData != null && ghostData.ContainsKey(sceneName))
         {
-            Console.AddLine("Found stored Ghost Boss in this scene, respawn available");
+            DebugMod.LogConsole("Found stored Ghost Boss in this scene, respawn available");
             ghostFound = true;
         }
     }
@@ -82,8 +82,8 @@ public static class BossHandler
 
                 if (bossLoader != null)
                 {
-                    Console.AddLine(bossLoader.ToString());
-                    Console.AddLine(bossLoader.sceneNameToLoad);
+                    DebugMod.LogConsole(bossLoader.ToString());
+                    DebugMod.LogConsole(bossLoader.sceneNameToLoad);
                 }
 
                 IEnumerator ResetBoss(string scene)
@@ -112,13 +112,13 @@ public static class BossHandler
                             if (playMakerFSM.FsmVariables.GetFsmBool("Activated") != null)
                             {
                                 playMakerFSM.FsmVariables.GetFsmBool("Activated").Value = false;
-                                Console.AddLine("Boss control for this scene was reset, re-enter scene or warp");
+                                DebugMod.LogConsole("Boss control for this scene was reset, re-enter scene or warp");
                             }
                         }
                     }
                     else
                     {
-                        Console.AddLine("GO does not exist or no FSM on it");
+                        DebugMod.LogConsole("GO does not exist or no FSM on it");
                     }
                 }
 
@@ -130,12 +130,12 @@ public static class BossHandler
                 PlayerData.instance.GetType().GetField(bossData[DebugMod.GetSceneName()].Value)
                     .SetValue(PlayerData.instance, false);
 
-                Console.AddLine("Boss control for this scene was reset, re-enter scene or warp");
+                DebugMod.LogConsole("Boss control for this scene was reset, re-enter scene or warp");
             }
         }
         else
         {
-            Console.AddLine("No boss in this scene to respawn");
+            DebugMod.LogConsole("No boss in this scene to respawn");
         }
     }
 }
