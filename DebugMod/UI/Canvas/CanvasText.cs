@@ -3,9 +3,9 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public sealed class CanvasText : CanvasElement
+public class CanvasText : CanvasObject
 {
-    public CanvasText(string name, CanvasElement parent, Vector2 position, Vector2 size, string text, Font font,
+    public CanvasText(string name, CanvasNode parent, Vector2 position, Vector2 size, string text, Font font,
         int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
         : base(name, parent, position, size)
     {

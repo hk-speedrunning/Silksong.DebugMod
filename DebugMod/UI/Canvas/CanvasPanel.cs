@@ -4,23 +4,23 @@ using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
-public sealed class CanvasPanel : CanvasElement
+public class CanvasPanel : CanvasNode
 {
     private readonly Dictionary<string, CanvasButton> buttons = new();
     private readonly Dictionary<string, CanvasPanel> panels = new();
     private readonly Dictionary<string, CanvasImage> images = new();
     private readonly Dictionary<string, CanvasText> texts = new();
 
-    public CanvasPanel(string name, CanvasElement parent, Vector2 position, Vector2 size)
+    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
         : base(name, parent, position, size) {}
 
-    public CanvasPanel(string name, CanvasElement parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
+    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
         : this(name, parent, position, size)
     {
-        AddImage("Background", tex, Vector2.zero, subSprite);
+        AddImage("Background", tex, Vector2.zero, size, subSprite);
     }
 
-    protected override IEnumerable<CanvasElement> ChildList()
+    protected override IEnumerable<CanvasNode> ChildList()
     {
         foreach (CanvasButton button in buttons.Values)
         {
@@ -45,9 +45,19 @@ public sealed class CanvasPanel : CanvasElement
 
     public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
     {
+        sz = Size + sz;
+        if (sz.x == 0 || sz.y == 0)
+        {
+            sz = new Vector2(subSprite.width, subSprite.height);
+        }
+
         CanvasButton button = new CanvasButton(name, this, pos, sz, func);
         button.SetImage(tex, subSprite);
-        button.SetText(text, font, fontSize, alignment: TextAnchor.MiddleCenter);
+
+        if (text != null && font != null)
+        {
+            button.SetText(text, font, fontSize, alignment: TextAnchor.MiddleCenter);
+        }
 
         buttons.Add(name, button);
     }
@@ -60,9 +70,14 @@ public sealed class CanvasPanel : CanvasElement
         return panel;
     }
 
-    public void AddImage(string name, Texture2D tex, Vector2 pos, Rect subSprite)
+    public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
     {
-        CanvasImage image = new CanvasImage(name, this, pos, tex, subSprite);
+        if (sz.x == 0 || sz.y == 0)
+        {
+            sz = new Vector2(subSprite.width, subSprite.height);
+        }
+
+        CanvasImage image = new CanvasImage(name, this, pos, sz, tex, subSprite);
         images.Add(name, image);
     }
 

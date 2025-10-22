@@ -5,18 +5,18 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public sealed class CanvasButton : CanvasElement
+public class CanvasButton : CanvasObject
 {
     private CanvasImage image;
     private CanvasText text;
 
-    public CanvasButton(string name, CanvasElement parent, Vector2 position, Vector2 size, Action clicked)
+    public CanvasButton(string name, CanvasNode parent, Vector2 position, Vector2 size, Action clicked)
         : base(name, parent, position, size)
     {
         obj.AddComponent<Button>().onClick.AddListener(() => clicked());
     }
 
-    protected override IEnumerable<CanvasElement> ChildList()
+    protected override IEnumerable<CanvasNode> ChildList()
     {
         if (image != null) yield return image;
         if (text != null) yield return text;
@@ -24,7 +24,8 @@ public sealed class CanvasButton : CanvasElement
 
     public void SetImage(Texture2D tex, Rect subSprite)
     {
-        image = new CanvasImage("ButtonImage", this, Vector2.zero, tex, subSprite);
+        image = new CanvasImage("ButtonImage", this, Vector2.zero, Size, tex, subSprite);
+        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
     }
 
     public void SetText(string t, Font font, int fontSize = 13,
