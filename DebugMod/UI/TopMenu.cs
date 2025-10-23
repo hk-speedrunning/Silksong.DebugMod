@@ -17,7 +17,7 @@ public static class TopMenu
         panel = new CanvasPanel(
             nameof(TopMenu),
             null,
-            new Vector2(1070f , 25f),
+            new Vector2(1070f, 25f),
             Vector2.zero,
             GUIController.Instance.images["ButtonsMenuBG"],
             new Rect(0f, 0f, GUIController.Instance.images["ButtonsMenuBG"].width, GUIController.Instance.images["ButtonsMenuBG"].height)

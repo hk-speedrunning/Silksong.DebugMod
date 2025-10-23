@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,7 +9,7 @@ public class Settings
 {
     //Save members
     [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
-    public Dictionary<string, KeyCode> binds = new Dictionary<string, KeyCode>();
+    public Dictionary<string, KeyCode> binds = new();
 
     public bool ConsoleVisible = true;
 
@@ -20,8 +19,6 @@ public class Settings
 
     public bool InfoPanelVisible = true;
 
-    [Obsolete]
-    public bool MinInfoPanelVisible = true;
     public string CurrentInfoPanelName = "";
 
     public bool SaveStatePanelVisible = true;
@@ -38,8 +35,6 @@ public class Settings
 
     public int MaxSavePages = 10;
 
-    public float AmountToMove = 0.1f;
-
     public float NoClipSpeedModifier = 1f;
 
     public bool ShowCursorWhileUnpaused = false;
@@ -48,8 +43,6 @@ public class Settings
 
     //TODO Get rid of this variable and implement an actual clear method
     public bool ClearSaveStatePanel = false;
-
-    public float PanthLoadDelay = 0.05f;
 
     public bool LogUnityExceptions = true;
 }

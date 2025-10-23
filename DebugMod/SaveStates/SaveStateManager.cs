@@ -46,8 +46,6 @@ internal class SaveStateManager
     private static Dictionary<int, SaveState> saveStateFiles = new Dictionary<int, SaveState>();
 
     //private static bool autoSlot;
-    private DateTime timeoutHelper;
-    private double timeoutAmount = 30;
 
     //public static bool preserveThroughStates = false;
 
@@ -182,7 +180,6 @@ internal class SaveStateManager
         }
         
         yield return null;
-        timeoutHelper = DateTime.Now.AddSeconds(timeoutAmount);
         //TODO: get rid of this variable and have an actual clear panel function
         DebugMod.settings.ClearSaveStatePanel = false;
         DebugMod.settings.SaveStatePanelVisible = inSelectSlotState = true;
@@ -206,7 +203,6 @@ internal class SaveStateManager
         {
             if (GUIController.didInput) DebugMod.LogConsole("Savestate action cancelled");
             else if (DebugMod.settings.ClearSaveStatePanel) DebugMod.settings.ClearSaveStatePanel = false;
-            else DebugMod.LogConsole("Timeout (" + timeoutAmount.ToString() + ")s was reached");
         }
         
         currentStateOperation = null;
@@ -275,10 +271,6 @@ internal class SaveStateManager
     private bool DidInput()
     {
         if (GUIController.didInput)
-        {
-            return true;
-        }
-        else if (timeoutHelper < DateTime.Now)
         {
             return true;
         }
