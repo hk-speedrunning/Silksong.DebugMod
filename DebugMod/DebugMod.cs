@@ -82,17 +82,19 @@ public partial class DebugMod : BaseUnityPlugin
     
     public void Awake()
     {
-        float startTime = Time.realtimeSinceStartup;
+        LoadSettings();
 
-        // Add Unity errors to main log
-        Application.logMessageReceived += (condition, stackTrace, type) =>
+        if (settings.LogUnityExceptions)
         {
-            if (type is LogType.Error or LogType.Exception && condition.Contains("Exception"))
+            Application.logMessageReceived += (condition, stackTrace, type) =>
             {
-                string message = $"[UNITY] {condition}\n{stackTrace}";
-                LogError(message.Trim());
-            }
-        };
+                if (type is LogType.Error or LogType.Exception && condition.Contains("Exception"))
+                {
+                    string message = $"[UNITY] {condition}\n{stackTrace}";
+                    LogError(message.Trim());
+                }
+            };
+        }
         
         bindActions.Clear();
         foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
@@ -105,8 +107,6 @@ public partial class DebugMod : BaseUnityPlugin
                 bindActions.Add(attr.name, new BindAction(attr, method));
             }
         }
-
-        LoadSettings();
 
         if (settings.FirstRun || settings.binds == null)
         {

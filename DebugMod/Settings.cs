@@ -50,4 +50,6 @@ public class Settings
     public bool ClearSaveStatePanel = false;
 
     public float PanthLoadDelay = 0.05f;
+
+    public bool LogUnityExceptions = true;
 }
