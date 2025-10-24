@@ -28,11 +28,16 @@ public static class SaveStatesPanel
         statePanel.AddText("Mode", "mode: ", new Vector2(8, 20), Vector2.zero, GUIController.Instance.arial, 15);
         statePanel.AddText("currentmode", "-", new Vector2(60, 20), Vector2.zero, GUIController.Instance.arial, 15);
 
-        for (int i = 0; i < SaveStateManager.maxSaveStates; i++) { 
+        for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
+        {
+            int index = i; // lambda capturing reasons
+
+            statePanel.AddButton($"Rename{i}", GUIController.Instance.images["ButtonRun"], new Vector2(-5, i * 20 + 42), new Vector2(12, 12),
+                () => SaveStateManager.RenameSaveState(index), new Rect(0, 0, GUIController.Instance.images["ButtonRun"].width, GUIController.Instance.images["ButtonRun"].height));
 
             //Labels - these shouldn't be modified
             statePanel.AddText($"Slot{i}", i.ToString(), new Vector2(10, i * 20 + 40), Vector2.zero, GUIController.Instance.arial, 15);
-            
+
             //Values
             statePanel.AddText(i.ToString(), "", new Vector2(50, i * 20 + 40), Vector2.zero, GUIController.Instance.arial, 15);
         }
@@ -57,20 +62,22 @@ public static class SaveStatesPanel
         {
             statePanel.GetText("currentmode").UpdateText(SaveStateManager.currentStateOperation);
             statePanel.GetText("CurrentFolder").UpdateText($"Page: {SaveStateManager.currentStateFolder+1}/{SaveStateManager.savePages}");
+
+            Dictionary<int, string[]> info = SaveStateManager.GetSaveStatesInfo();
+
             for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
             {
-                statePanel.GetText(i.ToString()).UpdateText("open");
-            }
-
-            foreach (KeyValuePair<int, string[]> entry in SaveStateManager.GetSaveStatesInfo())
-            {
-                statePanel.GetText(entry.Key.ToString()).UpdateText(string.Format("{0} - {1}", entry.Value[0], entry.Value[1]));
+                if (info.TryGetValue(i, out string[] array))
+                {
+                    statePanel.GetText(i.ToString()).UpdateText($"{array[0]} - {array[1]}");
+                    statePanel.GetButton($"Rename{i}").ActiveSelf = true;
+                }
+                else
+                {
+                    statePanel.GetText(i.ToString()).UpdateText("open");
+                    statePanel.GetButton($"Rename{i}").ActiveSelf = false;
+                }
             }
         }
-    }
-
-    private static string GetStringForBool(bool b)
-    {
-        return b ? "✓" : "X";
     }
 }

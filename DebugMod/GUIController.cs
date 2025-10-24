@@ -21,6 +21,8 @@ public class GUIController : MonoBehaviour
     public string respawnSceneWatch;
     public static bool didInput, inputEsc;
     private static readonly HitboxViewer hitboxes = new();
+    private string textBoxText;
+    private Action<string> textBoxCallback;
 
     public GameObject canvas;
     private static GUIController _instance;
@@ -376,6 +378,33 @@ public class GUIController : MonoBehaviour
             else if (HitboxViewer.State != 0 && DebugMod.settings.ShowHitBoxes == 0)
             {
                 hitboxes.Unload();
+            }
+        }
+    }
+
+    public void TextBox(string text, Action<string> callback)
+    {
+        textBoxText = text;
+        textBoxCallback = callback;
+    }
+
+    public void OnGUI()
+    {
+        if (textBoxCallback != null)
+        {
+            textBoxText = GUI.TextField(new Rect(860, 550, 200, 20), textBoxText);
+
+            if (GUI.Button(new Rect(860, 570, 100, 20), "Rename"))
+            {
+                textBoxCallback(textBoxText);
+
+                textBoxText = null;
+                textBoxCallback = null;
+            }
+            else if (GUI.Button(new Rect(960, 570, 100, 20), "Cancel"))
+            {
+                textBoxText = null;
+                textBoxCallback = null;
             }
         }
     }

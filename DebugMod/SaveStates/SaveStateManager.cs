@@ -367,6 +367,21 @@ internal class SaveStateManager
         }
     }
 
+    public static void RenameSaveState(int index)
+    {
+        GUIController.Instance.TextBox(saveStateFiles[index].data.saveStateIdentifier, name =>
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                saveStateFiles[index].data.saveStateIdentifier = name;
+                saveStateFiles[index].SaveStateToFile(index);
+            }
+            else
+            {
+                DebugMod.LogConsole("Invalid name for savestate");
+            }
+        });
+    }
 
     #endregion
 }
