@@ -91,16 +91,19 @@ public static class EnemiesPanel
         {
             panel.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
 
-            if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING &&
-                (panel.GetPanel("Pause").ActiveInHierarchy || !panel.GetPanel("Play").ActiveInHierarchy))
+            if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)
             {
                 panel.GetPanel("Pause").ActiveSelf = false;
                 panel.GetPanel("Play").ActiveSelf = true;
             }
-            else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED &&
-                     (!panel.GetPanel("Pause").ActiveInHierarchy || panel.GetPanel("Play").ActiveInHierarchy))
+            else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED)
             {
                 panel.GetPanel("Pause").ActiveSelf = true;
+                panel.GetPanel("Play").ActiveSelf = false;
+            }
+            else
+            {
+                panel.GetPanel("Pause").ActiveSelf = false;
                 panel.GetPanel("Play").ActiveSelf = false;
             }
         }
