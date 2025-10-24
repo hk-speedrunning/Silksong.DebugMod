@@ -18,6 +18,7 @@ public class EnemyHandle : MonoBehaviour
     private BoxCollider2D collider;
     private CanvasPanel hpBar;
     private int lastHP = -1;
+    private int maxHP;
 
     public int HP
     {
@@ -25,7 +26,7 @@ public class EnemyHandle : MonoBehaviour
         set => hm.hp = value;
     }
 
-    public int MaxHP => hm.initHp;
+    public int MaxHP => maxHP;
 
     public void Awake()
     {
@@ -57,6 +58,11 @@ public class EnemyHandle : MonoBehaviour
                 hpBar.ActiveSelf = false;
             }
             return;
+        }
+
+        if (maxHP <= 0 && hm.hp > 0)
+        {
+            maxHP = hm.hp;
         }
 
         if (EnemiesPanel.hpBars)
