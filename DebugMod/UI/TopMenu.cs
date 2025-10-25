@@ -6,46 +6,41 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public static class TopMenu
+public class TopMenu : CanvasPanel
 {
-    private static CanvasPanel panel;
-
+    public static TopMenu Instance { get; private set; }
     private static readonly Color selectedColor = new(244f / 255f, 127f / 255f, 32f / 255f);
 
-    public static void BuildMenu(GameObject canvas)
+    public static void Build()
     {
-        panel = new CanvasPanel(
-            nameof(TopMenu),
-            null,
-            new Vector2(1070f, 25f),
-            Vector2.zero,
-            GUIController.Instance.images["ButtonsMenuBG"],
-            new Rect(0f, 0f, GUIController.Instance.images["ButtonsMenuBG"].width, GUIController.Instance.images["ButtonsMenuBG"].height)
-        );
+        Instance = new TopMenu();
+    }
 
+    public TopMenu() : base(nameof(TopMenu), null, new Vector2(1070f, 25f), Vector2.zero, GUIController.Instance.images["ButtonsMenuBG"])
+    {
         Rect buttonRect = new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height);
         
         //Main buttons
-        panel.AddButton("Hide Menu", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 28f), Vector2.zero, HideMenuClicked, buttonRect, GUIController.Instance.trajanBold, "Hide Menu");
-        panel.AddButton("Kill All", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 28f), Vector2.zero, BindableFunctions.KillAll, buttonRect, GUIController.Instance.trajanBold, "Kill All");
-        panel.AddButton("Set Spawn", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 28f), Vector2.zero, BindableFunctions.SetHazardRespawn, buttonRect, GUIController.Instance.trajanBold, "Set Spawn");
-        panel.AddButton("Respawn", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 28f), Vector2.zero, BindableFunctions.Respawn, buttonRect, GUIController.Instance.trajanBold, "Respawn");
-        panel.AddButton("Other", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 28f), Vector2.zero, () => panel.TogglePanel("Other Panel"), buttonRect, GUIController.Instance.trajanBold, "Other");
-        panel.AddButton("Cheats", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 68f), Vector2.zero, () => panel.TogglePanel("Cheats Panel"), buttonRect, GUIController.Instance.trajanBold, "Cheats");
-        panel.AddButton("Tools", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 68f), Vector2.zero, () => panel.TogglePanel("Tools Panel"), buttonRect, GUIController.Instance.trajanBold, "Tools");
-        panel.AddButton("Skills", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 68f), Vector2.zero, () => panel.TogglePanel("Skills Panel"), buttonRect, GUIController.Instance.trajanBold, "Skills");
-        panel.AddButton("Items", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 68f), Vector2.zero, () => panel.TogglePanel("Items Panel"), buttonRect, GUIController.Instance.trajanBold, "Items");
-        // panel.AddButton("Bosses", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, () => panel.TogglePanel("Bosses Panel"), buttonRect, GUIController.Instance.trajanBold, "Bosses");
-        panel.AddButton("SaveStates", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, () => panel.TogglePanel("SaveStates Panel"), buttonRect, GUIController.Instance.trajanBold, "SaveStates");
+        AddButton("Hide Menu", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 28f), Vector2.zero, HideMenuClicked, buttonRect, GUIController.Instance.trajanBold, "Hide Menu");
+        AddButton("Kill All", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 28f), Vector2.zero, BindableFunctions.KillAll, buttonRect, GUIController.Instance.trajanBold, "Kill All");
+        AddButton("Set Spawn", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 28f), Vector2.zero, BindableFunctions.SetHazardRespawn, buttonRect, GUIController.Instance.trajanBold, "Set Spawn");
+        AddButton("Respawn", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 28f), Vector2.zero, BindableFunctions.Respawn, buttonRect, GUIController.Instance.trajanBold, "Respawn");
+        AddButton("Other", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 28f), Vector2.zero, () => TogglePanel("Other Panel"), buttonRect, GUIController.Instance.trajanBold, "Other");
+        AddButton("Cheats", GUIController.Instance.images["ButtonRect"], new Vector2(46f, 68f), Vector2.zero, () => TogglePanel("Cheats Panel"), buttonRect, GUIController.Instance.trajanBold, "Cheats");
+        AddButton("Tools", GUIController.Instance.images["ButtonRect"], new Vector2(146f, 68f), Vector2.zero, () => TogglePanel("Tools Panel"), buttonRect, GUIController.Instance.trajanBold, "Tools");
+        AddButton("Skills", GUIController.Instance.images["ButtonRect"], new Vector2(246f, 68f), Vector2.zero, () => TogglePanel("Skills Panel"), buttonRect, GUIController.Instance.trajanBold, "Skills");
+        AddButton("Items", GUIController.Instance.images["ButtonRect"], new Vector2(346f, 68f), Vector2.zero, () => TogglePanel("Items Panel"), buttonRect, GUIController.Instance.trajanBold, "Items");
+        // AddButton("Bosses", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, () => TogglePanel("Bosses Panel"), buttonRect, GUIController.Instance.trajanBold, "Bosses");
+        AddButton("SaveStates", GUIController.Instance.images["ButtonRect"], new Vector2(446f, 68f), Vector2.zero, () => TogglePanel("SaveStates Panel"), buttonRect, GUIController.Instance.trajanBold, "SaveStates");
 
         //Dropdown panels
-        var cheatsPanel = panel.AddPanel("Cheats Panel", GUIController.Instance.images["DropdownBG"], new Vector2(45f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 240f), true);
-        var toolsPanel = panel.AddPanel("Tools Panel", GUIController.Instance.images["DropdownBG"], new Vector2(145f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 210f), true);
-        var skillsPanel = panel.AddPanel("Skills Panel", GUIController.Instance.images["DropdownBG"], new Vector2(245f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, GUIController.Instance.images["DropdownBG"].height), true);
-        var itemsPanel = panel.AddPanel("Items Panel", GUIController.Instance.images["DropdownBG"], new Vector2(345f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 180f), true);
-        // var bossesPanel = panel.AddPanel("Bosses Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 200f), true);
-        var otherPanel = panel.AddPanel("Other Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 120f), true);
-        var saveStatesPanel = panel.AddPanel("SaveStates Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 170f), true);
+        var cheatsPanel = AddPanel("Cheats Panel", GUIController.Instance.images["DropdownBG"], new Vector2(45f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 240f), true);
+        var toolsPanel = AddPanel("Tools Panel", GUIController.Instance.images["DropdownBG"], new Vector2(145f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 210f), true);
+        var skillsPanel = AddPanel("Skills Panel", GUIController.Instance.images["DropdownBG"], new Vector2(245f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, GUIController.Instance.images["DropdownBG"].height), true);
+        var itemsPanel = AddPanel("Items Panel", GUIController.Instance.images["DropdownBG"], new Vector2(345f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 180f), true);
+        // var bossesPanel = AddPanel("Bosses Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 200f), true);
+        var otherPanel = AddPanel("Other Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 120f), true);
+        var saveStatesPanel = AddPanel("SaveStates Panel", GUIController.Instance.images["DropdownBG"], new Vector2(445f, 75f), Vector2.zero, new Rect(0, 0, GUIController.Instance.images["DropdownBG"].width, 170f), true);
 
         //Cheats panel
         cheatsPanel.AddButton("Infinite HP", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.ToggleInfiniteHP, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Infinite HP", 10);
@@ -138,59 +133,48 @@ public static class TopMenu
         saveStatesPanel.AddButton("Scroll Right", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(20f, 115f), Vector2.zero, BindableFunctions.NextStatePage, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "Right", 8);
         saveStatesPanel.AddButton("Load State On Death", GUIController.Instance.images["ButtonRectEmpty"], new Vector2(5f, 145f), Vector2.zero, BindableFunctions.LoadStateOnDeath, new Rect(0f, 0f, 80f, 20f), GUIController.Instance.trajanNormal, "State On Death", 9);
 
-        panel.FixRenderOrder();
+        FixRenderOrder();
     }
 
-    public static void Update()
+    public override void Update()
     {
-        if (panel == null)
+        ActiveSelf = DebugMod.settings.TopMenuVisible;
+
+        if (GetPanel("Skills Panel").ActiveInHierarchy) RefreshSkillsMenu();
+
+        if (GetPanel("Items Panel").ActiveInHierarchy) RefreshItemsMenu();
+
+        if (GetPanel("Tools Panel").ActiveInHierarchy)
         {
-            return;
-        }
-
-        if (GUIController.ForceHideUI())
-        {
-            panel.ActiveSelf = false;
-            return;
-        }
-
-        panel.ActiveSelf = DebugMod.settings.TopMenuVisible;
-
-        if (panel.GetPanel("Skills Panel").ActiveInHierarchy) RefreshSkillsMenu();
-
-        if (panel.GetPanel("Items Panel").ActiveInHierarchy) RefreshItemsMenu();
-
-        if (panel.GetPanel("Tools Panel").ActiveInHierarchy)
-        {
-            panel.GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
-            panel.GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
-            panel.GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? selectedColor : Color.white);
+            GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
+            GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
+            GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? selectedColor : Color.white);
 
         }
 
-        if (panel.GetPanel("Cheats Panel").ActiveInHierarchy)
+        if (GetPanel("Cheats Panel").ActiveInHierarchy)
         {
-            panel.GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
-            panel.GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
-            panel.GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? selectedColor : Color.white);
-            panel.GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? selectedColor : Color.white);
-            panel.GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? selectedColor : Color.white);
-            panel.GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? selectedColor : Color.white);
+            GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
+            GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
+            GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? selectedColor : Color.white);
+            GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? selectedColor : Color.white);
+            GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? selectedColor : Color.white);
+            GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? selectedColor : Color.white);
 
         }
 
-        // if (panel.GetPanel("Bosses Panel").active)
+        // if (GetPanel("Bosses Panel").active)
         // {
-        //     panel.GetButton("Failed Champ", "Bosses Panel").SetTextColor(PlayerData.instance.falseKnightDreamDefeated ? selectedColor : Color.white);
-        //     panel.GetButton("Soul Tyrant", "Bosses Panel").SetTextColor(PlayerData.instance.mageLordDreamDefeated ? selectedColor : Color.white);
-        //     panel.GetButton("Lost Kin", "Bosses Panel").SetTextColor(PlayerData.instance.infectedKnightDreamDefeated ? selectedColor : Color.white);
-        //     panel.GetButton("NK Grimm", "Bosses Panel").SetTextColor((PlayerData.instance.GetBoolInternal("killedNightmareGrimm") || PlayerData.instance.GetBoolInternal("destroyedNightmareLantern")) ? selectedColor : Color.white);
+        //     GetButton("Failed Champ", "Bosses Panel").SetTextColor(PlayerData.instance.falseKnightDreamDefeated ? selectedColor : Color.white);
+        //     GetButton("Soul Tyrant", "Bosses Panel").SetTextColor(PlayerData.instance.mageLordDreamDefeated ? selectedColor : Color.white);
+        //     GetButton("Lost Kin", "Bosses Panel").SetTextColor(PlayerData.instance.infectedKnightDreamDefeated ? selectedColor : Color.white);
+        //     GetButton("NK Grimm", "Bosses Panel").SetTextColor((PlayerData.instance.GetBoolInternal("killedNightmareGrimm") || PlayerData.instance.GetBoolInternal("destroyedNightmareLantern")) ? selectedColor : Color.white);
         // }
         
         //TODO fix naming so this doesnt require it to be setup like this (currently page panel is savestate panel so CC thinks its throwing errors not sure)
-        if (panel.GetPanel("SaveStates Panel").ActiveInHierarchy)
+        if (GetPanel("SaveStates Panel").ActiveInHierarchy)
         {
-            CanvasPanel savepanel = panel.GetPanel("SaveStates Panel");
+            CanvasPanel savepanel = GetPanel("SaveStates Panel");
             savepanel.GetButton("Scroll Left").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
             savepanel.GetButton("Scroll Right").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
             savepanel.GetButton("File Save").SetTextColor(SaveStateManager.currentStateOperation == "Save new state to file" ? selectedColor : Color.white);
@@ -199,48 +183,48 @@ public static class TopMenu
         }
     }
 
-    private static void RefreshItemsMenu()
+    private void RefreshItemsMenu()
     {
-        // panel.GetImage("Lantern Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Tram Pass Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Map & Quill Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("City Crest Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Sly Key Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Elegant Key Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Love Key Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("King's Brand Glow", "Items Panel").SetActive(true);
-        // panel.GetImage("Bullshit Flower Glow", "Items Panel").SetActive(true);
+        // GetImage("Lantern Glow", "Items Panel").SetActive(true);
+        // GetImage("Tram Pass Glow", "Items Panel").SetActive(true);
+        // GetImage("Map & Quill Glow", "Items Panel").SetActive(true);
+        // GetImage("City Crest Glow", "Items Panel").SetActive(true);
+        // GetImage("Sly Key Glow", "Items Panel").SetActive(true);
+        // GetImage("Elegant Key Glow", "Items Panel").SetActive(true);
+        // GetImage("Love Key Glow", "Items Panel").SetActive(true);
+        // GetImage("King's Brand Glow", "Items Panel").SetActive(true);
+        // GetImage("Bullshit Flower Glow", "Items Panel").SetActive(true);
         //
-        // if (!PlayerData.instance.hasLantern) panel.GetImage("Lantern Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasTramPass) panel.GetImage("Tram Pass Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasQuill) panel.GetImage("Map & Quill Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasCityKey) panel.GetImage("City Crest Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasSlykey) panel.GetImage("Sly Key Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasWhiteKey) panel.GetImage("Elegant Key Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasLoveKey) panel.GetImage("Love Key Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasKingsBrand) panel.GetImage("King's Brand Glow", "Items Panel").SetActive(false);
-        // if (!PlayerData.instance.hasXunFlower || PlayerData.instance.xunFlowerBroken) panel.GetImage("Bullshit Flower Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasLantern) GetImage("Lantern Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasTramPass) GetImage("Tram Pass Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasQuill) GetImage("Map & Quill Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasCityKey) GetImage("City Crest Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasSlykey) GetImage("Sly Key Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasWhiteKey) GetImage("Elegant Key Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasLoveKey) GetImage("Love Key Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasKingsBrand) GetImage("King's Brand Glow", "Items Panel").SetActive(false);
+        // if (!PlayerData.instance.hasXunFlower || PlayerData.instance.xunFlowerBroken) GetImage("Bullshit Flower Glow", "Items Panel").SetActive(false);
     }
 
-    private static void RefreshSkillsMenu()
+    private void RefreshSkillsMenu()
     {
-        panel.GetButton("Silk Heart", "Skills Panel").UpdateText("Silk Hearts: " + PlayerData.instance.silkRegenMax);
+        GetButton("Silk Heart", "Skills Panel").UpdateText("Silk Hearts: " + PlayerData.instance.silkRegenMax);
 
-        panel.GetButton("Cloak", "Skills Panel").SetTextColor(PlayerData.instance.hasBrolly ? selectedColor : Color.white);
-        if (PlayerData.instance.hasDoubleJump) panel.GetButton("Cloak", "Skills Panel").UpdateText("Faydown");
-        else panel.GetButton("Cloak", "Skills Panel").UpdateText("Drifter's");
+        GetButton("Cloak", "Skills Panel").SetTextColor(PlayerData.instance.hasBrolly ? selectedColor : Color.white);
+        if (PlayerData.instance.hasDoubleJump) GetButton("Cloak", "Skills Panel").UpdateText("Faydown");
+        else GetButton("Cloak", "Skills Panel").UpdateText("Drifter's");
 
-        panel.GetButton("Swift Step", "Skills Panel").SetTextColor(PlayerData.instance.hasDash ? selectedColor : Color.white);
-        panel.GetButton("Cling Grip", "Skills Panel").SetTextColor(PlayerData.instance.hasWalljump ? selectedColor : Color.white);
-        panel.GetButton("Needolin", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolin ? selectedColor : Color.white);
-        panel.GetButton("Clawline", "Skills Panel").SetTextColor(PlayerData.instance.hasHarpoonDash ? selectedColor : Color.white);
-        panel.GetButton("Silk Soar", "Skills Panel").SetTextColor(PlayerData.instance.hasSuperJump ? selectedColor : Color.white);
-        panel.GetButton("Beastling Call", "Skills Panel").SetTextColor(PlayerData.instance.UnlockedFastTravelTeleport ? selectedColor : Color.white);
-        panel.GetButton("Elegy of the Deep", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolinMemoryPowerup ? selectedColor : Color.white);
-        panel.GetButton("Needle Strike", "Skills Panel").SetTextColor(PlayerData.instance.hasChargeSlash ? selectedColor : Color.white);
+        GetButton("Swift Step", "Skills Panel").SetTextColor(PlayerData.instance.hasDash ? selectedColor : Color.white);
+        GetButton("Cling Grip", "Skills Panel").SetTextColor(PlayerData.instance.hasWalljump ? selectedColor : Color.white);
+        GetButton("Needolin", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolin ? selectedColor : Color.white);
+        GetButton("Clawline", "Skills Panel").SetTextColor(PlayerData.instance.hasHarpoonDash ? selectedColor : Color.white);
+        GetButton("Silk Soar", "Skills Panel").SetTextColor(PlayerData.instance.hasSuperJump ? selectedColor : Color.white);
+        GetButton("Beastling Call", "Skills Panel").SetTextColor(PlayerData.instance.UnlockedFastTravelTeleport ? selectedColor : Color.white);
+        GetButton("Elegy of the Deep", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolinMemoryPowerup ? selectedColor : Color.white);
+        GetButton("Needle Strike", "Skills Panel").SetTextColor(PlayerData.instance.hasChargeSlash ? selectedColor : Color.white);
     }
 
-    private static void HideMenuClicked()
+    private void HideMenuClicked()
     {
         // Text text = CanvasUtil.CreateTextPanel(GUIController.Instance.canvas, "", 27, TextAnchor.MiddleCenter,
         //     new CanvasUtil.RectData(

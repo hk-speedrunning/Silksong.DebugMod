@@ -6,44 +6,30 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public static class ConsolePanel
+public class ConsolePanel : CanvasPanel
 {
-    private static CanvasPanel panel;
-    private static List<string> history = new List<string>();
+    public static ConsolePanel Instance { get; private set; }
+    private static readonly List<string> history = [];
     private static Vector2 scrollPosition = Vector2.zero;
 
-    public static void BuildMenu(GameObject canvas)
+    public static void Build()
     {
-        panel = new CanvasPanel(
-            nameof(ConsolePanel),
-            null,
-            new Vector2(1275, 800),
-            Vector2.zero,
-            GUIController.Instance.images["ConsoleBg"],
-            new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height)
-        );
-        panel.AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
-        panel.FixRenderOrder();
+        Instance = new ConsolePanel();
+    }
+
+    public ConsolePanel() : base(nameof(ConsolePanel), null, new Vector2(1275, 800), Vector2.zero, GUIController.Instance.images["ConsoleBg"])
+    {
+        AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
+        FixRenderOrder();
 
         GUIController.Instance.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
     }
 
-    public static void Update()
+    public override void Update()
     {
-        if (panel == null)
-        {
-            return;
-        }
+        ActiveSelf = DebugMod.settings.ConsoleVisible;
 
-        if (GUIController.ForceHideUI())
-        {
-            panel.ActiveSelf = false;
-            return;
-        }
-
-        panel.ActiveSelf = DebugMod.settings.ConsoleVisible;
-
-        if (panel.ActiveInHierarchy)
+        if (ActiveInHierarchy)
         {
             string consoleString = "";
             int lineCount = 0;
@@ -55,7 +41,7 @@ public static class ConsolePanel
                 lineCount++;
             }
 
-            panel.GetText("Console").UpdateText(consoleString);
+            GetText("Console").UpdateText(consoleString);
         }
     }
 

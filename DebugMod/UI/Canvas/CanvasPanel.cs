@@ -22,7 +22,7 @@ public class CanvasPanel : CanvasNode
         }
     }
 
-    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite, bool contextual = false)
+    public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite = default, bool contextual = false)
         : this(name, parent, position, size, contextual)
     {
         AddImage("Background", tex, Vector2.zero, size, subSprite);
@@ -77,8 +77,13 @@ public class CanvasPanel : CanvasNode
         return panel;
     }
 
-    public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite)
+    public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz = default, Rect subSprite = default)
     {
+        if (subSprite.width == 0 || subSprite.height == 0)
+        {
+            subSprite = new Rect(0, 0, tex.width, tex.height);
+        }
+
         if (sz.x == 0 || sz.y == 0)
         {
             sz = new Vector2(subSprite.width, subSprite.height);

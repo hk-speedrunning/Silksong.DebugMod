@@ -34,15 +34,15 @@ public class EnemyHandle : MonoBehaviour
         sprite = GetComponent<tk2dSprite>();
         collider = GetComponent<BoxCollider2D>();
 
-        if (!EnemiesPanel.enemyPool.Contains(this))
+        if (!EnemiesPanel.Instance.enemyPool.Contains(this))
         {
-            EnemiesPanel.enemyPool.Add(this);
+            EnemiesPanel.Instance.enemyPool.Add(this);
         }
     }
 
     public void OnDestroy()
     {
-        EnemiesPanel.enemyPool.Remove(this);
+        EnemiesPanel.Instance.enemyPool.Remove(this);
         hpBar?.Destroy();
     }
 

@@ -7,41 +7,41 @@ using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
-public static class EnemiesPanel
+public class EnemiesPanel : CanvasPanel
 {
-    private static CanvasPanel panel;
-    public static readonly List<EnemyHandle> enemyPool = [];
+    public static EnemiesPanel Instance { get; private set; }
+    public readonly List<EnemyHandle> enemyPool = [];
 
-    public static GameObject parent { get; private set; }
     public static bool hpBars;
 
-    public static void BuildMenu(GameObject canvas)
+    public static void Build()
     {
-        parent = canvas;
+        Instance = new EnemiesPanel();
+    }
 
-        panel = new CanvasPanel(nameof(EnemiesPanel), null, new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f), Vector2.zero);
+    public EnemiesPanel() : base(nameof(EnemiesPanel), null, new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f), Vector2.zero)
+    {
+        AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, GUIController.Instance.trajanBold, 30);
 
-        panel.AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, GUIController.Instance.trajanBold, 30);
+        AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, GUIController.Instance.arial);
+        AddText("Enemy HP", "", new Vector2(300f, 20f), Vector2.zero, GUIController.Instance.arial);
 
-        panel.AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, GUIController.Instance.arial);
-        panel.AddText("Enemy HP", "", new Vector2(300f, 20f), Vector2.zero, GUIController.Instance.arial);
-
-        panel.AddPanel("Pause", GUIController.Instance.images["EnemiesPBg"], Vector2.zero, Vector2.zero, new Rect(0, 0, GUIController.Instance.images["EnemiesPBg"].width, GUIController.Instance.images["EnemiesPBg"].height));
-        panel.AddPanel("Play", GUIController.Instance.images["EnemiesBg"], new Vector2(57f, 0f), Vector2.zero, new Rect(0f, 0f, GUIController.Instance.images["EnemiesBg"].width, GUIController.Instance.images["EnemiesBg"].height));
+        AddPanel("Pause", GUIController.Instance.images["EnemiesPBg"], Vector2.zero, Vector2.zero, new Rect(0, 0, GUIController.Instance.images["EnemiesPBg"].width, GUIController.Instance.images["EnemiesPBg"].height));
+        AddPanel("Play", GUIController.Instance.images["EnemiesBg"], new Vector2(57f, 0f), Vector2.zero, new Rect(0f, 0f, GUIController.Instance.images["EnemiesBg"].width, GUIController.Instance.images["EnemiesBg"].height));
 
         for (int i = 1; i <= 14; i++)
         {
-            panel.GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
-            panel.GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
-            panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
+            GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
+            GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
+            GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
         }
 
-        panel.GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
+        GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
 
-        panel.FixRenderOrder();
+        FixRenderOrder();
     }
 
-    private static void DelClicked(int index)
+    private void DelClicked(int index)
     {
         if (index <= enemyPool.Count)
         {
@@ -52,7 +52,7 @@ public static class EnemiesPanel
         }
     }
 
-    private static void CloneClicked(int index)
+    private void CloneClicked(int index)
     {
         if (index <= enemyPool.Count)
         {
@@ -63,7 +63,7 @@ public static class EnemiesPanel
         }
     }
 
-    private static void InfClicked(int index)
+    private void InfClicked(int index)
     {
         if (index <= enemyPool.Count)
         {
@@ -74,43 +74,31 @@ public static class EnemiesPanel
         }
     }
 
-    private static void HPBarsClicked() => BindableFunctions.ToggleEnemyHPBars();
+    private void HPBarsClicked() => BindableFunctions.ToggleEnemyHPBars();
     
-    public static void Update()
+    public override void Update()
     {
-        if (panel == null)
-        {
-            return;
-        }
+        ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
 
-        if (GUIController.ForceHideUI())
+        if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)
         {
-            panel.ActiveSelf = false;
+            GetPanel("Pause").ActiveSelf = false;
+            GetPanel("Play").ActiveSelf = true;
+        }
+        else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED)
+        {
+            GetPanel("Pause").ActiveSelf = true;
+            GetPanel("Play").ActiveSelf = false;
         }
         else
         {
-            panel.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
-
-            if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)
-            {
-                panel.GetPanel("Pause").ActiveSelf = false;
-                panel.GetPanel("Play").ActiveSelf = true;
-            }
-            else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED)
-            {
-                panel.GetPanel("Pause").ActiveSelf = true;
-                panel.GetPanel("Play").ActiveSelf = false;
-            }
-            else
-            {
-                panel.GetPanel("Pause").ActiveSelf = false;
-                panel.GetPanel("Play").ActiveSelf = false;
-            }
+            GetPanel("Pause").ActiveSelf = false;
+            GetPanel("Play").ActiveSelf = false;
         }
 
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
-        if (panel.ActiveInHierarchy)
+        if (ActiveInHierarchy)
         {
             string enemyNames = "";
             string enemyHP = "";
@@ -128,25 +116,25 @@ public static class EnemiesPanel
                 }
             }
 
-            if (panel.GetPanel("Pause").ActiveInHierarchy)
+            if (GetPanel("Pause").ActiveInHierarchy)
             {
                 for (int i = 1; i <= 14; i++)
                 {
                     if (i <= enemyCount)
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
-                        panel.GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
-                        panel.GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
+                        GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
+                        GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
+                        GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
                     }
                     else
                     {
-                        panel.GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
-                        panel.GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
-                        panel.GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
+                        GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
+                        GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
+                        GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
                     }
                 }
 
-                panel.GetPanel("Pause").GetButton("HP Bars")
+                GetPanel("Pause").GetButton("HP Bars")
                     .SetTextColor(hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
             }
 
@@ -155,8 +143,8 @@ public static class EnemiesPanel
                 enemyNames += "And " + (enemyCount - 14) + " more";
             }
 
-            panel.GetText("Enemy Names").UpdateText(enemyNames);
-            panel.GetText("Enemy HP").UpdateText(enemyHP);
+            GetText("Enemy Names").UpdateText(enemyNames);
+            GetText("Enemy HP").UpdateText(enemyHP);
         }
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public static class KeyBindPanel
+public class KeyBindPanel : CanvasPanel
 {
     private class CategoryInfo
     {
@@ -91,34 +91,31 @@ public static class KeyBindPanel
     }
 
     public const int ItemsPerPage = 11;
-
-    private static CanvasPanel panel;
     
     public static KeyCode keyWarning = KeyCode.None;
 
-    // TODO: Refactor to allow rotating images
-    public static void BuildMenu(GameObject canvas)
+    public static KeyBindPanel Instance { get; private set; }
+
+    public static void Build()
     {
-        panel = new CanvasPanel(
-            nameof(KeyBindPanel),
-            null,
-            new Vector2(1123, 456),
-            Vector2.zero,
-            GUIController.Instance.images["HelpBG"],
-            new Rect(0, 0, GUIController.Instance.images["HelpBG"].width,
-                GUIController.Instance.images["HelpBG"].height));
-        panel.AddText("Label", "Binds", new Vector2(130f, -25f), Vector2.zero, GUIController.Instance.trajanBold,
+        Instance = new KeyBindPanel();
+    }
+
+    // TODO: Refactor to allow rotating images
+    public KeyBindPanel() : base(nameof(KeyBindPanel), null, new Vector2(1123, 456), Vector2.zero, GUIController.Instance.images["HelpBG"])
+    {
+        AddText("Label", "Binds", new Vector2(130f, -25f), Vector2.zero, GUIController.Instance.trajanBold,
             30);
 
-        panel.AddText("Category", "", new Vector2(25f, 25f), Vector2.zero, GUIController.Instance.trajanNormal, 20);
-        panel.AddText("Help", "", new Vector2(25f, 50f), Vector2.zero, GUIController.Instance.arial, 15);
-        panel.AddButton("Page", GUIController.Instance.images["ButtonRect"], new Vector2(125, 250), Vector2.zero,
+        AddText("Category", "", new Vector2(25f, 25f), Vector2.zero, GUIController.Instance.trajanNormal, 20);
+        AddText("Help", "", new Vector2(25f, 50f), Vector2.zero, GUIController.Instance.arial, 15);
+        AddButton("Page", GUIController.Instance.images["ButtonRect"], new Vector2(125, 250), Vector2.zero,
             () => NextClicked(false),
             new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width,
                 GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "# / #");
 
 
-        panel.AddButton(
+        AddButton(
             "NextPage",
             GUIController.Instance.images["ScrollBarArrowRight"],
             new Vector2(223, 254),
@@ -130,7 +127,7 @@ public static class KeyBindPanel
                 GUIController.Instance.images["ScrollBarArrowRight"].width,
                 GUIController.Instance.images["ScrollBarArrowRight"].height)
         );
-        panel.AddButton(
+        AddButton(
             "PrevPage",
             GUIController.Instance.images["ScrollBarArrowLeft"],
             new Vector2(95, 254),
@@ -147,11 +144,11 @@ public static class KeyBindPanel
         {
             int index = i; // so that the for loop doesn't mutate the captured variable
 
-            panel.AddButton(i.ToString(), GUIController.Instance.images["Scrollbar_point"],
+            AddButton(i.ToString(), GUIController.Instance.images["Scrollbar_point"],
                 new Vector2(290f, 45f + 17.5f * i), Vector2.zero, () => ChangeBind(index),
                 new Rect(0, 0, GUIController.Instance.images["Scrollbar_point"].width,
                     GUIController.Instance.images["Scrollbar_point"].height));
-            panel.AddButton($"run{i}", GUIController.Instance.images["ButtonRun"],
+            AddButton($"run{i}", GUIController.Instance.images["ButtonRun"],
                 new Vector2(308f, 51f + 17.5f * i), new Vector2(12f, 12f), () => RunBind(index),
                 new Rect(0, 0, GUIController.Instance.images["ButtonRun"].width,
                     GUIController.Instance.images["ButtonRun"].height));
@@ -164,12 +161,12 @@ public static class KeyBindPanel
         }
         CategoryInfo.GeneratePageData();
 
-        panel.GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-        panel.GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
+        GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
+        GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
         UpdateHelpText();
     }
     
-    private static void RunBind(int index) {
+    private void RunBind(int index) {
         string bindName = CategoryInfo.FunctionsOnCurrentPage()[index];
 
         if (DebugMod.bindActions.TryGetValue(bindName, out var action))
@@ -182,7 +179,7 @@ public static class KeyBindPanel
         }
     }
 
-    public static void UpdateHelpText()
+    public void UpdateHelpText()
     {
         if (CategoryInfo.currentPage < 0 || CategoryInfo.currentPage >= CategoryInfo.TotalPages) return;
 
@@ -216,10 +213,10 @@ public static class KeyBindPanel
             updatedText += "\n";
         }
 
-        panel.GetText("Help").UpdateText(updatedText);
+        GetText("Help").UpdateText(updatedText);
     }
 
-    private static void NextClicked(bool previous)
+    private void NextClicked(bool previous)
     {
         if (previous)
         {
@@ -232,12 +229,12 @@ public static class KeyBindPanel
             if (CategoryInfo.currentPage >= CategoryInfo.TotalPages) CategoryInfo.currentPage = 0;
         }
 
-        panel.GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-        panel.GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
+        GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
+        GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
         UpdateHelpText();
     }
 
-    private static void ChangeBind(int index)
+    private void ChangeBind(int index)
     {
         if (index < 0 || index >= CategoryInfo.FunctionsOnCurrentPage().Count)
         {
@@ -259,27 +256,16 @@ public static class KeyBindPanel
         UpdateHelpText();
     }
 
-    public static void Update()
+    public override void Update()
     {
-        if (panel == null)
-        {
-            return;
-        }
+        ActiveSelf = DebugMod.settings.HelpPanelVisible;
 
-        if (GUIController.ForceHideUI())
-        {
-            panel.ActiveSelf = false;
-            return;
-        }
-
-        panel.ActiveSelf = DebugMod.settings.HelpPanelVisible;
-
-        if (panel.ActiveInHierarchy && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
+        if (ActiveInHierarchy && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
         {
             for (int i = 0; i < ItemsPerPage; i++)
             {
-                panel.GetButton(i.ToString()).ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
-                panel.GetButton($"run{i}").ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
+                GetButton(i.ToString()).ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
+                GetButton($"run{i}").ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
             }
         }
     }

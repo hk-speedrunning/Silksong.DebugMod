@@ -1,4 +1,6 @@
 ﻿using System;
+using DebugMod.UI.Canvas;
+using UnityEngine;
 
 namespace DebugMod.UI;
 
@@ -7,9 +9,13 @@ namespace DebugMod.UI;
 /// </summary>
 public class SimpleInfoPanel : CustomInfoPanel
 {
-    private float sep;
+    private readonly float sep;
     private float y = -10f;
-    public SimpleInfoPanel(string Name, float sep) : base(Name, false) { this.sep = sep; }
+
+    public SimpleInfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, float sep) : base(name, parent, position, size)
+    {
+        this.sep = sep;
+    }
 
     public void AddInfo(string label, Func<string> textFunc)
     {

@@ -6,6 +6,8 @@ namespace DebugMod.UI.Canvas;
 // Base class for all canvas elements
 public abstract class CanvasNode
 {
+    internal static readonly List<CanvasNode> rootNodes = [];
+
     private Vector2 localPosition;
     private bool activeSelf = true;
 
@@ -51,6 +53,11 @@ public abstract class CanvasNode
         Parent = parent;
         Size = size;
         localPosition = position;
+
+        if (parent == null)
+        {
+            rootNodes.Add(this);
+        }
     }
 
     protected virtual IEnumerable<CanvasNode> ChildList()
@@ -74,6 +81,14 @@ public abstract class CanvasNode
         }
     }
 
+    public virtual void Update()
+    {
+        foreach (CanvasNode child in ChildList())
+        {
+            child.Update();
+        }
+    }
+
     protected string GetQualifiedName() => $"{Parent?.GetQualifiedName()}:{Name}";
 
     public void ToggleActive() => ActiveSelf = !ActiveSelf;
@@ -83,6 +98,11 @@ public abstract class CanvasNode
         foreach (CanvasNode element in ChildList())
         {
             element.Destroy();
+        }
+
+        if (Parent == null)
+        {
+            rootNodes.Remove(this);
         }
     }
 }

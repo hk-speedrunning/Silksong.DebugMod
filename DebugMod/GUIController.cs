@@ -6,6 +6,7 @@ using System.Reflection;
 using DebugMod.Hitbox;
 using DebugMod.SaveStates;
 using DebugMod.UI;
+using DebugMod.UI.Canvas;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -76,13 +77,12 @@ public class GUIController : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         canvas.AddComponent<GraphicRaycaster>();
 
-        SaveStatesPanel.BuildMenu(canvas);
-        TopMenu.BuildMenu(canvas);
-        EnemiesPanel.BuildMenu(canvas);
-        ConsolePanel.BuildMenu(canvas);
-
-        InfoPanel.BuildInfoPanels(canvas);
-        KeyBindPanel.BuildMenu(canvas);
+        TopMenu.Build();
+        KeyBindPanel.Build();
+        EnemiesPanel.Build();
+        ConsolePanel.Build();
+        SaveStatesPanel.Build();
+        InfoPanel.BuildInfoPanels();
 
         DontDestroyOnLoad(canvas);
     }
@@ -152,13 +152,18 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
-        SaveStatesPanel.Update();
-        TopMenu.Update();
-        EnemiesPanel.Update();
-        ConsolePanel.Update();
-        KeyBindPanel.Update();
-        InfoPanel.Update();
-        
+        foreach (CanvasNode root in CanvasNode.rootNodes)
+        {
+            if (ForceHideUI())
+            {
+                root.ActiveSelf = false;
+            }
+            else
+            {
+                root.Update();
+            }
+        }
+
         if (DebugMod.GetSceneName() == "Menu_Title") return;
         
         // If the mouse is visible, then make sure it can be used.
@@ -213,7 +218,7 @@ public class GUIController : MonoBehaviour
                                 DebugMod.settings.binds[bindName] = kc;
                             }
 
-                            KeyBindPanel.UpdateHelpText();
+                            KeyBindPanel.Instance.UpdateHelpText();
                             break;
                         }
                     }

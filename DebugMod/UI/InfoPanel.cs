@@ -9,34 +9,12 @@ namespace DebugMod.UI;
 /// <summary>
 /// Represents an info panel in the style of the standard info panel
 /// </summary>
-public abstract class InfoPanel
+public abstract class InfoPanel : CanvasPanel
 {
     public const string MainInfoPanelName = "DebugMod.MainInfoPanel";
     public const string MinimalInfoPanelName = "DebugMod.MinimalInfoPanel";
 
-    protected CanvasPanel panel = null;
-
-    /// <summary>
-    /// Determine whether the panel should be displayed.
-    /// </summary>
-    public abstract bool Active { get; }
-
-    /// <summary>
-    /// Called once to set up the panel.
-    /// </summary>
-    public abstract void BuildPanel(GameObject canvas);
-    /// <summary>
-    /// Called every frame to change the text on the panel.
-    /// </summary>
-    public abstract void UpdatePanel();
-
-
-    private static Dictionary<string, InfoPanel> AllPanels = new()
-    {
-        ["DebugMod.BottomRightInfoPanel"] = new BottomRightInfoPanel(),
-        [MainInfoPanelName] = CustomInfoPanel.GetMainInfoPanel(),
-        [MinimalInfoPanelName] = CustomInfoPanel.GetMinimalInfoPanel(),
-    };
+    private static Dictionary<string, InfoPanel> AllPanels = new();
     private static List<string> TogglablePanelNames = new() { MainInfoPanelName, MinimalInfoPanelName };
 
     public static void ToggleActivePanel()
@@ -46,57 +24,27 @@ public abstract class InfoPanel
         DebugMod.settings.CurrentInfoPanelName = TogglablePanelNames[i];
     }
 
-    public static void BuildInfoPanels(GameObject canvas)
+    public static void BuildInfoPanels()
     {
-        foreach (InfoPanel panel in AllPanels.Values)
-        {
-            panel.BuildPanel(canvas);
-        }
+        AllPanels.Add(MainInfoPanelName, CustomInfoPanel.BuildMainInfoPanel());
+        AllPanels.Add(MinimalInfoPanelName, CustomInfoPanel.BuildMinimalInfoPanel());
+        AllPanels.Add("DebugMod.BottomRightInfoPanel", new BottomRightInfoPanel());
 
         if (!TogglablePanelNames.Contains(DebugMod.settings.CurrentInfoPanelName))
         {
             DebugMod.settings.CurrentInfoPanelName = MainInfoPanelName;
         }
     }
-    public static void Update()
+
+    protected InfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
+        : base(name, parent, position, size) {}
+
+    public override void Update()
     {
-        if (GUIController.ForceHideUI() || !DebugMod.settings.InfoPanelVisible)
-        {
-            foreach (InfoPanel infoPanel in AllPanels.Values)
-            {
-                if (infoPanel.panel != null)
-                {
-                    infoPanel.panel.ActiveSelf = false;
-                }
-            }
-            return;
-        }
-
-        foreach (InfoPanel infoPanel in AllPanels.Values)
-        {
-            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.ActiveSelf)
-            {
-                infoPanel.panel.ActiveSelf = infoPanel.Active;
-            }
-
-            if (infoPanel.Active)
-            {
-                infoPanel.UpdatePanel();
-            }
-        }
+        ActiveSelf = DebugMod.settings.InfoPanelVisible && DebugMod.settings.CurrentInfoPanelName == Name;
     }
 
     #region Custom Panel API
-    /// <summary>
-    /// Create a new Custom Info Panel with the given name.
-    /// </summary>
-    /// <param name="Name">The name of the panel - this will not be displayed.</param>
-    /// <param name="ShowSprite">Whether to place the panel on the background sprite.</param>
-    [PublicAPI]
-    public static void CreateCustomInfoPanel(string Name, bool ShowSprite)
-    {
-        AddInfoPanel(Name, new CustomInfoPanel(Name, ShowSprite));
-    }
 
     /// <summary>
     /// Add an info entry to the specified info panel.
@@ -111,17 +59,6 @@ public abstract class InfoPanel
     public static void AddInfoToPanel(string Name, float xLabel, float xInfo, float y, string label, Func<string> textFunc)
     {
         ((CustomInfoPanel)AllPanels[Name]).AddInfo(xLabel, xInfo, y, label, textFunc);
-    }
-
-    /// <summary>
-    /// Create a new Simple Info Panel with the given name.
-    /// </summary>
-    /// <param name="Name">The name of the panel - this will not be displayed.</param>
-    /// <param name="sep">The separation between the columns.</param>
-    [PublicAPI]
-    public static void CreateSimpleInfoPanel(string Name, float sep)
-    {
-        AddInfoPanel(Name, new SimpleInfoPanel(Name, sep));
     }
 
     /// <summary>
@@ -143,7 +80,7 @@ public abstract class InfoPanel
     /// <param name="p">The panel to add.</param>
     /// <exception cref="InvalidOperationException">A panel with this name already exists.</exception>
     [PublicAPI]
-    public static void AddInfoPanel(string Name, TogglableInfoPanel p)
+    public static void AddInfoPanel(string Name, InfoPanel p)
     {
         if (AllPanels.ContainsKey(Name))
         {
