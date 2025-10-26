@@ -69,10 +69,11 @@ public class CanvasPanel : CanvasNode
 
         if (text != null && font != null)
         {
-            button.Text.Text = text;
-            button.Text.Font = font;
-            button.Text.FontSize = fontSize;
-            button.Text.Alignment = TextAnchor.MiddleCenter;
+            CanvasText t = button.AddText();
+            t.Text = text;
+            t.Font = font;
+            t.FontSize = fontSize;
+            t.Alignment = TextAnchor.MiddleCenter;
         }
 
         buttons.Add(name, button);

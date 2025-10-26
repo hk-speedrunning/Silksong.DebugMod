@@ -137,6 +137,8 @@ public class TopMenu : CanvasPanel
 
     public override void Update()
     {
+        base.Update();
+
         ActiveSelf = DebugMod.settings.TopMenuVisible;
 
         if (GetPanel("Skills Panel").ActiveInHierarchy) RefreshSkillsMenu();

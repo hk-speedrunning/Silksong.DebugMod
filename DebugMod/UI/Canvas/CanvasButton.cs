@@ -8,19 +8,7 @@ public class CanvasButton : CanvasImage
 {
     private CanvasText text;
 
-    public CanvasText Text
-    {
-        get
-        {
-            if (text == null)
-            {
-                text = new CanvasText("ButtonText", this);
-                text.Size = Size;
-            }
-
-            return text;
-        }
-    }
+    public CanvasText Text => text;
 
     public event Action OnClicked;
 
@@ -28,6 +16,13 @@ public class CanvasButton : CanvasImage
 
     public CanvasButton(string name, CanvasNode parent)
         : base(name, parent) {}
+
+    public CanvasText AddText()
+    {
+        text = new CanvasText("ButtonText", this);
+        text.Size = Size;
+        return text;
+    }
 
     protected override IEnumerable<CanvasNode> ChildList()
     {

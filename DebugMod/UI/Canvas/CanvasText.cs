@@ -12,7 +12,7 @@ public class CanvasText : CanvasObject
     private int fontSize = 13;
     private FontStyle fontStyle = FontStyle.Normal;
     private TextAnchor alignment = TextAnchor.UpperLeft;
-    private Color color;
+    private Color color = Color.white;
 
     public string Text
     {

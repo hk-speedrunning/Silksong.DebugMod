@@ -50,6 +50,7 @@ public abstract class InfoPanel : CanvasPanel
 
     public override void Update()
     {
+        base.Update();
         ActiveSelf = DebugMod.settings.InfoPanelVisible && DebugMod.settings.CurrentInfoPanelName == Name;
     }
 

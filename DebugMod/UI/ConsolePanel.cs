@@ -27,6 +27,8 @@ public class ConsolePanel : CanvasPanel
 
     public override void Update()
     {
+        base.Update();
+
         ActiveSelf = DebugMod.settings.ConsoleVisible;
 
         if (ActiveInHierarchy)

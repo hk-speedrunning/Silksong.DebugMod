@@ -259,6 +259,8 @@ public class KeyBindPanel : CanvasPanel
 
     public override void Update()
     {
+        base.Update();
+
         ActiveSelf = DebugMod.settings.HelpPanelVisible;
 
         if (ActiveInHierarchy && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)

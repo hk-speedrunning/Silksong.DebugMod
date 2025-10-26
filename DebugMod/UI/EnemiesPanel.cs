@@ -79,6 +79,8 @@ public class EnemiesPanel : CanvasPanel
     
     public override void Update()
     {
+        base.Update();
+
         ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
 
         if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)

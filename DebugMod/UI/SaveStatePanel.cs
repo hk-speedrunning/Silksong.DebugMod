@@ -38,11 +38,7 @@ public class SaveStatesPanel : CanvasPanel
 
     public override void Update()
     {
-        if (GUIController.ForceHideUI())
-        {
-            ActiveSelf = false;
-            return;
-        }
+        base.Update();
 
         ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
 
