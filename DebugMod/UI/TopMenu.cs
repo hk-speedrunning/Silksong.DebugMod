@@ -1,6 +1,4 @@
-using System.Diagnostics;
-using System.IO;
-using DebugMod.SaveStates;
+using System.Collections.Generic;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 
@@ -11,16 +9,29 @@ public class TopMenu : CanvasPanel
     public static TopMenu Instance { get; private set; }
     private static readonly Color selectedColor = new(244f / 255f, 127f / 255f, 32f / 255f);
 
+    private List<CanvasPanel> tabs = [];
+    private string currentTab = "Gameplay";
+    private float tabX = 0;
+
     public static void BuildPanel()
     {
         Instance = new TopMenu();
         Instance.Build();
     }
 
-    public TopMenu() : base(nameof(TopMenu), null, new Vector2(1070f, 25f), Vector2.zero, UICommon.images["ButtonsMenuBG"])
+    public TopMenu() : base(nameof(TopMenu), null)
     {
+        LocalPosition = new Vector2(1070f, 25f);
+
+        CanvasPanel a = AddTab("Tab 1");
+        a.AddText("TextA", "Hello", new Vector2(10, 10), Vector2.zero, UICommon.trajanNormal);
+
+        CanvasPanel b = AddTab("Tab 2");
+        b.AddText("TextB", "World", new Vector2(10, 30), Vector2.zero, UICommon.trajanNormal);
+
+        /*
         Rect buttonRect = new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height);
-        
+
         //Main buttons
         AddButton("Hide Menu", UICommon.images["ButtonRect"], new Vector2(46f, 28f), Vector2.zero, HideMenuClicked, buttonRect, UICommon.trajanBold, "Hide Menu");
         AddButton("Kill All", UICommon.images["ButtonRect"], new Vector2(146f, 28f), Vector2.zero, BindableFunctions.KillAll, buttonRect, UICommon.trajanBold, "Kill All");
@@ -133,6 +144,17 @@ public class TopMenu : CanvasPanel
         saveStatesPanel.AddButton("Scroll Left", UICommon.images["ButtonRectEmpty"], new Vector2(-15f, 115f), Vector2.zero, BindableFunctions.PrevStatePage, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Left", 8);
         saveStatesPanel.AddButton("Scroll Right", UICommon.images["ButtonRectEmpty"], new Vector2(20f, 115f), Vector2.zero, BindableFunctions.NextStatePage, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Right", 8);
         saveStatesPanel.AddButton("Load State On Death", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 145f), Vector2.zero, BindableFunctions.LoadStateOnDeath, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "State On Death", 9);
+        */
+    }
+
+    private CanvasPanel AddTab(string name)
+    {
+        this.AddStyledButton($"{name}TabButton", new Vector2(tabX, 0), new Vector2(60, 20), name, () => currentTab = name);
+        tabX += 70;
+
+        CanvasPanel panel = this.AddStyledPanel(name, new Vector2(0, 20), new Vector2(400, 600));
+        tabs.Add(panel);
+        return panel;
     }
 
     public override void Update()
@@ -141,6 +163,15 @@ public class TopMenu : CanvasPanel
 
         ActiveSelf = DebugMod.settings.TopMenuVisible;
 
+        if (ActiveInHierarchy)
+        {
+            foreach (CanvasPanel tab in tabs)
+            {
+                tab.ActiveSelf = currentTab == tab.Name;
+            }
+        }
+
+        /*
         if (GetPanel("Skills Panel").ActiveInHierarchy) RefreshSkillsMenu();
 
         if (GetPanel("Items Panel").ActiveInHierarchy) RefreshItemsMenu();
@@ -182,6 +213,7 @@ public class TopMenu : CanvasPanel
             savepanel.GetButton("File Load").Text.Color = SaveStateManager.currentStateOperation == "Load new state from file" ? selectedColor : Color.white;
             savepanel.GetButton("Load State On Death").Text.Color = DebugMod.stateOnDeath ? selectedColor : Color.white;
         }
+        */
     }
 
     private void RefreshItemsMenu()

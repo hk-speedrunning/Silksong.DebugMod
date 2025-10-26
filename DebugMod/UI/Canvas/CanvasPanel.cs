@@ -53,8 +53,20 @@ public class CanvasPanel : CanvasNode
         }
     }
 
-    public void AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite, Font font = null, string text = null, int fontSize = 13)
+    public CanvasButton AddButton(string name)
     {
+        CanvasButton button = new CanvasButton(name, this);
+        buttons.Add(name, button);
+        return button;
+    }
+
+    public CanvasButton AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite = default, Font font = null, string text = null, int fontSize = 13)
+    {
+        if (subSprite.width == 0 || subSprite.height == 0)
+        {
+            subSprite = new Rect(0, 0, tex.width, tex.height);
+        }
+
         sz = Size + sz;
         if (sz.x == 0 || sz.y == 0)
         {
@@ -77,17 +89,31 @@ public class CanvasPanel : CanvasNode
         }
 
         buttons.Add(name, button);
+        return button;
+    }
+
+    public CanvasPanel AddPanel(string name)
+    {
+        CanvasPanel panel = new CanvasPanel(name, this);
+        panels.Add(name, panel);
+        return panel;
     }
 
     public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite, bool contextual = false)
     {
         CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite, contextual);
-
         panels.Add(name, panel);
         return panel;
     }
 
-    public void AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz = default, Rect subSprite = default)
+    public CanvasImage AddImage(string name)
+    {
+        CanvasImage image = new CanvasImage(name, this);
+        images.Add(name, image);
+        return image;
+    }
+
+    public CanvasImage AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz = default, Rect subSprite = default)
     {
         if (subSprite.width == 0 || subSprite.height == 0)
         {
@@ -105,9 +131,17 @@ public class CanvasPanel : CanvasNode
         image.UpdateImage(tex, subSprite);
 
         images.Add(name, image);
+        return image;
     }
 
-    public void AddText(string name, string text, Vector2 pos, Vector2 sz, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+    public CanvasText AddText(string name)
+    {
+        CanvasText text = new CanvasText(name, this);
+        texts.Add(name, text);
+        return text;
+    }
+
+    public CanvasText AddText(string name, string text, Vector2 pos, Vector2 sz, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
     {
         if (sz.x == 0 || sz.y == 0)
         {
@@ -124,6 +158,7 @@ public class CanvasPanel : CanvasNode
         t.Alignment = alignment;
 
         texts.Add(name, t);
+        return t;
     }
 
     public CanvasButton GetButton(string buttonName, string panelName = null)
