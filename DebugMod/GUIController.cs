@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using DebugMod.Hitbox;
 using DebugMod.SaveStates;
 using DebugMod.UI;
@@ -14,10 +12,6 @@ namespace DebugMod;
 
 public class GUIController : MonoBehaviour
 {
-    public Font trajanBold;
-    public Font trajanNormal;
-    public Font arial;
-    public Dictionary<string, Texture2D> images = new Dictionary<string, Texture2D>();
     public Vector3 hazardLocation;
     public string respawnSceneWatch;
     public static bool didInput, inputEsc;
@@ -68,7 +62,7 @@ public class GUIController : MonoBehaviour
 
     public void BuildMenus()
     {
-        LoadResources();
+        UICommon.LoadResources();
 
         canvas = new GameObject("DebugModCanvas");
         canvas.AddComponent<UnityEngine.Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
@@ -85,67 +79,6 @@ public class GUIController : MonoBehaviour
         InfoPanel.BuildInfoPanels();
 
         DontDestroyOnLoad(canvas);
-    }
-
-    private void LoadResources()
-    {
-        foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
-        {
-            if (f != null && f.name == "TrajanPro-Bold")
-            {
-                trajanBold = f;
-            }
-
-            if (f != null && f.name == "TrajanPro-Regular")
-            {
-                trajanNormal = f;
-            }
-
-            //Just in case for some reason the computer doesn't have arial
-            if (f != null && f.name == "Perpetua")
-            {
-                arial = f;
-            }
-
-            foreach (string font in Font.GetOSInstalledFontNames())
-            {
-                if (font.ToLower().Contains("arial"))
-                {
-                    arial = Font.CreateDynamicFontFromOSFont(font, 13);
-                    break;
-                }
-            }
-        }
-
-        if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
-
-        string[] resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-
-        foreach (string res in resourceNames)
-        {
-            if (res.StartsWith("DebugMod.Images."))
-            {
-                try
-                {
-                    Stream imageStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
-                    byte[] buffer = new byte[imageStream.Length];
-                    imageStream.Read(buffer, 0, buffer.Length);
-
-                    Texture2D tex = new Texture2D(1, 1);
-                    tex.LoadImage(buffer.ToArray());
-
-                    string[] split = res.Split('.');
-                    string internalName = split[split.Length - 2];
-                    images.Add(internalName, tex);
-
-                    DebugMod.LogDebug("Loaded image: " + internalName);
-                }
-                catch (Exception e)
-                {
-                    DebugMod.LogError("Failed to load image: " + res + "\n" + e.ToString());
-                }
-            }
-        }
     }
 
     public void Update()

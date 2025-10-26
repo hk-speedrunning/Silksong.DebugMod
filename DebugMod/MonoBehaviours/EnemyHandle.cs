@@ -70,7 +70,7 @@ public class EnemyHandle : MonoBehaviour
             if (hpBar == null)
             {
                 hpBar = new CanvasPanel($"{gameObject.name} HP Bar", null, Vector2.zero, Vector2.zero, DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
-                hpBar.AddText("HP", "", Vector2.zero, new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT), GUIController.Instance.arial, 20, FontStyle.Normal, TextAnchor.MiddleCenter);
+                hpBar.AddText("HP", "", Vector2.zero, new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT), UICommon.arial, 20, FontStyle.Normal, TextAnchor.MiddleCenter);
                 hpBar.FixRenderOrder();
             }
 

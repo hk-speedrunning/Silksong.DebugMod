@@ -19,24 +19,24 @@ public class EnemiesPanel : CanvasPanel
         Instance = new EnemiesPanel();
     }
 
-    public EnemiesPanel() : base(nameof(EnemiesPanel), null, new Vector2(1920f - GUIController.Instance.images["EnemiesPBg"].width, 481f), Vector2.zero)
+    public EnemiesPanel() : base(nameof(EnemiesPanel), null, new Vector2(1920f - UICommon.images["EnemiesPBg"].width, 481f), Vector2.zero)
     {
-        AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, GUIController.Instance.trajanBold, 30);
+        AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, UICommon.trajanBold, 30);
 
-        AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, GUIController.Instance.arial);
-        AddText("Enemy HP", "", new Vector2(300f, 20f), Vector2.zero, GUIController.Instance.arial);
+        AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, UICommon.arial);
+        AddText("Enemy HP", "", new Vector2(300f, 20f), Vector2.zero, UICommon.arial);
 
-        AddPanel("Pause", GUIController.Instance.images["EnemiesPBg"], Vector2.zero, Vector2.zero, new Rect(0, 0, GUIController.Instance.images["EnemiesPBg"].width, GUIController.Instance.images["EnemiesPBg"].height));
-        AddPanel("Play", GUIController.Instance.images["EnemiesBg"], new Vector2(57f, 0f), Vector2.zero, new Rect(0f, 0f, GUIController.Instance.images["EnemiesBg"].width, GUIController.Instance.images["EnemiesBg"].height));
+        AddPanel("Pause", UICommon.images["EnemiesPBg"], Vector2.zero, Vector2.zero, new Rect(0, 0, UICommon.images["EnemiesPBg"].width, UICommon.images["EnemiesPBg"].height));
+        AddPanel("Play", UICommon.images["EnemiesBg"], new Vector2(57f, 0f), Vector2.zero, new Rect(0f, 0f, UICommon.images["EnemiesBg"].width, UICommon.images["EnemiesBg"].height));
 
         for (int i = 1; i <= 14; i++)
         {
-            GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
-            GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
-            GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
+            GetPanel("Pause").AddButton("Del" + i, UICommon.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, UICommon.images["ButtonDel"].width, UICommon.images["ButtonDel"].height));
+            GetPanel("Pause").AddButton("Clone" + i, UICommon.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, UICommon.images["ButtonPlus"].width, UICommon.images["ButtonPlus"].height));
+            GetPanel("Pause").AddButton("Inf" + i, UICommon.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, UICommon.images["ButtonInf"].width, UICommon.images["ButtonInf"].height));
         }
 
-        GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
+        GetPanel("Pause").AddButton("HP Bars", UICommon.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height), UICommon.trajanBold, "HP Bars");
 
         FixRenderOrder();
     }

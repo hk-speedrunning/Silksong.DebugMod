@@ -8,14 +8,14 @@ public class BottomRightInfoPanel : InfoPanel
 {
     public BottomRightInfoPanel() : base(nameof(BottomRightInfoPanel), null, new Vector2(0f, 223f), Vector2.zero)
     {
-        AddText("Right1 Label", "Load\nHero Pos\nMove Raw", new Vector2(1285, 747), Vector2.zero, GUIController.Instance.arial);
-        AddText("Right1", "", new Vector2(1385, 747), Vector2.zero, GUIController.Instance.trajanNormal);
+        AddText("Right1 Label", "Load\nHero Pos\nMove Raw", new Vector2(1285, 747), Vector2.zero, UICommon.arial);
+        AddText("Right1", "", new Vector2(1385, 747), Vector2.zero, UICommon.trajanNormal);
 
-        AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed", new Vector2(1525, 747), Vector2.zero, GUIController.Instance.arial);
-        AddText("Right2", "", new Vector2(1625, 747), Vector2.zero, GUIController.Instance.trajanNormal);
+        AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed", new Vector2(1525, 747), Vector2.zero, UICommon.arial);
+        AddText("Right2", "", new Vector2(1625, 747), Vector2.zero, UICommon.trajanNormal);
 
-        AddText("Right3 Label", "Frame Counter\nGame Time Elapsed\nSession Time", new Vector2(1670, 747), Vector2.zero, GUIController.Instance.arial);
-        AddText("Right3", "", new Vector2(1800, 747), Vector2.zero, GUIController.Instance.trajanNormal);
+        AddText("Right3 Label", "Frame Counter\nGame Time Elapsed\nSession Time", new Vector2(1670, 747), Vector2.zero, UICommon.arial);
+        AddText("Right3", "", new Vector2(1800, 747), Vector2.zero, UICommon.trajanNormal);
 
         FixRenderOrder();
     }

@@ -102,56 +102,56 @@ public class KeyBindPanel : CanvasPanel
     }
 
     // TODO: Refactor to allow rotating images
-    public KeyBindPanel() : base(nameof(KeyBindPanel), null, new Vector2(1123, 456), Vector2.zero, GUIController.Instance.images["HelpBG"])
+    public KeyBindPanel() : base(nameof(KeyBindPanel), null, new Vector2(1123, 456), Vector2.zero, UICommon.images["HelpBG"])
     {
-        AddText("Label", "Binds", new Vector2(130f, -25f), Vector2.zero, GUIController.Instance.trajanBold,
+        AddText("Label", "Binds", new Vector2(130f, -25f), Vector2.zero, UICommon.trajanBold,
             30);
 
-        AddText("Category", "", new Vector2(25f, 25f), Vector2.zero, GUIController.Instance.trajanNormal, 20);
-        AddText("Help", "", new Vector2(25f, 50f), Vector2.zero, GUIController.Instance.arial, 15);
-        AddButton("Page", GUIController.Instance.images["ButtonRect"], new Vector2(125, 250), Vector2.zero,
+        AddText("Category", "", new Vector2(25f, 25f), Vector2.zero, UICommon.trajanNormal, 20);
+        AddText("Help", "", new Vector2(25f, 50f), Vector2.zero, UICommon.arial, 15);
+        AddButton("Page", UICommon.images["ButtonRect"], new Vector2(125, 250), Vector2.zero,
             () => NextClicked(false),
-            new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width,
-                GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "# / #");
+            new Rect(0, 0, UICommon.images["ButtonRect"].width,
+                UICommon.images["ButtonRect"].height), UICommon.trajanBold, "# / #");
 
 
         AddButton(
             "NextPage",
-            GUIController.Instance.images["ScrollBarArrowRight"],
+            UICommon.images["ScrollBarArrowRight"],
             new Vector2(223, 254),
             Vector2.zero,
             () => NextClicked(false),
             new Rect(
                 0,
                 0,
-                GUIController.Instance.images["ScrollBarArrowRight"].width,
-                GUIController.Instance.images["ScrollBarArrowRight"].height)
+                UICommon.images["ScrollBarArrowRight"].width,
+                UICommon.images["ScrollBarArrowRight"].height)
         );
         AddButton(
             "PrevPage",
-            GUIController.Instance.images["ScrollBarArrowLeft"],
+            UICommon.images["ScrollBarArrowLeft"],
             new Vector2(95, 254),
             Vector2.zero,
             () => NextClicked(true),
             new Rect(
                 0,
                 0,
-                GUIController.Instance.images["ScrollBarArrowLeft"].width,
-                GUIController.Instance.images["ScrollBarArrowLeft"].height)
+                UICommon.images["ScrollBarArrowLeft"].width,
+                UICommon.images["ScrollBarArrowLeft"].height)
         );
 
         for (int i = 0; i < ItemsPerPage; i++)
         {
             int index = i; // so that the for loop doesn't mutate the captured variable
 
-            AddButton(i.ToString(), GUIController.Instance.images["Scrollbar_point"],
+            AddButton(i.ToString(), UICommon.images["Scrollbar_point"],
                 new Vector2(290f, 45f + 17.5f * i), Vector2.zero, () => ChangeBind(index),
-                new Rect(0, 0, GUIController.Instance.images["Scrollbar_point"].width,
-                    GUIController.Instance.images["Scrollbar_point"].height));
-            AddButton($"run{i}", GUIController.Instance.images["ButtonRun"],
+                new Rect(0, 0, UICommon.images["Scrollbar_point"].width,
+                    UICommon.images["Scrollbar_point"].height));
+            AddButton($"run{i}", UICommon.images["ButtonRun"],
                 new Vector2(308f, 51f + 17.5f * i), new Vector2(12f, 12f), () => RunBind(index),
-                new Rect(0, 0, GUIController.Instance.images["ButtonRun"].width,
-                    GUIController.Instance.images["ButtonRun"].height));
+                new Rect(0, 0, UICommon.images["ButtonRun"].width,
+                    UICommon.images["ButtonRun"].height));
         }
     
         //Build pages based on categories

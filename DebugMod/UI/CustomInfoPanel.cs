@@ -22,8 +22,8 @@ public class CustomInfoPanel : InfoPanel
 
         foreach ((float xLabel, float xInfo, float y, string label, Func<string> textFunc) in PanelBuildInfo)
         {
-            AddText($"Label-{counter++}", label, new Vector2(xLabel, y), Vector2.zero, GUIController.Instance.arial, 15);
-            AddText($"Info-{counter}", "", new Vector2(xInfo, y + 4f), Vector2.zero, GUIController.Instance.trajanNormal);
+            AddText($"Label-{counter++}", label, new Vector2(xLabel, y), Vector2.zero, UICommon.arial, 15);
+            AddText($"Info-{counter}", "", new Vector2(xInfo, y + 4f), Vector2.zero, UICommon.trajanNormal);
             UpdateActions.Add($"Info-{counter}", textFunc);
         }
 
@@ -49,7 +49,7 @@ public class CustomInfoPanel : InfoPanel
     internal static CustomInfoPanel BuildMainInfoPanel()
     {
         CustomInfoPanel panel = new CustomInfoPanel(MainInfoPanelName, null, new Vector2(0f, 223f), Vector2.zero);
-        panel.AddImage("Background", GUIController.Instance.images["StatusPanelBG"], Vector2.zero);
+        panel.AddImage("Background", UICommon.images["StatusPanelBG"], Vector2.zero);
 
         float y = 0f;
 

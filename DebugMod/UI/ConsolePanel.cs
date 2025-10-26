@@ -17,12 +17,12 @@ public class ConsolePanel : CanvasPanel
         Instance = new ConsolePanel();
     }
 
-    public ConsolePanel() : base(nameof(ConsolePanel), null, new Vector2(1275, 800), Vector2.zero, GUIController.Instance.images["ConsoleBg"])
+    public ConsolePanel() : base(nameof(ConsolePanel), null, new Vector2(1275, 800), Vector2.zero, UICommon.images["ConsoleBg"])
     {
-        AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
+        AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, UICommon.arial);
         FixRenderOrder();
 
-        GUIController.Instance.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
+        UICommon.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
     }
 
     public override void Update()
@@ -58,7 +58,7 @@ public class ConsolePanel : CanvasPanel
             history.RemoveAt(0);
         }
 
-        int wrap = WrapIndex(GUIController.Instance.arial, 13, chatLine);
+        int wrap = WrapIndex(UICommon.arial, 13, chatLine);
 
         while (wrap != -1)
         {
@@ -68,7 +68,7 @@ public class ConsolePanel : CanvasPanel
             {
                 history.Add(chatLine.Substring(0, index));
                 chatLine = chatLine.Substring(index + 1);
-                wrap = WrapIndex(GUIController.Instance.arial, 13, chatLine);
+                wrap = WrapIndex(UICommon.arial, 13, chatLine);
             }
             else
             {

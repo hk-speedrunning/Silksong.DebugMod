@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DebugMod.UI;
+using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
 
@@ -34,7 +35,7 @@ public class CocoonPreviewer : MonoBehaviour
                 compass.transform.parent = cocoon.transform;
 
                 //right arrow was used because the arctan calculates angle relative to +x so using the right arrow means no extra correction
-                Texture2D texture = GUIController.Instance.images["ScrollBarArrowRight"];
+                Texture2D texture = UICommon.images["ScrollBarArrowRight"];
                 Sprite sprite = Sprite.Create(
                     texture,
                     new Rect(0, 0, texture.width, texture.height),
