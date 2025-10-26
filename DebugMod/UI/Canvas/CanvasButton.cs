@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
@@ -9,31 +8,36 @@ public class CanvasButton : CanvasImage
 {
     private CanvasText text;
 
+    public CanvasText Text
+    {
+        get
+        {
+            if (text == null)
+            {
+                text = new CanvasText("ButtonText", this);
+                text.Size = Size;
+            }
+
+            return text;
+        }
+    }
+
+    public event Action OnClicked;
+
     protected override bool Interactable => true;
 
-    public CanvasButton(string name, CanvasNode parent, Vector2 position, Vector2 size, Action clicked, Texture2D tex, Rect subSprite)
-        : base(name, parent, position, size, tex, subSprite)
-    {
-        obj.AddComponent<Button>().onClick.AddListener(() => clicked());
-    }
+    public CanvasButton(string name, CanvasNode parent)
+        : base(name, parent) {}
 
     protected override IEnumerable<CanvasNode> ChildList()
     {
         if (text != null) yield return text;
     }
 
-    public void SetText(string t, Font font, int fontSize = 13,
-        FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+    public override void Build()
     {
-        text = new CanvasText("ButtonText", this, Vector2.zero, Size, t, font, fontSize, style, alignment);
-    }
+        base.Build();
 
-    public void UpdateText(string t) => text.UpdateText(t);
-    public void SetTextColor(Color color) => text.SetTextColor(color);
-
-    public void MoveToTop()
-    {
-        obj.transform.SetAsLastSibling();
-        text?.MoveToTop();
+        obj.AddComponent<Button>().onClick.AddListener(() => OnClicked?.Invoke());
     }
 }

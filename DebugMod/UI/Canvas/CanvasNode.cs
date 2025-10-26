@@ -9,6 +9,7 @@ public abstract class CanvasNode
     internal static readonly List<CanvasNode> rootNodes = [];
 
     private Vector2 localPosition;
+    private Vector2 size;
     private bool activeSelf = true;
 
     public string Name { get; }
@@ -30,7 +31,18 @@ public abstract class CanvasNode
 
     public Vector2 Position => LocalPosition + (Parent?.Position ?? Vector2.zero);
 
-    public Vector2 Size { get; }
+    public Vector2 Size
+    {
+        get => size;
+        set
+        {
+            if (size != value)
+            {
+                size = value;
+                OnUpdatePosition();
+            }
+        }
+    }
 
     public bool ActiveSelf
     {
@@ -47,12 +59,10 @@ public abstract class CanvasNode
 
     public bool ActiveInHierarchy => ActiveSelf && (Parent?.ActiveInHierarchy ?? true);
 
-    protected CanvasNode(string name, CanvasNode parent, Vector2 position, Vector2 size)
+    protected CanvasNode(string name, CanvasNode parent)
     {
         Name = name;
         Parent = parent;
-        Size = size;
-        localPosition = position;
 
         if (parent == null)
         {
@@ -78,6 +88,14 @@ public abstract class CanvasNode
         foreach (CanvasNode child in ChildList())
         {
             child.OnUpdateActive();
+        }
+    }
+
+    public virtual void Build()
+    {
+        foreach (CanvasNode child in ChildList())
+        {
+            child.Build();
         }
     }
 

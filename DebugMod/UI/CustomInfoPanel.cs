@@ -15,7 +15,7 @@ public class CustomInfoPanel : InfoPanel
     public CustomInfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
         : base(name, parent, position, size) {}
 
-    protected void Build()
+    public override void Build()
     {
         UpdateActions = new();
         int counter = 0;
@@ -27,7 +27,7 @@ public class CustomInfoPanel : InfoPanel
             UpdateActions.Add($"Info-{counter}", textFunc);
         }
 
-        FixRenderOrder();
+        base.Build();
     }
 
     public override void Update()
@@ -38,7 +38,7 @@ public class CustomInfoPanel : InfoPanel
         {
             foreach (var kvp in UpdateActions)
             {
-                GetText(kvp.Key).UpdateText(kvp.Value.Invoke());
+                GetText(kvp.Key).Text = kvp.Value.Invoke();
             }
         }
     }
@@ -115,7 +115,6 @@ public class CustomInfoPanel : InfoPanel
         panel.AddInfo(300f, 440f, y += 20, "Is Gameplay", () => GetStringForBool(DebugMod.GM.IsGameplayScene()));
         panel.AddInfo(300f, 440f, y += 20, "Hero Paused", () => GetStringForBool(HeroController.instance.cState.isPaused));
 
-        panel.Build();
         return panel;
     }
 
@@ -138,7 +137,6 @@ public class CustomInfoPanel : InfoPanel
         panel.AddInfo(110, 200, 130, "Current slot", GetCurrentSlotString);
         panel.AddInfo(10, 80, 130, "Hardfall", () => GetStringForBool(HeroController.instance.cState.willHardLand));
 
-        panel.Build();
         return panel;
     }
 

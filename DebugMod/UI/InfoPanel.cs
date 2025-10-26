@@ -30,6 +30,11 @@ public abstract class InfoPanel : CanvasPanel
         AllPanels.Add(MinimalInfoPanelName, CustomInfoPanel.BuildMinimalInfoPanel());
         AllPanels.Add("DebugMod.BottomRightInfoPanel", new BottomRightInfoPanel());
 
+        foreach (InfoPanel panel in AllPanels.Values)
+        {
+            panel.Build();
+        }
+
         if (!TogglablePanelNames.Contains(DebugMod.settings.CurrentInfoPanelName))
         {
             DebugMod.settings.CurrentInfoPanelName = MainInfoPanelName;
@@ -37,7 +42,11 @@ public abstract class InfoPanel : CanvasPanel
     }
 
     protected InfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
-        : base(name, parent, position, size) {}
+        : base(name, parent)
+    {
+        LocalPosition = position;
+        Size = size;
+    }
 
     public override void Update()
     {

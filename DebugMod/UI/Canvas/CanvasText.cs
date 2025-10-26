@@ -5,30 +5,88 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasText : CanvasObject
 {
-    public CanvasText(string name, CanvasNode parent, Vector2 position, Vector2 size, string text, Font font,
-        int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
-        : base(name, parent, position, size)
+    private Text t;
+
+    private string text;
+    private Font font;
+    private int fontSize = 13;
+    private FontStyle fontStyle = FontStyle.Normal;
+    private TextAnchor alignment = TextAnchor.UpperLeft;
+    private Color color;
+
+    public string Text
     {
-        Text t = obj.AddComponent<Text>();
+        get => text;
+        set
+        {
+            text = value;
+            if (t) t.text = text;
+        }
+    }
+
+    public Font Font
+    {
+        get => font;
+        set
+        {
+            font = value;
+            if (t) t.font = font;
+        }
+    }
+
+    public int FontSize
+    {
+        get => fontSize;
+        set
+        {
+            fontSize = value;
+            if (t) t.fontSize = fontSize;
+        }
+    }
+
+    public FontStyle FontStyle
+    {
+        get => fontStyle;
+        set
+        {
+            fontStyle = value;
+            if (t) t.fontStyle = fontStyle;
+        }
+    }
+
+    public TextAnchor Alignment
+    {
+        get => alignment;
+        set
+        {
+            alignment = value;
+            if (t) t.alignment = alignment;
+        }
+    }
+
+    public Color Color
+    {
+        get => color;
+        set
+        {
+            color = value;
+            if (t) t.color = color;
+        }
+    }
+
+    public CanvasText(string name, CanvasNode parent)
+        : base(name, parent) {}
+
+    public override void Build()
+    {
+        base.Build();
+
+        t = obj.AddComponent<Text>();
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;
-        t.fontStyle = style;
+        t.fontStyle = fontStyle;
         t.alignment = alignment;
-    }
-
-    public void UpdateText(string text)
-    {
-        obj.GetComponent<Text>().text = text;
-    }
-
-    public void MoveToTop()
-    {
-        obj.transform.SetAsLastSibling();
-    }
-
-    public void SetTextColor(Color color)
-    {
-        obj.GetComponent<Text>().color = color;
+        t.color = color;
     }
 }

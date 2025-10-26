@@ -9,9 +9,10 @@ public class SaveStatesPanel : CanvasPanel
 {
     public static SaveStatesPanel Instance { get; private set; }
 
-    public static void Build()
+    public static void BuildPanel()
     {
         Instance = new SaveStatesPanel();
+        Instance.Build();
     }
 
     public SaveStatesPanel() : base(nameof(SaveStatesPanel), null, new Vector2(720f, 40f), Vector2.zero, UICommon.images["BlankVertical"])
@@ -47,8 +48,8 @@ public class SaveStatesPanel : CanvasPanel
 
         if (ActiveInHierarchy)
         {
-            GetText("currentmode").UpdateText(SaveStateManager.currentStateOperation);
-            GetText("CurrentFolder").UpdateText($"Page: {SaveStateManager.currentStateFolder+1}/{SaveStateManager.savePages}");
+            GetText("currentmode").Text = SaveStateManager.currentStateOperation;
+            GetText("CurrentFolder").Text = $"Page: {SaveStateManager.currentStateFolder + 1}/{SaveStateManager.savePages}";
 
             Dictionary<int, string[]> info = SaveStateManager.GetSaveStatesInfo();
 
@@ -56,12 +57,12 @@ public class SaveStatesPanel : CanvasPanel
             {
                 if (info.TryGetValue(i, out string[] array))
                 {
-                    GetText(i.ToString()).UpdateText($"{array[0]} - {array[1]}");
+                    GetText(i.ToString()).Text = $"{array[0]} - {array[1]}";
                     GetButton($"Rename{i}").ActiveSelf = true;
                 }
                 else
                 {
-                    GetText(i.ToString()).UpdateText("open");
+                    GetText(i.ToString()).Text = "open";
                     GetButton($"Rename{i}").ActiveSelf = false;
                 }
             }

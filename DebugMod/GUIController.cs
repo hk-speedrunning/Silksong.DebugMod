@@ -71,11 +71,11 @@ public class GUIController : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         canvas.AddComponent<GraphicRaycaster>();
 
-        TopMenu.Build();
-        KeyBindPanel.Build();
-        EnemiesPanel.Build();
-        ConsolePanel.Build();
-        SaveStatesPanel.Build();
+        TopMenu.BuildPanel();
+        KeyBindPanel.BuildPanel();
+        EnemiesPanel.BuildPanel();
+        ConsolePanel.BuildPanel();
+        SaveStatesPanel.BuildPanel();
         InfoPanel.BuildInfoPanels();
 
         DontDestroyOnLoad(canvas);

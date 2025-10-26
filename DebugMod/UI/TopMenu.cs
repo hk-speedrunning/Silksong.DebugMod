@@ -11,9 +11,10 @@ public class TopMenu : CanvasPanel
     public static TopMenu Instance { get; private set; }
     private static readonly Color selectedColor = new(244f / 255f, 127f / 255f, 32f / 255f);
 
-    public static void Build()
+    public static void BuildPanel()
     {
         Instance = new TopMenu();
+        Instance.Build();
     }
 
     public TopMenu() : base(nameof(TopMenu), null, new Vector2(1070f, 25f), Vector2.zero, UICommon.images["ButtonsMenuBG"])
@@ -132,8 +133,6 @@ public class TopMenu : CanvasPanel
         saveStatesPanel.AddButton("Scroll Left", UICommon.images["ButtonRectEmpty"], new Vector2(-15f, 115f), Vector2.zero, BindableFunctions.PrevStatePage, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Left", 8);
         saveStatesPanel.AddButton("Scroll Right", UICommon.images["ButtonRectEmpty"], new Vector2(20f, 115f), Vector2.zero, BindableFunctions.NextStatePage, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Right", 8);
         saveStatesPanel.AddButton("Load State On Death", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 145f), Vector2.zero, BindableFunctions.LoadStateOnDeath, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "State On Death", 9);
-
-        FixRenderOrder();
     }
 
     public override void Update()
@@ -146,20 +145,20 @@ public class TopMenu : CanvasPanel
 
         if (GetPanel("Tools Panel").ActiveInHierarchy)
         {
-            GetButton("Tool Pouches", "Tools Panel").UpdateText("Pouches: " + PlayerData.instance.ToolPouchUpgrades);
-            GetButton("Crafting Kits", "Tools Panel").UpdateText("Kits: " + PlayerData.instance.ToolKitUpgrades);
-            GetButton("Infinite Tools", "Tools Panel").SetTextColor(DebugMod.infiniteTools ? selectedColor : Color.white);
+            GetButton("Tool Pouches", "Tools Panel").Text.Text = "Pouches: " + PlayerData.instance.ToolPouchUpgrades;
+            GetButton("Crafting Kits", "Tools Panel").Text.Text = "Kits: " + PlayerData.instance.ToolKitUpgrades;
+            GetButton("Infinite Tools", "Tools Panel").Text.Color = DebugMod.infiniteTools ? selectedColor : Color.white;
 
         }
 
         if (GetPanel("Cheats Panel").ActiveInHierarchy)
         {
-            GetButton("Infinite HP", "Cheats Panel").SetTextColor(DebugMod.infiniteHP ? selectedColor : Color.white);
-            GetButton("Infinite Silk", "Cheats Panel").SetTextColor(DebugMod.infiniteSilk ? selectedColor : Color.white);
-            GetButton("Invincibility", "Cheats Panel").SetTextColor(PlayerData.instance.isInvincible ? selectedColor : Color.white);
-            GetButton("Noclip", "Cheats Panel").SetTextColor(DebugMod.noclip ? selectedColor : Color.white);
-            GetButton("Infinite Jump", "Cheats Panel").SetTextColor(PlayerData.instance.infiniteAirJump ? selectedColor : Color.white);
-            GetButton("Lock KeyBinds", "Cheats Panel").SetTextColor(DebugMod.KeyBindLock ? selectedColor : Color.white);
+            GetButton("Infinite HP", "Cheats Panel").Text.Color = DebugMod.infiniteHP ? selectedColor : Color.white;
+            GetButton("Infinite Silk", "Cheats Panel").Text.Color = DebugMod.infiniteSilk ? selectedColor : Color.white;
+            GetButton("Invincibility", "Cheats Panel").Text.Color = PlayerData.instance.isInvincible ? selectedColor : Color.white;
+            GetButton("Noclip", "Cheats Panel").Text.Color = DebugMod.noclip ? selectedColor : Color.white;
+            GetButton("Infinite Jump", "Cheats Panel").Text.Color = PlayerData.instance.infiniteAirJump ? selectedColor : Color.white;
+            GetButton("Lock KeyBinds", "Cheats Panel").Text.Color = DebugMod.KeyBindLock ? selectedColor : Color.white;
 
         }
 
@@ -175,11 +174,11 @@ public class TopMenu : CanvasPanel
         if (GetPanel("SaveStates Panel").ActiveInHierarchy)
         {
             CanvasPanel savepanel = GetPanel("SaveStates Panel");
-            savepanel.GetButton("Scroll Left").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
-            savepanel.GetButton("Scroll Right").SetTextColor(SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f));
-            savepanel.GetButton("File Save").SetTextColor(SaveStateManager.currentStateOperation == "Save new state to file" ? selectedColor : Color.white);
-            savepanel.GetButton("File Load").SetTextColor(SaveStateManager.currentStateOperation == "Load new state from file" ? selectedColor : Color.white);
-            savepanel.GetButton("Load State On Death").SetTextColor(DebugMod.stateOnDeath ? selectedColor : Color.white);
+            savepanel.GetButton("Scroll Left").Text.Color = SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f);
+            savepanel.GetButton("Scroll Right").Text.Color = SaveStateManager.inSelectSlotState ? new Color(244f / 255f, 216f / 255f, 184f / 255f) : new Color(69f / 255f, 69f / 255f, 69f / 255f);
+            savepanel.GetButton("File Save").Text.Color = SaveStateManager.currentStateOperation == "Save new state to file" ? selectedColor : Color.white;
+            savepanel.GetButton("File Load").Text.Color = SaveStateManager.currentStateOperation == "Load new state from file" ? selectedColor : Color.white;
+            savepanel.GetButton("Load State On Death").Text.Color = DebugMod.stateOnDeath ? selectedColor : Color.white;
         }
     }
 
@@ -208,20 +207,20 @@ public class TopMenu : CanvasPanel
 
     private void RefreshSkillsMenu()
     {
-        GetButton("Silk Heart", "Skills Panel").UpdateText("Silk Hearts: " + PlayerData.instance.silkRegenMax);
+        GetButton("Silk Heart", "Skills Panel").Text.Text = "Silk Hearts: " + PlayerData.instance.silkRegenMax;
 
-        GetButton("Cloak", "Skills Panel").SetTextColor(PlayerData.instance.hasBrolly ? selectedColor : Color.white);
-        if (PlayerData.instance.hasDoubleJump) GetButton("Cloak", "Skills Panel").UpdateText("Faydown");
-        else GetButton("Cloak", "Skills Panel").UpdateText("Drifter's");
+        GetButton("Cloak", "Skills Panel").Text.Color = PlayerData.instance.hasBrolly ? selectedColor : Color.white;
+        if (PlayerData.instance.hasDoubleJump) GetButton("Cloak", "Skills Panel").Text.Text = "Faydown";
+        else GetButton("Cloak", "Skills Panel").Text.Text = "Drifter's";
 
-        GetButton("Swift Step", "Skills Panel").SetTextColor(PlayerData.instance.hasDash ? selectedColor : Color.white);
-        GetButton("Cling Grip", "Skills Panel").SetTextColor(PlayerData.instance.hasWalljump ? selectedColor : Color.white);
-        GetButton("Needolin", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolin ? selectedColor : Color.white);
-        GetButton("Clawline", "Skills Panel").SetTextColor(PlayerData.instance.hasHarpoonDash ? selectedColor : Color.white);
-        GetButton("Silk Soar", "Skills Panel").SetTextColor(PlayerData.instance.hasSuperJump ? selectedColor : Color.white);
-        GetButton("Beastling Call", "Skills Panel").SetTextColor(PlayerData.instance.UnlockedFastTravelTeleport ? selectedColor : Color.white);
-        GetButton("Elegy of the Deep", "Skills Panel").SetTextColor(PlayerData.instance.hasNeedolinMemoryPowerup ? selectedColor : Color.white);
-        GetButton("Needle Strike", "Skills Panel").SetTextColor(PlayerData.instance.hasChargeSlash ? selectedColor : Color.white);
+        GetButton("Swift Step", "Skills Panel").Text.Color = PlayerData.instance.hasDash ? selectedColor : Color.white;
+        GetButton("Cling Grip", "Skills Panel").Text.Color = PlayerData.instance.hasWalljump ? selectedColor : Color.white;
+        GetButton("Needolin", "Skills Panel").Text.Color = PlayerData.instance.hasNeedolin ? selectedColor : Color.white;
+        GetButton("Clawline", "Skills Panel").Text.Color = PlayerData.instance.hasHarpoonDash ? selectedColor : Color.white;
+        GetButton("Silk Soar", "Skills Panel").Text.Color = PlayerData.instance.hasSuperJump ? selectedColor : Color.white;
+        GetButton("Beastling Call", "Skills Panel").Text.Color = PlayerData.instance.UnlockedFastTravelTeleport ? selectedColor : Color.white;
+        GetButton("Elegy of the Deep", "Skills Panel").Text.Color = PlayerData.instance.hasNeedolinMemoryPowerup ? selectedColor : Color.white;
+        GetButton("Needle Strike", "Skills Panel").Text.Color = PlayerData.instance.hasChargeSlash ? selectedColor : Color.white;
     }
 
     private void HideMenuClicked()

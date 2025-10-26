@@ -12,15 +12,15 @@ public class ConsolePanel : CanvasPanel
     private static readonly List<string> history = [];
     private static Vector2 scrollPosition = Vector2.zero;
 
-    public static void Build()
+    public static void BuildPanel()
     {
         Instance = new ConsolePanel();
+        Instance.Build();
     }
 
     public ConsolePanel() : base(nameof(ConsolePanel), null, new Vector2(1275, 800), Vector2.zero, UICommon.images["ConsoleBg"])
     {
         AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, UICommon.arial);
-        FixRenderOrder();
 
         UICommon.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
     }
@@ -41,7 +41,7 @@ public class ConsolePanel : CanvasPanel
                 lineCount++;
             }
 
-            GetText("Console").UpdateText(consoleString);
+            GetText("Console").Text = consoleString;
         }
     }
 

@@ -14,13 +14,16 @@ public class EnemiesPanel : CanvasPanel
 
     public static bool hpBars;
 
-    public static void Build()
+    public static void BuildPanel()
     {
         Instance = new EnemiesPanel();
+        Instance.Build();
     }
 
-    public EnemiesPanel() : base(nameof(EnemiesPanel), null, new Vector2(1920f - UICommon.images["EnemiesPBg"].width, 481f), Vector2.zero)
+    public EnemiesPanel() : base(nameof(EnemiesPanel), null)
     {
+        LocalPosition = new Vector2(1920f - UICommon.images["EnemiesPBg"].width, 481f);
+
         AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, UICommon.trajanBold, 30);
 
         AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, UICommon.arial);
@@ -37,8 +40,6 @@ public class EnemiesPanel : CanvasPanel
         }
 
         GetPanel("Pause").AddButton("HP Bars", UICommon.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height), UICommon.trajanBold, "HP Bars");
-
-        FixRenderOrder();
     }
 
     private void DelClicked(int index)
@@ -134,8 +135,8 @@ public class EnemiesPanel : CanvasPanel
                     }
                 }
 
-                GetPanel("Pause").GetButton("HP Bars")
-                    .SetTextColor(hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white);
+                GetPanel("Pause").GetButton("HP Bars").Text.Color =
+                    hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white;
             }
 
             if (enemyCount > 14)
@@ -143,8 +144,8 @@ public class EnemiesPanel : CanvasPanel
                 enemyNames += "And " + (enemyCount - 14) + " more";
             }
 
-            GetText("Enemy Names").UpdateText(enemyNames);
-            GetText("Enemy HP").UpdateText(enemyHP);
+            GetText("Enemy Names").Text = enemyNames;
+            GetText("Enemy HP").Text = enemyHP;
         }
     }
 

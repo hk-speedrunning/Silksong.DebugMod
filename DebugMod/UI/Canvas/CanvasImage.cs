@@ -5,24 +5,42 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasImage : CanvasObject
 {
-    public CanvasImage(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite)
-        : base(name, parent, position, size)
-    {
-        obj.AddComponent<Image>();
-        UpdateImage(tex, subSprite);
+    private Texture2D tex;
+    private Rect subSprite;
 
-        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-        transform.SetScaleX(Size.x / subSprite.width);
-        transform.SetScaleY(Size.y / subSprite.height);
+    public CanvasImage(string name, CanvasNode parent)
+        : base(name, parent) {}
+
+    public void UpdateImage(Texture2D tex, Rect subSprite = default)
+    {
+        if (subSprite.width == 0 || subSprite.height == 0)
+        {
+            subSprite = new Rect(0, 0, tex.width, tex.height);
+        }
+
+        this.tex = tex;
+        this.subSprite = subSprite;
+
+        if (obj)
+        {
+            UpdateSprite();
+        }
     }
 
-    public void UpdateImage(Texture2D tex, Rect subSprite)
+    private void UpdateSprite()
     {
         obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
     }
 
-    public void SetRenderIndex(int idx)
+    public override void Build()
     {
-        obj.transform.SetSiblingIndex(idx);
+        base.Build();
+
+        obj.AddComponent<Image>();
+        UpdateSprite();
+
+        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
+        transform.SetScaleX(Size.x / subSprite.width);
+        transform.SetScaleY(Size.y / subSprite.height);
     }
 }

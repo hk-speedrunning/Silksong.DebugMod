@@ -96,9 +96,10 @@ public class KeyBindPanel : CanvasPanel
 
     public static KeyBindPanel Instance { get; private set; }
 
-    public static void Build()
+    public static void BuildPanel()
     {
         Instance = new KeyBindPanel();
+        Instance.Build();
     }
 
     // TODO: Refactor to allow rotating images
@@ -161,8 +162,8 @@ public class KeyBindPanel : CanvasPanel
         }
         CategoryInfo.GeneratePageData();
 
-        GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-        GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
+        GetText("Category").Text = CategoryInfo.CurrentCategory;
+        GetButton("Page").Text.Text = CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages;
         UpdateHelpText();
     }
     
@@ -213,7 +214,7 @@ public class KeyBindPanel : CanvasPanel
             updatedText += "\n";
         }
 
-        GetText("Help").UpdateText(updatedText);
+        GetText("Help").Text = updatedText;
     }
 
     private void NextClicked(bool previous)
@@ -229,8 +230,8 @@ public class KeyBindPanel : CanvasPanel
             if (CategoryInfo.currentPage >= CategoryInfo.TotalPages) CategoryInfo.currentPage = 0;
         }
 
-        GetText("Category").UpdateText(CategoryInfo.CurrentCategory);
-        GetButton("Page").UpdateText(CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages);
+        GetText("Category").Text = CategoryInfo.CurrentCategory;
+        GetButton("Page").Text.Text = CategoryInfo.currentPage + 1 + " / " + CategoryInfo.TotalPages;
         UpdateHelpText();
     }
 
