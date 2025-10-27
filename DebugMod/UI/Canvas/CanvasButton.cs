@@ -29,6 +29,16 @@ public class CanvasButton : CanvasImage
         if (text != null) yield return text;
     }
 
+    protected override void OnUpdatePosition()
+    {
+        if (text != null)
+        {
+            text.Size = Size;
+        }
+
+        base.OnUpdatePosition();
+    }
+
     public override void Build()
     {
         base.Build();

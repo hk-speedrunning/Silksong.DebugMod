@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DebugMod.UI.Canvas;
 using UnityEngine;
@@ -6,12 +7,15 @@ namespace DebugMod.UI;
 
 public class TopMenu : CanvasPanel
 {
-    public static TopMenu Instance { get; private set; }
-    private static readonly Color selectedColor = new(244f / 255f, 127f / 255f, 32f / 255f);
+    public const int TAB_BUTTON_HEIGHT = 20;
 
-    private List<CanvasPanel> tabs = [];
-    private string currentTab = "Gameplay";
-    private float tabX = 0;
+    private static readonly Color selectedColor = UICommon.accentColor;
+    private static readonly Color deselectedColor = UICommon.textColor;
+
+    public static TopMenu Instance { get; private set; }
+
+    private readonly List<Tab> tabs = [];
+    private string currentTab;
 
     public static void BuildPanel()
     {
@@ -21,13 +25,12 @@ public class TopMenu : CanvasPanel
 
     public TopMenu() : base(nameof(TopMenu), null)
     {
-        LocalPosition = new Vector2(1070f, 25f);
+        LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.SCREEN_MARGIN);
+        Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT);
 
-        CanvasPanel a = AddTab("Tab 1");
-        a.AddText("TextA", "Hello", new Vector2(10, 10), Vector2.zero, UICommon.trajanNormal);
+        Tab gameplay = AddTab("Gameplay");
 
-        CanvasPanel b = AddTab("Tab 2");
-        b.AddText("TextB", "World", new Vector2(10, 30), Vector2.zero, UICommon.trajanNormal);
+        gameplay.AddBoolControl("Noclip", "Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
 
         /*
         Rect buttonRect = new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height);
@@ -147,14 +150,40 @@ public class TopMenu : CanvasPanel
         */
     }
 
-    private CanvasPanel AddTab(string name)
+    private Tab AddTab(string name)
     {
-        this.AddStyledButton($"{name}TabButton", new Vector2(tabX, 0), new Vector2(60, 20), name, () => currentTab = name);
-        tabX += 70;
+        Tab tab = new Tab();
+        tab.name = name;
 
-        CanvasPanel panel = this.AddStyledPanel(name, new Vector2(0, 20), new Vector2(400, 600));
-        tabs.Add(panel);
-        return panel;
+        CanvasButton button = this.AddStyledButton($"{name}TabButton");
+        button.UpdateImage(UICommon.panelBG);
+        button.Text.Text = name;
+        button.OnClicked += () => currentTab = name;
+        tab.tabButton = button;
+
+        CanvasPanel panel = this.AddStyledPanel(name, new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT));
+        panel.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
+        tab.panel = panel;
+
+        tabs.Add(tab);
+        return tab;
+    }
+
+    public override void Build()
+    {
+        int tabButtonWidth = (int)(Size.x - UICommon.MARGIN * (tabs.Count - 1)) / tabs.Count;
+        int tabX = 0;
+
+        foreach (Tab tab in tabs)
+        {
+            tab.tabButton.LocalPosition = new Vector2(tabX, 0);
+            tab.tabButton.Size = new Vector2(tabButtonWidth, TAB_BUTTON_HEIGHT);
+            tabX += tabButtonWidth + UICommon.MARGIN;
+        }
+
+        currentTab = tabs[0].name;
+
+        base.Build();
     }
 
     public override void Update()
@@ -165,9 +194,9 @@ public class TopMenu : CanvasPanel
 
         if (ActiveInHierarchy)
         {
-            foreach (CanvasPanel tab in tabs)
+            foreach (Tab tab in tabs)
             {
-                tab.ActiveSelf = currentTab == tab.Name;
+                tab.panel.ActiveSelf = currentTab == tab.name;
             }
         }
 
@@ -272,5 +301,32 @@ public class TopMenu : CanvasPanel
         // text.CrossFadeAlpha(1f, 0f, false);
         // text.CrossFadeAlpha(0f, 6f, false);
         BindableFunctions.ToggleAllPanels();
+    }
+
+    private class Tab
+    {
+        public string name;
+        public CanvasPanel panel;
+        public CanvasButton tabButton;
+
+        private int y = UICommon.MARGIN;
+
+        public CanvasButton AddBoolControl(string name, string displayName, Func<bool> getter, Action updater)
+        {
+            CanvasButton button = panel.AddStyledButton(name);
+
+            button.LocalPosition = new Vector2(UICommon.MARGIN, y);
+            button.Size = new Vector2(panel.Size.x - UICommon.MARGIN * 2, UICommon.CONTROL_HEIGHT);
+            y += UICommon.CONTROL_HEIGHT + UICommon.MARGIN;
+
+            button.Text.Text = displayName;
+            button.OnUpdate += () =>
+            {
+                button.Text.Color = getter() ? selectedColor : deselectedColor;
+            };
+            button.OnClicked += updater;
+
+            return button;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
@@ -59,6 +60,8 @@ public abstract class CanvasNode
 
     public bool ActiveInHierarchy => ActiveSelf && (Parent?.ActiveInHierarchy ?? true);
 
+    public event Action OnUpdate;
+
     protected CanvasNode(string name, CanvasNode parent)
     {
         Name = name;
@@ -101,6 +104,8 @@ public abstract class CanvasNode
 
     public virtual void Update()
     {
+        OnUpdate?.Invoke();
+
         foreach (CanvasNode child in ChildList())
         {
             child.Update();

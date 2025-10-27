@@ -10,33 +10,37 @@ namespace DebugMod.UI;
 
 public static class UICommon
 {
+    public const int RIGHT_SIDE_WIDTH = 400;
+    public const int MAIN_MENU_HEIGHT = 650;
+    public const int SCREEN_MARGIN = 25;
+    public const int MARGIN = 6;
+    public const int CONTROL_HEIGHT = 25;
+
+    public static readonly Color textColor = Color.white;
+    public static readonly Color accentColor = RGB(137, 180, 250);
+
     public static Font trajanBold;
     public static Font trajanNormal;
     public static Font arial;
     public static readonly Dictionary<string, Texture2D> images = new();
-    public static readonly Texture2D buttonBG = SolidColor(54, 58, 79);
-    public static readonly Texture2D panelBG = SolidColor(36, 39, 58);
+    public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
+    public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
 
-    public static CanvasButton AddStyledButton(this CanvasPanel panel, string name, Vector2 position, Vector2 size, string text, Action clicked)
+    public static CanvasButton AddStyledButton(this CanvasPanel panel, string name)
     {
         CanvasButton button = panel.AddButton(name);
-        button.LocalPosition = position;
-        button.Size = size;
         button.UpdateImage(buttonBG);
-        button.OnClicked += clicked;
 
         CanvasText t = button.AddText();
-        t.Text = text;
         t.Font = arial;
         t.Alignment = TextAnchor.MiddleCenter;
 
         return button;
     }
 
-    public static CanvasPanel AddStyledPanel(this CanvasPanel panel, string name, Vector2 position, Vector2 size)
+    public static CanvasPanel AddStyledPanel(this CanvasPanel panel, string name, Vector2 size)
     {
         CanvasPanel p = panel.AddPanel(name);
-        p.LocalPosition = position;
         p.Size = size;
 
         CanvasImage background = p.AddImage("Background");
@@ -46,10 +50,12 @@ public static class UICommon
         return p;
     }
 
-    private static Texture2D SolidColor(int r, int g, int b)
+    private static Color RGB(int r, int g, int b) => new Color(r / 255f, g / 255f, b / 255f);
+
+    private static Texture2D SolidColor(Color color)
     {
         Texture2D tex = new(1, 1);
-        tex.SetPixel(0, 0, new Color(r / 255f, g / 255f, b / 255f));
+        tex.SetPixel(0, 0, color);
         tex.Apply();
         return tex;
     }
