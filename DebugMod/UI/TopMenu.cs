@@ -30,7 +30,13 @@ public class TopMenu : CanvasPanel
 
         Tab gameplay = AddTab("Gameplay");
 
-        gameplay.AddBoolControl("Noclip", "Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
+        gameplay.AddBoolControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
+        gameplay.AddBoolControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
+        gameplay.AddBoolControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
+        gameplay.AddBoolControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
+        gameplay.AddBoolControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
+        gameplay.AddBoolControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
+        gameplay.AddControl("Disable Hero Collider", BindableFunctions.ToggleHeroCollider);
 
         /*
         Rect buttonRect = new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height);
@@ -311,7 +317,7 @@ public class TopMenu : CanvasPanel
 
         private int y = UICommon.MARGIN;
 
-        public CanvasButton AddBoolControl(string name, string displayName, Func<bool> getter, Action updater)
+        public CanvasButton AddControl(string name, Action updater)
         {
             CanvasButton button = panel.AddStyledButton(name);
 
@@ -319,7 +325,22 @@ public class TopMenu : CanvasPanel
             button.Size = new Vector2(panel.Size.x - UICommon.MARGIN * 2, UICommon.CONTROL_HEIGHT);
             y += UICommon.CONTROL_HEIGHT + UICommon.MARGIN;
 
-            button.Text.Text = displayName;
+            button.Text.Text = name;
+            button.Text.Color = deselectedColor;
+            button.OnClicked += updater;
+
+            return button;
+        }
+
+        public CanvasButton AddBoolControl(string name, Func<bool> getter, Action updater)
+        {
+            CanvasButton button = panel.AddStyledButton(name);
+
+            button.LocalPosition = new Vector2(UICommon.MARGIN, y);
+            button.Size = new Vector2(panel.Size.x - UICommon.MARGIN * 2, UICommon.CONTROL_HEIGHT);
+            y += UICommon.CONTROL_HEIGHT + UICommon.MARGIN;
+
+            button.Text.Text = name;
             button.OnUpdate += () =>
             {
                 button.Text.Color = getter() ? selectedColor : deselectedColor;

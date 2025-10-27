@@ -77,6 +77,7 @@ public static partial class BindableFunctions
             DebugMod.RefHeroBox.enabled = true;
             DebugMod.LogConsole("Enabled hero collider" + (DebugMod.noclip ? " and disabled noclip" : ""));
             DebugMod.noclip = false;
+            DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
         }
         else
         {
