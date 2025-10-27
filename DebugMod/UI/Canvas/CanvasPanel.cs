@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
 public class CanvasPanel : CanvasNode
 {
-    private readonly Dictionary<string, CanvasButton> buttons = new();
-    private readonly Dictionary<string, CanvasPanel> panels = new();
-    private readonly Dictionary<string, CanvasImage> images = new();
-    private readonly Dictionary<string, CanvasText> texts = new();
+    protected readonly Dictionary<string, CanvasNode> elements = new();
     private readonly bool contextual;
 
     public CanvasPanel(string name, CanvasNode parent, bool contextual = false)
@@ -30,33 +28,12 @@ public class CanvasPanel : CanvasNode
         AddImage("Background", tex, Vector2.zero, size, subSprite);
     }
 
-    protected override IEnumerable<CanvasNode> ChildList()
-    {
-        foreach (CanvasImage image in images.Values)
-        {
-            yield return image;
-        }
-
-        foreach (CanvasButton button in buttons.Values)
-        {
-            yield return button;
-        }
-
-        foreach (CanvasText text in texts.Values)
-        {
-            yield return text;
-        }
-
-        foreach (CanvasPanel panel in panels.Values)
-        {
-            yield return panel;
-        }
-    }
+    protected override IEnumerable<CanvasNode> ChildList() => elements.Values;
 
     public CanvasButton AddButton(string name)
     {
         CanvasButton button = new CanvasButton(name, this);
-        buttons.Add(name, button);
+        elements.Add(name, button);
         return button;
     }
 
@@ -88,28 +65,28 @@ public class CanvasPanel : CanvasNode
             t.Alignment = TextAnchor.MiddleCenter;
         }
 
-        buttons.Add(name, button);
+        elements.Add(name, button);
         return button;
     }
 
     public CanvasPanel AddPanel(string name)
     {
         CanvasPanel panel = new CanvasPanel(name, this);
-        panels.Add(name, panel);
+        elements.Add(name, panel);
         return panel;
     }
 
     public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite, bool contextual = false)
     {
         CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite, contextual);
-        panels.Add(name, panel);
+        elements.Add(name, panel);
         return panel;
     }
 
     public CanvasImage AddImage(string name)
     {
         CanvasImage image = new CanvasImage(name, this);
-        images.Add(name, image);
+        elements.Add(name, image);
         return image;
     }
 
@@ -130,14 +107,14 @@ public class CanvasPanel : CanvasNode
         image.Size = sz;
         image.UpdateImage(tex, subSprite);
 
-        images.Add(name, image);
+        elements.Add(name, image);
         return image;
     }
 
     public CanvasText AddText(string name)
     {
         CanvasText text = new CanvasText(name, this);
-        texts.Add(name, text);
+        elements.Add(name, text);
         return text;
     }
 
@@ -157,77 +134,41 @@ public class CanvasPanel : CanvasNode
         t.FontStyle = style;
         t.Alignment = alignment;
 
-        texts.Add(name, t);
+        elements.Add(name, t);
         return t;
     }
 
-    public CanvasButton GetButton(string buttonName, string panelName = null)
+    protected void AddElement(CanvasNode node)
     {
-        if (panelName != null && panels.ContainsKey(panelName))
-        {
-            return panels[panelName].GetButton(buttonName);
-        }
-
-        if (buttons.ContainsKey(buttonName))
-        {
-            return buttons[buttonName];
-        }
-
-        return null;
+        elements.Add(node.Name, node);
     }
 
-    public CanvasImage GetImage(string imageName, string panelName = null)
+    public CanvasButton GetButton(string name) => elements[name] as CanvasButton;
+    public CanvasButton GetButton(string name, string panel) => GetPanel(panel).GetButton(name);
+    public CanvasImage GetImage(string name) => elements[name] as CanvasImage;
+    public CanvasImage GetImage(string name, string panel) => GetPanel(panel).GetImage(name);
+    public CanvasPanel GetPanel(string name) => elements[name] as CanvasPanel;
+    public CanvasText GetText(string name) => elements[name] as CanvasText;
+    public CanvasText GetText(string name, string panel) => GetPanel(panel).GetText(name);
+
+    protected IEnumerable<T> AllElementsOfType<T>() where T : CanvasNode
     {
-        if (panelName != null && panels.ContainsKey(panelName))
-        {
-            return panels[panelName].GetImage(imageName);
-        }
-
-        if (images.ContainsKey(imageName))
-        {
-            return images[imageName];
-        }
-
-        return null;
-    }
-
-    public CanvasPanel GetPanel(string panelName)
-    {
-        if (panels.ContainsKey(panelName))
-        {
-            return panels[panelName];
-        }
-
-        return null;
-    }
-
-    public CanvasText GetText(string textName, string panelName = null)
-    {
-        if (panelName != null && panels.ContainsKey(panelName))
-        {
-            return panels[panelName].GetText(textName);
-        }
-
-        if (texts.ContainsKey(textName))
-        {
-            return texts[textName];
-        }
-
-        return null;
+        return elements.Values.Where(x => x is T).Cast<T>();
     }
 
     public void TogglePanel(string name)
     {
-        if (ActiveInHierarchy && panels.ContainsKey(name))
+        if (ActiveInHierarchy)
         {
-            panels[name].ToggleActive();
+            CanvasPanel panel = GetPanel(name);
+            panel.ToggleActive();
 
             // Hide any other panels with the same position
-            foreach (CanvasPanel panel in panels.Values)
+            foreach (CanvasPanel other in AllElementsOfType<CanvasPanel>())
             {
-                if (panel != panels[name] && panel.ActiveInHierarchy && panel.Position == panels[name].Position)
+                if (other != panel && other.ActiveInHierarchy && other.Position == panel.Position)
                 {
-                    panel.ActiveSelf = false;
+                    other.ActiveSelf = false;
                 }
             }
         }
@@ -240,7 +181,7 @@ public class CanvasPanel : CanvasNode
         if (!ActiveSelf)
         {
             // Hide contextual panels
-            foreach (CanvasPanel panel in panels.Values)
+            foreach (CanvasPanel panel in AllElementsOfType<CanvasPanel>())
             {
                 if (panel.contextual)
                 {

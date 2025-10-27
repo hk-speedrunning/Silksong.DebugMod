@@ -26,31 +26,24 @@ public static class UICommon
     public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
     public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
 
-    public static CanvasButton AddStyledButton(this CanvasPanel panel, string name)
+    public static void ApplyCommonStyle(CanvasButton button)
     {
-        CanvasButton button = panel.AddButton(name);
         button.UpdateImage(buttonBG);
 
         CanvasText t = button.AddText();
         t.Font = arial;
         t.Alignment = TextAnchor.MiddleCenter;
-
-        return button;
+        t.Color = textColor;
     }
 
-    public static CanvasPanel AddStyledPanel(this CanvasPanel panel, string name, Vector2 size)
+    public static void ApplyCommonStyle(CanvasPanel panel)
     {
-        CanvasPanel p = panel.AddPanel(name);
-        p.Size = size;
-
-        CanvasImage background = p.AddImage("Background");
-        background.Size = size;
+        CanvasImage background = panel.AddImage("Background");
+        background.Size = panel.Size;
         background.UpdateImage(panelBG);
-
-        return p;
     }
 
-    private static Color RGB(int r, int g, int b) => new Color(r / 255f, g / 255f, b / 255f);
+    private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
 
     private static Texture2D SolidColor(Color color)
     {
