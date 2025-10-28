@@ -15,9 +15,11 @@ public static class UICommon
     public const int SCREEN_MARGIN = 25;
     public const int MARGIN = 6;
     public const int CONTROL_HEIGHT = 25;
+    public const int BORDER_THICKNESS = 1;
 
     public static readonly Color textColor = Color.white;
     public static readonly Color accentColor = RGB(137, 180, 250);
+    public static readonly Color borderColor = RGB(205, 214, 244);
 
     public static Font trajanBold;
     public static Font trajanNormal;
@@ -28,7 +30,8 @@ public static class UICommon
 
     public static void ApplyCommonStyle(CanvasButton button)
     {
-        button.UpdateImage(buttonBG);
+        button.SetImage(buttonBG);
+        AddBorder(button);
 
         CanvasText t = button.AddText();
         t.Font = arial;
@@ -40,7 +43,13 @@ public static class UICommon
     {
         CanvasImage background = panel.AddImage("Background");
         background.Size = panel.Size;
-        background.UpdateImage(panelBG);
+        background.SetImage(panelBG);
+        AddBorder(background);
+    }
+
+    public static void AddBorder(CanvasImage image)
+    {
+        image.AddBorder(BORDER_THICKNESS, borderColor);
     }
 
     private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);

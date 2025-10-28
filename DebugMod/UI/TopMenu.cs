@@ -156,7 +156,8 @@ public class TopMenu : CanvasPanel
     {
         CanvasButton button = AddButton($"{name}TabButton");
         UICommon.ApplyCommonStyle(button);
-        button.UpdateImage(UICommon.panelBG);
+        button.SetImage(UICommon.panelBG);
+        button.Border.Sides &= ~BorderSides.BOTTOM;
         button.Text.Text = name;
         button.OnClicked += () => currentTab = name;
 

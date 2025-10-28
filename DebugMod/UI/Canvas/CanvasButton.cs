@@ -26,6 +26,11 @@ public class CanvasButton : CanvasImage
 
     protected override IEnumerable<CanvasNode> ChildList()
     {
+        foreach (CanvasNode child in base.ChildList())
+        {
+            yield return child;
+        }
+
         if (text != null) yield return text;
     }
 

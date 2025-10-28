@@ -53,7 +53,7 @@ public class CanvasPanel : CanvasNode
         CanvasButton button = new CanvasButton(name, this);
         button.LocalPosition = pos;
         button.Size = sz;
-        button.UpdateImage(tex, subSprite);
+        button.SetImage(tex, subSprite);
         button.OnClicked += func;
 
         if (text != null && font != null)
@@ -105,7 +105,7 @@ public class CanvasPanel : CanvasNode
         CanvasImage image = new CanvasImage(name, this);
         image.LocalPosition = pos;
         image.Size = sz;
-        image.UpdateImage(tex, subSprite);
+        image.SetImage(tex, subSprite);
 
         elements.Add(name, image);
         return image;

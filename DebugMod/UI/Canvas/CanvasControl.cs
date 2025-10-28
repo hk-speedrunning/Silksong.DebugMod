@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
@@ -25,6 +26,8 @@ public class CanvasControl : CanvasNode
     public CanvasButton AppendSquareButton(string name) => AppendButton(name, Size.y);
 
     protected override IEnumerable<CanvasNode> ChildList() => nodes;
+
+    public T GetNode<T>(string name) where T : CanvasNode => nodes.FirstOrDefault(x => x.Name == name) as T;
 
     public override void Build()
     {

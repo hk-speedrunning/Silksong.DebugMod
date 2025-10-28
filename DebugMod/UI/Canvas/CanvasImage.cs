@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
@@ -7,11 +8,14 @@ public class CanvasImage : CanvasObject
 {
     private Texture2D tex;
     private Rect subSprite;
+    private CanvasBorder border;
+
+    public CanvasBorder Border => border;
 
     public CanvasImage(string name, CanvasNode parent)
         : base(name, parent) {}
 
-    public void UpdateImage(Texture2D tex, Rect subSprite = default)
+    public void SetImage(Texture2D tex, Rect subSprite = default)
     {
         if (subSprite.width == 0 || subSprite.height == 0)
         {
@@ -27,9 +31,16 @@ public class CanvasImage : CanvasObject
         }
     }
 
-    private void UpdateSprite()
+    public void AddBorder(int thickness, Color color)
     {
-        obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+        border = new CanvasBorder("Border", this);
+        border.Thickness = thickness;
+        border.Color = color;
+    }
+
+    protected override IEnumerable<CanvasNode> ChildList()
+    {
+        if (border != null) yield return border;
     }
 
     public override void Build()
@@ -42,5 +53,10 @@ public class CanvasImage : CanvasObject
         transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
         transform.SetScaleX(Size.x / subSprite.width);
         transform.SetScaleY(Size.y / subSprite.height);
+    }
+
+    private void UpdateSprite()
+    {
+        obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
     }
 }
