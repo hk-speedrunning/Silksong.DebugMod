@@ -7,7 +7,7 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasBorder : CanvasObject
 {
-    private static readonly Dictionary<(Vector2, int, Color, BorderSides), Texture2D> textureCache = new();
+    private static readonly Dictionary<(Vector2, int, Color, BorderSides), Sprite> spriteCache = new();
 
     public int Thickness { get; set; }
     public Color Color { get; set; }
@@ -22,9 +22,10 @@ public class CanvasBorder : CanvasObject
 
         Size = Parent.Size;
 
-        if (!textureCache.TryGetValue((Size, Thickness, Color, Sides), out Texture2D tex))
+        if (!spriteCache.TryGetValue((Size, Thickness, Color, Sides), out Sprite sprite))
         {
-            tex = new Texture2D((int)Size.x, (int)Size.y);
+            Texture2D tex = new Texture2D((int)Size.x, (int)Size.y, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
 
             // Make the entire texture transparent
             Color[] colors = new Color[tex.width * tex.height];
@@ -37,17 +38,18 @@ public class CanvasBorder : CanvasObject
                 tex.SetPixels(x, y, width, height, colors);
             }
 
-            if ((Sides & BorderSides.LEFT) > 0) FillRect(0, 0, Thickness, tex.height);
-            if ((Sides & BorderSides.RIGHT) > 0) FillRect(tex.width - Thickness, 0, Thickness, tex.height);
-            if ((Sides & BorderSides.TOP) > 0) FillRect(0, tex.height - Thickness, tex.width, Thickness);
-            if ((Sides & BorderSides.BOTTOM) > 0) FillRect(0, 0, tex.width, Thickness);
+            if ((Sides & BorderSides.LEFT) != 0) FillRect(0, 0, Thickness, tex.height);
+            if ((Sides & BorderSides.RIGHT) != 0) FillRect(tex.width - Thickness, 0, Thickness, tex.height);
+            if ((Sides & BorderSides.TOP) != 0) FillRect(0, tex.height - Thickness, tex.width, Thickness);
+            if ((Sides & BorderSides.BOTTOM) != 0) FillRect(0, 0, tex.width, Thickness);
 
             tex.Apply();
-            textureCache.Add((Size, Thickness, Color, Sides), tex);
+
+            sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+            spriteCache.Add((Size, Thickness, Color, Sides), sprite);
         }
 
-        Image image = obj.AddComponent<Image>();
-        image.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+        obj.AddComponent<Image>().sprite = sprite;
     }
 }
 

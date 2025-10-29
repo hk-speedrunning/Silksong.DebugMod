@@ -17,11 +17,6 @@ public class CanvasControl : CanvasNode
         nodes.Add(button);
 
         UICommon.ApplyCommonStyle(button);
-        if (nodes.Count > 1)
-        {
-            button.Border.Sides &= ~BorderSides.LEFT;
-        }
-
         button.Size = new Vector2(width, Size.y);
 
         return button;
@@ -58,11 +53,12 @@ public class CanvasControl : CanvasNode
             }
             else
             {
-                fixedSize += node.Size.x;
+                // Overlap borders on adjacent elements so the middle ones aren't twice as thick
+                fixedSize += node.Size.x - UICommon.BORDER_THICKNESS;
             }
         }
 
-        float flexWidth = (Size.x - fixedSize) / flexNodes;
+        float flexWidth = (Size.x - UICommon.BORDER_THICKNESS - fixedSize) / flexNodes;
         float x = 0;
 
         foreach (CanvasNode node in nodes)
@@ -73,7 +69,7 @@ public class CanvasControl : CanvasNode
             }
 
             node.LocalPosition = new Vector2(x, 0);
-            x += node.Size.x;
+            x += node.Size.x - UICommon.BORDER_THICKNESS;
         }
 
         base.Build();
