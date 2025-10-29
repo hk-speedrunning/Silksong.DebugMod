@@ -5,7 +5,7 @@ namespace DebugMod.UI;
 
 public class KeybindContextPanel : CanvasPanel
 {
-    public const int KEYCODE_TEXT_WIDTH = 80;
+    public const int KEYCODE_TEXT_WIDTH = 90;
     public const int ROW_HEIGHT = 20;
     public const int PANEL_WIDTH = KEYCODE_TEXT_WIDTH + ROW_HEIGHT * 2 + UICommon.MARGIN * 2;
     public const int PANEL_HEIGHT = ROW_HEIGHT * 2 + UICommon.MARGIN;
@@ -48,11 +48,13 @@ public class KeybindContextPanel : CanvasPanel
         editButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + UICommon.MARGIN * 2, ROW_HEIGHT + UICommon.MARGIN * 2);
         editButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         editButton.SetImage(UICommon.images["Scrollbar_point"]);
+        editButton.OnClicked += () => DebugMod.settings.binds[bindAction.Name] = KeyCode.None;
 
         CanvasButton clearButton = AddButton("Clear");
         clearButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + ROW_HEIGHT + UICommon.MARGIN * 3, ROW_HEIGHT + UICommon.MARGIN * 2);
         clearButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         clearButton.SetImage(UICommon.images["ButtonDel"]);
+        clearButton.OnClicked += () => DebugMod.settings.binds.Remove(bindAction.Name);
     }
 
     public override void Update()
