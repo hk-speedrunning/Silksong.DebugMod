@@ -155,18 +155,15 @@ public class TopMenu : CanvasPanel
     private CanvasAutoPanel AddTab(string name)
     {
         CanvasButton button = AddButton($"{name}TabButton");
-        UICommon.ApplyCommonStyle(button);
         button.SetImage(UICommon.panelBG);
         button.Border.Sides &= ~BorderSides.BOTTOM;
         button.Text.Text = name;
         button.OnClicked += () => currentTab = name;
 
-        CanvasAutoPanel panel = new CanvasAutoPanel(name, this);
-        AddElement(panel);
-
+        CanvasAutoPanel panel = Add<CanvasAutoPanel>(name);
         panel.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
         panel.Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT);
-        UICommon.ApplyCommonStyle(panel);
+        UICommon.AddBackground(panel);
 
         tabs.Add(panel);
         return panel;

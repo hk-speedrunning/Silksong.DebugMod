@@ -12,8 +12,7 @@ public class CanvasAutoPanel : CanvasPanel
 
     private CanvasControl AppendEmptyControl(string name)
     {
-        CanvasControl control = new CanvasControl(name, this);
-        AddElement(control);
+        CanvasControl control = Add<CanvasControl>(name);
 
         control.LocalPosition = new Vector2(UICommon.MARGIN, Offset);
         control.Size = new Vector2(Size.x - UICommon.MARGIN * 2, UICommon.CONTROL_HEIGHT);

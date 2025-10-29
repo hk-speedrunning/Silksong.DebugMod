@@ -56,14 +56,18 @@ public class CanvasPanel : CanvasNode
         button.SetImage(tex, subSprite);
         button.OnClicked += func;
 
-        if (text != null && font != null)
+        if (text != null || font != null)
         {
-            CanvasText t = button.AddText();
-            t.Text = text;
-            t.Font = font;
-            t.FontSize = fontSize;
-            t.Alignment = TextAnchor.MiddleCenter;
+            button.Text.Text = text;
+            button.Text.Font = font;
+            button.Text.FontSize = fontSize;
         }
+        else
+        {
+            button.RemoveText();
+        }
+
+        button.RemoveBorder();
 
         elements.Add(name, button);
         return button;
@@ -138,9 +142,11 @@ public class CanvasPanel : CanvasNode
         return t;
     }
 
-    protected void AddElement(CanvasNode node)
+    public T Add<T>(string name) where T : CanvasNode
     {
-        elements.Add(node.Name, node);
+        T element = (T)Activator.CreateInstance(typeof(T), name, this);
+        elements.Add(name, element);
+        return element;
     }
 
     public CanvasButton GetButton(string name) => elements[name] as CanvasButton;

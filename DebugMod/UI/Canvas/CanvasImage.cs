@@ -33,9 +33,14 @@ public class CanvasImage : CanvasObject
 
     public void AddBorder(int thickness, Color color)
     {
-        border = new CanvasBorder("Border", this);
+        border ??= new CanvasBorder("Border", this);
         border.Thickness = thickness;
         border.Color = color;
+    }
+
+    public void RemoveBorder()
+    {
+        border = null;
     }
 
     protected override IEnumerable<CanvasNode> ChildList()

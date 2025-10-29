@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
@@ -15,13 +16,19 @@ public class CanvasButton : CanvasImage
     protected override bool Interactable => true;
 
     public CanvasButton(string name, CanvasNode parent)
-        : base(name, parent) {}
-
-    public CanvasText AddText()
+        : base(name, parent)
     {
+        SetImage(UICommon.buttonBG);
+
         text = new CanvasText("ButtonText", this);
-        text.Size = Size;
-        return text;
+        text.Alignment = TextAnchor.MiddleCenter;
+
+        UICommon.AddBorder(this);
+    }
+
+    public void RemoveText()
+    {
+        text = null;
     }
 
     protected override IEnumerable<CanvasNode> ChildList()

@@ -30,30 +30,33 @@ public class KeybindContextPanel : CanvasPanel
         ActiveSelf = false;
         Size = new Vector2(PANEL_WIDTH + UICommon.MARGIN * 2, PANEL_HEIGHT + UICommon.MARGIN * 2);
 
-        UICommon.ApplyCommonStyle(this);
+        UICommon.AddBackground(this);
 
         nameText = AddText("BindName");
         nameText.LocalPosition = new Vector2(UICommon.MARGIN, UICommon.MARGIN);
         nameText.Size = new Vector2(PANEL_WIDTH, ROW_HEIGHT);
-        UICommon.ApplyCommonStyle(nameText);
+        nameText.Alignment = TextAnchor.MiddleCenter;
 
         // TODO: replace this with uneditable text field
         keycodeText = AddText("Keycode");
         keycodeText.LocalPosition = new Vector2(UICommon.MARGIN, ROW_HEIGHT + UICommon.MARGIN * 2);
         keycodeText.Size = new Vector2(KEYCODE_TEXT_WIDTH, ROW_HEIGHT);
-        UICommon.ApplyCommonStyle(keycodeText);
         keycodeText.Alignment = TextAnchor.MiddleLeft;
 
         CanvasButton editButton = AddButton("Edit");
         editButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + UICommon.MARGIN * 2, ROW_HEIGHT + UICommon.MARGIN * 2);
         editButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         editButton.SetImage(UICommon.images["Scrollbar_point"]);
+        editButton.RemoveText();
+        editButton.RemoveBorder();
         editButton.OnClicked += () => DebugMod.settings.binds[bindAction.Name] = KeyCode.None;
 
         CanvasButton clearButton = AddButton("Clear");
         clearButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + ROW_HEIGHT + UICommon.MARGIN * 3, ROW_HEIGHT + UICommon.MARGIN * 2);
         clearButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         clearButton.SetImage(UICommon.images["ButtonDel"]);
+        clearButton.RemoveText();
+        clearButton.RemoveBorder();
         clearButton.OnClicked += () => DebugMod.settings.binds.Remove(bindAction.Name);
     }
 

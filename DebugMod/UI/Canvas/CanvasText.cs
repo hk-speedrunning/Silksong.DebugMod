@@ -8,11 +8,11 @@ public class CanvasText : CanvasObject
     private Text t;
 
     private string text;
-    private Font font;
+    private Font font = UICommon.arial;
     private int fontSize = 13;
     private FontStyle fontStyle = FontStyle.Normal;
     private TextAnchor alignment = TextAnchor.UpperLeft;
-    private Color color = Color.white;
+    private Color color = UICommon.textColor;
 
     public string Text
     {

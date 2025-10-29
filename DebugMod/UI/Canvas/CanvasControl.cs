@@ -14,11 +14,8 @@ public class CanvasControl : CanvasNode
     public CanvasButton AppendButton(string name, float width)
     {
         CanvasButton button = new CanvasButton(name, this);
-        nodes.Add(button);
-
-        UICommon.ApplyCommonStyle(button);
         button.Size = new Vector2(width, Size.y);
-
+        nodes.Add(button);
         return button;
     }
 
@@ -27,9 +24,9 @@ public class CanvasControl : CanvasNode
 
     public CanvasButton AttachKeybind(string bindName)
     {
-        CanvasButton button = AppendSquareButton("Keybind"); // TODO: do this without creating a CanvasText
-        UICommon.ApplyCommonStyle(button, text: false);
+        CanvasButton button = AppendSquareButton("Keybind");
         button.SetImage(UICommon.images["Scrollbar_point"]);
+        button.RemoveText();
 
         button.OnClicked += () => KeybindContextPanel.Instance.Toggle(button, bindName);
 
