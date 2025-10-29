@@ -17,6 +17,11 @@ public class CanvasControl : CanvasNode
         nodes.Add(button);
 
         UICommon.ApplyCommonStyle(button);
+        if (nodes.Count > 1)
+        {
+            button.Border.Sides &= ~BorderSides.LEFT;
+        }
+
         button.Size = new Vector2(width, Size.y);
 
         return button;
@@ -24,6 +29,17 @@ public class CanvasControl : CanvasNode
 
     public CanvasButton AppendFlexButton(string name) => AppendButton(name, 0);
     public CanvasButton AppendSquareButton(string name) => AppendButton(name, Size.y);
+
+    public CanvasButton AttachKeybind(string bindName)
+    {
+        CanvasButton button = AppendSquareButton("Keybind"); // TODO: do this without creating a CanvasText
+        UICommon.ApplyCommonStyle(button, text: false);
+        button.SetImage(UICommon.images["Scrollbar_point"]);
+
+        button.OnClicked += () => KeybindContextPanel.Instance.Toggle(button, bindName);
+
+        return button;
+    }
 
     protected override IEnumerable<CanvasNode> ChildList() => nodes;
 

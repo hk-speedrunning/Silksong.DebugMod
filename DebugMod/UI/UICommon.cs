@@ -28,15 +28,23 @@ public static class UICommon
     public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
     public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
 
-    public static void ApplyCommonStyle(CanvasButton button)
+    public static void ApplyCommonStyle(CanvasButton button, bool text = true)
     {
         button.SetImage(buttonBG);
         AddBorder(button);
 
-        CanvasText t = button.AddText();
-        t.Font = arial;
-        t.Alignment = TextAnchor.MiddleCenter;
-        t.Color = textColor;
+        if (text)
+        {
+            CanvasText t = button.AddText();
+            ApplyCommonStyle(t);
+        }
+    }
+
+    public static void ApplyCommonStyle(CanvasText text)
+    {
+        text.Font = arial;
+        text.Alignment = TextAnchor.MiddleCenter;
+        text.Color = textColor;
     }
 
     public static void ApplyCommonStyle(CanvasPanel panel)

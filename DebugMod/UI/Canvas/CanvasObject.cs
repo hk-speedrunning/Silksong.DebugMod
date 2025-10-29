@@ -54,7 +54,7 @@ public abstract class CanvasObject : CanvasNode
         {
             CanvasGroup group = obj.AddComponent<CanvasGroup>();
             group.interactable = false;
-            group.blocksRaycasts = false;
+            group.blocksRaycasts = Name == "Background";
         }
 
         obj.SetActive(ActiveInHierarchy);

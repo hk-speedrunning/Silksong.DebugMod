@@ -77,6 +77,7 @@ public class GUIController : MonoBehaviour
         ConsolePanel.BuildPanel();
         SaveStatesPanel.BuildPanel();
         InfoPanel.BuildInfoPanels();
+        KeybindContextPanel.BuildPanel();
 
         DontDestroyOnLoad(canvas);
     }

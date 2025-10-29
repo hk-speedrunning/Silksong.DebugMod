@@ -43,6 +43,12 @@ public class CanvasImage : CanvasObject
         if (border != null) yield return border;
     }
 
+    protected override void OnUpdatePosition()
+    {
+        base.OnUpdatePosition();
+        UpdateScale();
+    }
+
     public override void Build()
     {
         base.Build();
@@ -50,13 +56,28 @@ public class CanvasImage : CanvasObject
         obj.AddComponent<Image>();
         UpdateSprite();
 
-        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-        transform.SetScaleX(Size.x / subSprite.width);
-        transform.SetScaleY(Size.y / subSprite.height);
+        UpdateScale();
     }
 
     private void UpdateSprite()
     {
-        obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+        if (tex)
+        {
+            obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+        }
+        else
+        {
+            DebugMod.LogWarn($"CanvasImage {GetQualifiedName()} has no texture");
+        }
+    }
+
+    private void UpdateScale()
+    {
+        if (transform)
+        {
+            transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
+            transform.SetScaleX(Size.x / subSprite.width);
+            transform.SetScaleY(Size.y / subSprite.height);
+        }
     }
 }

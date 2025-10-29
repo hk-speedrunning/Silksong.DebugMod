@@ -26,13 +26,13 @@ public class TopMenu : CanvasPanel
 
         CanvasAutoPanel gameplay = AddTab("Gameplay");
 
-        gameplay.AppendBoolControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
-        gameplay.AppendBoolControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
-        gameplay.AppendBoolControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
-        gameplay.AppendBoolControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
-        gameplay.AppendBoolControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
-        gameplay.AppendBoolControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
-        gameplay.AppendControl("Disable Hero Collider", BindableFunctions.ToggleHeroCollider);
+        gameplay.AppendBoolControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip).AttachKeybind("Noclip");
+        gameplay.AppendBoolControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility).AttachKeybind("Invincibility");
+        gameplay.AppendBoolControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP).AttachKeybind("Infinite HP");
+        gameplay.AppendBoolControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk).AttachKeybind("Infinite Silk");
+        gameplay.AppendBoolControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools).AttachKeybind("Infinite Tools");
+        gameplay.AppendBoolControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump).AttachKeybind("Infinite Jump");
+        gameplay.AppendControl("Disable Hero Collider", BindableFunctions.ToggleHeroCollider).AttachKeybind("Toggle Hero Collider");
 
         /*
         Rect buttonRect = new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height);
