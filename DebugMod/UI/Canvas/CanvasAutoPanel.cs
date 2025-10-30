@@ -48,4 +48,13 @@ public class CanvasAutoPanel : CanvasPanel
             button.Text.Color = getter() ? UICommon.accentColor : UICommon.textColor;
         });
     }
+
+    // TODO: replace this with a slider or increment/decrement buttons
+    public CanvasControl AppendIncrementControl(string name, Func<int> getter, Action effect)
+    {
+        return AppendButtonControl(name, effect, button =>
+        {
+            button.Text.Text = $"{name}: {getter()}";
+        });
+    }
 }

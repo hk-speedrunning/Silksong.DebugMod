@@ -53,24 +53,18 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Increment Cloak", category = "Skills")]
-    public static void IncrementCloak()
+    [BindableMethod(name = "Give Drifter's Cloak", category = "Skills")]
+    public static void ToggleDriftersCloak()
     {
-        if (!PlayerData.instance.hasBrolly && !PlayerData.instance.hasDoubleJump)
+        if (!PlayerData.instance.hasBrolly)
         {
             PlayerData.instance.hasBrolly = true;
             DebugMod.LogConsole("Giving player Drifter's Cloak");
         }
-        else if (PlayerData.instance.hasBrolly && !PlayerData.instance.hasDoubleJump)
-        {
-            PlayerData.instance.hasDoubleJump = true;
-            DebugMod.LogConsole("Giving player Faydown Cloak");
-        }
         else
         {
             PlayerData.instance.hasBrolly = false;
-            PlayerData.instance.hasDoubleJump = false;
-            DebugMod.LogConsole("Taking away cloak upgrades");
+            DebugMod.LogConsole("Taking away Drifter's Cloak");
         }
     }
 
@@ -118,6 +112,21 @@ public static partial class BindableFunctions
         {
             PlayerData.instance.hasHarpoonDash = false;
             DebugMod.LogConsole("Taking away Clawline");
+        }
+    }
+
+    [BindableMethod(name = "Give Faydown Cloak", category = "Skills")]
+    public static void ToggleFaydownCloak()
+    {
+        if (!PlayerData.instance.hasDoubleJump)
+        {
+            PlayerData.instance.hasDoubleJump = true;
+            DebugMod.LogConsole("Giving player Faydown Cloak");
+        }
+        else
+        {
+            PlayerData.instance.hasDoubleJump = false;
+            DebugMod.LogConsole("Taking away Faydown Cloak");
         }
     }
 
