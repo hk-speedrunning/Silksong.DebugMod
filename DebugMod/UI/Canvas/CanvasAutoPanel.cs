@@ -21,27 +21,31 @@ public class CanvasAutoPanel : CanvasPanel
         return control;
     }
 
-    public CanvasControl AppendControl(string name, Action effect)
+    private CanvasControl AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
         CanvasControl control = AppendEmptyControl(name);
 
         CanvasButton button = control.AppendFlexButton("Button");
         button.Text.Text = name;
         button.OnClicked += effect;
+        if (update != null) button.OnUpdate += () => update(button);
+
+        if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
+        {
+            control.AttachKeybind(action.Name);
+        }
 
         return control;
     }
 
+    public CanvasControl AppendControl(string name, Action effect) => AppendButtonControl(name, effect, null);
+
     // TODO: replace this with checkbox
-    public CanvasControl AppendBoolControl(string name, Func<bool> getter, Action updater)
+    public CanvasControl AppendToggleControl(string name, Func<bool> getter, Action effect)
     {
-        CanvasControl control = AppendEmptyControl(name);
-
-        CanvasButton button = control.AppendFlexButton("Button");
-        button.Text.Text = name;
-        button.OnUpdate += () => button.Text.Color = getter() ? UICommon.accentColor : UICommon.textColor;
-        button.OnClicked += updater;
-
-        return control;
+        return AppendButtonControl(name, effect, button =>
+        {
+            button.Text.Color = getter() ? UICommon.accentColor : UICommon.textColor;
+        });
     }
 }

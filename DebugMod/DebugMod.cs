@@ -78,6 +78,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static int extraNailDamage;
 
     internal static readonly Dictionary<string, BindAction> bindActions = new();
+    internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
     internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
     
     public void Awake()
@@ -104,7 +105,9 @@ public partial class DebugMod : BaseUnityPlugin
             if (attributes.Any())
             {
                 BindableMethod attr = (BindableMethod)attributes[0];
-                bindActions.Add(attr.name, new BindAction(attr, method));
+                BindAction action = new(attr, method);
+                bindActions.Add(attr.name, action);
+                bindsByMethod.Add(method, action);
             }
         }
 

@@ -26,15 +26,48 @@ public class MainPanel : CanvasPanel
 
         CanvasAutoPanel gameplay = AddTab("Gameplay");
 
-        gameplay.AppendBoolControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip).AttachKeybind("Noclip");
-        gameplay.AppendBoolControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility).AttachKeybind("Invincibility");
-        gameplay.AppendBoolControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP).AttachKeybind("Infinite HP");
-        gameplay.AppendBoolControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk).AttachKeybind("Infinite Silk");
-        gameplay.AppendBoolControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools).AttachKeybind("Infinite Tools");
-        gameplay.AppendBoolControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump).AttachKeybind("Infinite Jump");
-        gameplay.AppendControl("Disable Hero Collider", BindableFunctions.ToggleHeroCollider).AttachKeybind("Toggle Hero Collider");
+        gameplay.AppendToggleControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
+        gameplay.AppendToggleControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
+        gameplay.AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
+        gameplay.AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
+        gameplay.AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
+        gameplay.AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
+        gameplay.AppendControl("Disable Hero Collider", BindableFunctions.ToggleHeroCollider);
+
+        CanvasAutoPanel items = AddTab("Items");
+
+        items.AppendControl("All Skills", BindableFunctions.GiveAllSkills);
 
         /*
+        //Skills panel buttons
+        // TODO: use images instead of text?
+        skillsPanel.AddButton("All Skills", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveAllSkills, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Skills", 10);
+        skillsPanel.AddButton("Silk Heart", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.IncrementSilkHeart, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silk Hearts: " + PlayerData.instance.silkRegenMax, 10);
+        skillsPanel.AddButton("Swift Step", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.ToggleSwiftStep, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Swift Step", 10);
+        skillsPanel.AddButton("Cloak", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementCloak, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Drifter's", 10);
+        skillsPanel.AddButton("Cling Grip", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleClingGrip, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Cling Grip", 10);
+        skillsPanel.AddButton("Needolin", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.ToggleNeedolin, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Needolin", 10);
+        skillsPanel.AddButton("Clawline", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, BindableFunctions.ToggleClawline, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Clawline", 10);
+        skillsPanel.AddButton("Silk Soar", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 240f), Vector2.zero, BindableFunctions.ToggleSilkSoar, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silk Soar", 10);
+        skillsPanel.AddButton("Beastling Call", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 270f), Vector2.zero, BindableFunctions.ToggleBeastlingCall, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Beastling", 10);
+        skillsPanel.AddButton("Elegy of the Deep", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 300f), Vector2.zero, BindableFunctions.ToggleElegyOfTheDeep, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Elegy", 10);
+        skillsPanel.AddButton("Needle Strike", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 330f), Vector2.zero, BindableFunctions.ToggleNeedleStrike, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Needle Strike", 10);
+
+        //Tools panel
+        toolsPanel.AddButton("All Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Tools", 10);
+        toolsPanel.AddButton("All Crests", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Crests", 10);
+        toolsPanel.AddButton("Tool Pouches", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.IncrementPouches, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
+        toolsPanel.AddButton("Crafting Kits", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementKits, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
+        toolsPanel.AddButton("Infinite Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleInfiniteTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Infinite Uses", 10);
+        toolsPanel.AddButton("Craft Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.CraftTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Craft Tools", 10);
+
+        //Items panel
+        itemsPanel.AddButton("Rosaries", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Rosaries", 10);
+        itemsPanel.AddButton("Shell Shards", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.GiveShellShards, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Shards", 10);
+        itemsPanel.AddButton("Memory Lockets", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.GiveMemoryLockets, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Lockets", 10);
+        itemsPanel.AddButton("Craftmetal", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.GiveCraftmetal, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Craftmetal", 10);
+        itemsPanel.AddButton("Silkeater", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.GiveSilkeater, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silkeater", 10);
+
         Rect buttonRect = new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height);
 
         //Main buttons
@@ -67,53 +100,6 @@ public class MainPanel : CanvasPanel
         cheatsPanel.AddButton("Infinite Jump", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleInfiniteJump, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Infinite Jump", 10);
         cheatsPanel.AddButton("Kill Self", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.KillSelf, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Kill Self", 10);
         cheatsPanel.AddButton("Lock KeyBinds", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, BindableFunctions.ToggleLockKeyBinds, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Lock KeyBinds", 9);
-
-        //Skills panel buttons
-        // TODO: use images instead of text?
-        skillsPanel.AddButton("All Skills", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveAllSkills, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Skills", 10);
-        skillsPanel.AddButton("Silk Heart", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.IncrementSilkHeart, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silk Hearts: " + PlayerData.instance.silkRegenMax, 10);
-        skillsPanel.AddButton("Swift Step", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.ToggleSwiftStep, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Swift Step", 10);
-        skillsPanel.AddButton("Cloak", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementCloak, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Drifter's", 10);
-        skillsPanel.AddButton("Cling Grip", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleClingGrip, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Cling Grip", 10);
-        skillsPanel.AddButton("Needolin", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.ToggleNeedolin, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Needolin", 10);
-        skillsPanel.AddButton("Clawline", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 210f), Vector2.zero, BindableFunctions.ToggleClawline, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Clawline", 10);
-        skillsPanel.AddButton("Silk Soar", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 240f), Vector2.zero, BindableFunctions.ToggleSilkSoar, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silk Soar", 10);
-        skillsPanel.AddButton("Beastling Call", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 270f), Vector2.zero, BindableFunctions.ToggleBeastlingCall, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Beastling", 10);
-        skillsPanel.AddButton("Elegy of the Deep", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 300f), Vector2.zero, BindableFunctions.ToggleElegyOfTheDeep, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Elegy", 10);
-        skillsPanel.AddButton("Needle Strike", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 330f), Vector2.zero, BindableFunctions.ToggleNeedleStrike, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Needle Strike", 10);
-
-        //Tools panel
-        toolsPanel.AddButton("All Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.UnlockAllTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Tools", 10);
-        toolsPanel.AddButton("All Crests", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.UnlockAllCrests, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "All Crests", 10);
-        toolsPanel.AddButton("Tool Pouches", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.IncrementPouches, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Pouches: " + PlayerData.instance.ToolPouchUpgrades, 10);
-        toolsPanel.AddButton("Crafting Kits", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.IncrementKits, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Kits: " + PlayerData.instance.ToolKitUpgrades, 10);
-        toolsPanel.AddButton("Infinite Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.ToggleInfiniteTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Infinite Uses", 10);
-        toolsPanel.AddButton("Craft Tools", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 180f), Vector2.zero, BindableFunctions.CraftTools, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Craft Tools", 10);
-
-        //Items panel
-        itemsPanel.AddButton("Rosaries", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 30f), Vector2.zero, BindableFunctions.GiveRosaries, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Rosaries", 10);
-        itemsPanel.AddButton("Shell Shards", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 60f), Vector2.zero, BindableFunctions.GiveShellShards, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Shards", 10);
-        itemsPanel.AddButton("Memory Lockets", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 90f), Vector2.zero, BindableFunctions.GiveMemoryLockets, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Lockets", 10);
-        itemsPanel.AddButton("Craftmetal", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 120f), Vector2.zero, BindableFunctions.GiveCraftmetal, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Craftmetal", 10);
-        itemsPanel.AddButton("Silkeater", UICommon.images["ButtonRectEmpty"], new Vector2(5f, 150f), Vector2.zero, BindableFunctions.GiveSilkeater, new Rect(0f, 0f, 80f, 20f), UICommon.trajanNormal, "Silkeater", 10);
-
-        // itemsPanel.AddButton("Pale Ore", UICommon.images["PaleOre"], new Vector2(5f, 30f), new Vector2(23f, 22f), PaleOreClicked, new Rect(0, 0, UICommon.images["PaleOre"].width, UICommon.images["PaleOre"].height));
-        // itemsPanel.AddButton("Simple Key", UICommon.images["SimpleKey"], new Vector2(33f, 30f), new Vector2(23f, 23f), SimpleKeyClicked, new Rect(0, 0, UICommon.images["SimpleKey"].width, UICommon.images["SimpleKey"].height));
-        // itemsPanel.AddButton("Rancid Egg", UICommon.images["RancidEgg"], new Vector2(61f, 30f), new Vector2(23f, 30f), RancidEggClicked, new Rect(0, 0, UICommon.images["RancidEgg"].width, UICommon.images["RancidEgg"].height));
-        // itemsPanel.AddButton("Geo", UICommon.images["Geo"], new Vector2(5f, 63f), new Vector2(23f, 23f), GeoClicked, new Rect(0, 0, UICommon.images["Geo"].width, UICommon.images["Geo"].height));
-        // itemsPanel.AddButton("Essence", UICommon.images["Essence"], new Vector2(33f, 63f), new Vector2(23f, 23f), EssenceClicked, new Rect(0, 0, UICommon.images["Essence"].width, UICommon.images["Essence"].height));
-        // itemsPanel.AddButton("Lantern", UICommon.images["Lantern"], new Vector2(5f, 96f), new Vector2(37f, 41f), LanternClicked, new Rect(0, 0, UICommon.images["Lantern"].width, UICommon.images["Lantern"].height));
-        // itemsPanel.AddButton("Tram Pass", UICommon.images["TramPass"], new Vector2(43f, 96f), new Vector2(37f, 27f), TramPassClicked, new Rect(0, 0, UICommon.images["TramPass"].width, UICommon.images["TramPass"].height));
-        // itemsPanel.AddButton("Map & Quill", UICommon.images["MapQuill"], new Vector2(5f, 147f), new Vector2(37f, 30f), MapQuillClicked, new Rect(0, 0, UICommon.images["MapQuill"].width, UICommon.images["MapQuill"].height));
-        // itemsPanel.AddButton("City Crest", UICommon.images["CityKey"], new Vector2(43f, 147f), new Vector2(37f, 50f), CityKeyClicked, new Rect(0, 0, UICommon.images["CityKey"].width, UICommon.images["CityKey"].height));
-        // itemsPanel.AddButton("Sly Key", UICommon.images["SlyKey"], new Vector2(5f, 207f), new Vector2(37f, 39f), SlyKeyClicked, new Rect(0, 0, UICommon.images["SlyKey"].width, UICommon.images["SlyKey"].height));
-        // itemsPanel.AddButton("Elegant Key", UICommon.images["ElegantKey"], new Vector2(43f, 207f), new Vector2(37f, 36f), ElegantKeyClicked, new Rect(0, 0, UICommon.images["ElegantKey"].width, UICommon.images["ElegantKey"].height));
-        // itemsPanel.AddButton("Love Key", UICommon.images["LoveKey"], new Vector2(5f, 256f), new Vector2(37f, 36f), LoveKeyClicked, new Rect(0, 0, UICommon.images["LoveKey"].width, UICommon.images["LoveKey"].height));
-        // itemsPanel.AddButton("King's Brand", UICommon.images["Kingsbrand"], new Vector2(43f, 256f), new Vector2(37f, 35f), KingsbrandClicked, new Rect(0, 0, UICommon.images["Kingsbrand"].width, UICommon.images["Kingsbrand"].height));
-        // itemsPanel.AddButton("Bullshit Flower", UICommon.images["Flower"], new Vector2(5f, 302f), new Vector2(37f, 35f), FlowerClicked, new Rect(0, 0, UICommon.images["Flower"].width, UICommon.images["Flower"].height));
-        // itemsPanel.AddButton("Stags", UICommon.images["LastStagFace"], new Vector2(43f, 302f), new Vector2(37f, 35f), StagsClicked, new Rect(0, 0, UICommon.images["LastStagFace"].width, UICommon.images["LastStagFace"].height));
-        // itemsPanel.AddButton("Mask", UICommon.images["Mask"], new Vector2(5f, 351f), new Vector2(37f, 35f), MaskClicked, new Rect(0, 0, UICommon.images["Mask"].width, UICommon.images["Mask"].height));
-        // itemsPanel.AddButton("Vessel", UICommon.images["Vessel"], new Vector2(43f, 351f), new Vector2(37f, 35f), VesselClicked, new Rect(0, 0, UICommon.images["Vessel"].width, UICommon.images["Vessel"].height));
 
         //Items panel button glow
         // itemsPanel.AddImage("Lantern Glow", UICommon.images["BlueGlow"], new Vector2(0f, 91f), new Vector2(47f, 51f), new Rect(0f, 0f, UICommon.images["BlueGlow"].width, UICommon.images["BlueGlow"].height));
