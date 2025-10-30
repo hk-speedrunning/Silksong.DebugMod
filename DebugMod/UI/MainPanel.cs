@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public class TopMenu : CanvasPanel
+public class MainPanel : CanvasPanel
 {
     public const int TAB_BUTTON_HEIGHT = 20;
 
-    public static TopMenu Instance { get; private set; }
+    public static MainPanel Instance { get; private set; }
 
     private readonly List<CanvasAutoPanel> tabs = [];
     private string currentTab;
 
     public static void BuildPanel()
     {
-        Instance = new TopMenu();
+        Instance = new MainPanel();
         Instance.Build();
     }
 
-    public TopMenu() : base(nameof(TopMenu), null)
+    public MainPanel() : base(nameof(MainPanel), null)
     {
         LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.SCREEN_MARGIN);
         Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT);
@@ -191,7 +191,7 @@ public class TopMenu : CanvasPanel
     {
         base.Update();
 
-        ActiveSelf = DebugMod.settings.TopMenuVisible;
+        ActiveSelf = DebugMod.settings.MainPanelVisible;
 
         if (ActiveInHierarchy)
         {

@@ -23,7 +23,7 @@ public class Settings
 
     public bool SaveStatePanelVisible = true;
     
-    public bool TopMenuVisible = true;
+    public bool MainPanelVisible = true;
 
     public bool FirstRun = true;
 

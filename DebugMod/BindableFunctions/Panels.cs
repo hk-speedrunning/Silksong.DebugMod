@@ -11,13 +11,13 @@ public static partial class BindableFunctions
             DebugMod.settings.HelpPanelVisible ||
             DebugMod.settings.InfoPanelVisible ||
             DebugMod.settings.EnemiesPanelVisible ||
-            DebugMod.settings.TopMenuVisible ||
+            DebugMod.settings.MainPanelVisible ||
             DebugMod.settings.ConsoleVisible ||
             DebugMod.settings.SaveStatePanelVisible
             );
 
         DebugMod.settings.InfoPanelVisible = active;
-        DebugMod.settings.TopMenuVisible = active;
+        DebugMod.settings.MainPanelVisible = active;
         DebugMod.settings.EnemiesPanelVisible = active;
         DebugMod.settings.ConsoleVisible = active;
         DebugMod.settings.HelpPanelVisible = active;
@@ -40,10 +40,10 @@ public static partial class BindableFunctions
         DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Top Menu", category = "Mod UI")]
-    public static void ToggleTopRightPanel()
+    [BindableMethod(name = "Toggle Main Panel", category = "Mod UI")]
+    public static void ToggleMainPanel()
     {
-        DebugMod.settings.TopMenuVisible = !DebugMod.settings.TopMenuVisible;
+        DebugMod.settings.MainPanelVisible = !DebugMod.settings.MainPanelVisible;
     }
 
     [BindableMethod(name = "Toggle Console", category = "Mod UI")]
