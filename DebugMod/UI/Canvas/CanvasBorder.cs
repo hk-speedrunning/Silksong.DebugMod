@@ -20,7 +20,16 @@ public class CanvasBorder : CanvasObject
     {
         base.Build();
 
-        Size = Parent.Size;
+        Vector2 truncated = new((int)Position.x, (int)Position.y);
+        if (Position != truncated)
+        {
+            LocalPosition += truncated - Position;
+        }
+
+        if (Size.x == 0 || Size.y == 0)
+        {
+            Size = Parent.Size;
+        }
 
         if (!spriteCache.TryGetValue((Size, Thickness, Color, Sides), out Sprite sprite))
         {

@@ -26,6 +26,7 @@ public class MainPanel : CanvasPanel
 
         CanvasAutoPanel gameplay = AddTab("Gameplay");
 
+        gameplay.AppendSectionHeader("Cheats");
         gameplay.AppendToggleControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
         gameplay.AppendToggleControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
         gameplay.AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
@@ -36,6 +37,7 @@ public class MainPanel : CanvasPanel
 
         CanvasAutoPanel items = AddTab("Items");
 
+        items.AppendSectionHeader("Skills");
         items.AppendControl("All Skills", BindableFunctions.GiveAllSkills);
         items.AppendIncrementControl("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart);
         items.AppendToggleControl("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep);
@@ -49,12 +51,14 @@ public class MainPanel : CanvasPanel
         items.AppendToggleControl("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep);
         items.AppendToggleControl("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike);
 
+        items.AppendSectionHeader("Tools");
         items.AppendControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
         items.AppendControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
         items.AppendIncrementControl("Tool Pouches", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches);
         items.AppendIncrementControl("Crafting Kits", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits);
         items.AppendControl("Craft Tools", BindableFunctions.CraftTools);
 
+        items.AppendSectionHeader("Consumables");
         items.AppendControl("Give Rosaries", BindableFunctions.GiveRosaries);
         items.AppendControl("Give Shell Shards", BindableFunctions.GiveShellShards);
         items.AppendControl("Give All Memory Lockets", BindableFunctions.GiveMemoryLockets);

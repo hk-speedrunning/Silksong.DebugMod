@@ -5,25 +5,43 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasAutoPanel : CanvasPanel
 {
-    public int Offset { get; set; } = UICommon.MARGIN;
+    public const int SECTION_END_PADDING = 20;
+    public const int SECTION_HEADER_HEIGHT = 30;
+
+    public float Offset { get; set; } = UICommon.MARGIN;
 
     public CanvasAutoPanel(string name, CanvasNode parent)
         : base(name, parent) {}
 
-    private CanvasControl AppendEmptyControl(string name)
+    public T Append<T>(string name, float height) where T : CanvasNode
     {
-        CanvasControl control = Add<CanvasControl>(name);
+        T element = Add<T>(name);
+        element.LocalPosition = new Vector2(UICommon.MARGIN, Offset);
+        element.Size = new Vector2(Size.x - UICommon.MARGIN * 2, height);
+        Offset += height + UICommon.MARGIN;
+        return element;
+    }
 
-        control.LocalPosition = new Vector2(UICommon.MARGIN, Offset);
-        control.Size = new Vector2(Size.x - UICommon.MARGIN * 2, UICommon.CONTROL_HEIGHT);
-        Offset += UICommon.CONTROL_HEIGHT + UICommon.MARGIN;
+    public CanvasText AppendSectionHeader(string name)
+    {
+        Offset += SECTION_END_PADDING;
 
-        return control;
+        TextGenerationSettings settings = new();
+        TextGenerator generator = new TextGenerator();
+        float height = generator.GetPreferredHeight(name, settings);
+
+        CanvasText text = Append<CanvasText>(name, SECTION_HEADER_HEIGHT);
+        text.Text = name;
+        text.Font = UICommon.trajanNormal;
+        text.FontSize = 30;
+        text.Alignment = TextAnchor.MiddleCenter;
+
+        return text;
     }
 
     private CanvasControl AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasControl control = AppendEmptyControl(name);
+        CanvasControl control = Append<CanvasControl>(name, UICommon.CONTROL_HEIGHT);
 
         CanvasButton button = control.AppendFlexButton("Button");
         button.Text.Text = name;
