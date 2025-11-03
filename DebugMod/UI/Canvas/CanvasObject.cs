@@ -5,17 +5,16 @@ namespace DebugMod.UI.Canvas;
 // Represents a node that maps to a Unity object in the UI
 public abstract class CanvasObject : CanvasNode
 {
-    internal GameObject obj;
-    internal RectTransform transform;
+    protected GameObject gameObject;
+    protected RectTransform transform;
 
     protected virtual bool Interactable => false;
 
-    protected CanvasObject(string name, CanvasNode parent)
-        : base(name, parent) {}
+    protected CanvasObject(string name) : base(name) {}
 
     protected override void OnUpdatePosition()
     {
-        if (obj)
+        if (gameObject)
         {
             AnchorToCenter();
         }
@@ -32,9 +31,9 @@ public abstract class CanvasObject : CanvasNode
 
     protected override void OnUpdateActive()
     {
-        if (obj)
+        if (gameObject)
         {
-            obj.SetActive(ActiveInHierarchy);
+            gameObject.SetActive(ActiveInHierarchy);
         }
 
         base.OnUpdateActive();
@@ -42,34 +41,38 @@ public abstract class CanvasObject : CanvasNode
 
     public override void Build()
     {
-        obj = new GameObject(GetQualifiedName());
-        obj.transform.SetParent(GUIController.Instance.canvas.transform, false);
+        gameObject = new GameObject(GetQualifiedName());
+        gameObject.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
-        obj.AddComponent<CanvasRenderer>();
+        CanvasRenderer renderer = gameObject.AddComponent<CanvasRenderer>();
+        if (ShouldClip(out Rect clipRect))
+        {
+            DebugMod.LogDebug($"{Name} {clipRect}");
+            renderer.EnableRectClipping(clipRect);
+        }
 
-        transform = obj.AddComponent<RectTransform>();
+        transform = gameObject.AddComponent<RectTransform>();
         AnchorToCenter();
 
         if (!Interactable)
         {
-            CanvasGroup group = obj.AddComponent<CanvasGroup>();
+            CanvasGroup group = gameObject.AddComponent<CanvasGroup>();
             group.interactable = false;
             group.blocksRaycasts = Name == "Background";
         }
 
-        obj.SetActive(ActiveInHierarchy);
+        gameObject.SetActive(ActiveInHierarchy);
 
         base.Build();
     }
-
 
     public override void Destroy()
     {
         base.Destroy();
 
-        if (obj)
+        if (gameObject)
         {
-            Object.Destroy(obj);
+            Object.Destroy(gameObject);
         }
     }
 }

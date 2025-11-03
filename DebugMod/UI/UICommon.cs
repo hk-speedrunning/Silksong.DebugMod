@@ -30,7 +30,7 @@ public static class UICommon
 
     public static void AddBackground(CanvasPanel panel)
     {
-        CanvasImage background = panel.AddImage("Background");
+        CanvasImage background = panel.Add(new CanvasImage("Background"));
         background.Size = panel.Size;
         background.SetImage(panelBG);
         AddBorder(background);

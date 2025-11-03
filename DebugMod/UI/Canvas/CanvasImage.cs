@@ -12,8 +12,7 @@ public class CanvasImage : CanvasObject
 
     public CanvasBorder Border => border;
 
-    public CanvasImage(string name, CanvasNode parent)
-        : base(name, parent) {}
+    public CanvasImage(string name) : base(name) {}
 
     public void SetImage(Texture2D tex, Rect subSprite = default)
     {
@@ -25,7 +24,7 @@ public class CanvasImage : CanvasObject
         this.tex = tex;
         this.subSprite = subSprite;
 
-        if (obj)
+        if (gameObject)
         {
             UpdateSprite();
         }
@@ -33,7 +32,8 @@ public class CanvasImage : CanvasObject
 
     public void AddBorder(int thickness, Color color)
     {
-        border ??= new CanvasBorder("Border", this);
+        border ??= new CanvasBorder("Border");
+        border.Parent = this;
         border.Thickness = thickness;
         border.Color = color;
     }
@@ -58,7 +58,7 @@ public class CanvasImage : CanvasObject
     {
         base.Build();
 
-        obj.AddComponent<Image>();
+        gameObject.AddComponent<Image>();
         UpdateSprite();
 
         UpdateScale();
@@ -68,7 +68,7 @@ public class CanvasImage : CanvasObject
     {
         if (tex)
         {
-            obj.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+            gameObject.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
         }
         else
         {

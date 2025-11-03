@@ -8,12 +8,12 @@ public class CanvasControl : CanvasNode
 {
     private readonly List<CanvasNode> nodes = [];
 
-    public CanvasControl(string name, CanvasNode parent)
-        : base(name, parent) {}
+    public CanvasControl(string name) : base(name) {}
 
     public CanvasButton AppendButton(string name, float width)
     {
-        CanvasButton button = new CanvasButton(name, this);
+        CanvasButton button = new CanvasButton(name);
+        button.Parent = this;
         button.Size = new Vector2(width, Size.y);
         nodes.Add(button);
         return button;

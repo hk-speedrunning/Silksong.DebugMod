@@ -10,12 +10,11 @@ public class CanvasAutoPanel : CanvasPanel
 
     public float Offset { get; set; } = UICommon.MARGIN;
 
-    public CanvasAutoPanel(string name, CanvasNode parent)
-        : base(name, parent) {}
+    public CanvasAutoPanel(string name) : base(name) {}
 
-    public T Append<T>(string name, float height) where T : CanvasNode
+    public T Append<T>(T element, float height) where T : CanvasNode
     {
-        T element = Add<T>(name);
+        Add(element);
         element.LocalPosition = new Vector2(UICommon.MARGIN, Offset);
         element.Size = new Vector2(Size.x - UICommon.MARGIN * 2, height);
         Offset += height + UICommon.MARGIN;
@@ -26,11 +25,7 @@ public class CanvasAutoPanel : CanvasPanel
     {
         Offset += SECTION_END_PADDING;
 
-        TextGenerationSettings settings = new();
-        TextGenerator generator = new TextGenerator();
-        float height = generator.GetPreferredHeight(name, settings);
-
-        CanvasText text = Append<CanvasText>(name, SECTION_HEADER_HEIGHT);
+        CanvasText text = Append(new CanvasText(name), SECTION_HEADER_HEIGHT);
         text.Text = name;
         text.Font = UICommon.trajanNormal;
         text.FontSize = 30;
@@ -41,7 +36,7 @@ public class CanvasAutoPanel : CanvasPanel
 
     private CanvasControl AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasControl control = Append<CanvasControl>(name, UICommon.CONTROL_HEIGHT);
+        CanvasControl control = Append(new CanvasControl(name), UICommon.CONTROL_HEIGHT);
 
         CanvasButton button = control.AppendFlexButton("Button");
         button.Text.Text = name;
@@ -74,21 +69,5 @@ public class CanvasAutoPanel : CanvasPanel
         {
             button.Text.Text = $"{name}: {getter()}";
         });
-    }
-
-    public override void Build()
-    {
-        base.Build();
-
-        Rect clipRect = new Rect(Position.x - 1920f / 2f + 1, 1080f / 2f - Position.y - Size.y + 1, Size.x - 2, Size.y - 2);
-
-        foreach (CanvasNode child in Subtree())
-        {
-            if (child != GetImage("Background") && child != GetImage("Background").Border && child is CanvasObject canvasObject)
-            {
-                CanvasRenderer renderer = canvasObject.obj.GetComponent<CanvasRenderer>();
-                renderer.EnableRectClipping(clipRect);
-            }
-        }
     }
 }

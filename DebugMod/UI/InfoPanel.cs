@@ -42,8 +42,9 @@ public abstract class InfoPanel : CanvasPanel
     }
 
     protected InfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
-        : base(name, parent)
+        : base(name)
     {
+        Parent = parent;
         LocalPosition = position;
         Size = size;
     }

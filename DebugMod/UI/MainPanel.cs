@@ -10,7 +10,7 @@ public class MainPanel : CanvasPanel
 
     public static MainPanel Instance { get; private set; }
 
-    private readonly List<CanvasAutoPanel> tabs = [];
+    private readonly List<CanvasPanel> tabs = [];
     private string currentTab;
 
     public static void BuildPanel()
@@ -19,7 +19,7 @@ public class MainPanel : CanvasPanel
         Instance.Build();
     }
 
-    public MainPanel() : base(nameof(MainPanel), null)
+    public MainPanel() : base(nameof(MainPanel))
     {
         LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.SCREEN_MARGIN);
         Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT);
@@ -68,18 +68,26 @@ public class MainPanel : CanvasPanel
 
     private CanvasAutoPanel AddTab(string name)
     {
-        CanvasButton button = AddButton($"{name}TabButton");
+        CanvasButton button = Add(new CanvasButton($"{name}TabButton"));
         button.SetImage(UICommon.panelBG);
         button.Border.Sides &= ~BorderSides.BOTTOM;
         button.Text.Text = name;
         button.OnClicked += () => currentTab = name;
 
-        CanvasAutoPanel panel = Add<CanvasAutoPanel>(name);
-        panel.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
-        panel.Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT);
+        CanvasPanel tab = Add(new CanvasPanel(name));
+        tab.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
+        tab.Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT);
+        UICommon.AddBackground(tab);
+        tabs.Add(tab);
+
+        CanvasScrollView scroll = tab.Add(new CanvasScrollView("ScrollView"));
+        scroll.Margin = new Vector2(UICommon.BORDER_THICKNESS, UICommon.BORDER_THICKNESS);
+        scroll.Size = tab.Size;
+
+        CanvasAutoPanel panel = scroll.SetContent(new CanvasAutoPanel("Panel"));
+        panel.Size = tab.Size;
         UICommon.AddBackground(panel);
 
-        tabs.Add(panel);
         return panel;
     }
 
@@ -88,7 +96,7 @@ public class MainPanel : CanvasPanel
         float tabButtonWidth = (Size.x - UICommon.MARGIN * (tabs.Count - 1)) / tabs.Count;
         float tabX = 0;
 
-        foreach (CanvasAutoPanel tab in tabs)
+        foreach (CanvasPanel tab in tabs)
         {
             CanvasButton tabButton = GetButton($"{tab.Name}TabButton");
             tabButton.LocalPosition = new Vector2(tabX, 0);
@@ -109,7 +117,7 @@ public class MainPanel : CanvasPanel
 
         if (ActiveInHierarchy)
         {
-            foreach (CanvasAutoPanel tab in tabs)
+            foreach (CanvasPanel tab in tabs)
             {
                 tab.ActiveSelf = currentTab == tab.Name;
             }

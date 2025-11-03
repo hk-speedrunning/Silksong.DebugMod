@@ -74,14 +74,13 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public CanvasText(string name, CanvasNode parent)
-        : base(name, parent) {}
+    public CanvasText(string name) : base(name) {}
 
     public override void Build()
     {
         base.Build();
 
-        t = obj.AddComponent<Text>();
+        t = gameObject.AddComponent<Text>();
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;

@@ -10,8 +10,7 @@ public class CanvasPanel : CanvasNode
     protected readonly Dictionary<string, CanvasNode> elements = new();
     private readonly bool contextual;
 
-    public CanvasPanel(string name, CanvasNode parent, bool contextual = false)
-        : base(name, parent)
+    public CanvasPanel(string name, bool contextual = false) : base(name)
     {
         this.contextual = contextual;
         if (contextual)
@@ -21,21 +20,15 @@ public class CanvasPanel : CanvasNode
     }
 
     public CanvasPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, Texture2D tex, Rect subSprite = default, bool contextual = false)
-        : this(name, parent, contextual)
+        : this(name, contextual)
     {
+        Parent = parent;
         LocalPosition = position;
         Size = size;
         AddImage("Background", tex, Vector2.zero, size, subSprite);
     }
 
     protected override IEnumerable<CanvasNode> ChildList() => elements.Values;
-
-    public CanvasButton AddButton(string name)
-    {
-        CanvasButton button = new CanvasButton(name, this);
-        elements.Add(name, button);
-        return button;
-    }
 
     public CanvasButton AddButton(string name, Texture2D tex, Vector2 pos, Vector2 sz, Action func, Rect subSprite = default, Font font = null, string text = null, int fontSize = 13)
     {
@@ -50,7 +43,8 @@ public class CanvasPanel : CanvasNode
             sz = new Vector2(subSprite.width, subSprite.height);
         }
 
-        CanvasButton button = new CanvasButton(name, this);
+        CanvasButton button = new CanvasButton(name);
+        button.Parent = this;
         button.LocalPosition = pos;
         button.Size = sz;
         button.SetImage(tex, subSprite);
@@ -73,25 +67,11 @@ public class CanvasPanel : CanvasNode
         return button;
     }
 
-    public CanvasPanel AddPanel(string name)
-    {
-        CanvasPanel panel = new CanvasPanel(name, this);
-        elements.Add(name, panel);
-        return panel;
-    }
-
     public CanvasPanel AddPanel(string name, Texture2D tex, Vector2 pos, Vector2 sz, Rect subSprite, bool contextual = false)
     {
         CanvasPanel panel = new CanvasPanel(name, this, pos, sz, tex, subSprite, contextual);
         elements.Add(name, panel);
         return panel;
-    }
-
-    public CanvasImage AddImage(string name)
-    {
-        CanvasImage image = new CanvasImage(name, this);
-        elements.Add(name, image);
-        return image;
     }
 
     public CanvasImage AddImage(string name, Texture2D tex, Vector2 pos, Vector2 sz = default, Rect subSprite = default)
@@ -106,20 +86,14 @@ public class CanvasPanel : CanvasNode
             sz = new Vector2(subSprite.width, subSprite.height);
         }
 
-        CanvasImage image = new CanvasImage(name, this);
+        CanvasImage image = new CanvasImage(name);
+        image.Parent = this;
         image.LocalPosition = pos;
         image.Size = sz;
         image.SetImage(tex, subSprite);
 
         elements.Add(name, image);
         return image;
-    }
-
-    public CanvasText AddText(string name)
-    {
-        CanvasText text = new CanvasText(name, this);
-        elements.Add(name, text);
-        return text;
     }
 
     public CanvasText AddText(string name, string text, Vector2 pos, Vector2 sz, Font font, int fontSize = 13, FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
@@ -129,7 +103,8 @@ public class CanvasPanel : CanvasNode
             sz = new Vector2(1920f, 1080f);
         }
 
-        CanvasText t = new CanvasText(name, this);
+        CanvasText t = new CanvasText(name);
+        t.Parent = this;
         t.LocalPosition = pos;
         t.Size = sz;
         t.Text = text;
@@ -142,10 +117,10 @@ public class CanvasPanel : CanvasNode
         return t;
     }
 
-    public T Add<T>(string name) where T : CanvasNode
+    public T Add<T>(T element) where T : CanvasNode
     {
-        T element = (T)Activator.CreateInstance(typeof(T), name, this);
-        elements.Add(name, element);
+        element.Parent = this;
+        elements.Add(element.Name, element);
         return element;
     }
 
@@ -167,7 +142,7 @@ public class CanvasPanel : CanvasNode
         if (ActiveInHierarchy)
         {
             CanvasPanel panel = GetPanel(name);
-            panel.ToggleActive();
+            panel.ActiveSelf = !panel.ActiveSelf;
 
             // Hide any other panels with the same position
             foreach (CanvasPanel other in AllElementsOfType<CanvasPanel>())

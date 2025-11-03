@@ -20,7 +20,7 @@ public class EnemiesPanel : CanvasPanel
         Instance.Build();
     }
 
-    public EnemiesPanel() : base(nameof(EnemiesPanel), null)
+    public EnemiesPanel() : base(nameof(EnemiesPanel))
     {
         LocalPosition = new Vector2(1920f - UICommon.images["EnemiesPBg"].width, 481f);
 

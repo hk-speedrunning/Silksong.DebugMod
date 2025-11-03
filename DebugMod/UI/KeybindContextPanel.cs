@@ -25,25 +25,25 @@ public class KeybindContextPanel : CanvasPanel
         Instance.Build();
     }
 
-    public KeybindContextPanel() : base(nameof(KeybindContextPanel), null)
+    public KeybindContextPanel() : base(nameof(KeybindContextPanel))
     {
         ActiveSelf = false;
         Size = new Vector2(PANEL_WIDTH + UICommon.MARGIN * 2, PANEL_HEIGHT + UICommon.MARGIN * 2);
 
         UICommon.AddBackground(this);
 
-        nameText = AddText("BindName");
+        nameText = Add(new CanvasText("BindName"));
         nameText.LocalPosition = new Vector2(UICommon.MARGIN, UICommon.MARGIN);
         nameText.Size = new Vector2(PANEL_WIDTH, ROW_HEIGHT);
         nameText.Alignment = TextAnchor.MiddleCenter;
 
         // TODO: replace this with uneditable text field
-        keycodeText = AddText("Keycode");
+        keycodeText = Add(new CanvasText("Keycode"));
         keycodeText.LocalPosition = new Vector2(UICommon.MARGIN, ROW_HEIGHT + UICommon.MARGIN * 2);
         keycodeText.Size = new Vector2(KEYCODE_TEXT_WIDTH, ROW_HEIGHT);
         keycodeText.Alignment = TextAnchor.MiddleLeft;
 
-        CanvasButton editButton = AddButton("Edit");
+        CanvasButton editButton = Add(new CanvasButton("Edit"));
         editButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + UICommon.MARGIN * 2, ROW_HEIGHT + UICommon.MARGIN * 2);
         editButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         editButton.SetImage(UICommon.images["Scrollbar_point"]);
@@ -51,7 +51,7 @@ public class KeybindContextPanel : CanvasPanel
         editButton.RemoveBorder();
         editButton.OnClicked += () => DebugMod.settings.binds[bindAction.Name] = KeyCode.None;
 
-        CanvasButton clearButton = AddButton("Clear");
+        CanvasButton clearButton = Add(new CanvasButton("Clear"));
         clearButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + ROW_HEIGHT + UICommon.MARGIN * 3, ROW_HEIGHT + UICommon.MARGIN * 2);
         clearButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
         clearButton.SetImage(UICommon.images["ButtonDel"]);

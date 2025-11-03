@@ -15,12 +15,12 @@ public class CanvasButton : CanvasImage
 
     protected override bool Interactable => true;
 
-    public CanvasButton(string name, CanvasNode parent)
-        : base(name, parent)
+    public CanvasButton(string name) : base(name)
     {
         SetImage(UICommon.buttonBG);
 
-        text = new CanvasText("ButtonText", this);
+        text = new CanvasText("ButtonText");
+        text.Parent = this;
         text.Alignment = TextAnchor.MiddleCenter;
 
         UICommon.AddBorder(this);
@@ -55,6 +55,6 @@ public class CanvasButton : CanvasImage
     {
         base.Build();
 
-        obj.AddComponent<Button>().onClick.AddListener(() => OnClicked?.Invoke());
+        gameObject.AddComponent<Button>().onClick.AddListener(() => OnClicked?.Invoke());
     }
 }

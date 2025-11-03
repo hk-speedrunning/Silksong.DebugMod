@@ -13,8 +13,7 @@ public class CanvasBorder : CanvasObject
     public Color Color { get; set; }
     public BorderSides Sides { get; set; } = BorderSides.ALL;
 
-    public CanvasBorder(string name, CanvasNode parent)
-        : base(name, parent) {}
+    public CanvasBorder(string name) : base(name) {}
 
     public override void Build()
     {
@@ -58,7 +57,7 @@ public class CanvasBorder : CanvasObject
             spriteCache.Add((Size, Thickness, Color, Sides), sprite);
         }
 
-        obj.AddComponent<Image>().sprite = sprite;
+        gameObject.AddComponent<Image>().sprite = sprite;
     }
 }
 
