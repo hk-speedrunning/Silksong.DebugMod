@@ -75,4 +75,20 @@ public class CanvasAutoPanel : CanvasPanel
             button.Text.Text = $"{name}: {getter()}";
         });
     }
+
+    public override void Build()
+    {
+        base.Build();
+
+        Rect clipRect = new Rect(Position.x - 1920f / 2f + 1, 1080f / 2f - Position.y - Size.y + 1, Size.x - 2, Size.y - 2);
+
+        foreach (CanvasNode child in Subtree())
+        {
+            if (child != GetImage("Background") && child != GetImage("Background").Border && child is CanvasObject canvasObject)
+            {
+                CanvasRenderer renderer = canvasObject.obj.GetComponent<CanvasRenderer>();
+                renderer.EnableRectClipping(clipRect);
+            }
+        }
+    }
 }

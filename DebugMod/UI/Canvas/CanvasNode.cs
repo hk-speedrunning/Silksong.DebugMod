@@ -78,6 +78,19 @@ public abstract class CanvasNode
         yield break;
     }
 
+    protected IEnumerable<CanvasNode> Subtree()
+    {
+        yield return this;
+
+        foreach (CanvasNode child in ChildList())
+        {
+            foreach (CanvasNode node in child.Subtree())
+            {
+                yield return node;
+            }
+        }
+    }
+
     protected virtual void OnUpdatePosition()
     {
         foreach (CanvasNode child in ChildList())
@@ -112,7 +125,7 @@ public abstract class CanvasNode
         }
     }
 
-    protected string GetQualifiedName() => $"{Parent?.GetQualifiedName()}:{Name}";
+    internal string GetQualifiedName() => $"{Parent?.GetQualifiedName()}:{Name}";
 
     public void ToggleActive() => ActiveSelf = !ActiveSelf;
 

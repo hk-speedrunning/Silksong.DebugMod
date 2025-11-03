@@ -5,8 +5,8 @@ namespace DebugMod.UI.Canvas;
 // Represents a node that maps to a Unity object in the UI
 public abstract class CanvasObject : CanvasNode
 {
-    protected GameObject obj;
-    protected RectTransform transform;
+    internal GameObject obj;
+    internal RectTransform transform;
 
     protected virtual bool Interactable => false;
 
