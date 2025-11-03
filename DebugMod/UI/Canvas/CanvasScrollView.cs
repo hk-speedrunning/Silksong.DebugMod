@@ -34,11 +34,13 @@ public class CanvasScrollView : CanvasNode
 
     public override void Update()
     {
-        if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f))
+        if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && IsMouseOver())
         {
             float y = content.LocalPosition.y + Input.mouseScrollDelta.y * SCROLL_SPEED;
             y = Mathf.Clamp(y, Size.y - content.Size.y, 0f);
             content.LocalPosition = new Vector2(content.LocalPosition.x, y);
         }
+
+        base.Update();
     }
 }

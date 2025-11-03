@@ -162,6 +162,18 @@ public abstract class CanvasNode
         return clip;
     }
 
+    protected bool IsMouseOver()
+    {
+        Rect bounds = new Rect(Position.x, 1080f - Position.y - Size.y, Size.x, Size.y);
+        if (ShouldClip(out Rect clipRect))
+        {
+            clipRect = new Rect(clipRect.position + new Vector2(1920f / 2f, 1080f / 2f), clipRect.size);
+            bounds = Intersect(bounds, clipRect);
+        }
+
+        return bounds.Contains(Input.mousePosition);
+    }
+
     private static Rect Intersect(Rect a, Rect b)
     {
         float xMin = Mathf.Max(a.xMin, b.xMin);

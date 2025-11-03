@@ -106,14 +106,14 @@ public class KeybindContextPanel : CanvasPanel
         bindAction = DebugMod.bindActions[action];
         nameText.Text = bindAction.Name;
 
-        float x = anchor.Position.x + anchor.Size.x / 2;
+        float x = (int)(anchor.Position.x + anchor.Size.x / 2);
         float xOver = x + Size.x - (1920f - UICommon.MARGIN);
         if (xOver > 0)
         {
             x -= xOver;
         }
 
-        float y = anchor.Position.y + anchor.Size.y / 2;
+        float y = (int)(anchor.Position.y + anchor.Size.y / 2);
         float yOver = y + Size.y - (1080f - UICommon.MARGIN);
         if (yOver > 0)
         {

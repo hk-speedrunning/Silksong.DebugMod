@@ -47,7 +47,6 @@ public abstract class CanvasObject : CanvasNode
         CanvasRenderer renderer = gameObject.AddComponent<CanvasRenderer>();
         if (ShouldClip(out Rect clipRect))
         {
-            DebugMod.LogDebug($"{Name} {clipRect}");
             renderer.EnableRectClipping(clipRect);
         }
 

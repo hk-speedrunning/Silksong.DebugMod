@@ -57,12 +57,10 @@ public class CanvasButton : CanvasImage
 
         gameObject.AddComponent<Button>().onClick.AddListener(() =>
         {
-            if (ShouldClip(out Rect clipRect) && !clipRect.Contains(Input.mousePosition + new Vector3(-1920f / 2f, -1080f / 2f)))
+            if (IsMouseOver())
             {
-                return;
+                OnClicked?.Invoke();
             }
-
-            OnClicked?.Invoke();
         });
     }
 }
