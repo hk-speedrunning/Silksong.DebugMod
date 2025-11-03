@@ -70,4 +70,10 @@ public class CanvasAutoPanel : CanvasPanel
             button.Text.Text = $"{name}: {getter()}";
         });
     }
+
+    public override void Build()
+    {
+        Size = new Vector2(Size.x, Mathf.Max(Size.y, Offset));
+        base.Build();
+    }
 }

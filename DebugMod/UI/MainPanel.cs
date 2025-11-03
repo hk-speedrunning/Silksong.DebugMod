@@ -68,12 +68,6 @@ public class MainPanel : CanvasPanel
 
     private CanvasAutoPanel AddTab(string name)
     {
-        CanvasButton button = Add(new CanvasButton($"{name}TabButton"));
-        button.SetImage(UICommon.panelBG);
-        button.Border.Sides &= ~BorderSides.BOTTOM;
-        button.Text.Text = name;
-        button.OnClicked += () => currentTab = name;
-
         CanvasPanel tab = Add(new CanvasPanel(name));
         tab.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
         tab.Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT);
@@ -86,7 +80,6 @@ public class MainPanel : CanvasPanel
 
         CanvasAutoPanel panel = scroll.SetContent(new CanvasAutoPanel("Panel"));
         panel.Size = tab.Size;
-        UICommon.AddBackground(panel);
 
         return panel;
     }
@@ -98,9 +91,15 @@ public class MainPanel : CanvasPanel
 
         foreach (CanvasPanel tab in tabs)
         {
-            CanvasButton tabButton = GetButton($"{tab.Name}TabButton");
-            tabButton.LocalPosition = new Vector2(tabX, 0);
-            tabButton.Size = new Vector2(tabButtonWidth, TAB_BUTTON_HEIGHT);
+            // Created after the tabs themselves so they get input priority over offscreen controls
+            CanvasButton button = Add(new CanvasButton($"{tab.Name}TabButton"));
+            button.LocalPosition = new Vector2(tabX, 0);
+            button.Size = new Vector2(tabButtonWidth, TAB_BUTTON_HEIGHT);
+            button.SetImage(UICommon.panelBG);
+            button.Border.Sides &= ~BorderSides.BOTTOM;
+            button.Text.Text = tab.Name;
+            button.OnClicked += () => currentTab = tab.Name;
+
             tabX += tabButtonWidth + UICommon.MARGIN;
         }
 
