@@ -294,6 +294,8 @@ internal class SaveState
         DialogueYesNoBox.ForceClose();
         QuestYesNoBox.ForceClose();
 
+        EventRegister.SendEvent("REST AREA MUSIC STOP");
+
         // Fix slopes
         foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
         {
