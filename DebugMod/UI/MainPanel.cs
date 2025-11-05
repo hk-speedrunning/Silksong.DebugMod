@@ -7,8 +7,27 @@ namespace DebugMod.UI;
 public class MainPanel : CanvasPanel
 {
     public const int TAB_BUTTON_HEIGHT = 20;
+    public const int KEYBIND_CATEGORY_HEADER_FONT_SIZE = 20;
+    public const int KEYBIND_LISTING_HEIGHT = 15;
 
     public static MainPanel Instance { get; private set; }
+
+    private static readonly List<string> keybindCategoryOrder =
+    [
+        "Cheats",
+        "Player",
+        "Time",
+        "Skills",
+        "Tools",
+        "Items",
+        "Consumables",
+        "Masks & Spools",
+        "Mod UI",
+        "Visual",
+        "Misc",
+        "Savestates",
+        "Enemy Panel",
+    ];
 
     private readonly List<CanvasPanel> tabs = [];
     private string currentTab;
@@ -127,6 +146,56 @@ public class MainPanel : CanvasPanel
         other.AppendControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
         other.AppendControl("Lock Keybinds", BindableFunctions.ToggleLockKeyBinds);
         other.AppendControl("Reset Cheats", BindableFunctions.Reset);
+
+        Dictionary<string, List<BindAction>> keybindData = [];
+        foreach (string category in keybindCategoryOrder)
+        {
+            keybindData.Add(category, []);
+        }
+
+        foreach (BindAction action in DebugMod.bindActions.Values)
+        {
+            if (!keybindData.ContainsKey(action.Category))
+            {
+                keybindCategoryOrder.Add(action.Category);
+                keybindData.Add(action.Category, []);
+            }
+            keybindData[action.Category].Add(action);
+        }
+
+        CanvasAutoPanel keybinds = AddTab("Keybinds");
+
+        foreach (string category in keybindCategoryOrder)
+        {
+            CanvasText header = keybinds.AppendSectionHeader(category);
+            header.FontSize = KEYBIND_CATEGORY_HEADER_FONT_SIZE;
+            header.Alignment = TextAnchor.MiddleLeft;
+
+            foreach (BindAction action in keybindData[category])
+            {
+                CanvasControl control = keybinds.Append(new CanvasControl(action.Name), KEYBIND_LISTING_HEIGHT);
+
+                CanvasText keybindName = control.AppendFlex(new CanvasText("KeybindName"));
+                keybindName.Text = action.Name;
+                keybindName.Alignment = TextAnchor.MiddleLeft;
+
+                CanvasText keycode = control.AppendFlex(new CanvasText("Keycode"));
+                keycode.Alignment = TextAnchor.MiddleLeft;
+                keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
+
+                CanvasButton edit = control.AppendSquare(new CanvasButton("Edit"));
+                edit.SetImage(UICommon.images["Scrollbar_point"]);
+                edit.RemoveText();
+                edit.RemoveBorder();
+                edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
+
+                CanvasButton clear = control.AppendSquare(new CanvasButton("Clear"));
+                clear.SetImage(UICommon.images["ButtonDel"]);
+                clear.RemoveText();
+                clear.RemoveBorder();
+                clear.OnClicked += () => DebugMod.settings.binds.Remove(action.Name);
+            }
+        }
     }
 
     private CanvasAutoPanel AddTab(string name)

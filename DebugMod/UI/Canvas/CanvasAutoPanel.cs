@@ -6,6 +6,7 @@ namespace DebugMod.UI.Canvas;
 public class CanvasAutoPanel : CanvasPanel
 {
     public const int SECTION_END_PADDING = 20;
+    public const int SECTION_HEADER_FONT_SIZE = 30;
     public const int SECTION_HEADER_HEIGHT = 30;
 
     public float Offset { get; set; } = UICommon.MARGIN;
@@ -28,7 +29,7 @@ public class CanvasAutoPanel : CanvasPanel
         CanvasText text = Append(new CanvasText(name), SECTION_HEADER_HEIGHT);
         text.Text = name;
         text.Font = UICommon.trajanNormal;
-        text.FontSize = 30;
+        text.FontSize = SECTION_HEADER_FONT_SIZE;
         text.Alignment = TextAnchor.MiddleCenter;
 
         return text;
@@ -38,7 +39,7 @@ public class CanvasAutoPanel : CanvasPanel
     {
         CanvasControl control = Append(new CanvasControl(name), UICommon.CONTROL_HEIGHT);
 
-        CanvasButton button = control.AppendFlexButton("Button");
+        CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
         button.Text.Text = name;
         button.OnClicked += effect;
         if (update != null) button.OnUpdate += () => update(button);

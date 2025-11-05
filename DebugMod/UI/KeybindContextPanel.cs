@@ -77,7 +77,7 @@ public class KeybindContextPanel : CanvasPanel
         base.Update();
     }
 
-    private string GetKeycodeText(string action)
+    public static string GetKeycodeText(string action)
     {
         if (DebugMod.settings.binds.TryGetValue(action, out KeyCode keycode))
         {

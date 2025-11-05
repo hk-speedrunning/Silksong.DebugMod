@@ -10,21 +10,20 @@ public class CanvasControl : CanvasNode
 
     public CanvasControl(string name) : base(name) {}
 
-    public CanvasButton AppendButton(string name, float width)
+    public T Append<T>(T element, float width) where T : CanvasNode
     {
-        CanvasButton button = new CanvasButton(name);
-        button.Parent = this;
-        button.Size = new Vector2(width, Size.y);
-        nodes.Add(button);
-        return button;
+        element.Parent = this;
+        element.Size = new Vector2(width, Size.y);
+        nodes.Add(element);
+        return element;
     }
 
-    public CanvasButton AppendFlexButton(string name) => AppendButton(name, 0);
-    public CanvasButton AppendSquareButton(string name) => AppendButton(name, Size.y);
+    public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, 0);
+    public T AppendSquare<T>(T element) where T : CanvasNode => Append(element, Size.y);
 
     public CanvasButton AttachKeybind(string bindName)
     {
-        CanvasButton button = AppendSquareButton("Keybind");
+        CanvasButton button = AppendSquare(new CanvasButton("Keybind"));
         button.SetImage(UICommon.images["Scrollbar_point"]);
         button.RemoveText();
 
