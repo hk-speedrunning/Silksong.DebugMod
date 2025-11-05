@@ -286,7 +286,7 @@ public class GUIController : MonoBehaviour
 
         if (DebugMod.cameraFollow)
         {
-            BindableFunctions.cameraGameplayScene.SetValue(DebugMod.RefCamera, false);
+            DebugMod.RefCamera.isGameplayScene = false;
             DebugMod.RefCamera.SnapTo(DebugMod.RefKnight.transform.position.x, DebugMod.RefKnight.transform.position.y);
         }
 
