@@ -62,22 +62,19 @@ public class KeybindContextPanel : CanvasPanel
 
     public override void Update()
     {
-        base.Update();
+        keycodeText.Text = GetKeycodeText(bindAction.Name);
 
-        if (ActiveInHierarchy)
+        if (!new Rect(Position.x, 1080f - Position.y - Size.y, Size.x, Size.y).Contains(Input.mousePosition)
+            && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
         {
-            keycodeText.Text = GetKeycodeText(bindAction.Name);
-
-            if (!new Rect(Position.x, 1080f - Position.y - Size.y, Size.x, Size.y).Contains(Input.mousePosition)
-                && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
-            {
-                Hide();
-            }
-            else if (anchor != null && (anchor.Position != anchorPos || !anchor.ActiveInHierarchy))
-            {
-                Hide();
-            }
+            Hide();
         }
+        else if (anchor != null && (anchor.Position != anchorPos || !anchor.ActiveInHierarchy))
+        {
+            Hide();
+        }
+
+        base.Update();
     }
 
     private string GetKeycodeText(string action)

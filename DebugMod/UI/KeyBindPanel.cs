@@ -258,11 +258,7 @@ public class KeyBindPanel : CanvasPanel
 
     public override void Update()
     {
-        base.Update();
-
-        ActiveSelf = DebugMod.settings.HelpPanelVisible;
-
-        if (ActiveInHierarchy && CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
+        if (CategoryInfo.currentPage >= 0 && CategoryInfo.currentPage < CategoryInfo.TotalPages)
         {
             for (int i = 0; i < ItemsPerPage; i++)
             {
@@ -270,5 +266,7 @@ public class KeyBindPanel : CanvasPanel
                 GetButton($"run{i}").ActiveSelf = CategoryInfo.FunctionsOnCurrentPage().Count > i;
             }
         }
+
+        base.Update();
     }
 }

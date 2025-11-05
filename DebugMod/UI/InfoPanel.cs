@@ -41,18 +41,20 @@ public abstract class InfoPanel : CanvasPanel
         }
     }
 
+    public static void UpdatePanels()
+    {
+        foreach (InfoPanel panel in AllPanels.Values)
+        {
+            panel.ActiveSelf = DebugMod.settings.InfoPanelVisible && DebugMod.settings.CurrentInfoPanelName == panel.Name;
+        }
+    }
+
     protected InfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
         : base(name)
     {
         Parent = parent;
         LocalPosition = position;
         Size = size;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-        ActiveSelf = DebugMod.settings.InfoPanelVisible && DebugMod.settings.CurrentInfoPanelName == Name;
     }
 
     #region Custom Panel API

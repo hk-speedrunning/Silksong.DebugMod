@@ -173,16 +173,11 @@ public class MainPanel : CanvasPanel
 
     public override void Update()
     {
-        base.Update();
-
-        ActiveSelf = DebugMod.settings.MainPanelVisible;
-
-        if (ActiveInHierarchy)
+        foreach (CanvasPanel tab in tabs)
         {
-            foreach (CanvasPanel tab in tabs)
-            {
-                tab.ActiveSelf = currentTab == tab.Name;
-            }
+            tab.ActiveSelf = currentTab == tab.Name;
         }
+
+        base.Update();
     }
 }

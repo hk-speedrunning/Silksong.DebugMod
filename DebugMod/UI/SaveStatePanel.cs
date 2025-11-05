@@ -38,30 +38,25 @@ public class SaveStatesPanel : CanvasPanel
 
     public override void Update()
     {
-        base.Update();
+        GetText("currentmode").Text = SaveStateManager.currentStateOperation;
+        GetText("CurrentFolder").Text = $"Page: {SaveStateManager.currentStateFolder + 1}/{SaveStateManager.savePages}";
 
-        ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
+        Dictionary<int, string[]> info = SaveStateManager.GetSaveStatesInfo();
 
-        if (ActiveInHierarchy)
+        for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
         {
-            GetText("currentmode").Text = SaveStateManager.currentStateOperation;
-            GetText("CurrentFolder").Text = $"Page: {SaveStateManager.currentStateFolder + 1}/{SaveStateManager.savePages}";
-
-            Dictionary<int, string[]> info = SaveStateManager.GetSaveStatesInfo();
-
-            for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
+            if (info.TryGetValue(i, out string[] array))
             {
-                if (info.TryGetValue(i, out string[] array))
-                {
-                    GetText(i.ToString()).Text = $"{array[0]} - {array[1]}";
-                    GetButton($"Rename{i}").ActiveSelf = true;
-                }
-                else
-                {
-                    GetText(i.ToString()).Text = "open";
-                    GetButton($"Rename{i}").ActiveSelf = false;
-                }
+                GetText(i.ToString()).Text = $"{array[0]} - {array[1]}";
+                GetButton($"Rename{i}").ActiveSelf = true;
+            }
+            else
+            {
+                GetText(i.ToString()).Text = "open";
+                GetButton($"Rename{i}").ActiveSelf = false;
             }
         }
+
+        base.Update();
     }
 }

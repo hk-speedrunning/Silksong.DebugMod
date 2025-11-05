@@ -51,7 +51,7 @@ public class EnemyHandle : MonoBehaviour
 
     public void Update()
     {
-        if (!EnemiesPanel.IsActive())
+        if (!EnemiesPanel.ActivelyUpdating())
         {
             if (hpBar != null)
             {

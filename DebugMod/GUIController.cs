@@ -86,13 +86,20 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
+        MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
+        KeyBindPanel.Instance.ActiveSelf = DebugMod.settings.HelpPanelVisible;
+        EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
+        ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
+        SaveStatesPanel.Instance.ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
+        InfoPanel.UpdatePanels();
+
         foreach (CanvasNode root in CanvasNode.rootNodes)
         {
             if (ForceHideUI())
             {
                 root.ActiveSelf = false;
             }
-            else
+            else if (root.ActiveSelf)
             {
                 root.Update();
             }

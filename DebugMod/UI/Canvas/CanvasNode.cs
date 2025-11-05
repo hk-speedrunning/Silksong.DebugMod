@@ -126,7 +126,7 @@ public abstract class CanvasNode
 
         foreach (CanvasNode child in ChildList())
         {
-            child.Update();
+            if (child.ActiveSelf) child.Update();
         }
     }
 

@@ -79,10 +79,6 @@ public class EnemiesPanel : CanvasPanel
     
     public override void Update()
     {
-        base.Update();
-
-        ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
-
         if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)
         {
             GetPanel("Pause").ActiveSelf = false;
@@ -101,57 +97,56 @@ public class EnemiesPanel : CanvasPanel
 
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
-        if (ActiveInHierarchy)
+        string enemyNames = "";
+        string enemyHP = "";
+        int enemyCount = 0;
+
+        if (ActivelyUpdating())
         {
-            string enemyNames = "";
-            string enemyHP = "";
-            int enemyCount = 0;
-
-            if (IsActive())
+            foreach (EnemyHandle handle in enemyPool)
             {
-                foreach (EnemyHandle handle in enemyPool)
+                if (++enemyCount <= 14)
                 {
-                    if (++enemyCount <= 14)
-                    {
-                        enemyNames += $"{handle.gameObject.name}\n";
-                        enemyHP += $"{handle.HP}/{handle.MaxHP}\n";
-                    }
+                    enemyNames += $"{handle.gameObject.name}\n";
+                    enemyHP += $"{handle.HP}/{handle.MaxHP}\n";
                 }
             }
-
-            if (GetPanel("Pause").ActiveInHierarchy)
-            {
-                for (int i = 1; i <= 14; i++)
-                {
-                    if (i <= enemyCount)
-                    {
-                        GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
-                        GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
-                        GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
-                    }
-                    else
-                    {
-                        GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
-                        GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
-                        GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
-                    }
-                }
-
-                GetPanel("Pause").GetButton("HP Bars").Text.Color =
-                    hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white;
-            }
-
-            if (enemyCount > 14)
-            {
-                enemyNames += "And " + (enemyCount - 14) + " more";
-            }
-
-            GetText("Enemy Names").Text = enemyNames;
-            GetText("Enemy HP").Text = enemyHP;
         }
+
+        if (GetPanel("Pause").ActiveInHierarchy)
+        {
+            for (int i = 1; i <= 14; i++)
+            {
+                if (i <= enemyCount)
+                {
+                    GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
+                    GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
+                    GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
+                }
+                else
+                {
+                    GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
+                    GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
+                    GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
+                }
+            }
+
+            GetPanel("Pause").GetButton("HP Bars").Text.Color =
+                hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white;
+        }
+
+        if (enemyCount > 14)
+        {
+            enemyNames += "And " + (enemyCount - 14) + " more";
+        }
+
+        GetText("Enemy Names").Text = enemyNames;
+        GetText("Enemy HP").Text = enemyHP;
+
+        base.Update();
     }
 
-    public static bool IsActive()
+    public static bool ActivelyUpdating()
     {
         return HeroController.instance && !HeroController.instance.cState.transitioning && GameManager.instance.IsGameplayScene();
     }

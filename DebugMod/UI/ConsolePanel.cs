@@ -27,24 +27,19 @@ public class ConsolePanel : CanvasPanel
 
     public override void Update()
     {
-        base.Update();
+        string consoleString = "";
+        int lineCount = 0;
 
-        ActiveSelf = DebugMod.settings.ConsoleVisible;
-
-        if (ActiveInHierarchy)
+        for (int i = history.Count - 1; i >= 0; i--)
         {
-            string consoleString = "";
-            int lineCount = 0;
-
-            for (int i = history.Count - 1; i >= 0; i--)
-            {
-                if (lineCount >= 8) break;
-                consoleString = history[i] + "\n" + consoleString;
-                lineCount++;
-            }
-
-            GetText("Console").Text = consoleString;
+            if (lineCount >= 8) break;
+            consoleString = history[i] + "\n" + consoleString;
+            lineCount++;
         }
+
+        GetText("Console").Text = consoleString;
+
+        base.Update();
     }
 
     public static void Reset()
