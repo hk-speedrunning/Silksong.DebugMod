@@ -34,6 +34,25 @@ public class MainPanel : CanvasPanel
         gameplay.AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         gameplay.AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
         gameplay.AppendControl("Toggle Hero Collider", BindableFunctions.ToggleHeroCollider);
+        gameplay.AppendControl("Kill All", BindableFunctions.KillAll);
+
+        gameplay.AppendSectionHeader("Player");
+        gameplay.AppendControl("Increase Needle Damage", BindableFunctions.IncreaseNeedleDamage);
+        gameplay.AppendControl("Decrease Needle Damage", BindableFunctions.DecreaseNeedleDamage);
+        gameplay.AppendControl("Set Hazard Respawn", BindableFunctions.SetHazardRespawn);
+        gameplay.AppendControl("Hazard Respawn", BindableFunctions.Respawn);
+        gameplay.AppendControl("Damage Self", BindableFunctions.SelfDamage);
+        gameplay.AppendControl("Kill Self", BindableFunctions.KillSelf);
+        gameplay.AppendControl("Break Cocoon", BindableFunctions.BreakCocoon);
+
+        gameplay.AppendSectionHeader("Time");
+        gameplay.AppendControl("Increase Timescale", BindableFunctions.TimescaleUp);
+        gameplay.AppendControl("Decrease Timescale", BindableFunctions.TimescaleDown);
+        gameplay.AppendControl("Freeze Game", BindableFunctions.PauseGameNoUI);
+        gameplay.AppendControl("Force Pause", BindableFunctions.ForcePause);
+        gameplay.AppendControl("Toggle Frame Advance", BindableFunctions.ToggleFrameAdvance);
+        gameplay.AppendControl("Advance Frame", BindableFunctions.AdvanceFrame);
+        gameplay.AppendControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);
 
         CanvasAutoPanel items = AddTab("Items");
 
@@ -64,6 +83,50 @@ public class MainPanel : CanvasPanel
         items.AppendControl("Give All Memory Lockets", BindableFunctions.GiveMemoryLockets);
         items.AppendControl("Give All Craftmetal", BindableFunctions.GiveCraftmetal);
         items.AppendControl("Give Silkeater", BindableFunctions.GiveSilkeater);
+
+        items.AppendSectionHeader("Masks and Spools");
+        items.AppendControl("Give Mask", BindableFunctions.GiveMask);
+        items.AppendControl("Take Mask", BindableFunctions.TakeAwayMask);
+        items.AppendControl("Give Spool", BindableFunctions.GiveSpool);
+        items.AppendControl("Take Spool", BindableFunctions.TakeAwaySpool);
+        items.AppendControl("Give Health", BindableFunctions.AddHealth);
+        items.AppendControl("Take Health", BindableFunctions.TakeHealth);
+        items.AppendControl("Give Silk", BindableFunctions.AddSilk);
+        items.AppendControl("Take Silk", BindableFunctions.TakeSilk);
+        items.AppendControl("Add Lifeblood", BindableFunctions.Lifeblood);
+
+        CanvasAutoPanel other = AddTab("Other");
+
+        other.AppendSectionHeader("Mod UI");
+        other.AppendControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
+        other.AppendControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
+        other.AppendControl("Toggle Console", BindableFunctions.ToggleConsole);
+        other.AppendControl("Toggle Keybinds Panel", BindableFunctions.ToggleHelpPanel);
+        other.AppendControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemyPanel);
+        other.AppendControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
+        other.AppendControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
+
+        other.AppendSectionHeader("Visual");
+        other.AppendControl("Toggle Hitboxes", BindableFunctions.ShowHitboxes);
+        other.AppendControl("Force Camera Follow", BindableFunctions.ForceCameraFollow);
+        other.AppendControl("Preview Cocoon Position", BindableFunctions.PreviewCocoonPosition);
+        other.AppendControl("Hide Hero", BindableFunctions.HideHero);
+        other.AppendControl("Toggle HUD", BindableFunctions.ToggleHUD);
+        other.AppendControl("Toggle Vignette", BindableFunctions.ToggleVignette);
+        other.AppendControl("Toggle Hero Light", BindableFunctions.ToggleHeroLight);
+        other.AppendControl("Toggle Camera Shake", BindableFunctions.ToggleCameraShake);
+        other.AppendControl("Deactivate Visual Masks", BindableFunctions.DoDeactivateVisualMasks);
+        other.AppendControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
+        other.AppendControl("Zoom In", BindableFunctions.ZoomIn);
+        other.AppendControl("Zoom Out", BindableFunctions.ZoomOut);
+        other.AppendControl("Reset Zoom", BindableFunctions.ResetZoom);
+
+        other.AppendSectionHeader("Misc");
+        other.AppendControl("Toggle Act 3", BindableFunctions.ToggleAct3);
+        other.AppendControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
+        other.AppendControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
+        other.AppendControl("Lock Keybinds", BindableFunctions.ToggleLockKeyBinds);
+        other.AppendControl("Reset Cheats", BindableFunctions.Reset);
     }
 
     private CanvasAutoPanel AddTab(string name)

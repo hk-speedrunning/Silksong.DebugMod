@@ -1,4 +1,5 @@
 ﻿using DebugMod.UI;
+using UnityEngine;
 
 namespace DebugMod;
 
@@ -63,5 +64,39 @@ public static partial class BindableFunctions
     public static void SwitchActiveInfoPanel()
     {
         InfoPanel.ToggleActivePanel();
+    }
+
+    [BindableMethod(name = "Toggle Cursor", category = "Mod UI")]
+    public static void ToggleAlwaysShowCursor()
+    {
+        DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;
+
+        if (DebugMod.settings.ShowCursorWhileUnpaused)
+        {
+            SetAlwaysShowCursor();
+            DebugMod.LogConsole("Showing cursor while unpaused");
+        }
+        else
+        {
+            UnsetAlwaysShowCursor();
+            DebugMod.LogConsole("Not showing cursor while unpaused");
+        }
+    }
+
+    internal static void SetAlwaysShowCursor()
+    {
+        ModHooks.CursorHook -= CursorDisplayActive;
+        ModHooks.CursorHook += CursorDisplayActive;
+    }
+
+    internal static void UnsetAlwaysShowCursor()
+    {
+        ModHooks.CursorHook -= CursorDisplayActive;
+    }
+
+    private static void CursorDisplayActive()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

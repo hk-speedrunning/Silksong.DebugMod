@@ -42,6 +42,13 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Infinite HP set to " + DebugMod.infiniteHP.ToString().ToUpper());
     }
 
+    [BindableMethod(name = "Infinite Tools", category = "Cheats")]
+    public static void ToggleInfiniteTools()
+    {
+        DebugMod.infiniteTools = !DebugMod.infiniteTools;
+        DebugMod.LogConsole("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
+    }
+
     [BindableMethod(name = "Invincibility", category = "Cheats")]
     public static void ToggleInvincibility()
     {
@@ -86,16 +93,6 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("Disabled hero collider" + (DebugMod.noclip ? "" : " and enabled noclip"));
             DebugMod.noclip = true;
             DebugMod.noclipPos = DebugMod.RefKnight.transform.position;
-        }
-    }
-
-    [BindableMethod(name = "Kill Self", category = "Cheats")]
-    public static void KillSelf()
-    {
-        if (!HeroController.instance.cState.dead && !HeroController.instance.cState.transitioning)
-        {
-            HeroController.instance.StartCoroutine(HeroController.instance.Die(false, false));
-            DebugMod.LogConsole("Killed player");
         }
     }
 }

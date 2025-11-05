@@ -15,6 +15,22 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
     }
 
+    [BindableMethod(name = "Force Camera Follow", category = "Visual")]
+    public static void ForceCameraFollow()
+    {
+        if (!DebugMod.cameraFollow)
+        {
+            DebugMod.LogConsole("Forcing camera follow");
+            DebugMod.cameraFollow = true;
+        }
+        else
+        {
+            DebugMod.cameraFollow = false;
+            DebugMod.RefCamera.isGameplayScene = true;
+            DebugMod.LogConsole("Returning camera to normal settings");
+        }
+    }
+
     [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
     public static void PreviewCocoonPosition()
     {
@@ -43,6 +59,18 @@ public static partial class BindableFunctions
     public static void DoDeactivateVisualMasks()
     {
         VisualMaskHelper.ToggleAllMasks();
+    }
+
+    // TODO: verify if this does anything in Silksong
+    [BindableMethod(name = "Clear White Screen", category = "Visual")]
+    public static void ClearWhiteScreen()
+    {
+        //fix white screen
+        PlayMakerFSM wakeFSM = HeroController.instance.gameObject.LocateMyFSM("Dream Return");
+        wakeFSM.SetState("GET UP");
+        wakeFSM.SendEvent("FINISHED");
+        GameObject.Find("Blanker White").LocateMyFSM("Blanker Control").SendEvent("FADE OUT");
+        HeroController.instance.EnableRenderer();
     }
 
     [BindableMethod(name = "Toggle Hero Light", category = "Visual")]
@@ -127,39 +155,5 @@ public static partial class BindableFunctions
         bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;
         GameCameras.instance.cameraShakeFSM.enabled = newValue;
         DebugMod.LogConsole($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
-    }
-
-    [BindableMethod(name = "Toggle Cursor", category = "Visual")]
-    public static void ToggleAlwaysShowCursor()
-    {
-        DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;
-
-        if (DebugMod.settings.ShowCursorWhileUnpaused)
-        {
-            SetAlwaysShowCursor();
-            DebugMod.LogConsole("Showing cursor while unpaused");
-        }
-        else
-        {
-            UnsetAlwaysShowCursor();
-            DebugMod.LogConsole("Not showing cursor while unpaused");
-        }
-    }
-
-    internal static void SetAlwaysShowCursor()
-    {
-        ModHooks.CursorHook -= CursorDisplayActive;
-        ModHooks.CursorHook += CursorDisplayActive;
-    }
-
-    internal static void UnsetAlwaysShowCursor()
-    {
-        ModHooks.CursorHook -= CursorDisplayActive;
-    }
-
-    private static void CursorDisplayActive()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 }

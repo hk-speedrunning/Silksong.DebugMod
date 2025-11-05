@@ -29,24 +29,23 @@ public class KeyBindPanel : CanvasPanel
             }
         }
 
-
         public static List<string> Categories = new()
         {
-            "Gameplay Altering",
-            "Savestates",
-            "Misc",
-            "Visual",
-            "Mod UI",
-            "Enemy Panel",
             "Cheats",
-            "Tools",
+            "Player",
+            "Time",
             "Skills",
-            "Spells",
-            "Bosses",
+            "Tools",
             "Items",
-            "Masks & Spools",
             "Consumables",
+            "Masks & Spools",
+            "Mod UI",
+            "Visual",
+            "Misc",
+            "Savestates",
+            "Enemy Panel",
         };
+
         public static Dictionary<string, CategoryInfo> CategoryInfos = new();
         public static int TotalPages => CategoryInfos.Select(x => x.Value.NumPages).Sum();
 
