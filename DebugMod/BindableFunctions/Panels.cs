@@ -9,7 +9,6 @@ public static partial class BindableFunctions
     public static void ToggleAllPanels()
     {
         bool active = !(
-            DebugMod.settings.HelpPanelVisible ||
             DebugMod.settings.InfoPanelVisible ||
             DebugMod.settings.EnemiesPanelVisible ||
             DebugMod.settings.MainPanelVisible ||
@@ -21,18 +20,11 @@ public static partial class BindableFunctions
         DebugMod.settings.MainPanelVisible = active;
         DebugMod.settings.EnemiesPanelVisible = active;
         DebugMod.settings.ConsoleVisible = active;
-        DebugMod.settings.HelpPanelVisible = active;
 
         if (!active)
         {
             DebugMod.settings.ClearSaveStatePanel = true;
         }
-    }
-
-    [BindableMethod(name = "Toggle Binds", category = "Mod UI")]
-    public static void ToggleHelpPanel()
-    {
-        DebugMod.settings.HelpPanelVisible = !DebugMod.settings.HelpPanelVisible;
     }
 
     [BindableMethod(name = "Toggle Info", category = "Mod UI")]

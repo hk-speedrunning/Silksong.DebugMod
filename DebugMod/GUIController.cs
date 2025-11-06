@@ -18,6 +18,7 @@ public class GUIController : MonoBehaviour
     private static readonly HitboxViewer hitboxes = new();
     private string textBoxText;
     private Action<string> textBoxCallback;
+    private KeyCode keyWarning;
 
     public GameObject canvas;
     private static GUIController _instance;
@@ -72,7 +73,6 @@ public class GUIController : MonoBehaviour
         canvas.AddComponent<GraphicRaycaster>();
 
         MainPanel.BuildPanel();
-        KeyBindPanel.BuildPanel();
         EnemiesPanel.BuildPanel();
         ConsolePanel.BuildPanel();
         SaveStatesPanel.BuildPanel();
@@ -87,7 +87,6 @@ public class GUIController : MonoBehaviour
         if (DebugMod.GM == null) return;
 
         MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
-        KeyBindPanel.Instance.ActiveSelf = DebugMod.settings.HelpPanelVisible;
         EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
         ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
         SaveStatesPanel.Instance.ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
@@ -131,21 +130,21 @@ public class GUIController : MonoBehaviour
                     {
                         if (Input.GetKeyDown(kc) && !UnbindableKeys.Contains(kc))
                         {
-                            if (KeyBindPanel.keyWarning != kc)
+                            if (keyWarning != kc)
                             {
                                 foreach (string method in DebugMod.bindActions.Keys)
                                 {
                                     if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
                                     {
                                         DebugMod.LogConsole($"{kc} already bound to {method}, press again to confirm");
-                                        KeyBindPanel.keyWarning = kc;
+                                        keyWarning = kc;
                                     }
                                 }
 
-                                if (KeyBindPanel.keyWarning == kc) break;
+                                if (keyWarning == kc) break;
                             }
 
-                            KeyBindPanel.keyWarning = KeyCode.None;
+                            keyWarning = KeyCode.None;
 
                             //remove bind
                             if (kc == KeyCode.Escape)
@@ -159,7 +158,6 @@ public class GUIController : MonoBehaviour
                                 DebugMod.settings.binds[bindName] = kc;
                             }
 
-                            KeyBindPanel.Instance.UpdateHelpText();
                             break;
                         }
                     }

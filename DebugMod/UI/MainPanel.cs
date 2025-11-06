@@ -120,7 +120,6 @@ public class MainPanel : CanvasPanel
         other.AppendControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
         other.AppendControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
         other.AppendControl("Toggle Console", BindableFunctions.ToggleConsole);
-        other.AppendControl("Toggle Keybinds Panel", BindableFunctions.ToggleHelpPanel);
         other.AppendControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemyPanel);
         other.AppendControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
         other.AppendControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);

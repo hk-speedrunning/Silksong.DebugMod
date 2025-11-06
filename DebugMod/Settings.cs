@@ -15,8 +15,6 @@ public class Settings
 
     public bool EnemiesPanelVisible = true;
 
-    public bool HelpPanelVisible = true;
-
     public bool InfoPanelVisible = true;
 
     public string CurrentInfoPanelName = "";
