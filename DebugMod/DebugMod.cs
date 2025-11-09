@@ -237,7 +237,7 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void LoadCharacter(SaveGameData saveGameData)
     {
-        ConsolePanel.Reset();
+        ConsolePanel.Instance?.Reset();
 
         playerInvincible = false;
         infiniteHP = false;
@@ -437,6 +437,6 @@ public partial class DebugMod : BaseUnityPlugin
 
     public static void LogConsole(string message)
     {
-        ConsolePanel.AddLine(message);
+        ConsolePanel.Instance.AddLine(message);
     }
 }

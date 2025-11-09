@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 
@@ -8,9 +6,12 @@ namespace DebugMod.UI;
 
 public class ConsolePanel : CanvasPanel
 {
+    public const int MAX_LINES = 16;
+
     public static ConsolePanel Instance { get; private set; }
-    private static readonly List<string> history = [];
-    private static Vector2 scrollPosition = Vector2.zero;
+
+    private readonly CanvasText text;
+    private readonly List<string> history = [];
 
     public static void BuildPanel()
     {
@@ -18,11 +19,16 @@ public class ConsolePanel : CanvasPanel
         Instance.Build();
     }
 
-    public ConsolePanel() : base(nameof(ConsolePanel), null, new Vector2(1275, 800), Vector2.zero, UICommon.images["ConsoleBg"])
+    public ConsolePanel() : base(nameof(ConsolePanel))
     {
-        AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, UICommon.arial);
+        LocalPosition = new Vector2(UICommon.SCREEN_MARGIN, 1080f - UICommon.SCREEN_MARGIN - UICommon.CONSOLE_HEIGHT);
+        Size = new Vector2(UICommon.LEFT_SIDE_WIDTH, UICommon.CONSOLE_HEIGHT);
 
-        UICommon.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
+        UICommon.AddBackground(this);
+
+        text = Add(new CanvasText("Text"));
+        text.LocalPosition = new Vector2(UICommon.MARGIN, UICommon.MARGIN);
+        text.Size = new Vector2(Size.x - UICommon.MARGIN * 2, Size.y - UICommon.MARGIN * 2);
     }
 
     public override void Update()
@@ -32,30 +38,29 @@ public class ConsolePanel : CanvasPanel
 
         for (int i = history.Count - 1; i >= 0; i--)
         {
-            if (lineCount >= 8) break;
+            if (lineCount >= MAX_LINES) break;
             consoleString = history[i] + "\n" + consoleString;
             lineCount++;
         }
 
-        GetText("Console").Text = consoleString;
+        text.Text = consoleString;
 
         base.Update();
     }
 
-    public static void Reset()
+    public void Reset()
     {
         history.Clear();
-        scrollPosition = Vector2.zero;
     }
 
-    public static void AddLine(string chatLine)
+    public void AddLine(string chatLine)
     {
         while (history.Count > 1000)
         {
             history.RemoveAt(0);
         }
 
-        int wrap = WrapIndex(UICommon.arial, 13, chatLine);
+        int wrap = WrapIndex(chatLine);
 
         while (wrap != -1)
         {
@@ -65,7 +70,7 @@ public class ConsolePanel : CanvasPanel
             {
                 history.Add(chatLine.Substring(0, index));
                 chatLine = chatLine.Substring(index + 1);
-                wrap = WrapIndex(UICommon.arial, 13, chatLine);
+                wrap = WrapIndex(chatLine);
             }
             else
             {
@@ -74,25 +79,9 @@ public class ConsolePanel : CanvasPanel
         }
 
         history.Add(chatLine);
-
-        scrollPosition.y = scrollPosition.y + 50f;
     }
 
-    public static void SaveHistory()
-    {
-        try
-        {
-            File.WriteAllLines("console.txt", history.ToArray());
-            AddLine("Written history to console.txt");
-        }
-        catch (Exception arg)
-        {
-            DebugMod.LogError("[CONSOLE] Unable to write console history: " + arg);
-            AddLine("Unable to write console history");
-        }
-    }
-
-    private static int WrapIndex(Font font, int fontSize, string message)
+    private int WrapIndex(string message)
     {
         int totalLength = 0;
 
@@ -101,10 +90,10 @@ public class ConsolePanel : CanvasPanel
         for (int i = 0; i < arr.Length; i++)
         {
             char c = arr[i];
-            font.GetCharacterInfo(c, out CharacterInfo characterInfo, fontSize);
+            text.Font.GetCharacterInfo(c, out CharacterInfo characterInfo, text.FontSize);
             totalLength += characterInfo.advance;
 
-            if (totalLength >= 564) return i;
+            if (totalLength >= text.Size.x) return i;
         }
 
         return -1;
