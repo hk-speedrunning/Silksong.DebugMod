@@ -14,8 +14,6 @@ public enum SaveStateType
     SkipOne
 }
 
-// TODO: Fix vessel count between savestates
-
 // Handles organisation of SaveState-s
 // quickState replicating legacy behaviour of only stored in RAM.
 // Dictionary(int slot : file). Might change to HashMap(?) 
@@ -30,7 +28,7 @@ internal class SaveStateManager
     public static SaveState quickState;
     public static bool inSelectSlotState = false;   // a mutex, in practice?
     public static int currentStateSlot = -1;
-    public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
+    public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
     public static string path = Path.Combine(saveStatesBaseDirectory, "0"); // initialize to page 0, this gets read and updated by callbacks during runtime.
     public static string currentStateOperation = null;
 
@@ -51,29 +49,35 @@ internal class SaveStateManager
 
     internal SaveStateManager()
     {
-        try
-        {
-            inSelectSlotState = false;
-            //autoSlot = false;
-            DebugMod.settings.SaveStatePanelVisible = false;
-            quickState = new SaveState();
+        inSelectSlotState = false;
+        //autoSlot = false;
+        quickState = new SaveState();
 
-            for (int i = 0; i < savePages; i++)
+        if (!Directory.Exists(saveStatesBaseDirectory))
+        {
+            string legacyPath = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
+            if (Directory.Exists(legacyPath))
             {
-                string saveStatePageDirectory = Path.Combine(saveStatesBaseDirectory, i.ToString());
-                if (!Directory.Exists(saveStatePageDirectory))
-                {
-                    Directory.CreateDirectory(saveStatePageDirectory);
-                }
-                else
-                {
-                    RefreshStateMenu();
-                }
+                DebugMod.LogWarn("Legacy savestates directory detected. Renaming...");
+                Directory.Move(legacyPath, saveStatesBaseDirectory);
+            }
+            else
+            {
+                Directory.CreateDirectory(saveStatesBaseDirectory);
             }
         }
-        catch (Exception)
+
+        for (int i = 0; i < savePages; i++)
         {
-            throw;
+            string saveStatePageDirectory = Path.Combine(saveStatesBaseDirectory, i.ToString());
+            if (!Directory.Exists(saveStatePageDirectory))
+            {
+                Directory.CreateDirectory(saveStatePageDirectory);
+            }
+            else
+            {
+                RefreshStateMenu();
+            }
         }
     }
 
@@ -180,9 +184,8 @@ internal class SaveStateManager
         }
         
         yield return null;
-        //TODO: get rid of this variable and have an actual clear panel function
-        DebugMod.settings.ClearSaveStatePanel = false;
-        DebugMod.settings.SaveStatePanelVisible = inSelectSlotState = true;
+
+        inSelectSlotState = true;
         yield return new WaitUntil(DidInput);
         
         if (GUIController.didInput && !GUIController.inputEsc)
@@ -202,12 +205,11 @@ internal class SaveStateManager
         else
         {
             if (GUIController.didInput) DebugMod.LogConsole("Savestate action cancelled");
-            else if (DebugMod.settings.ClearSaveStatePanel) DebugMod.settings.ClearSaveStatePanel = false;
         }
         
         currentStateOperation = null;
         GUIController.inputEsc = GUIController.didInput = false;
-        DebugMod.settings.SaveStatePanelVisible = inSelectSlotState = false;
+        inSelectSlotState = false;
     }
 
     // Todo: cleanup Adds and Removes, because used to C++ :)
@@ -274,7 +276,7 @@ internal class SaveStateManager
         {
             return true;
         }
-        else if(DebugMod.settings.ClearSaveStatePanel)
+        else if (!inSelectSlotState)
         {
             return true;
         }

@@ -39,8 +39,5 @@ public class Settings
 
     public bool SaveStateGlitchFixes = true;
 
-    //TODO Get rid of this variable and implement an actual clear method
-    public bool ClearSaveStatePanel = false;
-
     public bool LogUnityExceptions = true;
 }

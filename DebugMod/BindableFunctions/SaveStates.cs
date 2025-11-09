@@ -22,28 +22,28 @@ public static partial class BindableFunctions
     public static void CurrentSaveStateToFile()
     {
         if (SaveStateManager.currentStateOperation != "Quickslot save to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.File);
-        else DebugMod.settings.ClearSaveStatePanel = true;
+        else SaveStateManager.inSelectSlotState = false;
     }
 
     [BindableMethod(name = "Load file to quickslot", category = "Savestates")]
     public static void CurrentSlotToSaveMemory()
     {
         if (SaveStateManager.currentStateOperation != "Load file to quickslot") DebugMod.saveStateManager.LoadSaveState(SaveStateType.File);
-        else DebugMod.settings.ClearSaveStatePanel = true;
+        else SaveStateManager.inSelectSlotState = false;
     }
 
     [BindableMethod(name = "Save new state to file", category = "Savestates")]
     public static void NewSaveStateToFile()
     {
         if (SaveStateManager.currentStateOperation != "Save new state to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.SkipOne);
-        else DebugMod.settings.ClearSaveStatePanel = true;
+        else SaveStateManager.inSelectSlotState = false;
     }
 
     [BindableMethod(name = "Load new state from file", category = "Savestates")]
     public static void LoadFromFile()
     {
         if (SaveStateManager.currentStateOperation != "Load new state from file") DebugMod.saveStateManager.LoadSaveState(SaveStateType.SkipOne);
-        else DebugMod.settings.ClearSaveStatePanel = true;
+        else SaveStateManager.inSelectSlotState = false;
 
     }
 
@@ -85,14 +85,14 @@ public static partial class BindableFunctions
     public static void LoadStateOnDeath()
     {
         DebugMod.stateOnDeath = !DebugMod.stateOnDeath;
-        DebugMod.LogConsole("Quickslot SaveState will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
+        DebugMod.LogConsole("Quickslot savestate will now" + (DebugMod.stateOnDeath ? " be" : " no longer") + " loaded on death");
     }
 
     [BindableMethod(name = "Override Lockout", category = "Savestates")]
     public static void OverrideLoadLockout()
     {
         DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
-        DebugMod.LogConsole("SaveState Lockout set to " + DebugMod.overrideLoadLockout);
+        DebugMod.LogConsole("Savestate lockout override set to " + DebugMod.overrideLoadLockout);
     }
 
     /*

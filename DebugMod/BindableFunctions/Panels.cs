@@ -20,17 +20,7 @@ public static partial class BindableFunctions
         DebugMod.settings.MainPanelVisible = active;
         DebugMod.settings.EnemiesPanelVisible = active;
         DebugMod.settings.ConsoleVisible = active;
-
-        if (!active)
-        {
-            DebugMod.settings.ClearSaveStatePanel = true;
-        }
-    }
-
-    [BindableMethod(name = "Toggle Info", category = "Mod UI")]
-    public static void ToggleInfoPanel()
-    {
-        DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
+        DebugMod.settings.SaveStatePanelVisible = active;
     }
 
     [BindableMethod(name = "Toggle Main Panel", category = "Mod UI")]
@@ -39,16 +29,29 @@ public static partial class BindableFunctions
         DebugMod.settings.MainPanelVisible = !DebugMod.settings.MainPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Console", category = "Mod UI")]
-    public static void ToggleConsole()
+
+    [BindableMethod(name = "Toggle Enemies Panel", category = "Mod UI")]
+    public static void ToggleEnemiesPanel()
+    {
+        DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
+    }
+
+    [BindableMethod(name = "Toggle Console Panel", category = "Mod UI")]
+    public static void ToggleConsolePanel()
     {
         DebugMod.settings.ConsoleVisible = !DebugMod.settings.ConsoleVisible;
     }
 
-    [BindableMethod(name = "Toggle Enemy Panel", category = "Mod UI")]
-    public static void ToggleEnemyPanel()
+    [BindableMethod(name = "Toggle Savestates Panel", category = "Mod UI")]
+    public static void ToggleSaveStatePanel()
     {
-        DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
+        DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
+    }
+
+    [BindableMethod(name = "Toggle Info Panel", category = "Mod UI")]
+    public static void ToggleInfoPanel()
+    {
+        DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
     }
 
     // View handled in the InfoPanel classes

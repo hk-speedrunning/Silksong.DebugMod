@@ -119,8 +119,9 @@ public class MainPanel : CanvasPanel
         other.AppendSectionHeader("Mod UI");
         other.AppendBasicControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
         other.AppendBasicControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
-        other.AppendBasicControl("Toggle Console", BindableFunctions.ToggleConsole);
-        other.AppendBasicControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemyPanel);
+        other.AppendBasicControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemiesPanel);
+        other.AppendBasicControl("Toggle Console Panel", BindableFunctions.ToggleConsolePanel);
+        other.AppendBasicControl("Toggle Savestates Panel", BindableFunctions.ToggleSaveStatePanel);
         other.AppendBasicControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
         other.AppendBasicControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
 

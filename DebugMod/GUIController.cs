@@ -89,7 +89,7 @@ public class GUIController : MonoBehaviour
         MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
         EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
         ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
-        SaveStatesPanel.Instance.ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
+        SaveStatesPanel.Instance.ActiveSelf = DebugMod.settings.SaveStatePanelVisible || SaveStateManager.inSelectSlotState;
         InfoPanel.UpdatePanels();
 
         foreach (CanvasNode root in CanvasNode.rootNodes)
