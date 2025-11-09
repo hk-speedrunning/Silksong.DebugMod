@@ -52,7 +52,7 @@ public class CanvasAutoPanel : CanvasPanel
         return control;
     }
 
-    public CanvasControl AppendControl(string name, Action effect) => AppendButtonControl(name, effect, null);
+    public CanvasControl AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
 
     // TODO: replace this with checkbox
     public CanvasControl AppendToggleControl(string name, Func<bool> getter, Action effect)

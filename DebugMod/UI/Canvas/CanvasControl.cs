@@ -21,6 +21,8 @@ public class CanvasControl : CanvasNode
     public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, 0);
     public T AppendSquare<T>(T element) where T : CanvasNode => Append(element, Size.y);
 
+    public void AppendPadding(float width) => Append(new CanvasText($"Padding{nodes.Count}"), width);
+
     public CanvasButton AttachKeybind(string bindName)
     {
         CanvasButton button = AppendSquare(new CanvasButton("Keybind"));

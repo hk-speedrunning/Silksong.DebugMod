@@ -132,6 +132,8 @@ public class CanvasPanel : CanvasNode
     public CanvasText GetText(string name) => elements[name] as CanvasText;
     public CanvasText GetText(string name, string panel) => GetPanel(panel).GetText(name);
 
+    public T Get<T>(string name) where T : CanvasNode => elements[name] as T;
+
     protected IEnumerable<T> AllElementsOfType<T>() where T : CanvasNode
     {
         return elements.Values.Where(x => x is T).Cast<T>();

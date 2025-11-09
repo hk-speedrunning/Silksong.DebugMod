@@ -27,6 +27,7 @@ public class EnemyHandle : MonoBehaviour
     }
 
     public int MaxHP => maxHP;
+    public string Name => gameObject.name;
 
     public void Awake()
     {
@@ -34,15 +35,15 @@ public class EnemyHandle : MonoBehaviour
         sprite = GetComponent<tk2dSprite>();
         collider = GetComponent<BoxCollider2D>();
 
-        if (!EnemiesPanel.Instance.enemyPool.Contains(this))
+        if (!EnemiesPanel.enemyPool.Contains(this))
         {
-            EnemiesPanel.Instance.enemyPool.Add(this);
+            EnemiesPanel.enemyPool.Add(this);
         }
     }
 
     public void OnDestroy()
     {
-        EnemiesPanel.Instance.enemyPool.Remove(this);
+        EnemiesPanel.enemyPool.Remove(this);
         hpBar?.Destroy();
     }
 

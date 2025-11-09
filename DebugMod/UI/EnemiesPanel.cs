@@ -1,16 +1,18 @@
 using System.Collections.Generic;
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
-using GlobalEnums;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
-public class EnemiesPanel : CanvasPanel
+public class EnemiesPanel : CanvasAutoPanel
 {
+    public const float LISTING_HEIGHT = 15f;
+    public const int NUM_LISTINGS = 13;
+
     public static EnemiesPanel Instance { get; private set; }
-    public readonly List<EnemyHandle> enemyPool = [];
+    public static readonly List<EnemyHandle> enemyPool = [];
 
     public static bool hpBars;
 
@@ -22,126 +24,84 @@ public class EnemiesPanel : CanvasPanel
 
     public EnemiesPanel() : base(nameof(EnemiesPanel))
     {
-        LocalPosition = new Vector2(1920f - UICommon.images["EnemiesPBg"].width, 481f);
+        LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT + UICommon.SCREEN_MARGIN * 2);
+        Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, 1080f - UICommon.MAIN_MENU_HEIGHT - UICommon.SCREEN_MARGIN * 3);
 
-        AddText("Panel Label", "Enemies", new Vector2(125f, -25f), Vector2.zero, UICommon.trajanBold, 30);
+        UICommon.AddBackground(this);
 
-        AddText("Enemy Names", "", new Vector2(90f, 20f), Vector2.zero, UICommon.arial);
-        AddText("Enemy HP", "", new Vector2(300f, 20f), Vector2.zero, UICommon.arial);
+        CanvasText panelTitle = Append(new CanvasText("PanelTitle"), 30f);
+        panelTitle.Text = "Enemies";
+        panelTitle.Font = UICommon.trajanBold;
+        panelTitle.FontSize = 30;
+        panelTitle.Alignment = TextAnchor.UpperCenter;
 
-        AddPanel("Pause", UICommon.images["EnemiesPBg"], Vector2.zero, Vector2.zero, new Rect(0, 0, UICommon.images["EnemiesPBg"].width, UICommon.images["EnemiesPBg"].height));
-        AddPanel("Play", UICommon.images["EnemiesBg"], new Vector2(57f, 0f), Vector2.zero, new Rect(0f, 0f, UICommon.images["EnemiesBg"].width, UICommon.images["EnemiesBg"].height));
-
-        for (int i = 1; i <= 14; i++)
+        for (int i = 1; i <= NUM_LISTINGS; i++)
         {
-            GetPanel("Pause").AddButton("Del" + i, UICommon.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, UICommon.images["ButtonDel"].width, UICommon.images["ButtonDel"].height));
-            GetPanel("Pause").AddButton("Clone" + i, UICommon.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, UICommon.images["ButtonPlus"].width, UICommon.images["ButtonPlus"].height));
-            GetPanel("Pause").AddButton("Inf" + i, UICommon.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, UICommon.images["ButtonInf"].width, UICommon.images["ButtonInf"].height));
+            int index = i - 1;
+
+            CanvasControl control = Append(new CanvasControl(i.ToString()), LISTING_HEIGHT);
+
+            CanvasText enemyName = control.AppendFlex(new CanvasText("EnemyName"));
+            enemyName.Alignment = TextAnchor.MiddleLeft;
+            enemyName.OnUpdate += () => enemyName.Text = enemyPool[index].Name;
+
+            CanvasText enemyHp = control.Append(new CanvasText("EnemyHP"), 80f);
+            enemyHp.Alignment = TextAnchor.MiddleLeft;
+            enemyHp.OnUpdate += () => enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
+
+            CanvasButton delete = control.AppendSquare(new CanvasButton("Delete"));
+            delete.ImageOnly(UICommon.images["ButtonDel"]);
+            delete.OnClicked += () =>
+            {
+                EnemyHandle handle = enemyPool[index];
+                Object.DestroyImmediate(handle.gameObject);
+                DebugMod.LogConsole($"Destroyed {handle.Name}");
+            };
+
+            control.AppendPadding(UICommon.MARGIN);
+
+            CanvasButton clone = control.AppendSquare(new CanvasButton("Clone"));
+            clone.ImageOnly(UICommon.images["ButtonPlus"]);
+            clone.OnClicked += () =>
+            {
+                EnemyHandle handle = enemyPool[index];
+                Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
+                DebugMod.LogConsole($"Cloned {handle.Name}");
+            };
+
+            control.AppendPadding(UICommon.MARGIN);
+
+            CanvasButton infHealth = control.AppendSquare(new CanvasButton("InfiniteHealth"));
+            infHealth.ImageOnly(UICommon.images["ButtonInf"]);
+            infHealth.OnClicked += () =>
+            {
+                EnemyHandle handle = enemyPool[index];
+                handle.HP = 9999;
+                DebugMod.LogConsole($"Set {handle.Name} HP to 9999");
+            };
         }
 
-        GetPanel("Pause").AddButton("HP Bars", UICommon.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, UICommon.images["ButtonRect"].width, UICommon.images["ButtonRect"].height), UICommon.trajanBold, "HP Bars");
+        CanvasText overflow = Append(new CanvasText("Overflow"), LISTING_HEIGHT);
+        overflow.OnUpdate += () => overflow.Text = enemyPool.Count > NUM_LISTINGS ? $"... and {enemyPool.Count - NUM_LISTINGS} more" : "";
+
+        CanvasButton hpBarsButton = Add(new CanvasButton("HPBars"));
+        hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.MARGIN - 100f, Size.y - UICommon.MARGIN - UICommon.CONTROL_HEIGHT);
+        hpBarsButton.Size = new Vector2(100f, UICommon.CONTROL_HEIGHT);
+        hpBarsButton.Text.Text = "HP Bars";
+        hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
+        hpBarsButton.OnUpdate += () => hpBarsButton.Text.Color = hpBars ? UICommon.accentColor : UICommon.textColor;
     }
-
-    private void DelClicked(int index)
-    {
-        if (index <= enemyPool.Count)
-        {
-            EnemyHandle handle = enemyPool[index - 1];
-            Object.DestroyImmediate(handle.gameObject);
-
-            DebugMod.LogConsole($"Destroying enemy: {handle.gameObject.name}");
-        }
-    }
-
-    private void CloneClicked(int index)
-    {
-        if (index <= enemyPool.Count)
-        {
-            EnemyHandle handle = enemyPool[index - 1];
-            GameObject gameObject2 = Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
-
-            DebugMod.LogConsole($"Cloning enemy as: {gameObject2.name}");
-        }
-    }
-
-    private void InfClicked(int index)
-    {
-        if (index <= enemyPool.Count)
-        {
-            EnemyHandle handle = enemyPool[index - 1];
-            handle.HP = 9999;
-
-            DebugMod.LogConsole($"HP for enemy: {handle.gameObject.name} is now 9999");
-        }
-    }
-
-    private void HPBarsClicked() => BindableFunctions.ToggleEnemyHPBars();
     
     public override void Update()
     {
-        if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PLAYING)
-        {
-            GetPanel("Pause").ActiveSelf = false;
-            GetPanel("Play").ActiveSelf = true;
-        }
-        else if (DebugMod.settings.EnemiesPanelVisible && UIManager.instance.uiState == UIState.PAUSED)
-        {
-            GetPanel("Pause").ActiveSelf = true;
-            GetPanel("Play").ActiveSelf = false;
-        }
-        else
-        {
-            GetPanel("Pause").ActiveSelf = false;
-            GetPanel("Play").ActiveSelf = false;
-        }
-
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
-        string enemyNames = "";
-        string enemyHP = "";
-        int enemyCount = 0;
+        int enemyCount = ActivelyUpdating() ? enemyPool.Count : 0;
 
-        if (ActivelyUpdating())
+        for (int i = 1; i <= NUM_LISTINGS; i++)
         {
-            foreach (EnemyHandle handle in enemyPool)
-            {
-                if (++enemyCount <= 14)
-                {
-                    enemyNames += $"{handle.gameObject.name}\n";
-                    enemyHP += $"{handle.HP}/{handle.MaxHP}\n";
-                }
-            }
+            Get<CanvasControl>(i.ToString()).ActiveSelf = i <= enemyCount;
         }
-
-        if (GetPanel("Pause").ActiveInHierarchy)
-        {
-            for (int i = 1; i <= 14; i++)
-            {
-                if (i <= enemyCount)
-                {
-                    GetPanel("Pause").GetButton("Del" + i).ActiveSelf = true;
-                    GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = true;
-                    GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = true;
-                }
-                else
-                {
-                    GetPanel("Pause").GetButton("Del" + i).ActiveSelf = false;
-                    GetPanel("Pause").GetButton("Clone" + i).ActiveSelf = false;
-                    GetPanel("Pause").GetButton("Inf" + i).ActiveSelf = false;
-                }
-            }
-
-            GetPanel("Pause").GetButton("HP Bars").Text.Color =
-                hpBars ? new Color(244f / 255f, 127f / 255f, 32f / 255f) : Color.white;
-        }
-
-        if (enemyCount > 14)
-        {
-            enemyNames += "And " + (enemyCount - 14) + " more";
-        }
-
-        GetText("Enemy Names").Text = enemyNames;
-        GetText("Enemy HP").Text = enemyHP;
 
         base.Update();
     }

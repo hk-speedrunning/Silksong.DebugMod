@@ -46,17 +46,13 @@ public class KeybindContextPanel : CanvasPanel
         CanvasButton editButton = Add(new CanvasButton("Edit"));
         editButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + UICommon.MARGIN * 2, ROW_HEIGHT + UICommon.MARGIN * 2);
         editButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
-        editButton.SetImage(UICommon.images["Scrollbar_point"]);
-        editButton.RemoveText();
-        editButton.RemoveBorder();
+        editButton.ImageOnly(UICommon.images["Scrollbar_point"]);
         editButton.OnClicked += () => DebugMod.settings.binds[bindAction.Name] = KeyCode.None;
 
         CanvasButton clearButton = Add(new CanvasButton("Clear"));
         clearButton.LocalPosition = new Vector2(KEYCODE_TEXT_WIDTH + ROW_HEIGHT + UICommon.MARGIN * 3, ROW_HEIGHT + UICommon.MARGIN * 2);
         clearButton.Size = new Vector2(ROW_HEIGHT, ROW_HEIGHT);
-        clearButton.SetImage(UICommon.images["ButtonDel"]);
-        clearButton.RemoveText();
-        clearButton.RemoveBorder();
+        clearButton.ImageOnly(UICommon.images["ButtonDel"]);
         clearButton.OnClicked += () => DebugMod.settings.binds.Remove(bindAction.Name);
     }
 

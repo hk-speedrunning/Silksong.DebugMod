@@ -31,6 +31,13 @@ public class CanvasButton : CanvasImage
         text = null;
     }
 
+    public void ImageOnly(Texture2D tex, Rect subSprite = default)
+    {
+        SetImage(tex, subSprite);
+        RemoveText();
+        RemoveBorder();
+    }
+
     protected override IEnumerable<CanvasNode> ChildList()
     {
         foreach (CanvasNode child in base.ChildList())
