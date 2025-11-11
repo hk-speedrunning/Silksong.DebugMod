@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
@@ -69,5 +70,15 @@ public class CanvasButton : CanvasImage
                 OnClicked?.Invoke();
             }
         });
+    }
+
+    public override void Update()
+    {
+        if (EventSystem.current.currentSelectedGameObject == gameObject)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+
+        base.Update();
     }
 }
