@@ -6,16 +6,18 @@ namespace DebugMod.UI;
 
 public class BottomRightInfoPanel : InfoPanel
 {
-    public BottomRightInfoPanel() : base(nameof(BottomRightInfoPanel), null, new Vector2(0f, 223f), Vector2.zero)
+    public BottomRightInfoPanel() : base(nameof(BottomRightInfoPanel))
     {
-        AddText("Right1 Label", "Load\nHero Pos\nMove Raw", new Vector2(1285, 747), Vector2.zero, UICommon.arial);
-        AddText("Right1", "", new Vector2(1385, 747), Vector2.zero, UICommon.trajanNormal);
+        LocalPosition = new Vector2(25f, 300f);
 
-        AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed", new Vector2(1525, 747), Vector2.zero, UICommon.arial);
-        AddText("Right2", "", new Vector2(1625, 747), Vector2.zero, UICommon.trajanNormal);
+        AddText("Right1 Label", "Load\nHero Pos\nMove Raw", new Vector2(0f, 0f), Vector2.zero, UICommon.arial);
+        AddText("Right1", "", new Vector2(100f, 0f), Vector2.zero, UICommon.trajanNormal);
 
-        AddText("Right3 Label", "Frame Counter\nGame Time Elapsed\nSession Time", new Vector2(1670, 747), Vector2.zero, UICommon.arial);
-        AddText("Right3", "", new Vector2(1800, 747), Vector2.zero, UICommon.trajanNormal);
+        AddText("Right2 Label", "Move Vector\nKey Pressed\nMove Pressed", new Vector2(240f, 0f), Vector2.zero, UICommon.arial);
+        AddText("Right2", "", new Vector2(340f, 0f), Vector2.zero, UICommon.trajanNormal);
+
+        AddText("Right3 Label", "Frame Counter\nGame Time Elapsed\nSession Time", new Vector2(385f, 0f), Vector2.zero, UICommon.arial);
+        AddText("Right3", "", new Vector2(515f, 0f), Vector2.zero, UICommon.trajanNormal);
     }
 
     public override void Update()

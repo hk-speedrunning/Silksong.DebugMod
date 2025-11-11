@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DebugMod.UI.Canvas;
 using JetBrains.Annotations;
-using UnityEngine;
 
 namespace DebugMod.UI;
 
@@ -45,17 +44,17 @@ public abstract class InfoPanel : CanvasPanel
     {
         foreach (InfoPanel panel in AllPanels.Values)
         {
-            panel.ActiveSelf = DebugMod.settings.InfoPanelVisible && DebugMod.settings.CurrentInfoPanelName == panel.Name;
+            bool active = DebugMod.settings.InfoPanelVisible;
+            if (TogglablePanelNames.Contains(panel.Name))
+            {
+                active = active && DebugMod.settings.CurrentInfoPanelName == panel.Name;
+            }
+
+            panel.ActiveSelf = active;
         }
     }
 
-    protected InfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
-        : base(name)
-    {
-        Parent = parent;
-        LocalPosition = position;
-        Size = size;
-    }
+    protected InfoPanel(string name): base(name) {}
 
     #region Custom Panel API
 

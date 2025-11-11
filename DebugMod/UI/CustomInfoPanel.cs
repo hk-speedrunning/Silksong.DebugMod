@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DebugMod.SaveStates;
-using DebugMod.UI.Canvas;
 using GlobalSettings;
 using UnityEngine;
 
@@ -12,8 +11,7 @@ public class CustomInfoPanel : InfoPanel
     protected List<(float xLabel, float xInfo, float y, string label, Func<string> textFunc)> PanelBuildInfo = new();
     private Dictionary<string, Func<string>> UpdateActions;
 
-    public CustomInfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size)
-        : base(name, parent, position, size) {}
+    public CustomInfoPanel(string name) : base(name) {}
 
     public override void Build()
     {
@@ -48,8 +46,8 @@ public class CustomInfoPanel : InfoPanel
 
     internal static CustomInfoPanel BuildMainInfoPanel()
     {
-        CustomInfoPanel panel = new CustomInfoPanel(MainInfoPanelName, null, new Vector2(0f, 223f), Vector2.zero);
-        panel.AddImage("Background", UICommon.images["StatusPanelBG"], Vector2.zero);
+        CustomInfoPanel panel = new CustomInfoPanel(MainInfoPanelName);
+        panel.LocalPosition = new Vector2(500f, 450f);
 
         float y = 0f;
 
@@ -120,7 +118,8 @@ public class CustomInfoPanel : InfoPanel
 
     internal static CustomInfoPanel BuildMinimalInfoPanel()
     {
-        CustomInfoPanel panel = new CustomInfoPanel(MinimalInfoPanelName, null, new Vector2(130f, 230f), Vector2.zero);
+        CustomInfoPanel panel = new CustomInfoPanel(MinimalInfoPanelName);
+        panel.LocalPosition = new Vector2(500f, 500f);
 
         panel.AddInfo(10, 40, 10, "Vel", () => HeroController.instance.current_velocity.ToString());
         panel.AddInfo(110, 140, 10, "Pos", () => GetHeroPos());

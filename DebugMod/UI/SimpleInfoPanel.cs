@@ -12,8 +12,11 @@ public class SimpleInfoPanel : CustomInfoPanel
     private readonly float sep;
     private float y = -10f;
 
-    public SimpleInfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, float sep) : base(name, parent, position, size)
+    public SimpleInfoPanel(string name, CanvasNode parent, Vector2 position, Vector2 size, float sep) : base(name)
     {
+        Parent = parent;
+        LocalPosition = position;
+        Size = size;
         this.sep = sep;
     }
 
