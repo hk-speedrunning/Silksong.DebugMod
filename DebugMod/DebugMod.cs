@@ -68,7 +68,6 @@ public partial class DebugMod : BaseUnityPlugin
     internal static bool noclip;
     internal static Vector3 noclipPos;
     internal static bool cameraFollow;
-    internal static SaveStateManager saveStateManager;
     public static bool KeyBindLock;
     internal static bool TimeScaleActive;
     internal static float CurrentTimeScale = 1f;
@@ -129,7 +128,7 @@ public partial class DebugMod : BaseUnityPlugin
             alphaKeyDict.Add((KeyCode)(alphaStart + i), i);
         }
         
-        saveStateManager = new SaveStateManager();
+        SaveStateManager.Initialize();
 
         Harmony harmony = new(Id);
         harmony.PatchAll();
@@ -211,7 +210,7 @@ public partial class DebugMod : BaseUnityPlugin
         int damage = infiniteHP ? 0 : damageAmount;
         if (stateOnDeath && (PlayerData.instance.health - damage <= 0))
         {
-            saveStateManager.LoadSaveState(SaveStateType.Memory);
+            SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             LogConsole("Lethal damage prevented, savestate loading");
             return 0;
         }

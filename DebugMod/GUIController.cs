@@ -14,7 +14,6 @@ public class GUIController : MonoBehaviour
 {
     public Vector3 hazardLocation;
     public string respawnSceneWatch;
-    public static bool didInput, inputEsc;
     private static readonly HitboxViewer hitboxes = new();
     private string textBoxText;
     private Action<string> textBoxCallback;
@@ -89,7 +88,7 @@ public class GUIController : MonoBehaviour
         MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
         EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
         ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
-        SaveStatesPanel.Instance.ActiveSelf = DebugMod.settings.SaveStatePanelVisible || SaveStateManager.inSelectSlotState;
+        SaveStatesPanel.Instance.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
         InfoPanel.UpdatePanels();
 
         foreach (CanvasNode root in CanvasNode.rootNodes)
@@ -186,29 +185,6 @@ public class GUIController : MonoBehaviour
                                                    e.ToString());
                     }
                     
-                }
-            }
-        }
-        
-        if (SaveStateManager.inSelectSlotState && DebugMod.settings.SaveStatePanelVisible)
-        {
-            foreach (KeyValuePair<KeyCode, int> entry in DebugMod.alphaKeyDict)
-            {
-                
-                if (Input.GetKeyDown(entry.Key))
-                {
-                    if (DebugMod.alphaKeyDict.TryGetValue(entry.Key, out int keyInt))
-                    {
-                        // keyInt should be between 0-9
-                        SaveStateManager.currentStateSlot = keyInt;
-                        didInput = true;
-                        break;
-                    }
-                    else
-                    {
-                        didInput = inputEsc = true;
-                        break;
-                    }
                 }
             }
         }

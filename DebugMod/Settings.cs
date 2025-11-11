@@ -29,8 +29,6 @@ public class Settings
     
     public int ShowHitBoxes;
 
-    public int MaxSaveStates = 10;
-
     public int MaxSavePages = 10;
 
     public float NoClipSpeedModifier = 1f;

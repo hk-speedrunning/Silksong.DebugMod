@@ -1,5 +1,5 @@
-﻿using System.IO;
-using DebugMod.SaveStates;
+﻿using DebugMod.SaveStates;
+using DebugMod.UI;
 
 namespace DebugMod;
 
@@ -8,77 +8,51 @@ public static partial class BindableFunctions
      [BindableMethod(name = "Quickslot (save)", category = "Savestates")]
     public static void SaveState()
     {
-        DebugMod.saveStateManager.SaveSaveState(SaveStateType.Memory);
+        SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
     }
 
     [BindableMethod(name = "Quickslot (load)", category = "Savestates")]
     public static void LoadState()
     {
-        DebugMod.saveStateManager.LoadSaveState(SaveStateType.Memory);
+        SaveStateManager.LoadState(SaveStateManager.GetQuickState());
     }
 
     //TODO: Allow these binds to override each other properly
     [BindableMethod(name = "Quickslot save to file", category = "Savestates")]
     public static void CurrentSaveStateToFile()
     {
-        if (SaveStateManager.currentStateOperation != "Quickslot save to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.File);
-        else SaveStateManager.inSelectSlotState = false;
+        SaveStatesPanel.Instance.EnterSelectState(SelectOperation.QuickslotToFile);
     }
 
     [BindableMethod(name = "Load file to quickslot", category = "Savestates")]
     public static void CurrentSlotToSaveMemory()
     {
-        if (SaveStateManager.currentStateOperation != "Load file to quickslot") DebugMod.saveStateManager.LoadSaveState(SaveStateType.File);
-        else SaveStateManager.inSelectSlotState = false;
+        SaveStatesPanel.Instance.EnterSelectState(SelectOperation.FileToQuickslot);
     }
 
     [BindableMethod(name = "Save new state to file", category = "Savestates")]
     public static void NewSaveStateToFile()
     {
-        if (SaveStateManager.currentStateOperation != "Save new state to file") DebugMod.saveStateManager.SaveSaveState(SaveStateType.SkipOne);
-        else SaveStateManager.inSelectSlotState = false;
+        SaveStatesPanel.Instance.EnterSelectState(SelectOperation.SaveToFile);
     }
 
     [BindableMethod(name = "Load new state from file", category = "Savestates")]
     public static void LoadFromFile()
     {
-        if (SaveStateManager.currentStateOperation != "Load new state from file") DebugMod.saveStateManager.LoadSaveState(SaveStateType.SkipOne);
-        else SaveStateManager.inSelectSlotState = false;
+        SaveStatesPanel.Instance.EnterSelectState(SelectOperation.LoadFromFile);
 
     }
 
     [BindableMethod(name = "Next Save Page", category = "Savestates")]
     public static void NextStatePage()
     {
-        if (!SaveStateManager.inSelectSlotState) return;
-        
-        SaveStateManager.currentStateFolder++;
-        if (SaveStateManager.currentStateFolder >= SaveStateManager.savePages)
-        {
-            SaveStateManager.currentStateFolder = 0;
-        } //rollback to 0 if higher than max
-
-        SaveStateManager.path = Path.Combine(
-            SaveStateManager.saveStatesBaseDirectory,
-            SaveStateManager.currentStateFolder.ToString()); //change path
-        DebugMod.saveStateManager.RefreshStateMenu(); // update menu
+        SaveStatesPanel.Instance.NextPage();
     }
 
     [BindableMethod(name = "Prev Save Page", category = "Savestates")]
     public static void PrevStatePage()
     {
-        if (!SaveStateManager.inSelectSlotState) return;
-        
-        SaveStateManager.currentStateFolder--;
-        if (SaveStateManager.currentStateFolder < 0)
-        {
-            SaveStateManager.currentStateFolder = SaveStateManager.savePages - 1;
-        } //rollback to max if we go below page 0
-
-        SaveStateManager.path = Path.Combine(
-            SaveStateManager.saveStatesBaseDirectory,
-            SaveStateManager.currentStateFolder.ToString()); //change path
-        DebugMod.saveStateManager.RefreshStateMenu(); // update menu
+        SaveStatesPanel.Instance.PrevPage();
     }
 
     [BindableMethod(name = "Load Savestate On Death", category = "Savestates")]
@@ -94,19 +68,4 @@ public static partial class BindableFunctions
         DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
         DebugMod.LogConsole("Savestate lockout override set to " + DebugMod.overrideLoadLockout);
     }
-
-    /*
-    [BindableMethod(name = "Toggle auto slot", category = "Savestates")]
-    public static void ToggleAutoSlot()
-    {
-        DebugMod.saveStateManager.ToggleAutoSlot();
-    }
-    
-    
-    [BindableMethod(name = "Refresh state menu", category = "Savestates")]
-    public static void RefreshSaveStates()
-    {
-        DebugMod.saveStateManager.RefreshStateMenu();
-    }
-    */
 }

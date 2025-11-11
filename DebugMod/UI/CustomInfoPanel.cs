@@ -133,20 +133,9 @@ public class CustomInfoPanel : InfoPanel
         panel.AddInfo(140, 195, 70, "Fleas", () => Gameplay.FleasCollectedCount + " / 30");
         
         panel.AddInfo(10, 140, 90, "Scene Name", () => DebugMod.GetSceneName());
-        panel.AddInfo(10, 140, 110, "Current Savestate", () => SaveStateManager.quickState.IsSet() ? SaveStateManager.quickState.GetSaveStateID() : "No savestate");
-        panel.AddInfo(110, 200, 130, "Current slot", GetCurrentSlotString);
+        panel.AddInfo(10, 140, 110, "Current Savestate", () => SaveStateManager.GetQuickState().ToString());
         panel.AddInfo(10, 80, 130, "Hardfall", () => GetStringForBool(HeroController.instance.cState.willHardLand));
 
         return panel;
-    }
-
-    private static string GetCurrentSlotString()
-    {
-        string slotSet = SaveStateManager.GetCurrentSlot().ToString();
-        if (slotSet == "-1")
-        {
-            slotSet = "unset";
-        }
-        return slotSet;
     }
 }

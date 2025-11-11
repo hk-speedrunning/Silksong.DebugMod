@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using DebugMod.Helpers;
@@ -20,7 +19,7 @@ namespace DebugMod.SaveStates;
 /// Handles struct SaveStateData and individual SaveState operations
 /// </summary>
 [HarmonyPatch]
-internal class SaveState
+public class SaveState
 {
     // Some mods (ItemChanger) check type to detect vanilla scene loads.
     private class DebugModSaveStateSceneLoadInfo : GameManager.SceneLoadInfo { }
@@ -38,7 +37,6 @@ internal class SaveState
         public SceneData savedSd;
         public Vector3 savePos;
         public FieldInfo cameraLockArea;
-        public string filePath;
         public bool isKinematized;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
@@ -82,7 +80,11 @@ internal class SaveState
                     loadedSceneActiveScenes[i] = loadedScenes[i];
                 }
             }
+        }
 
+        public SaveStateData DeepCopy()
+        {
+            return new SaveStateData(this);
         }
     }
 
@@ -96,13 +98,12 @@ internal class SaveState
     }
 
     #region saving
-
-    public bool SaveTempState()
+    public bool Save()
     {
         //save level state before savestates so levers and dead enemies persist properly
         GameManager.instance.SaveLevelState();
         data.saveScene = GameManager.instance.GetSceneNameString();
-        data.saveStateIdentifier = $"(tmp)_{data.saveScene}-{DateTime.Now.ToString("H:mm_d-MMM")}";
+        data.saveStateIdentifier = $"{data.saveScene}-{DateTime.Now:H:mm_d-MMM}";
 
         //implementation so room specifics can be automatically saved
         try
@@ -128,124 +129,11 @@ internal class SaveState
         DebugMod.LogConsole("Saved temp state");
         return true;
     }
-
-    public void NewSaveStateToFile(int paramSlot)
-    {
-        if (SaveTempState())
-        {
-            SaveStateToFile(paramSlot);
-        }
-    }
-
-    public void SaveStateToFile(int paramSlot)
-    {
-        try
-        {
-            if (data.saveStateIdentifier.StartsWith("(tmp)_"))
-            {
-                data.saveStateIdentifier = data.saveStateIdentifier.Substring(6);
-            }
-            else if (String.IsNullOrEmpty(data.saveStateIdentifier))
-            {
-                throw new Exception("No temp save state set");
-            }
-
-            string saveStateFile = Path.Combine(SaveStateManager.path, $"savestate{paramSlot}.json");
-            File.WriteAllText(saveStateFile,
-                JsonUtility.ToJson(data, prettyPrint: true)
-            );
-        }
-        catch (Exception ex)
-        {
-            DebugMod.LogDebug(ex.Message);
-            throw ex;
-        }
-    }
     #endregion
 
     #region loading
-
     //loadDuped is used by external mods
-    public void LoadTempState(bool loadDuped = false)
-    {
-        if (CanLoadState())
-        {
-            GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
-        }
-        else if (DebugMod.overrideLoadLockout)
-        {
-            DebugMod.LogConsole("Attempting savestate load override");
-            GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
-        }
-    }
-
-    private bool CanLoadState()
-    {
-        if (PlayerDeathWatcher.playerDead)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when dead");
-            return false;
-        }
-
-        if (HeroController.instance.cState.transitioning)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when transitioning");
-            return false;
-        }
-
-        if (HeroController.instance.transform.parent != null)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when on elevators");
-            return false;
-        }
-
-        if (loadingSavestate != null)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when another savestate is loading");
-            return false;
-        }
-
-        return true;
-    }
-
-    //loadDuped is used by external mods
-    public void NewLoadStateFromFile(bool loadDuped = false)
-    {
-        LoadStateFromFile(SaveStateManager.currentStateSlot);
-        LoadTempState(loadDuped);
-    }
-
-    public void LoadStateFromFile(int paramSlot)
-    {
-        try
-        {
-            data.filePath = Path.Combine(SaveStateManager.path, $"savestate{paramSlot}.json");
-
-            if (File.Exists(data.filePath))
-            {
-                //DebugMod.Log("checked filepath: " + data.filePath);
-                SaveStateData tmpData = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(data.filePath));
-                try
-                {
-                    data = new SaveStateData(tmpData);
-
-                    DebugMod.Log("Load SaveState ready: " + data.saveStateIdentifier);
-                }
-                catch (Exception ex)
-                {
-                    DebugMod.LogError("Error applying save state data: " + ex);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            DebugMod.LogDebug(ex.Message);
-            throw;
-        }
-    }
-
-    //loadDuped is used by external mods
-    private IEnumerator LoadStateCoro(bool loadDuped)
+    public IEnumerator Load(bool loadDuped = false)
     {
         // Second check is probably not necessary since it's already checked at the call sites the frame before,
         // but might as well be defensive and rule out any frame-perfect nonsense
@@ -554,34 +442,12 @@ internal class SaveState
     #endregion
 
     #region helper functionality
+    public bool IsSet() => !string.IsNullOrEmpty(data.saveStateIdentifier);
 
-    public bool IsSet()
-    {
-        bool isSet = !String.IsNullOrEmpty(data.saveStateIdentifier);
-        return isSet;
-    }
-
-    public string GetSaveStateID()
-    {
-        return data.saveStateIdentifier;
-    }
-
-    public string[] GetSaveStateInfo()
-    {
-        return new string[]
-        {
-            data.saveStateIdentifier,
-            data.saveScene
-        };
-    }
-    public SaveState.SaveStateData DeepCopy()
-    {
-        return new SaveState.SaveStateData(this.data);
-    }
+    public override string ToString() => IsSet() ? data.saveStateIdentifier : "Empty";
     #endregion
 
     #region patches
-
     // Bring back dream gate transitions >:(
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.FindEntryPoint))]
     [HarmonyPrefix]
@@ -595,6 +461,5 @@ internal class SaveState
 
         return true;
     }
-
     #endregion
 }
