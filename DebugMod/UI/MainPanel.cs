@@ -190,6 +190,10 @@ public class MainPanel : CanvasPanel
                 CanvasButton clear = control.AppendSquare(new CanvasButton("Clear"));
                 clear.ImageOnly(UICommon.images["ButtonDel"]);
                 clear.OnClicked += () => DebugMod.settings.binds.Remove(action.Name);
+
+                CanvasButton run = control.AppendSquare(new CanvasButton("Run"));
+                run.ImageOnly(UICommon.images["ButtonRun"]);
+                run.OnClicked += action.Action;
             }
         }
     }

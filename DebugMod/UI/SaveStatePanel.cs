@@ -7,7 +7,7 @@ namespace DebugMod.UI;
 
 public class SaveStatesPanel : CanvasAutoPanel
 {
-    public const int SAVE_LOAD_BUTTON_WIDTH = 100;
+    public const int SAVE_LOAD_BUTTON_WIDTH = 60;
 
     public static SaveStatesPanel Instance { get; private set; }
 
@@ -52,15 +52,15 @@ public class SaveStatesPanel : CanvasAutoPanel
         pageText.Alignment = TextAnchor.MiddleLeft;
         pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
-        CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
-        nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
-        nextPage.OnClicked += NextPage;
-
-        pageControl.AppendPadding(UICommon.MARGIN);
-
         CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Next"));
         prevPage.ImageOnly(UICommon.images["ButtonDel"]);
         prevPage.OnClicked += PrevPage;
+
+        pageControl.AppendPadding(UICommon.MARGIN);
+
+        CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
+        nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
+        nextPage.OnClicked += NextPage;
 
         for (int i = 0; i < SaveStateManager.STATES_PER_PAGE; i++)
         {
@@ -68,25 +68,9 @@ public class SaveStatesPanel : CanvasAutoPanel
 
             CanvasControl fileSlot = Append(new CanvasControl($"FileSlot{i}"), UICommon.CONTROL_HEIGHT);
 
-            CanvasText indexLabel = fileSlot.Append(new CanvasText("Index"), 30f);
-            indexLabel.Alignment = TextAnchor.MiddleCenter;
-            indexLabel.Text = i.ToString();
-
             CanvasText label = fileSlot.AppendFlex(new CanvasText("Label"));
             label.Alignment = TextAnchor.MiddleLeft;
-            label.OnUpdate += () => label.Text = SaveStateManager.GetFileState(currentPage, index).ToString();
-
-            CanvasButton save = fileSlot.Append(new CanvasButton("Save"), SAVE_LOAD_BUTTON_WIDTH);
-            save.Text.Text = "Save";
-            save.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
-
-            fileSlot.AppendPadding(UICommon.MARGIN);
-
-            CanvasButton load = fileSlot.Append(new CanvasButton("Load"), SAVE_LOAD_BUTTON_WIDTH);
-            load.Text.Text = "Load";
-            load.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
-
-            fileSlot.AppendPadding(UICommon.MARGIN);
+            label.OnUpdate += () => label.Text = $"{index}: {SaveStateManager.GetFileState(currentPage, index)}";
 
             CanvasButton rename = fileSlot.AppendSquare(new CanvasButton("Rename"));
             rename.ImageOnly(UICommon.images["ButtonRun"]);
@@ -101,6 +85,18 @@ public class SaveStatesPanel : CanvasAutoPanel
                         name => SaveStateManager.RenameFileState(page, index, name));
                 }
             };
+
+            fileSlot.AppendPadding(UICommon.MARGIN);
+
+            CanvasButton save = fileSlot.Append(new CanvasButton("Save"), SAVE_LOAD_BUTTON_WIDTH);
+            save.Text.Text = "Save";
+            save.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+
+            fileSlot.AppendPadding(UICommon.MARGIN);
+
+            CanvasButton load = fileSlot.Append(new CanvasButton("Load"), SAVE_LOAD_BUTTON_WIDTH);
+            load.Text.Text = "Load";
+            load.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
         }
 
         CanvasText currentOperation = Append(new CanvasText("CurrentOperation"), 15f);

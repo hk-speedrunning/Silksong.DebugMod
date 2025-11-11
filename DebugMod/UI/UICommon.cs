@@ -12,7 +12,7 @@ public static class UICommon
 {
     public const int RIGHT_SIDE_WIDTH = 400;
     public const int MAIN_MENU_HEIGHT = 650;
-    public const int LEFT_SIDE_WIDTH = 550;
+    public const int LEFT_SIDE_WIDTH = 450;
     public const int CONSOLE_HEIGHT = 250;
     public const int SAVESTATES_HEIGHT = 400;
     public const int SCREEN_MARGIN = 25;
