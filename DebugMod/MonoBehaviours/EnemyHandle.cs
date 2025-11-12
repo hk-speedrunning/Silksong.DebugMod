@@ -1,4 +1,5 @@
-﻿using DebugMod.UI;
+﻿using System;
+using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using GlobalEnums;
 using HarmonyLib;
@@ -11,13 +12,13 @@ public class EnemyHandle : MonoBehaviour
 {
     private const int HPBAR_WIDTH = 120;
     private const int HPBAR_HEIGHT = 40;
-    private const int HPBAR_BORDER = 3;
 
     private HealthManager hm;
     private tk2dSprite sprite;
     private BoxCollider2D collider;
     private CanvasPanel hpBar;
-    private int lastHP = -1;
+    private Texture2D barTexture;
+    private int lastHP = -100000;
     private int maxHP;
 
     public int HP
@@ -54,10 +55,7 @@ public class EnemyHandle : MonoBehaviour
     {
         if (!EnemiesPanel.ActivelyUpdating())
         {
-            if (hpBar != null)
-            {
-                hpBar.ActiveSelf = false;
-            }
+            hpBar?.ActiveSelf = false;
             return;
         }
 
@@ -70,14 +68,31 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar == null)
             {
-                hpBar = new CanvasPanel($"{gameObject.name} HP Bar", null, Vector2.zero, Vector2.zero, DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
-                hpBar.AddText("HP", "", Vector2.zero, new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT), UICommon.arial, 20, FontStyle.Normal, TextAnchor.MiddleCenter);
+                barTexture = new Texture2D(HPBAR_WIDTH, 1);
+                Color[] colors = new Color[HPBAR_WIDTH];
+                Array.Fill(colors, Color.red);
+                barTexture.SetPixels(colors);
+                barTexture.Apply();
+
+                hpBar = new CanvasPanel($"{gameObject.name} HP Bar");
+                hpBar.Size = new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT);
+
+                CanvasImage background = UICommon.AddBackground(hpBar);
+                background.SetImage(barTexture);
+                background.Border.Size = hpBar.Size;
+                background.Border.Thickness = 3;
+
+                CanvasText text = hpBar.Add(new CanvasText("HP"));
+                text.Size = hpBar.Size;
+                text.FontSize = 20;
+                text.Alignment = TextAnchor.MiddleCenter;
+
                 hpBar.Build();
             }
 
             if (HP != lastHP)
             {
-                hpBar.GetImage("Background").SetImage(DrawTexture(), new Rect(0, 0, HPBAR_WIDTH, HPBAR_HEIGHT));
+                hpBar.GetImage("Background").Size = new Vector2(HPBAR_WIDTH * (float)HP / MaxHP, HPBAR_HEIGHT);
                 lastHP = HP;
             }
 
@@ -96,40 +111,7 @@ public class EnemyHandle : MonoBehaviour
             hpBar.GetText("HP").Text = $"{HP}/{MaxHP}";
         }
 
-        if (hpBar != null)
-        {
-            hpBar.ActiveSelf = EnemiesPanel.hpBars;
-        }
-    }
-
-    private Texture2D DrawTexture()
-    {
-        Texture2D tex = new Texture2D(HPBAR_WIDTH, HPBAR_HEIGHT);
-
-        for (int x = 0; x < HPBAR_WIDTH; x++)
-        {
-            for (int y = 0; y < HPBAR_HEIGHT; y++)
-            {
-                Color color;
-                if (x < HPBAR_BORDER || x >= HPBAR_WIDTH - HPBAR_BORDER || y < HPBAR_BORDER || y >= HPBAR_HEIGHT - HPBAR_BORDER)
-                {
-                    color = Color.black;
-                }
-                else if (HP / (float)MaxHP >= (x - HPBAR_BORDER) / (float)(HPBAR_WIDTH - HPBAR_BORDER))
-                {
-                    color = Color.red;
-                }
-                else
-                {
-                    color = Color.clear;
-                }
-
-                tex.SetPixel(x, y, color);
-            }
-        }
-
-        tex.Apply();
-        return tex;
+        hpBar?.ActiveSelf = EnemiesPanel.hpBars;
     }
 
     [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Start))]

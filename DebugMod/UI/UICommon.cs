@@ -31,12 +31,13 @@ public static class UICommon
     public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
     public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
 
-    public static void AddBackground(CanvasPanel panel)
+    public static CanvasImage AddBackground(CanvasPanel panel)
     {
         CanvasImage background = panel.Add(new CanvasImage("Background"));
         background.Size = panel.Size;
         background.SetImage(panelBG);
         AddBorder(background);
+        return background;
     }
 
     public static void AddBorder(CanvasImage image)
