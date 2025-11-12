@@ -164,10 +164,10 @@ public abstract class CanvasNode
 
     protected bool IsMouseOver()
     {
-        Rect bounds = new Rect(Position.x, 1080f - Position.y - Size.y, Size.x, Size.y);
+        Rect bounds = new Rect(Position.x, Screen.height - Position.y - Size.y, Size.x, Size.y);
         if (ShouldClip(out Rect clipRect))
         {
-            clipRect = new Rect(clipRect.position + new Vector2(1920f / 2f, 1080f / 2f), clipRect.size);
+            clipRect = new Rect(clipRect.position + new Vector2(Screen.width / 2f, Screen.height / 2f), clipRect.size);
             bounds = Intersect(bounds, clipRect);
         }
 

@@ -7,6 +7,7 @@ using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = System.Object;
 
 namespace DebugMod;
 
@@ -18,6 +19,7 @@ public class GUIController : MonoBehaviour
     private string textBoxText;
     private Action<string> textBoxCallback;
     private KeyCode keyWarning;
+    private Resolution resolution;
 
     public GameObject canvas;
     private static GUIController _instance;
@@ -62,14 +64,16 @@ public class GUIController : MonoBehaviour
 
     public void BuildMenus()
     {
-        UICommon.LoadResources();
+        if (canvas)
+        {
+            Destroy(canvas);
+        }
 
         canvas = new GameObject("DebugModCanvas");
-        canvas.AddComponent<UnityEngine.Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-        CanvasScaler scaler = canvas.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.AddComponent<GraphicRaycaster>();
+
+        DontDestroyOnLoad(canvas);
 
         MainPanel.BuildPanel();
         EnemiesPanel.BuildPanel();
@@ -78,12 +82,18 @@ public class GUIController : MonoBehaviour
         InfoPanel.BuildInfoPanels();
         KeybindContextPanel.BuildPanel();
 
-        DontDestroyOnLoad(canvas);
+        resolution = Screen.currentResolution;
     }
 
     public void Update()
     {
         if (DebugMod.GM == null) return;
+
+        if (resolution.width != Screen.currentResolution.width || resolution.height != Screen.currentResolution.height)
+        {
+            resolution = Screen.currentResolution;
+            BuildMenus();
+        }
 
         MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
         EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;

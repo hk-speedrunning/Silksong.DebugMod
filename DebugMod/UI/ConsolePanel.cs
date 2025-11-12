@@ -21,8 +21,8 @@ public class ConsolePanel : CanvasPanel
 
     public ConsolePanel() : base(nameof(ConsolePanel))
     {
-        LocalPosition = new Vector2(UICommon.SCREEN_MARGIN, 1080f - UICommon.SCREEN_MARGIN - UICommon.CONSOLE_HEIGHT);
-        Size = new Vector2(UICommon.LEFT_SIDE_WIDTH, UICommon.CONSOLE_HEIGHT);
+        LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ScreenMargin - UICommon.ConsoleHeight);
+        Size = new Vector2(UICommon.LeftSideWidth, UICommon.ConsoleHeight);
 
         UICommon.AddBackground(this);
 

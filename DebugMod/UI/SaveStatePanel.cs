@@ -25,12 +25,12 @@ public class SaveStatesPanel : CanvasAutoPanel
 
     public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
-        LocalPosition = new Vector2(UICommon.SCREEN_MARGIN, 1080f - UICommon.SAVESTATES_HEIGHT - UICommon.CONSOLE_HEIGHT - UICommon.SCREEN_MARGIN * 2);
-        Size = new Vector2(UICommon.LEFT_SIDE_WIDTH, UICommon.SAVESTATES_HEIGHT);
+        LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.SavestatesHeight - UICommon.ConsoleHeight - UICommon.ScreenMargin * 2);
+        Size = new Vector2(UICommon.LeftSideWidth, UICommon.SavestatesHeight);
 
         UICommon.AddBackground(this);
 
-        CanvasControl quickslot = Append(new CanvasControl("Quickslot"), UICommon.CONTROL_HEIGHT);
+        CanvasControl quickslot = Append(new CanvasControl("Quickslot"), UICommon.ControlHeight);
 
         CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
         quickslotLabel.Alignment = TextAnchor.MiddleLeft;
@@ -66,7 +66,7 @@ public class SaveStatesPanel : CanvasAutoPanel
         {
             int index = i; // lambda capturing reasons
 
-            CanvasControl fileSlot = Append(new CanvasControl($"FileSlot{i}"), UICommon.CONTROL_HEIGHT);
+            CanvasControl fileSlot = Append(new CanvasControl($"FileSlot{i}"), UICommon.ControlHeight);
 
             CanvasText label = fileSlot.AppendFlex(new CanvasText("Label"));
             label.Alignment = TextAnchor.MiddleLeft;

@@ -102,9 +102,6 @@ public class EnemyHandle : MonoBehaviour
             barPos.y += (bounds.max.y - bounds.min.y) / 2f;
 
             barPos = Camera.main.WorldToScreenPoint(barPos);
-            barPos.x = barPos.x / Screen.width * 1920f;
-            barPos.y = (1 - barPos.y / Screen.height) * 1080f;
-
             barPos.x -= HPBAR_WIDTH / 2f;
 
             hpBar.LocalPosition = barPos;

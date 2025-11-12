@@ -60,8 +60,7 @@ public class KeybindContextPanel : CanvasPanel
     {
         keycodeText.Text = GetKeycodeText(bindAction.Name);
 
-        if (!new Rect(Position.x, 1080f - Position.y - Size.y, Size.x, Size.y).Contains(Input.mousePosition)
-            && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
+        if (!IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
         {
             Hide();
         }
@@ -100,14 +99,14 @@ public class KeybindContextPanel : CanvasPanel
         nameText.Text = bindAction.Name;
 
         float x = (int)(anchor.Position.x + anchor.Size.x / 2);
-        float xOver = x + Size.x - (1920f - UICommon.MARGIN);
+        float xOver = x + Size.x - (Screen.width - UICommon.MARGIN);
         if (xOver > 0)
         {
             x -= xOver;
         }
 
         float y = (int)(anchor.Position.y + anchor.Size.y / 2);
-        float yOver = y + Size.y - (1080f - UICommon.MARGIN);
+        float yOver = y + Size.y - (Screen.height - UICommon.MARGIN);
         if (yOver > 0)
         {
             y -= yOver;

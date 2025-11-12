@@ -40,8 +40,8 @@ public class MainPanel : CanvasPanel
 
     public MainPanel() : base(nameof(MainPanel))
     {
-        LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.SCREEN_MARGIN);
-        Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT);
+        LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.ScreenMargin);
+        Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight);
 
         CanvasAutoPanel gameplay = AddTab("Gameplay");
 
@@ -202,7 +202,7 @@ public class MainPanel : CanvasPanel
     {
         CanvasPanel tab = Add(new CanvasPanel(name));
         tab.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
-        tab.Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT - TAB_BUTTON_HEIGHT);
+        tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - TAB_BUTTON_HEIGHT);
         UICommon.AddBackground(tab);
         tabs.Add(tab);
 

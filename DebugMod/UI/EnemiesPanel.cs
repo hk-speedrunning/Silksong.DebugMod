@@ -24,8 +24,8 @@ public class EnemiesPanel : CanvasAutoPanel
 
     public EnemiesPanel() : base(nameof(EnemiesPanel))
     {
-        LocalPosition = new Vector2(1920f - UICommon.SCREEN_MARGIN - UICommon.RIGHT_SIDE_WIDTH, UICommon.MAIN_MENU_HEIGHT + UICommon.SCREEN_MARGIN * 2);
-        Size = new Vector2(UICommon.RIGHT_SIDE_WIDTH, 1080f - UICommon.MAIN_MENU_HEIGHT - UICommon.SCREEN_MARGIN * 3);
+        LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.MainPanelHeight + UICommon.ScreenMargin * 2);
+        Size = new Vector2(UICommon.RightSideWidth, Screen.height - UICommon.MainPanelHeight - UICommon.ScreenMargin * 3);
 
         UICommon.AddBackground(this);
 
@@ -85,8 +85,8 @@ public class EnemiesPanel : CanvasAutoPanel
         overflow.OnUpdate += () => overflow.Text = enemyPool.Count > NUM_LISTINGS ? $"... and {enemyPool.Count - NUM_LISTINGS} more" : "";
 
         CanvasButton hpBarsButton = Add(new CanvasButton("HPBars"));
-        hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.MARGIN - 100f, Size.y - UICommon.MARGIN - UICommon.CONTROL_HEIGHT);
-        hpBarsButton.Size = new Vector2(100f, UICommon.CONTROL_HEIGHT);
+        hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.MARGIN - 100f, Size.y - UICommon.MARGIN - UICommon.ControlHeight);
+        hpBarsButton.Size = new Vector2(100f, UICommon.ControlHeight);
         hpBarsButton.Text.Text = "HP Bars";
         hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
         hpBarsButton.OnUpdate += () => hpBarsButton.Text.Color = hpBars ? UICommon.accentColor : UICommon.textColor;

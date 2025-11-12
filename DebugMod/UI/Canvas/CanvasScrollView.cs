@@ -27,7 +27,7 @@ public class CanvasScrollView : CanvasNode
 
     protected override bool GetClipRect(out Rect clipRect)
     {
-        clipRect = new Rect(Position.x - 1920f / 2f + Margin.x, 1080f / 2f - Position.y - Size.y + Margin.y,
+        clipRect = new Rect(Position.x - Screen.width / 2f + Margin.x, Screen.height / 2f - Position.y - Size.y + Margin.y,
             Size.x - Margin.x * 2, Size.y - Margin.y * 2);
         return true;
     }

@@ -100,7 +100,7 @@ public class CanvasPanel : CanvasNode
     {
         if (sz.x == 0 || sz.y == 0)
         {
-            sz = new Vector2(1920f, 1080f);
+            sz = new Vector2(Screen.width, Screen.height);
         }
 
         CanvasText t = new CanvasText(name);

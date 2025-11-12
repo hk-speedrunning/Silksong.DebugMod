@@ -148,6 +148,7 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.FinishedLoadingModsHook += () =>
         {
             BossHandler.PopulateBossLists();
+            UICommon.LoadResources();
             GUIController.Instance.BuildMenus();
             SceneWatcher.Init();
 

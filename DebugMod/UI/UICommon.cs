@@ -10,15 +10,18 @@ namespace DebugMod.UI;
 
 public static class UICommon
 {
-    public const int RIGHT_SIDE_WIDTH = 400;
-    public const int MAIN_MENU_HEIGHT = 650;
-    public const int LEFT_SIDE_WIDTH = 450;
-    public const int CONSOLE_HEIGHT = 250;
-    public const int SAVESTATES_HEIGHT = 400;
-    public const int SCREEN_MARGIN = 25;
+    // Values that should not scale with the resolution
     public const int MARGIN = 6;
-    public const int CONTROL_HEIGHT = 25;
     public const int BORDER_THICKNESS = 1;
+
+    // Values that scale with either width or height, unscaled value is for 1080p
+    public static int RightSideWidth => ScaleWidth(400);
+    public static int LeftSideWidth => ScaleWidth(450);
+    public static int MainPanelHeight => ScaleHeight(650);
+    public static int ConsoleHeight => ScaleHeight(250);
+    public static int SavestatesHeight => ScaleHeight(400);
+    public static int ScreenMargin => ScaleHeight(25);
+    public static int ControlHeight => ScaleHeight(25);
 
     public static readonly Color textColor = Color.white;
     public static readonly Color accentColor = RGB(137, 180, 250);
@@ -30,6 +33,19 @@ public static class UICommon
     public static readonly Dictionary<string, Texture2D> images = new();
     public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
     public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
+
+    public static int ScaleWidth(int unscaled) => (int)(unscaled * Screen.width / 1920f);
+    public static int ScaleHeight(int unscaled) => (int)(unscaled * Screen.height / 1080f);
+
+    private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
+
+    private static Texture2D SolidColor(Color color)
+    {
+        Texture2D tex = new(1, 1);
+        tex.SetPixel(0, 0, color);
+        tex.Apply();
+        return tex;
+    }
 
     public static CanvasImage AddBackground(CanvasPanel panel)
     {
@@ -43,16 +59,6 @@ public static class UICommon
     public static void AddBorder(CanvasImage image)
     {
         image.AddBorder(BORDER_THICKNESS, borderColor);
-    }
-
-    private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
-
-    private static Texture2D SolidColor(Color color)
-    {
-        Texture2D tex = new(1, 1);
-        tex.SetPixel(0, 0, color);
-        tex.Apply();
-        return tex;
     }
 
     public static void LoadResources()

@@ -25,6 +25,7 @@ public abstract class InfoPanel : CanvasPanel
 
     public static void BuildInfoPanels()
     {
+        AllPanels.Clear();
         AllPanels.Add(MainInfoPanelName, CustomInfoPanel.BuildMainInfoPanel());
         AllPanels.Add(MinimalInfoPanelName, CustomInfoPanel.BuildMinimalInfoPanel());
         AllPanels.Add("DebugMod.BottomRightInfoPanel", new BottomRightInfoPanel());

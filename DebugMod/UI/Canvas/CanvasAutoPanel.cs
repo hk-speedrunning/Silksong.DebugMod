@@ -37,7 +37,7 @@ public class CanvasAutoPanel : CanvasPanel
 
     private CanvasControl AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasControl control = Append(new CanvasControl(name), UICommon.CONTROL_HEIGHT);
+        CanvasControl control = Append(new CanvasControl(name), UICommon.ControlHeight);
 
         CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
         button.Text.Text = name;

@@ -24,7 +24,7 @@ public abstract class CanvasObject : CanvasNode
 
     private void AnchorToCenter()
     {
-        Vector2 anchor = new((Position.x + Size.x / 2f) / 1920f, (1080f - (Position.y + Size.y / 2f)) / 1080f);
+        Vector2 anchor = new((Position.x + Size.x / 2f) / Screen.width, 1f - (Position.y + Size.y / 2f) / Screen.height);
         transform.anchorMin = transform.anchorMax = anchor;
         transform.sizeDelta = Size;
     }
