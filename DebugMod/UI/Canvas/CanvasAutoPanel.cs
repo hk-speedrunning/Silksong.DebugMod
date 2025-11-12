@@ -5,31 +5,31 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasAutoPanel : CanvasPanel
 {
-    public const int SECTION_END_PADDING = 20;
-    public const int SECTION_HEADER_FONT_SIZE = 30;
-    public const int SECTION_HEADER_HEIGHT = 30;
+    public static int SectionEndPadding => UICommon.ScaleHeight(20);
+    public static int SectionHeaderFontSize => UICommon.ScaleHeight(30);
+    public static int SectionHeaderHeight => UICommon.ScaleHeight(30);
 
-    public float Offset { get; set; } = UICommon.MARGIN;
+    public float Offset { get; set; } = UICommon.Margin;
 
     public CanvasAutoPanel(string name) : base(name) {}
 
     public T Append<T>(T element, float height) where T : CanvasNode
     {
         Add(element);
-        element.LocalPosition = new Vector2(UICommon.MARGIN, Offset);
-        element.Size = new Vector2(Size.x - UICommon.MARGIN * 2, height);
-        Offset += height + UICommon.MARGIN;
+        element.LocalPosition = new Vector2(UICommon.Margin, Offset);
+        element.Size = new Vector2(Size.x - UICommon.Margin * 2, height);
+        Offset += height + UICommon.Margin;
         return element;
     }
 
     public CanvasText AppendSectionHeader(string name)
     {
-        Offset += SECTION_END_PADDING;
+        Offset += SectionEndPadding;
 
-        CanvasText text = Append(new CanvasText(name), SECTION_HEADER_HEIGHT);
+        CanvasText text = Append(new CanvasText(name), SectionHeaderHeight);
         text.Text = name;
         text.Font = UICommon.trajanNormal;
-        text.FontSize = SECTION_HEADER_FONT_SIZE;
+        text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
 
         return text;

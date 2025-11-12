@@ -30,12 +30,11 @@ public class CanvasImage : CanvasObject
         }
     }
 
-    public void AddBorder(int thickness, Color color)
+    public CanvasBorder AddBorder()
     {
         border ??= new CanvasBorder("Border");
         border.Parent = this;
-        border.Thickness = thickness;
-        border.Color = color;
+        return border;
     }
 
     public void RemoveBorder()

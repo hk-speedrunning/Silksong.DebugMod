@@ -7,7 +7,7 @@ namespace DebugMod.UI;
 
 public class SaveStatesPanel : CanvasAutoPanel
 {
-    public const int SAVE_LOAD_BUTTON_WIDTH = 60;
+    public static int SaveLoadButtonWidth => UICommon.ScaleWidth(60);
 
     public static SaveStatesPanel Instance { get; private set; }
 
@@ -36,19 +36,19 @@ public class SaveStatesPanel : CanvasAutoPanel
         quickslotLabel.Alignment = TextAnchor.MiddleLeft;
         quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
 
-        CanvasButton quickslotSave = quickslot.Append(new CanvasButton("Save"), SAVE_LOAD_BUTTON_WIDTH);
+        CanvasButton quickslotSave = quickslot.Append(new CanvasButton("Save"), SaveLoadButtonWidth);
         quickslotSave.Text.Text = "Save";
         quickslotSave.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
 
-        quickslot.AppendPadding(UICommon.MARGIN);
+        quickslot.AppendPadding(UICommon.Margin);
 
-        CanvasButton quickslotLoad = quickslot.Append(new CanvasButton("Load"), SAVE_LOAD_BUTTON_WIDTH);
+        CanvasButton quickslotLoad = quickslot.Append(new CanvasButton("Load"), SaveLoadButtonWidth);
         quickslotLoad.Text.Text = "Load";
         quickslotLoad.OnClicked += () => SaveStateManager.LoadState(SaveStateManager.GetQuickState());
 
-        CanvasControl pageControl = Append(new CanvasControl("Page"), 15f);
+        CanvasControl pageControl = Append(new CanvasControl("Page"), UICommon.ScaleHeight(15));
 
-        CanvasText pageText = pageControl.Append(new CanvasText("CurrentPage"), 70f);
+        CanvasText pageText = pageControl.Append(new CanvasText("CurrentPage"), UICommon.ScaleWidth(70));
         pageText.Alignment = TextAnchor.MiddleLeft;
         pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
@@ -56,7 +56,7 @@ public class SaveStatesPanel : CanvasAutoPanel
         prevPage.ImageOnly(UICommon.images["ButtonDel"]);
         prevPage.OnClicked += PrevPage;
 
-        pageControl.AppendPadding(UICommon.MARGIN);
+        pageControl.AppendPadding(UICommon.Margin);
 
         CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
         nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
@@ -86,20 +86,20 @@ public class SaveStatesPanel : CanvasAutoPanel
                 }
             };
 
-            fileSlot.AppendPadding(UICommon.MARGIN);
+            fileSlot.AppendPadding(UICommon.Margin);
 
-            CanvasButton save = fileSlot.Append(new CanvasButton("Save"), SAVE_LOAD_BUTTON_WIDTH);
+            CanvasButton save = fileSlot.Append(new CanvasButton("Save"), SaveLoadButtonWidth);
             save.Text.Text = "Save";
             save.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
 
-            fileSlot.AppendPadding(UICommon.MARGIN);
+            fileSlot.AppendPadding(UICommon.Margin);
 
-            CanvasButton load = fileSlot.Append(new CanvasButton("Load"), SAVE_LOAD_BUTTON_WIDTH);
+            CanvasButton load = fileSlot.Append(new CanvasButton("Load"), SaveLoadButtonWidth);
             load.Text.Text = "Load";
             load.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
         }
 
-        CanvasText currentOperation = Append(new CanvasText("CurrentOperation"), 15f);
+        CanvasText currentOperation = Append(new CanvasText("CurrentOperation"), UICommon.ScaleWidth(15));
         currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
     }
 
@@ -117,7 +117,7 @@ public class SaveStatesPanel : CanvasAutoPanel
 
     public override void Build()
     {
-        float targetHeight = Offset + UICommon.MARGIN;
+        float targetHeight = Offset + UICommon.Margin;
         if (Size.y > targetHeight)
         {
             LocalPosition -= new Vector2(0, targetHeight - Size.y);

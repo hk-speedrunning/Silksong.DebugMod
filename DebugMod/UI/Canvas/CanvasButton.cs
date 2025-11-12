@@ -24,7 +24,7 @@ public class CanvasButton : CanvasImage
         text.Parent = this;
         text.Alignment = TextAnchor.MiddleCenter;
 
-        UICommon.AddBorder(this);
+        AddBorder();
     }
 
     public void RemoveText()

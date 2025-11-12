@@ -6,9 +6,9 @@ namespace DebugMod.UI;
 
 public class MainPanel : CanvasPanel
 {
-    public const int TAB_BUTTON_HEIGHT = 20;
-    public const int KEYBIND_CATEGORY_HEADER_FONT_SIZE = 20;
-    public const int KEYBIND_LISTING_HEIGHT = 15;
+    public static int TabButtonHeight => UICommon.ScaleHeight(20);
+    public static int KeybindHeaderFontSize => UICommon.ScaleHeight(20);
+    public static int KeybindListingHeight => UICommon.ScaleHeight(15);
 
     public static MainPanel Instance { get; private set; }
 
@@ -168,12 +168,12 @@ public class MainPanel : CanvasPanel
         foreach (string category in keybindCategoryOrder)
         {
             CanvasText header = keybinds.AppendSectionHeader(category);
-            header.FontSize = KEYBIND_CATEGORY_HEADER_FONT_SIZE;
+            header.FontSize = KeybindHeaderFontSize;
             header.Alignment = TextAnchor.MiddleLeft;
 
             foreach (BindAction action in keybindData[category])
             {
-                CanvasControl control = keybinds.Append(new CanvasControl(action.Name), KEYBIND_LISTING_HEIGHT);
+                CanvasControl control = keybinds.Append(new CanvasControl(action.Name), KeybindListingHeight);
 
                 CanvasText keybindName = control.AppendFlex(new CanvasText("KeybindName"));
                 keybindName.Text = action.Name;
@@ -201,8 +201,8 @@ public class MainPanel : CanvasPanel
     private CanvasAutoPanel AddTab(string name)
     {
         CanvasPanel tab = Add(new CanvasPanel(name));
-        tab.LocalPosition = new Vector2(0, TAB_BUTTON_HEIGHT);
-        tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - TAB_BUTTON_HEIGHT);
+        tab.LocalPosition = new Vector2(0, TabButtonHeight);
+        tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - TabButtonHeight);
         UICommon.AddBackground(tab);
         tabs.Add(tab);
 
@@ -218,7 +218,7 @@ public class MainPanel : CanvasPanel
 
     public override void Build()
     {
-        float tabButtonWidth = (Size.x - UICommon.MARGIN * (tabs.Count - 1)) / tabs.Count;
+        float tabButtonWidth = (Size.x - UICommon.Margin * (tabs.Count - 1)) / tabs.Count;
         float tabX = 0;
 
         foreach (CanvasPanel tab in tabs)
@@ -226,13 +226,13 @@ public class MainPanel : CanvasPanel
             // Created after the tabs themselves so they get input priority over offscreen controls
             CanvasButton button = Add(new CanvasButton($"{tab.Name}TabButton"));
             button.LocalPosition = new Vector2(tabX, 0);
-            button.Size = new Vector2(tabButtonWidth, TAB_BUTTON_HEIGHT);
+            button.Size = new Vector2(tabButtonWidth, TabButtonHeight);
             button.SetImage(UICommon.panelBG);
             button.Border.Sides &= ~BorderSides.BOTTOM;
             button.Text.Text = tab.Name;
             button.OnClicked += () => currentTab = tab.Name;
 
-            tabX += tabButtonWidth + UICommon.MARGIN;
+            tabX += tabButtonWidth + UICommon.Margin;
         }
 
         currentTab = tabs[0].Name;

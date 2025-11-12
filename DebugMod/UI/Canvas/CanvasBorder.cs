@@ -9,8 +9,8 @@ public class CanvasBorder : CanvasObject
 {
     private static readonly Dictionary<(Vector2, int, Color, BorderSides), Sprite> spriteCache = new();
 
-    public int Thickness { get; set; }
-    public Color Color { get; set; }
+    public int Thickness { get; set; } = UICommon.BORDER_THICKNESS;
+    public Color Color { get; set; } = UICommon.borderColor;
     public BorderSides Sides { get; set; } = BorderSides.ALL;
 
     public CanvasBorder(string name) : base(name) {}

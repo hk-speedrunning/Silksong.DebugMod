@@ -11,7 +11,6 @@ namespace DebugMod.UI;
 public static class UICommon
 {
     // Values that should not scale with the resolution
-    public const int MARGIN = 6;
     public const int BORDER_THICKNESS = 1;
 
     // Values that scale with either width or height, unscaled value is for 1080p
@@ -20,8 +19,10 @@ public static class UICommon
     public static int MainPanelHeight => ScaleHeight(650);
     public static int ConsoleHeight => ScaleHeight(250);
     public static int SavestatesHeight => ScaleHeight(400);
+    public static int Margin => ScaleHeight(6);
     public static int ScreenMargin => ScaleHeight(25);
     public static int ControlHeight => ScaleHeight(25);
+    public static int FontSize => ScaleHeight(13);
 
     public static readonly Color textColor = Color.white;
     public static readonly Color accentColor = RGB(137, 180, 250);
@@ -52,13 +53,8 @@ public static class UICommon
         CanvasImage background = panel.Add(new CanvasImage("Background"));
         background.Size = panel.Size;
         background.SetImage(panelBG);
-        AddBorder(background);
+        background.AddBorder();
         return background;
-    }
-
-    public static void AddBorder(CanvasImage image)
-    {
-        image.AddBorder(BORDER_THICKNESS, borderColor);
     }
 
     public static void LoadResources()

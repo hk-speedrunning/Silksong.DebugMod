@@ -9,9 +9,9 @@ public class ConsolePanel : CanvasPanel
     public const int MAX_LINES = 16;
 
     public static ConsolePanel Instance { get; private set; }
+    private static readonly List<string> history = [];
 
     private readonly CanvasText text;
-    private readonly List<string> history = [];
 
     public static void BuildPanel()
     {
@@ -27,8 +27,8 @@ public class ConsolePanel : CanvasPanel
         UICommon.AddBackground(this);
 
         text = Add(new CanvasText("Text"));
-        text.LocalPosition = new Vector2(UICommon.MARGIN, UICommon.MARGIN);
-        text.Size = new Vector2(Size.x - UICommon.MARGIN * 2, Size.y - UICommon.MARGIN * 2);
+        text.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
+        text.Size = new Vector2(Size.x - UICommon.Margin * 2, Size.y - UICommon.Margin * 2);
     }
 
     public override void Update()
