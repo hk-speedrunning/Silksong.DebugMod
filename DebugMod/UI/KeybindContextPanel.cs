@@ -18,6 +18,7 @@ public class KeybindContextPanel : CanvasPanel
     private BindAction bindAction;
     private CanvasNode anchor;
     private Vector2 anchorPos;
+    private bool initialClickEnded;
 
     public static void BuildPanel()
     {
@@ -31,6 +32,7 @@ public class KeybindContextPanel : CanvasPanel
         Size = new Vector2(PanelWidth + UICommon.Margin * 2, PanelHeight + UICommon.Margin * 2);
 
         UICommon.AddBackground(this);
+        GetImage("Background").SetImage(UICommon.contextPanelBG);
 
         nameText = Add(new CanvasText("BindName"));
         nameText.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
@@ -60,13 +62,18 @@ public class KeybindContextPanel : CanvasPanel
     {
         keycodeText.Text = GetKeycodeText(bindAction.Name);
 
-        if (!IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
+        if (initialClickEnded && !IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
         {
             Hide();
         }
         else if (anchor != null && (anchor.Position != anchorPos || !anchor.ActiveInHierarchy))
         {
             Hide();
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            initialClickEnded = true;
         }
 
         base.Update();
@@ -94,6 +101,7 @@ public class KeybindContextPanel : CanvasPanel
 
         this.anchor = anchor;
         anchorPos = anchor.Position;
+        initialClickEnded = false;
 
         bindAction = DebugMod.bindActions[action];
         nameText.Text = bindAction.Name;

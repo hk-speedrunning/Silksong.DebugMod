@@ -34,7 +34,7 @@ public static class UICommon
     public static readonly Dictionary<string, Texture2D> images = new();
     public static readonly Texture2D buttonBG = SolidColor(RGBA(54, 58, 79, 100));
     public static readonly Texture2D panelBG = SolidColor(RGBA(36, 39, 58, 100));
-    public static readonly Texture2D accentBG = SolidColor(accentColor);
+    public static readonly Texture2D contextPanelBG = SolidColor(RGBA(36, 39, 58, 230));
 
     public static int ScaleWidth(int unscaled) => (int)(unscaled * Screen.width / 1920f);
     public static int ScaleHeight(int unscaled) => (int)(unscaled * Screen.height / 1080f);

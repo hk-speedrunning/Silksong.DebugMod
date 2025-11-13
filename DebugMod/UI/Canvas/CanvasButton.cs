@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DebugMod.MonoBehaviours;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -63,13 +64,7 @@ public class CanvasButton : CanvasImage
     {
         base.Build();
 
-        gameObject.AddComponent<Button>().onClick.AddListener(() =>
-        {
-            if (IsMouseOver())
-            {
-                OnClicked?.Invoke();
-            }
-        });
+        AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());
     }
 
     public override void Update()

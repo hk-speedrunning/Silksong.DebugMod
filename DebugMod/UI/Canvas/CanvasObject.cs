@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using HutongGames.PlayMaker.Actions;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using Object = UnityEngine.Object;
 
 namespace DebugMod.UI.Canvas;
 
@@ -7,6 +11,7 @@ public abstract class CanvasObject : CanvasNode
 {
     protected GameObject gameObject;
     protected RectTransform transform;
+    protected EventTrigger eventTrigger;
 
     protected virtual bool Interactable => false;
 
@@ -74,4 +79,20 @@ public abstract class CanvasObject : CanvasNode
             Object.Destroy(gameObject);
         }
     }
+
+    public void AddEventTrigger<T>(EventTriggerType type, Action<T> callback) where T : BaseEventData
+    {
+        if (eventTrigger == null)
+        {
+            eventTrigger = gameObject.AddComponent<EventTrigger>();
+        }
+
+        EventTrigger.Entry entry = new();
+        entry.eventID = type;
+        entry.callback.AddListener(data => callback((T)data));
+        eventTrigger.triggers.Add(entry);
+    }
+
+    public void AddEventTrigger(EventTriggerType type, Action<PointerEventData> callback)
+        => AddEventTrigger<PointerEventData>(type, callback);
 }
