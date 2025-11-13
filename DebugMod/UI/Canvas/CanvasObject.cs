@@ -82,6 +82,12 @@ public abstract class CanvasObject : CanvasNode
 
     public void AddEventTrigger<T>(EventTriggerType type, Action<T> callback) where T : BaseEventData
     {
+        if (!gameObject)
+        {
+            DebugMod.LogError("Cannot add event triggers before building");
+            return;
+        }
+
         if (eventTrigger == null)
         {
             eventTrigger = gameObject.AddComponent<EventTrigger>();

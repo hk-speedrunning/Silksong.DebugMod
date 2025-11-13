@@ -37,10 +37,16 @@ public class CanvasScrollView : CanvasNode
         if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && IsMouseOver())
         {
             float y = content.LocalPosition.y + Input.mouseScrollDelta.y * SCROLL_SPEED;
-            y = Mathf.Clamp(y, Size.y - content.Size.y, 0f);
+            y = Mathf.Clamp(y, Mathf.Min(Size.y - content.Size.y, 0f), 0f);
             content.LocalPosition = new Vector2(content.LocalPosition.x, y);
         }
 
         base.Update();
+    }
+
+    public void SetScrollPosition(float percentage)
+    {
+        percentage = Mathf.Clamp01(percentage);
+        content.LocalPosition = new Vector2(content.LocalPosition.x, percentage * (Size.y - content.Size.y));
     }
 }
