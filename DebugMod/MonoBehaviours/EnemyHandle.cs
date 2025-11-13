@@ -115,7 +115,7 @@ public class EnemyHandle : MonoBehaviour
     [HarmonyPostfix]
     private static void HealthManager_Start(HealthManager __instance)
     {
-        if (__instance.gameObject.layer == (int)PhysLayers.ENEMIES && !__instance.GetComponent<EnemyHandle>())
+        if (!__instance.GetComponent<EnemyHandle>())
         {
             __instance.gameObject.AddComponent<EnemyHandle>();
         }

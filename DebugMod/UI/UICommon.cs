@@ -14,13 +14,13 @@ public static class UICommon
     public const int BORDER_THICKNESS = 1;
 
     // Values that scale with either width or height, unscaled value is for 1080p
-    public static int RightSideWidth => ScaleWidth(400);
+    public static int RightSideWidth => ScaleWidth(450);
     public static int LeftSideWidth => ScaleWidth(450);
     public static int MainPanelHeight => ScaleHeight(650);
     public static int ConsoleHeight => ScaleHeight(250);
     public static int SavestatesHeight => ScaleHeight(400);
     public static int Margin => ScaleHeight(6);
-    public static int ScreenMargin => ScaleHeight(25);
+    public static int ScreenMargin => ScaleHeight(10);
     public static int ControlHeight => ScaleHeight(25);
     public static int FontSize => ScaleHeight(13);
 
@@ -32,13 +32,15 @@ public static class UICommon
     public static Font trajanNormal;
     public static Font arial;
     public static readonly Dictionary<string, Texture2D> images = new();
-    public static readonly Texture2D buttonBG = SolidColor(RGB(54, 58, 79));
-    public static readonly Texture2D panelBG = SolidColor(RGB(36, 39, 58));
+    public static readonly Texture2D buttonBG = SolidColor(RGBA(54, 58, 79, 100));
+    public static readonly Texture2D panelBG = SolidColor(RGBA(36, 39, 58, 100));
+    public static readonly Texture2D accentBG = SolidColor(accentColor);
 
     public static int ScaleWidth(int unscaled) => (int)(unscaled * Screen.width / 1920f);
     public static int ScaleHeight(int unscaled) => (int)(unscaled * Screen.height / 1080f);
 
     private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
+    private static Color RGBA(int r, int g, int b, int a) => new(r / 255f, g / 255f, b / 255f, a / 255f);
 
     private static Texture2D SolidColor(Color color)
     {
