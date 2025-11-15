@@ -7,7 +7,6 @@ using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = System.Object;
 
 namespace DebugMod;
 

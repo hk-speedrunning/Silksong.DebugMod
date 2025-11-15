@@ -7,7 +7,7 @@ namespace DebugMod.UI;
 public class MainPanel : CanvasPanel
 {
     public static int TabButtonHeight => UICommon.ScaleHeight(20);
-    public static int ScrollbarWidth => UICommon.ScaleWidth(10);
+    public static int ScrollbarWidth => UICommon.ScaleWidth(11);
     public static int KeybindHeaderFontSize => UICommon.ScaleHeight(20);
     public static int KeybindListingHeight => UICommon.ScaleHeight(15);
 
@@ -209,7 +209,7 @@ public class MainPanel : CanvasPanel
 
         CanvasScrollView scrollView = tab.Add(new CanvasScrollView("ScrollView"));
         scrollView.Margin = new Vector2(UICommon.BORDER_THICKNESS, UICommon.BORDER_THICKNESS);
-        scrollView.Size = new Vector2(tab.Size.x - ScrollbarWidth - UICommon.Margin, tab.Size.y);
+        scrollView.Size = new Vector2(tab.Size.x - UICommon.BORDER_THICKNESS - UICommon.Margin - ScrollbarWidth, tab.Size.y);
 
         CanvasScrollbar scrollbar = tab.Add(new CanvasScrollbar("Scrollbar"));
         scrollbar.LocalPosition = new Vector2(scrollView.Size.x, UICommon.Margin);

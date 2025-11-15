@@ -118,10 +118,11 @@ public class SaveStatesPanel : CanvasAutoPanel
     public override void Build()
     {
         float targetHeight = Offset + UICommon.Margin;
-        if (Size.y > targetHeight)
+        if (!Mathf.Approximately(Size.y, targetHeight))
         {
-            LocalPosition -= new Vector2(0, targetHeight - Size.y);
+            LocalPosition += new Vector2(0, Size.y - targetHeight);
             Size = new Vector2(Size.x, targetHeight);
+            GetImage("Background").Size = Size;
         }
 
         base.Build();
