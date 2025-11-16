@@ -18,7 +18,9 @@ public static class UICommon
     public static int LeftSideWidth => ScaleWidth(450);
     public static int MainPanelHeight => ScaleHeight(650);
     public static int ConsoleHeight => ScaleHeight(250);
-    public static int SavestatesHeight => ScaleHeight(400);
+    public static int InfoPanelHeight => ScaleHeight(600);
+    public static int SaveStatePanelWidth => ScaleWidth(500);
+    public static int SaveStatePanelHeight => ScaleHeight(400);
     public static int Margin => ScaleHeight(6);
     public static int ScreenMargin => ScaleHeight(10);
     public static int ControlHeight => ScaleHeight(25);
@@ -53,7 +55,7 @@ public static class UICommon
     public static CanvasImage AddBackground(CanvasPanel panel)
     {
         CanvasImage background = panel.Add(new CanvasImage("Background"));
-        background.Size = panel.Size;
+        background.IsBackground = true;
         background.SetImage(panelBG);
         background.AddBorder();
         return background;

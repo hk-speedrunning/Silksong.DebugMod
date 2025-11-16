@@ -11,6 +11,7 @@ public class CanvasImage : CanvasObject
     private CanvasBorder border;
 
     public CanvasBorder Border => border;
+    public bool IsBackground { get; set; }
 
     public CanvasImage(string name) : base(name) {}
 
@@ -55,7 +56,17 @@ public class CanvasImage : CanvasObject
 
     public override void Build()
     {
+        if (IsBackground && Parent != null)
+        {
+            Size = Parent.Size;
+        }
+
         base.Build();
+
+        if (IsBackground && !Interactable)
+        {
+            gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
+        }
 
         gameObject.AddComponent<Image>();
         UpdateSprite();
@@ -65,14 +76,7 @@ public class CanvasImage : CanvasObject
 
     private void UpdateSprite()
     {
-        if (tex)
-        {
-            gameObject.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
-        }
-        else
-        {
-            DebugMod.LogWarn($"CanvasImage {GetQualifiedName()} has no texture");
-        }
+        gameObject.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
     }
 
     private void UpdateScale()

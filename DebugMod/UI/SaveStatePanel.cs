@@ -25,8 +25,8 @@ public class SaveStatesPanel : CanvasAutoPanel
 
     public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
-        LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.SavestatesHeight - UICommon.ConsoleHeight - UICommon.ScreenMargin * 2);
-        Size = new Vector2(UICommon.LeftSideWidth, UICommon.SavestatesHeight);
+        LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
+        Size = new Vector2(UICommon.SaveStatePanelWidth, UICommon.SaveStatePanelHeight);
 
         UICommon.AddBackground(this);
 
@@ -117,13 +117,7 @@ public class SaveStatesPanel : CanvasAutoPanel
 
     public override void Build()
     {
-        float targetHeight = Offset + UICommon.Margin;
-        if (!Mathf.Approximately(Size.y, targetHeight))
-        {
-            LocalPosition += new Vector2(0, Size.y - targetHeight);
-            Size = new Vector2(Size.x, targetHeight);
-            GetImage("Background").Size = Size;
-        }
+        Size = new Vector2(Size.x, Offset + UICommon.Margin);
 
         base.Build();
     }
