@@ -77,8 +77,8 @@ public class GUIController : MonoBehaviour
         MainPanel.BuildPanel();
         EnemiesPanel.BuildPanel();
         ConsolePanel.BuildPanel();
+        InfoPanel.BuildPanel();
         SaveStatesPanel.BuildPanel();
-        InfoPanel.BuildInfoPanels();
         KeybindContextPanel.BuildPanel();
 
         resolution = Screen.currentResolution;
@@ -97,8 +97,8 @@ public class GUIController : MonoBehaviour
         MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
         EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
         ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
+        InfoPanel.Instance.ActiveSelf = DebugMod.settings.InfoPanelVisible;
         SaveStatesPanel.Instance.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
-        InfoPanel.UpdatePanels();
 
         foreach (CanvasNode root in CanvasNode.rootNodes)
         {

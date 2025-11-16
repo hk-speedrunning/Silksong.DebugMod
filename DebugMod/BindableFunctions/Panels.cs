@@ -42,23 +42,16 @@ public static partial class BindableFunctions
         DebugMod.settings.ConsoleVisible = !DebugMod.settings.ConsoleVisible;
     }
 
-    [BindableMethod(name = "Toggle Savestates Panel", category = "Mod UI")]
-    public static void ToggleSaveStatePanel()
-    {
-        DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
-    }
-
     [BindableMethod(name = "Toggle Info Panel", category = "Mod UI")]
     public static void ToggleInfoPanel()
     {
         DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
     }
 
-    // View handled in the InfoPanel classes
-    [BindableMethod(name = "Info Panel Switch", category = "Mod UI")]
-    public static void SwitchActiveInfoPanel()
+    [BindableMethod(name = "Toggle Savestates Panel", category = "Mod UI")]
+    public static void ToggleSaveStatePanel()
     {
-        InfoPanel.ToggleActivePanel();
+        DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
     }
 
     [BindableMethod(name = "Toggle Cursor", category = "Mod UI")]

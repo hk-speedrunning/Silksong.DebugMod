@@ -7,23 +7,20 @@ namespace DebugMod;
 
 public class Settings
 {
-    //Save members
     [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
     public Dictionary<string, KeyCode> binds = new();
 
-    public bool ConsoleVisible = true;
+    public bool FirstRun = true;
+
+    public bool MainPanelVisible = true;
 
     public bool EnemiesPanelVisible = true;
 
+    public bool ConsoleVisible = true;
+
     public bool InfoPanelVisible = true;
 
-    public string CurrentInfoPanelName = "";
-
     public bool SaveStatePanelVisible = true;
-    
-    public bool MainPanelVisible = true;
-
-    public bool FirstRun = true;
 
     public bool NumPadForSaveStates = false;
     

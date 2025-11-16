@@ -147,7 +147,6 @@ public partial class DebugMod : BaseUnityPlugin
 
         ModHooks.FinishedLoadingModsHook += () =>
         {
-            BossHandler.PopulateBossLists();
             UICommon.LoadResources();
             GUIController.Instance.BuildMenus();
             SceneWatcher.Init();
@@ -164,8 +163,6 @@ public partial class DebugMod : BaseUnityPlugin
     public DebugMod()
     {
         instance = this;
-        // Register exports early so other mods can use them when initializing
-        typeof(DebugExport).ModInterop();
     }
 
     private void LoadSettings()
@@ -270,7 +267,6 @@ public partial class DebugMod : BaseUnityPlugin
             _loadTime = Time.realtimeSinceStartup;
             LogConsole("New scene loaded: " + sceneName);
             PlayerDeathWatcher.Reset();
-            BossHandler.LookForBoss(sceneName);
             VisualMaskHelper.OnSceneChange(sceneTo);
         }
     }
