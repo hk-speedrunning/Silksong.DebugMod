@@ -5,7 +5,7 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasText : CanvasObject
 {
-    private Text t;
+    protected Text t;
 
     private string text;
     private Font font = UICommon.arial;

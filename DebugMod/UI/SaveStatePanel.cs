@@ -68,23 +68,18 @@ public class SaveStatesPanel : CanvasAutoPanel
 
             CanvasControl fileSlot = Append(new CanvasControl($"FileSlot{i}"), UICommon.ControlHeight);
 
-            CanvasText label = fileSlot.AppendFlex(new CanvasText("Label"));
-            label.Alignment = TextAnchor.MiddleLeft;
-            label.OnUpdate += () => label.Text = $"{index}: {SaveStateManager.GetFileState(currentPage, index)}";
+            CanvasText number = fileSlot.Append(new CanvasText("Number"), 30f);
+            number.Alignment = TextAnchor.MiddleLeft;
+            number.Text = $"{index}:";
+
+            CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Label"));
+            name.Alignment = TextAnchor.MiddleLeft;
+            name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
+            name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 
             CanvasButton rename = fileSlot.AppendSquare(new CanvasButton("Rename"));
             rename.ImageOnly(UICommon.images["ButtonRun"]);
-            rename.OnClicked += () =>
-            {
-                int page = currentPage;
-                SaveState state = SaveStateManager.GetFileState(page, index);
-
-                if (state.IsSet())
-                {
-                    GUIController.Instance.TextBox(state.data.saveStateIdentifier,
-                        name => SaveStateManager.RenameFileState(page, index, name));
-                }
-            };
+            rename.OnClicked += () => name.Activate();
 
             fileSlot.AppendPadding(UICommon.Margin);
 
