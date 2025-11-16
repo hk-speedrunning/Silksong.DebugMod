@@ -5,11 +5,13 @@ using DebugMod.Hitbox;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DebugMod;
 
+[HarmonyPatch]
 public class GUIController : MonoBehaviour
 {
     public Vector3 hazardLocation;
@@ -111,13 +113,6 @@ public class GUIController : MonoBehaviour
         }
 
         if (DebugMod.GetSceneName() == "Menu_Title") return;
-        
-        // If the mouse is visible, then make sure it can be used.
-        // Normally, allowMouseInput is false until first pause and then true from then on (even when not paused)
-        if (DebugMod.settings.ShowCursorWhileUnpaused && !ForceHideUI() && !UIManager.instance.inputModule.allowMouseInput)
-        {
-            InputHandler.Instance.StartUIInput();
-        }
 
         if (!CanvasTextField.AnyFieldFocused)
         {
@@ -312,6 +307,17 @@ public class GUIController : MonoBehaviour
 
                 }
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.SetCursorVisible))]
+    [HarmonyPrefix]
+    private static void SetCursorVisible(ref bool value)
+    {
+        if (DebugMod.settings.ShowCursorWhileUnpaused)
+        {
+            UIManager.instance.inputModule.allowMouseInput = true;
+            value = true;
         }
     }
 }

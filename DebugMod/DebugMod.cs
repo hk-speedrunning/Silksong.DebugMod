@@ -11,7 +11,6 @@ using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
-using MonoMod.ModInterop;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -48,7 +47,7 @@ public partial class DebugMod : BaseUnityPlugin
 
 
     internal static DebugMod instance;
-    
+
     public static Settings settings { get; set; } = new Settings();
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
@@ -79,7 +78,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
     internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
-    
+
     public void Awake()
     {
         LoadSettings();
@@ -95,7 +94,7 @@ public partial class DebugMod : BaseUnityPlugin
                 }
             };
         }
-        
+
         bindActions.Clear();
         foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
         {
@@ -127,7 +126,7 @@ public partial class DebugMod : BaseUnityPlugin
         {
             alphaKeyDict.Add((KeyCode)(alphaStart + i), i);
         }
-        
+
         SaveStateManager.Initialize();
 
         Harmony harmony = new(Id);
@@ -139,11 +138,6 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.BeforeSceneLoadHook += OnLevelUnload;
         ModHooks.TakeHealthHook += PlayerDamaged;
         ModHooks.ApplicationQuitHook += SaveSettings;
-
-        if (settings.ShowCursorWhileUnpaused)
-        {
-            BindableFunctions.SetAlwaysShowCursor();
-        }
 
         ModHooks.FinishedLoadingModsHook += () =>
         {
@@ -252,7 +246,7 @@ public partial class DebugMod : BaseUnityPlugin
     private void LevelActivated(Scene sceneFrom, Scene sceneTo)
     {
         string sceneName = sceneTo.name;
-        
+
         if (_loadingChar)
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(PlayerData.instance.playTime);
@@ -282,7 +276,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
         if (GM == null)
         {
-           LogWarn("GameManager reference is null in GetSceneName");
+            LogWarn("GameManager reference is null in GetSceneName");
             return "";
         }
 
@@ -350,7 +344,7 @@ public partial class DebugMod : BaseUnityPlugin
     private static bool HeroWaterController_TumbleOut_Prefix(HeroWaterController __instance)
     {
         if (SaveState.loadingSavestate == null) return true;
-        
+
         __instance.ExitedWater();
         return false;
     }
@@ -375,7 +369,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
         return !playerInvincible;
     }
-    
+
     /// <summary>
     /// Add all public static methods on a type to the keybinds list. Methods must be decorated with the BindableMethod attribute.
     /// </summary>
@@ -388,7 +382,7 @@ public partial class DebugMod : BaseUnityPlugin
             {
                 Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
                 bindActions.Add(attr.name, new BindAction(attr, method));
-            } 
+            }
         }
     }
 
@@ -398,7 +392,7 @@ public partial class DebugMod : BaseUnityPlugin
     [PublicAPI]
     public static void AddActionToKeyBindList(Action method, string name, string category)
     {
-        AddActionToKeyBindList(method, name, category, true);   
+        AddActionToKeyBindList(method, name, category, true);
     }
 
     /// <summary>

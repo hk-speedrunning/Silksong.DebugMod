@@ -1,7 +1,4 @@
-﻿using DebugMod.UI;
-using UnityEngine;
-
-namespace DebugMod;
+﻿namespace DebugMod;
 
 public static partial class BindableFunctions
 {
@@ -61,30 +58,11 @@ public static partial class BindableFunctions
 
         if (DebugMod.settings.ShowCursorWhileUnpaused)
         {
-            SetAlwaysShowCursor();
             DebugMod.LogConsole("Showing cursor while unpaused");
         }
         else
         {
-            UnsetAlwaysShowCursor();
             DebugMod.LogConsole("Not showing cursor while unpaused");
         }
-    }
-
-    internal static void SetAlwaysShowCursor()
-    {
-        ModHooks.CursorHook -= CursorDisplayActive;
-        ModHooks.CursorHook += CursorDisplayActive;
-    }
-
-    internal static void UnsetAlwaysShowCursor()
-    {
-        ModHooks.CursorHook -= CursorDisplayActive;
-    }
-
-    private static void CursorDisplayActive()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 }

@@ -86,7 +86,6 @@ public static partial class BindableFunctions
         {
             Time.timeScale = 0;
             GameCameras.instance.StopCameraShake();
-            SetAlwaysShowCursor();
             DebugMod.LogConsole("Game was Frozen");
         }
         else
@@ -98,11 +97,6 @@ public static partial class BindableFunctions
             if (HeroController.instance != null) HeroController.instance.UnPause();
             Time.timeScale = DebugMod.CurrentTimeScale;
             GameManager.instance.inputHandler.AllowPause();
-
-            if (!DebugMod.settings.ShowCursorWhileUnpaused)
-            {
-                UnsetAlwaysShowCursor();
-            }
 
             DebugMod.LogConsole("Game was Unfrozen");
         }
