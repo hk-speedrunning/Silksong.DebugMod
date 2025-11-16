@@ -1,7 +1,6 @@
 ﻿using System;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
-using GlobalEnums;
 using HarmonyLib;
 using UnityEngine;
 
@@ -92,7 +91,7 @@ public class EnemyHandle : MonoBehaviour
 
             if (HP != lastHP)
             {
-                hpBar.GetImage("Background").Size = new Vector2(HPBAR_WIDTH * (float)HP / MaxHP, HPBAR_HEIGHT);
+                hpBar.Get<CanvasImage>("Background").Size = new Vector2(HPBAR_WIDTH * (float)HP / MaxHP, HPBAR_HEIGHT);
                 lastHP = HP;
             }
 
@@ -105,7 +104,7 @@ public class EnemyHandle : MonoBehaviour
             barPos.x -= HPBAR_WIDTH / 2f;
 
             hpBar.LocalPosition = barPos;
-            hpBar.GetText("HP").Text = $"{HP}/{MaxHP}";
+            hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
         }
 
         hpBar?.ActiveSelf = EnemiesPanel.hpBars;

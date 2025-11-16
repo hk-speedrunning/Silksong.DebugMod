@@ -51,6 +51,7 @@ public class CanvasImage : CanvasObject
     protected override void OnUpdatePosition()
     {
         base.OnUpdatePosition();
+
         UpdateScale();
     }
 

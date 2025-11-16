@@ -32,7 +32,7 @@ public class KeybindContextPanel : CanvasPanel
         Size = new Vector2(PanelWidth + UICommon.Margin * 2, PanelHeight + UICommon.Margin * 2);
 
         UICommon.AddBackground(this);
-        GetImage("Background").SetImage(UICommon.contextPanelBG);
+        Get<CanvasImage>("Background").SetImage(UICommon.contextPanelBG);
 
         nameText = Add(new CanvasText("BindName"));
         nameText.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
