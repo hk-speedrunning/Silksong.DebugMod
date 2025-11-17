@@ -13,7 +13,7 @@ public class CanvasBorder : CanvasObject
     public Color Color { get; set; } = UICommon.borderColor;
     public BorderSides Sides { get; set; } = BorderSides.ALL;
 
-    public CanvasBorder(string name) : base(name) {}
+    public CanvasBorder(string name) : base(name) { }
 
     public override void Build()
     {
@@ -30,9 +30,14 @@ public class CanvasBorder : CanvasObject
             Size = Parent.Size;
         }
 
+        if (Size.x <= 0 || Size.y <= 0)
+        {
+            throw new Exception("Border size must be positive");
+        }
+
         if (!spriteCache.TryGetValue((Size, Thickness, Color, Sides), out Sprite sprite))
         {
-            Texture2D tex = new Texture2D((int)Size.x, (int)Size.y, TextureFormat.RGBA32, false);
+            Texture2D tex = new((int)Size.x, (int)Size.y, TextureFormat.RGBA32, false);
             tex.filterMode = FilterMode.Point;
 
             // Make the entire texture transparent

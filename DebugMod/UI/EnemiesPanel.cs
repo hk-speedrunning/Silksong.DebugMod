@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
-public class EnemiesPanel : CanvasAutoPanel
+public class EnemiesPanel : CanvasPanel
 {
     public static int ListingHeight => UICommon.ScaleHeight(15);
     public static int ButtonWidth => UICommon.ScaleWidth(100);
@@ -16,7 +16,7 @@ public class EnemiesPanel : CanvasAutoPanel
 
     public static bool hpBars;
 
-    private int numListings;
+    private readonly List<CanvasStack> listings = [];
 
     public static void BuildPanel()
     {
@@ -31,29 +31,33 @@ public class EnemiesPanel : CanvasAutoPanel
 
         UICommon.AddBackground(this);
 
-        CanvasText panelTitle = Append(new CanvasText("PanelTitle"), UICommon.ScaleHeight(30));
+        CanvasStack stack = Add(new CanvasStack("Stack"));
+        stack.Size = Size;
+        stack.Padding = UICommon.Margin;
+
+        CanvasText panelTitle = stack.AppendFixed(new CanvasText("PanelTitle"), UICommon.ScaleHeight(30));
         panelTitle.Text = "Enemies";
         panelTitle.Font = UICommon.trajanBold;
         panelTitle.FontSize = UICommon.ScaleHeight(30);
         panelTitle.Alignment = TextAnchor.UpperCenter;
 
-        numListings = 0;
-
-        while (Offset + ListingHeight <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
+        while (stack.GetCurrentLength() + ListingHeight + UICommon.Margin <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
         {
-            int index = numListings++;
+            int index = listings.Count;
 
-            CanvasControl control = Append(new CanvasControl($"{index + 1}"), ListingHeight);
+            CanvasStack listing = stack.AppendFixed(new CanvasStack($"{index + 1}"), ListingHeight);
+            listing.Horizontal = true;
+            listings.Add(listing);
 
-            CanvasText enemyName = control.AppendFlex(new CanvasText("EnemyName"));
+            CanvasText enemyName = listing.AppendFlex(new CanvasText("EnemyName"));
             enemyName.Alignment = TextAnchor.MiddleLeft;
             enemyName.OnUpdate += () => enemyName.Text = enemyPool[index].Name;
 
-            CanvasText enemyHp = control.Append(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
+            CanvasText enemyHp = listing.AppendFixed(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
             enemyHp.Alignment = TextAnchor.MiddleLeft;
             enemyHp.OnUpdate += () => enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
 
-            CanvasButton delete = control.AppendSquare(new CanvasButton("Delete"));
+            CanvasButton delete = listing.AppendSquare(new CanvasButton("Delete"));
             delete.ImageOnly(UICommon.images["ButtonDel"]);
             delete.OnClicked += () =>
             {
@@ -62,9 +66,9 @@ public class EnemiesPanel : CanvasAutoPanel
                 DebugMod.LogConsole($"Destroyed {handle.Name}");
             };
 
-            control.AppendPadding(UICommon.Margin);
+            listing.AppendPadding(UICommon.Margin);
 
-            CanvasButton clone = control.AppendSquare(new CanvasButton("Clone"));
+            CanvasButton clone = listing.AppendSquare(new CanvasButton("Clone"));
             clone.ImageOnly(UICommon.images["ButtonPlus"]);
             clone.OnClicked += () =>
             {
@@ -73,9 +77,9 @@ public class EnemiesPanel : CanvasAutoPanel
                 DebugMod.LogConsole($"Cloned {handle.Name}");
             };
 
-            control.AppendPadding(UICommon.Margin);
+            listing.AppendPadding(UICommon.Margin);
 
-            CanvasButton infHealth = control.AppendSquare(new CanvasButton("InfiniteHealth"));
+            CanvasButton infHealth = listing.AppendSquare(new CanvasButton("InfiniteHealth"));
             infHealth.ImageOnly(UICommon.images["ButtonInf"]);
             infHealth.OnClicked += () =>
             {
@@ -85,8 +89,8 @@ public class EnemiesPanel : CanvasAutoPanel
             };
         }
 
-        CanvasText overflow = Append(new CanvasText("Overflow"), ListingHeight);
-        overflow.OnUpdate += () => overflow.Text = enemyPool.Count > numListings ? $"... and {enemyPool.Count - numListings} more" : "";
+        CanvasText overflow = stack.AppendFixed(new CanvasText("Overflow"), ListingHeight);
+        overflow.OnUpdate += () => overflow.Text = enemyPool.Count > listings.Count ? $"... and {enemyPool.Count - listings.Count} more" : "";
 
         CanvasButton hpBarsButton = Add(new CanvasButton("HPBars"));
         hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.Margin - ButtonWidth, Size.y - UICommon.Margin - UICommon.ControlHeight);
@@ -95,16 +99,16 @@ public class EnemiesPanel : CanvasAutoPanel
         hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
         hpBarsButton.OnUpdate += () => hpBarsButton.Text.Color = hpBars ? UICommon.accentColor : UICommon.textColor;
     }
-    
+
     public override void Update()
     {
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
         int enemyCount = ActivelyUpdating() ? enemyPool.Count : 0;
 
-        for (int i = 1; i <= numListings; i++)
+        for (int i = 0; i < listings.Count; i++)
         {
-            Get<CanvasControl>(i.ToString()).ActiveSelf = i <= enemyCount;
+            listings[i].ActiveSelf = i < enemyCount;
         }
 
         base.Update();
