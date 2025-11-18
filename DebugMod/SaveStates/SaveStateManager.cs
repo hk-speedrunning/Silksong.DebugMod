@@ -138,7 +138,7 @@ public static class SaveStateManager
     #region loading
     public static void LoadState(SaveState state)
     {
-        if (LoadTest())
+        if (state.IsSet() && LoadTest())
         {
             GameManager.instance.StartCoroutine(state.Load());
         }

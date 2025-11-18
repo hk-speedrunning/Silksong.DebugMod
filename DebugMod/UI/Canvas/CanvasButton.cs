@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using DebugMod.MonoBehaviours;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
+    public static int HoverBorderThickness => UICommon.ScaleHeight(3);
+
     private CanvasText text;
+    private CanvasBorder hoverBorder;
 
     public CanvasText Text => text;
 
@@ -20,12 +21,17 @@ public class CanvasButton : CanvasImage
     public CanvasButton(string name) : base(name)
     {
         SetImage(UICommon.buttonBG);
+        AddBorder();
 
         text = new CanvasText("ButtonText");
         text.Parent = this;
         text.Alignment = TextAnchor.MiddleCenter;
 
-        AddBorder();
+        hoverBorder = new CanvasBorder("HoverBorder");
+        hoverBorder.Parent = this;
+        hoverBorder.Color = UICommon.accentColor;
+        hoverBorder.Thickness = HoverBorderThickness;
+        hoverBorder.ActiveSelf = false;
     }
 
     public void RemoveText()
@@ -33,11 +39,17 @@ public class CanvasButton : CanvasImage
         text = null;
     }
 
+    public void RemoveHoverBorder()
+    {
+        hoverBorder = null;
+    }
+
     public void ImageOnly(Texture2D tex, Rect subSprite = default)
     {
         SetImage(tex, subSprite);
         RemoveText();
         RemoveBorder();
+        RemoveHoverBorder();
     }
 
     protected override IEnumerable<CanvasNode> ChildList()
@@ -47,6 +59,7 @@ public class CanvasButton : CanvasImage
             yield return child;
         }
 
+        if (hoverBorder != null) yield return hoverBorder;
         if (text != null) yield return text;
     }
 
@@ -62,9 +75,31 @@ public class CanvasButton : CanvasImage
 
     public override void Build()
     {
+        // Expand hover border to cover borders of adjacent buttons if it wouldn't already
+        if (Border != null && hoverBorder != null)
+        {
+            Vector2 pos = Vector2.zero;
+            Vector2 sz = Size;
+
+            if ((Border.Sides & BorderSides.LEFT) == 0) pos -= new Vector2(Border.Thickness, 0);
+            if ((Border.Sides & BorderSides.RIGHT) == 0) sz += new Vector2(Border.Thickness, 0);
+            if ((Border.Sides & BorderSides.TOP) == 0) pos -= new Vector2(0, Border.Thickness);
+            if ((Border.Sides & BorderSides.BOTTOM) == 0) sz += new Vector2(0, Border.Thickness);
+
+            sz -= pos;
+            hoverBorder.LocalPosition = pos;
+            hoverBorder.Size = sz;
+        }
+
         base.Build();
 
         AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());
+
+        if (hoverBorder != null)
+        {
+            AddEventTrigger(EventTriggerType.PointerEnter, _ => hoverBorder.ActiveSelf = true);
+            AddEventTrigger(EventTriggerType.PointerExit, _ => hoverBorder.ActiveSelf = false);
+        }
     }
 
     public override void Update()

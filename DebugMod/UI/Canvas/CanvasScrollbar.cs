@@ -20,6 +20,7 @@ public class CanvasScrollbar : CanvasNode
         grip = new CanvasButton("Grip");
         grip.Parent = this;
         grip.RemoveText();
+        grip.RemoveHoverBorder();
 
         trackUpper = new CanvasImage("TrackUpper");
         trackUpper.Parent = this;
