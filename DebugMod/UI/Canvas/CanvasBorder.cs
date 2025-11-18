@@ -32,7 +32,7 @@ public class CanvasBorder : CanvasObject
 
         if (Size.x <= 0 || Size.y <= 0)
         {
-            throw new Exception("Border size must be positive");
+            throw new Exception($"Border size must be positive: {GetQualifiedName()}");
         }
 
         if (!spriteCache.TryGetValue((Size, Thickness, Color, Sides), out Sprite sprite))

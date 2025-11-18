@@ -16,8 +16,18 @@ public class CanvasStack : CanvasNode
 
     private T Append<T>(T element, LengthType type, float length = default) where T : CanvasNode
     {
+        if (element != null && type == LengthType.Fixed && length <= 0)
+        {
+            throw new Exception("Fixed elements must have a positive length");
+        }
+
         element?.Parent = this;
         entries.Add(new Entry(element, type, length));
+
+        // Set the breadth now since it is unlikely to change later and other code might rely on it
+        float breadth = Breadth() - Padding * 2;
+        element?.Size = Horizontal ? new Vector2(0, breadth) : new Vector2(breadth, 0);
+
         return element;
     }
 

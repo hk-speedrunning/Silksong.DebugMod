@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DebugMod.UI.Canvas;
 using UnityEngine;
 
@@ -36,7 +37,13 @@ public class MainPanel : CanvasPanel
 
     private readonly List<CanvasPanel> tabs = [];
     private string currentTab;
-    private CanvasStack currentStack; // used for building only
+
+    // Convenience fields for building
+    private CanvasStack currentStack;
+    private CanvasStack currentRow;
+    private int rowCounter;
+    private int[] relativeWidths;
+    private int rowIndex;
 
     public static void BuildPanel()
     {
@@ -52,12 +59,15 @@ public class MainPanel : CanvasPanel
         AddTab("Gameplay");
 
         AppendSectionHeader("Cheats");
+        AppendRow(1, 1, 1);
         AppendToggleControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
         AppendToggleControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
         AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
+        AppendRow(1, 1, 1);
         AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
         AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
+        AppendRow(2, 1);
         AppendBasicControl("Toggle Hero Collider", BindableFunctions.ToggleHeroCollider);
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
@@ -228,7 +238,20 @@ public class MainPanel : CanvasPanel
         stack.Padding = UICommon.Margin;
 
         currentStack = stack;
+        rowCounter = 0;
         return stack;
+    }
+
+    private CanvasStack AppendRow(params int[] widths)
+    {
+        CanvasStack row = currentStack.AppendFixed(new CanvasStack(rowCounter.ToString()), UICommon.ControlHeight);
+        row.Horizontal = true;
+
+        currentRow = row;
+        rowCounter++;
+        relativeWidths = widths;
+        rowIndex = 0;
+        return row;
     }
 
     private CanvasText AppendSectionHeader(string name)
@@ -246,24 +269,42 @@ public class MainPanel : CanvasPanel
 
     private CanvasStack AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasStack stack = currentStack.AppendFixed(new CanvasStack(name), UICommon.ControlHeight);
-        stack.Horizontal = true;
+        CanvasStack row = currentRow ?? AppendRow(1);
 
-        CanvasButton button = stack.AppendFlex(new CanvasButton("Button"));
+        int widthUnits = relativeWidths.Sum();
+        float singleWidth = (row.Size.x - UICommon.Margin * (widthUnits - 1)) / widthUnits;
+
+        int units = relativeWidths[rowIndex];
+        float width = singleWidth * units + UICommon.Margin * (units - 1);
+        if (DebugMod.bindsByMethod.ContainsKey(effect.Method)) width -= UICommon.ControlHeight;
+
+        CanvasButton button = row.AppendFixed(new CanvasButton("Button"), width);
         button.Text.Text = name;
         button.OnClicked += effect;
         if (update != null) button.OnUpdate += () => update(button);
 
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
-            CanvasButton keybindButton = stack.AppendSquare(new CanvasButton("Keybind"));
+            CanvasButton keybindButton = row.AppendSquare(new CanvasButton("Keybind"));
             keybindButton.SetImage(UICommon.images["Scrollbar_point"]);
             keybindButton.RemoveText();
             keybindButton.Border.Sides &= ~BorderSides.LEFT;
             keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
         }
 
-        return stack;
+        rowIndex++;
+        if (rowIndex == relativeWidths.Length)
+        {
+            currentRow = null;
+            relativeWidths = null;
+            rowIndex = 0;
+        }
+        else
+        {
+            row.AppendPadding(UICommon.Margin);
+        }
+
+        return row;
     }
 
     private CanvasStack AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
