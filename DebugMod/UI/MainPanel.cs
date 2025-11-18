@@ -72,22 +72,73 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
         AppendSectionHeader("Player");
+        AppendRow(1, 1);
         AppendBasicControl("Increase Needle Damage", BindableFunctions.IncreaseNeedleDamage);
         AppendBasicControl("Decrease Needle Damage", BindableFunctions.DecreaseNeedleDamage);
+        AppendRow(1, 1);
         AppendBasicControl("Set Hazard Respawn", BindableFunctions.SetHazardRespawn);
         AppendBasicControl("Hazard Respawn", BindableFunctions.Respawn);
+        AppendRow(1, 1, 1);
         AppendBasicControl("Damage Self", BindableFunctions.SelfDamage);
         AppendBasicControl("Kill Self", BindableFunctions.KillSelf);
         AppendBasicControl("Break Cocoon", BindableFunctions.BreakCocoon);
 
         AppendSectionHeader("Time");
+        AppendRow(1, 1);
         AppendBasicControl("Increase Timescale", BindableFunctions.TimescaleUp);
         AppendBasicControl("Decrease Timescale", BindableFunctions.TimescaleDown);
+        AppendRow(1, 1);
         AppendBasicControl("Freeze Game", BindableFunctions.PauseGameNoUI);
         AppendBasicControl("Force Pause", BindableFunctions.ForcePause);
+        AppendRow(1, 1);
         AppendBasicControl("Toggle Frame Advance", BindableFunctions.ToggleFrameAdvance);
         AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
+        AppendRow(1);
         AppendBasicControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);
+
+        AppendSectionHeader("Visual");
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle Hitboxes", BindableFunctions.ShowHitboxes);
+        AppendBasicControl("Force Camera Follow", BindableFunctions.ForceCameraFollow);
+        AppendRow(1, 1);
+        AppendBasicControl("Preview Cocoon Position", BindableFunctions.PreviewCocoonPosition);
+        AppendBasicControl("Hide Hero", BindableFunctions.HideHero);
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle HUD", BindableFunctions.ToggleHUD);
+        AppendBasicControl("Toggle Vignette", BindableFunctions.ToggleVignette);
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle Hero Light", BindableFunctions.ToggleHeroLight);
+        AppendBasicControl("Toggle Camera Shake", BindableFunctions.ToggleCameraShake);
+        AppendRow(1, 1);
+        AppendBasicControl("Deactivate Visual Masks", BindableFunctions.DoDeactivateVisualMasks);
+        AppendBasicControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
+        AppendRow(1, 1, 1);
+        AppendBasicControl("Zoom In", BindableFunctions.ZoomIn);
+        AppendBasicControl("Zoom Out", BindableFunctions.ZoomOut);
+        AppendBasicControl("Reset Zoom", BindableFunctions.ResetZoom);
+
+
+        AppendSectionHeader("Mod UI");
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
+        AppendBasicControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemiesPanel);
+        AppendBasicControl("Toggle Console Panel", BindableFunctions.ToggleConsolePanel);
+        AppendRow(1, 1);
+        AppendBasicControl("Toggle Savestates Panel", BindableFunctions.ToggleSaveStatePanel);
+        AppendBasicControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
+        AppendRow(1);
+        AppendBasicControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
+
+        AppendSectionHeader("Misc");
+        AppendRow(1, 1);
+        AppendBasicControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
+        AppendBasicControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
+        AppendRow(1, 1, 1);
+        AppendBasicControl("Toggle Act 3", BindableFunctions.ToggleAct3);
+        AppendBasicControl("Lock Keybinds", BindableFunctions.ToggleLockKeyBinds);
+        AppendBasicControl("Reset All", BindableFunctions.Reset);
 
         AddTab("Items");
 
@@ -130,38 +181,7 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Take Silk", BindableFunctions.TakeSilk);
         AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
 
-        AddTab("Other");
-
-        AppendSectionHeader("Mod UI");
-        AppendBasicControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
-        AppendBasicControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
-        AppendBasicControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemiesPanel);
-        AppendBasicControl("Toggle Console Panel", BindableFunctions.ToggleConsolePanel);
-        AppendBasicControl("Toggle Savestates Panel", BindableFunctions.ToggleSaveStatePanel);
-        AppendBasicControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
-        AppendBasicControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
-
-        AppendSectionHeader("Visual");
-        AppendBasicControl("Toggle Hitboxes", BindableFunctions.ShowHitboxes);
-        AppendBasicControl("Force Camera Follow", BindableFunctions.ForceCameraFollow);
-        AppendBasicControl("Preview Cocoon Position", BindableFunctions.PreviewCocoonPosition);
-        AppendBasicControl("Hide Hero", BindableFunctions.HideHero);
-        AppendBasicControl("Toggle HUD", BindableFunctions.ToggleHUD);
-        AppendBasicControl("Toggle Vignette", BindableFunctions.ToggleVignette);
-        AppendBasicControl("Toggle Hero Light", BindableFunctions.ToggleHeroLight);
-        AppendBasicControl("Toggle Camera Shake", BindableFunctions.ToggleCameraShake);
-        AppendBasicControl("Deactivate Visual Masks", BindableFunctions.DoDeactivateVisualMasks);
-        AppendBasicControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
-        AppendBasicControl("Zoom In", BindableFunctions.ZoomIn);
-        AppendBasicControl("Zoom Out", BindableFunctions.ZoomOut);
-        AppendBasicControl("Reset Zoom", BindableFunctions.ResetZoom);
-
-        AppendSectionHeader("Misc");
-        AppendBasicControl("Toggle Act 3", BindableFunctions.ToggleAct3);
-        AppendBasicControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
-        AppendBasicControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
-        AppendBasicControl("Lock Keybinds", BindableFunctions.ToggleLockKeyBinds);
-        AppendBasicControl("Reset Cheats", BindableFunctions.Reset);
+        AddTab("Keybinds");
 
         Dictionary<string, List<BindAction>> keybindData = [];
         foreach (string category in keybindCategoryOrder)
@@ -178,8 +198,6 @@ public class MainPanel : CanvasPanel
             }
             keybindData[action.Category].Add(action);
         }
-
-        AddTab("Keybinds");
 
         foreach (string category in keybindCategoryOrder)
         {
