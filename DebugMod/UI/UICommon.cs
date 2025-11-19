@@ -27,16 +27,19 @@ public static class UICommon
     public static int FontSize => ScaleHeight(13);
 
     public static readonly Color textColor = Color.white;
-    public static readonly Color accentColor = RGB(137, 180, 250);
     public static readonly Color borderColor = RGB(205, 214, 244);
+    public static readonly Color accentColor = RGB(230, 69, 83);
+
+    public static readonly Texture2D buttonBG = SolidColor(RGBA(54, 58, 79, 100));
+    public static readonly Texture2D panelBG = SolidColor(RGBA(36, 39, 58, 100));
+    public static readonly Texture2D contextPanelBG = SolidColor(RGBA(36, 39, 58, 230));
+    public static readonly Texture2D accentBG = SolidColor(RGBA(230, 69, 83, 100));
 
     public static Font trajanBold;
     public static Font trajanNormal;
     public static Font arial;
+
     public static readonly Dictionary<string, Texture2D> images = new();
-    public static readonly Texture2D buttonBG = SolidColor(RGBA(54, 58, 79, 100));
-    public static readonly Texture2D panelBG = SolidColor(RGBA(36, 39, 58, 100));
-    public static readonly Texture2D contextPanelBG = SolidColor(RGBA(36, 39, 58, 230));
 
     public static int ScaleWidth(int unscaled) => (int)(unscaled * Screen.width / 1920f);
     public static int ScaleHeight(int unscaled) => (int)(unscaled * Screen.height / 1080f);

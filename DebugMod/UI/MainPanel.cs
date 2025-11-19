@@ -332,7 +332,7 @@ public class MainPanel : CanvasPanel
     {
         return AppendButtonControl(name, effect, button =>
         {
-            button.Text.Color = getter() ? UICommon.accentColor : UICommon.textColor;
+            button.Toggled = getter();
         });
     }
 

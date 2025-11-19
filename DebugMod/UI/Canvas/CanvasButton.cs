@@ -11,8 +11,22 @@ public class CanvasButton : CanvasImage
 
     private CanvasText text;
     private CanvasBorder hoverBorder;
+    private bool toggled;
 
     public CanvasText Text => text;
+
+    public bool Toggled
+    {
+        get => toggled;
+        set
+        {
+            if (toggled != value)
+            {
+                toggled = value;
+                UpdateToggled();
+            }
+        }
+    }
 
     public event Action OnClicked;
 
@@ -110,5 +124,10 @@ public class CanvasButton : CanvasImage
         }
 
         base.Update();
+    }
+
+    private void UpdateToggled()
+    {
+        SetImage(toggled ? UICommon.accentBG : UICommon.buttonBG);
     }
 }
