@@ -7,18 +7,65 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasBorder : CanvasObject
 {
-    private static readonly Dictionary<(Vector2, int, Color, BorderSides), Sprite> spriteCache = new();
+    private static readonly Dictionary<Args, Sprite> spriteCache = new();
 
-    public int Thickness { get; set; } = UICommon.BORDER_THICKNESS;
-    public Color Color { get; set; } = UICommon.borderColor;
-    public BorderSides Sides { get; set; } = BorderSides.ALL;
+    private Args args = new(Vector2.zero, UICommon.BORDER_THICKNESS, UICommon.borderColor, BorderSides.ALL);
+
+    public int Thickness
+    {
+        get => args.thickness;
+        set
+        {
+            if (args.thickness != value)
+            {
+                args.thickness = value;
+                DrawTexture();
+            }
+        }
+    }
+
+    public Color Color
+    {
+        get => args.color;
+        set
+        {
+            if (args.color != value)
+            {
+                args.color = value;
+                DrawTexture();
+            }
+        }
+    }
+
+    public BorderSides Sides
+    {
+        get => args.sides;
+        set
+        {
+            if (args.sides != value)
+            {
+                args.sides = value;
+                DrawTexture();
+            }
+        }
+    }
 
     public CanvasBorder(string name) : base(name) { }
 
+    protected override void OnUpdatePosition()
+    {
+        base.OnUpdatePosition();
+
+        if (args.size != Size)
+        {
+            args.size = Size;
+            DrawTexture();
+        }
+    }
+
     public override void Build()
     {
-        base.Build();
-
+        // Absolute coords need to be whole numbers or the border will not render correctly
         Vector2 truncated = new((int)Position.x, (int)Position.y);
         if (Position != truncated)
         {
@@ -35,12 +82,23 @@ public class CanvasBorder : CanvasObject
             throw new Exception($"Border size must be positive: {GetQualifiedName()}");
         }
 
-        if (!spriteCache.TryGetValue((Size, Thickness, Color, Sides), out Sprite sprite))
+        base.Build();
+        DrawTexture();
+    }
+
+    private void DrawTexture()
+    {
+        if (!gameObject)
+        {
+            return;
+        }
+
+        if (!spriteCache.TryGetValue(args, out Sprite sprite))
         {
             Texture2D tex = new((int)Size.x, (int)Size.y, TextureFormat.RGBA32, false);
             tex.filterMode = FilterMode.Point;
 
-            // Make the entire texture transparent
+            // Make the entire texture transparent to start
             Color[] colors = new Color[tex.width * tex.height];
             tex.SetPixels(colors);
 
@@ -59,11 +117,14 @@ public class CanvasBorder : CanvasObject
             tex.Apply();
 
             sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
-            spriteCache.Add((Size, Thickness, Color, Sides), sprite);
+            spriteCache.Add(args, sprite);
         }
 
-        gameObject.AddComponent<Image>().sprite = sprite;
+        Image image = gameObject.GetComponent<Image>() ?? gameObject.AddComponent<Image>();
+        image.sprite = sprite;
     }
+
+    private record struct Args(Vector2 size, int thickness, Color color, BorderSides sides);
 }
 
 [Flags]
