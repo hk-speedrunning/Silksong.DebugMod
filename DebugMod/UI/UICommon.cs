@@ -26,14 +26,17 @@ public static class UICommon
     public static int ControlHeight => ScaleHeight(25);
     public static int FontSize => ScaleHeight(13);
 
-    public static readonly Color textColor = Color.white;
+    // Catppuccin Mocha
+    public static readonly Color baseColor = RGB(36, 39, 58);
+    public static readonly Color strongColor = RGB(54, 58, 79);
     public static readonly Color borderColor = RGB(205, 214, 244);
-    public static readonly Color accentColor = RGB(230, 69, 83);
+    public static readonly Color blueColor = RGB(137, 180, 250);
 
-    public static readonly Texture2D buttonBG = SolidColor(RGBA(54, 58, 79, 100));
-    public static readonly Texture2D panelBG = SolidColor(RGBA(36, 39, 58, 100));
-    public static readonly Texture2D contextPanelBG = SolidColor(RGBA(36, 39, 58, 230));
-    public static readonly Texture2D accentBG = SolidColor(RGBA(230, 69, 83, 100));
+    public static readonly Color textColor = Color.white;
+
+    public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
+    public static readonly Texture2D buttonBG = SolidColor(strongColor);
+    public static readonly Texture2D contextPanelBG = SolidColor(baseColor);
 
     public static Font trajanBold;
     public static Font trajanNormal;
@@ -46,9 +49,11 @@ public static class UICommon
 
     private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
     private static Color RGBA(int r, int g, int b, int a) => new(r / 255f, g / 255f, b / 255f, a / 255f);
+    private static Color WithAlpha(Color color, int a) => color with { a = a / 255f };
 
-    private static Texture2D SolidColor(Color color)
+    private static Texture2D SolidColor(Color color, int a = 255)
     {
+        color = WithAlpha(color, a);
         Texture2D tex = new(1, 1);
         tex.SetPixel(0, 0, color);
         tex.Apply();

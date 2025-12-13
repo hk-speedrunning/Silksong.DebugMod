@@ -7,8 +7,6 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
-    public static int HoverBorderThickness => UICommon.ScaleHeight(3);
-
     private CanvasText text;
     private CanvasBorder hoverBorder;
     private bool toggled;
@@ -43,8 +41,7 @@ public class CanvasButton : CanvasImage
 
         hoverBorder = new CanvasBorder("HoverBorder");
         hoverBorder.Parent = this;
-        hoverBorder.Color = UICommon.accentColor;
-        hoverBorder.Thickness = HoverBorderThickness;
+        hoverBorder.Color = UICommon.blueColor;
         hoverBorder.ActiveSelf = false;
     }
 
@@ -128,6 +125,6 @@ public class CanvasButton : CanvasImage
 
     private void UpdateToggled()
     {
-        SetImage(toggled ? UICommon.accentBG : UICommon.buttonBG);
+        text?.Color = toggled ? UICommon.blueColor : UICommon.textColor;
     }
 }

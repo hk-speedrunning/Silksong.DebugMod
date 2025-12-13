@@ -96,8 +96,11 @@ public class EnemiesPanel : CanvasPanel
         hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.Margin - ButtonWidth, Size.y - UICommon.Margin - UICommon.ControlHeight);
         hpBarsButton.Size = new Vector2(ButtonWidth, UICommon.ControlHeight);
         hpBarsButton.Text.Text = "HP Bars";
-        hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
-        hpBarsButton.OnUpdate += () => hpBarsButton.Text.Color = hpBars ? UICommon.accentColor : UICommon.textColor;
+        hpBarsButton.OnClicked += () =>
+        {
+            BindableFunctions.ToggleEnemyHPBars();
+            hpBarsButton.Toggled = hpBars;
+        };
     }
 
     public override void Update()
