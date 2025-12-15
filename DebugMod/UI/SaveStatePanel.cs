@@ -30,11 +30,11 @@ public class SaveStatesPanel : CanvasPanel
 
         UICommon.AddBackground(this);
 
-        CanvasStack stack = Add(new CanvasStack("Stack"));
-        stack.Size = Size;
-        stack.Padding = UICommon.Margin;
+        using PanelBuilder builder = new(this);
+        builder.DynamicLength = true;
+        builder.Padding = UICommon.Margin;
 
-        CanvasStack quickslot = stack.AppendFixed(new CanvasStack("Quickslot"), UICommon.ControlHeight);
+        using PanelBuilder quickslot = new(builder.AppendFixed(new CanvasPanel("Quickslot"), UICommon.ControlHeight));
         quickslot.Horizontal = true;
 
         CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
@@ -51,14 +51,14 @@ public class SaveStatesPanel : CanvasPanel
         quickslotLoad.Text.Text = "Load";
         quickslotLoad.OnClicked += () => SaveStateManager.LoadState(SaveStateManager.GetQuickState());
 
-        CanvasStack pageControl = stack.AppendFixed(new CanvasStack("Page"), UICommon.ScaleHeight(15));
+        using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
         pageControl.Horizontal = true;
 
-        CanvasText pageText = pageControl.AppendFixed(new CanvasText("CurrentPage"), UICommon.ScaleWidth(70));
+        CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(70));
         pageText.Alignment = TextAnchor.MiddleLeft;
         pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
-        CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Next"));
+        CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
         prevPage.ImageOnly(UICommon.images["ButtonDel"]);
         prevPage.OnClicked += PrevPage;
 
@@ -72,14 +72,14 @@ public class SaveStatesPanel : CanvasPanel
         {
             int index = i; // lambda capturing reasons
 
-            CanvasStack fileSlot = stack.AppendFixed(new CanvasStack($"FileSlot{i}"), UICommon.ControlHeight);
+            using PanelBuilder fileSlot = new(builder.AppendFixed(new CanvasPanel(i.ToString()), UICommon.ControlHeight));
             fileSlot.Horizontal = true;
 
             CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), 30f);
             number.Alignment = TextAnchor.MiddleLeft;
             number.Text = $"{index}:";
 
-            CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Label"));
+            CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
             name.Alignment = TextAnchor.MiddleLeft;
             name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
@@ -101,7 +101,7 @@ public class SaveStatesPanel : CanvasPanel
             load.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
         }
 
-        CanvasText currentOperation = stack.AppendFixed(new CanvasText("CurrentOperation"), UICommon.ScaleWidth(15));
+        CanvasText currentOperation = builder.AppendFixed(new CanvasText("CurrentOperation"), UICommon.ScaleWidth(15));
         currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
     }
 
@@ -115,13 +115,6 @@ public class SaveStatesPanel : CanvasPanel
             SelectOperation.LoadFromFile => "Loading from file slot",
             _ => null
         };
-    }
-
-    public override void Build()
-    {
-        Size = new Vector2(Size.x, Get<CanvasStack>("Stack").GetCurrentLength());
-
-        base.Build();
     }
 
     public override void Update()

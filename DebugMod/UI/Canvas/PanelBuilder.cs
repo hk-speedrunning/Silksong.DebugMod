@@ -4,29 +4,39 @@ using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasStack : CanvasNode
+// Helper class to automatically position a series of elements
+// one after the other while filling the space along the other axis
+public class PanelBuilder : IDisposable
 {
+    private readonly CanvasPanel panel;
     private readonly List<Entry> entries = [];
 
     public bool Horizontal { get; set; }
     public bool DynamicLength { get; set; }
     public float Padding { get; set; }
 
-    public CanvasStack(string name) : base(name) { }
+    public PanelBuilder(CanvasPanel panel)
+    {
+        this.panel = panel;
+    }
 
     private T Append<T>(T element, LengthType type, float length = default) where T : CanvasNode
     {
-        if (element != null && type == LengthType.Fixed && length <= 0)
-        {
-            throw new Exception("Fixed elements must have a positive length");
-        }
-
-        element?.Parent = this;
         entries.Add(new Entry(element, type, length));
 
-        // Set the breadth now since it is unlikely to change later and other code might rely on it
-        float breadth = Breadth() - Padding * 2;
-        element?.Size = Horizontal ? new Vector2(0, breadth) : new Vector2(breadth, 0);
+        if (element != null)
+        {
+            if (type == LengthType.Fixed && length <= 0)
+            {
+                throw new Exception("Fixed elements must have a positive length");
+            }
+
+            panel.Add(element);
+
+            // Set the breadth now since it is unlikely to change later and other code might rely on it
+            float breadth = Breadth() - Padding * 2;
+            element?.Size = Horizontal ? new Vector2(length, breadth) : new Vector2(breadth, length);
+        }
 
         return element;
     }
@@ -36,15 +46,7 @@ public class CanvasStack : CanvasNode
     public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, LengthType.Flex);
     public void AppendPadding(float length) => Append<CanvasNode>(null, LengthType.Fixed, length);
 
-    protected override IEnumerable<CanvasNode> ChildList()
-    {
-        foreach (Entry entry in entries)
-        {
-            if (entry.element != null) yield return entry.element;
-        }
-    }
-
-    public override void Build()
+    public void Build()
     {
         float totalFixedLength = Padding * (entries.Count + 1);
         int flexCount = 0;
@@ -67,12 +69,12 @@ public class CanvasStack : CanvasNode
 
         if (DynamicLength && flexCount != 0)
         {
-            throw new Exception("Flex elements are not supported for a dynamic-length CanvasStack");
+            throw new Exception("Flex elements are not supported for a dynamic-length PanelBuilder");
         }
 
         if (Length() < totalFixedLength && flexCount != 0)
         {
-            throw new Exception("Overflow in CanvasStack: no room for flex elements");
+            throw new Exception("Overflow in PanelBuilder: no room for flex elements");
         }
 
         float flexLength = (Length() - totalFixedLength) / flexCount;
@@ -104,10 +106,8 @@ public class CanvasStack : CanvasNode
 
         if (DynamicLength)
         {
-            Size = Horizontal ? new Vector2(t, Size.y) : new Vector2(Size.x, t);
+            panel.Size = Horizontal ? new Vector2(t, panel.Size.y) : new Vector2(panel.Size.x, t);
         }
-
-        base.Build();
     }
 
     public float GetCurrentLength()
@@ -125,15 +125,20 @@ public class CanvasStack : CanvasNode
                     length += Breadth();
                     break;
                 case LengthType.Flex:
-                    throw new Exception("Current length is meaningless if the stack contains flex elements");
+                    throw new Exception("Current length is meaningless if the panel contains flex elements");
             }
         }
 
         return length;
     }
 
-    private float Length() => Horizontal ? Size.x : Size.y;
-    private float Breadth() => Horizontal ? Size.y : Size.x;
+    public float Length() => Horizontal ? panel.Size.x : panel.Size.y;
+    public float Breadth() => Horizontal ? panel.Size.y : panel.Size.x;
+
+    public void Dispose()
+    {
+        Build();
+    }
 
     private class Entry
     {

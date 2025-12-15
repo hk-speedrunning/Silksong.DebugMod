@@ -39,8 +39,8 @@ public class MainPanel : CanvasPanel
     private string currentTab;
 
     // Convenience fields for building
-    private CanvasStack currentStack;
-    private CanvasStack currentRow;
+    private PanelBuilder currentBuilder;
+    private PanelBuilder currentRow;
     private int rowCounter;
     private int[] relativeWidths;
     private int rowIndex;
@@ -207,37 +207,38 @@ public class MainPanel : CanvasPanel
 
             foreach (BindAction action in keybindData[category])
             {
-                CanvasStack stack = currentStack.AppendFixed(new CanvasStack(action.Name), KeybindListingHeight);
-                stack.Horizontal = true;
+                using PanelBuilder builder = new(currentBuilder.AppendFixed(new CanvasPanel(action.Name), KeybindListingHeight));
+                builder.Horizontal = true;
 
-                CanvasText keybindName = stack.AppendFlex(new CanvasText("KeybindName"));
+                CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
                 keybindName.Text = action.Name;
                 keybindName.Alignment = TextAnchor.MiddleLeft;
 
-                CanvasText keycode = stack.AppendFlex(new CanvasText("Keycode"));
+                CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
                 keycode.Alignment = TextAnchor.MiddleLeft;
                 keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
 
-                CanvasButton edit = stack.AppendSquare(new CanvasButton("Edit"));
+                CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
                 edit.ImageOnly(UICommon.images["Scrollbar_point"]);
                 edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
 
-                CanvasButton clear = stack.AppendSquare(new CanvasButton("Clear"));
+                CanvasButton clear = builder.AppendSquare(new CanvasButton("Clear"));
                 clear.ImageOnly(UICommon.images["ButtonDel"]);
                 clear.OnClicked += () => DebugMod.settings.binds.Remove(action.Name);
 
-                CanvasButton run = stack.AppendSquare(new CanvasButton("Run"));
+                CanvasButton run = builder.AppendSquare(new CanvasButton("Run"));
                 run.ImageOnly(UICommon.images["ButtonRun"]);
                 run.OnClicked += action.Action;
             }
         }
     }
 
-    private CanvasStack AddTab(string name)
+    private PanelBuilder AddTab(string name)
     {
         CanvasPanel tab = Add(new CanvasPanel(name));
         tab.LocalPosition = new Vector2(0, TabButtonHeight);
         tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - TabButtonHeight);
+        tab.CollapseMode = CollapseMode.Deny;
         UICommon.AddBackground(tab);
         tabs.Add(tab);
 
@@ -250,33 +251,40 @@ public class MainPanel : CanvasPanel
         scrollbar.Size = new Vector2(ScrollbarWidth, tab.Size.y - UICommon.Margin * 2);
         scrollbar.ScrollView = scrollView;
 
-        CanvasStack stack = scrollView.SetContent(new CanvasStack("Stack"));
-        stack.Size = scrollView.Size;
-        stack.DynamicLength = true;
-        stack.Padding = UICommon.Margin;
+        CanvasPanel panel = scrollView.SetContent(new CanvasPanel("Panel"));
+        panel.Size = scrollView.Size;
 
-        currentStack = stack;
+        PanelBuilder builder = new(panel);
+        builder.DynamicLength = true;
+        builder.Padding = UICommon.Margin;
+
+        currentBuilder?.Build();
+        currentBuilder = builder;
         rowCounter = 0;
-        return stack;
+        return builder;
     }
 
-    private CanvasStack AppendRow(params int[] widths)
+    private PanelBuilder AppendRow(params int[] widths)
     {
-        CanvasStack row = currentStack.AppendFixed(new CanvasStack(rowCounter.ToString()), UICommon.ControlHeight);
-        row.Horizontal = true;
+        CanvasPanel row = currentBuilder.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
+        row.CollapseMode = CollapseMode.AllowNoRenaming;
 
-        currentRow = row;
+        PanelBuilder builder = new(row);
+        builder.Horizontal = true;
+
+        currentRow?.Build();
+        currentRow = builder;
         rowCounter++;
         relativeWidths = widths;
         rowIndex = 0;
-        return row;
+        return builder;
     }
 
     private CanvasText AppendSectionHeader(string name)
     {
-        currentStack.AppendPadding(SectionEndPadding);
+        currentBuilder.AppendPadding(SectionEndPadding);
 
-        CanvasText text = currentStack.AppendFixed(new CanvasText(name), SectionHeaderHeight);
+        CanvasText text = currentBuilder.AppendFixed(new CanvasText(name), SectionHeaderHeight);
         text.Text = name;
         text.Font = UICommon.trajanNormal;
         text.FontSize = SectionHeaderFontSize;
@@ -285,25 +293,25 @@ public class MainPanel : CanvasPanel
         return text;
     }
 
-    private CanvasStack AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
+    private PanelBuilder AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasStack row = currentRow ?? AppendRow(1);
+        PanelBuilder row = currentRow ?? AppendRow(1);
 
         int widthUnits = relativeWidths.Sum();
-        float singleWidth = (row.Size.x - UICommon.Margin * (widthUnits - 1)) / widthUnits;
+        float singleWidth = (row.Length() - UICommon.Margin * (widthUnits - 1)) / widthUnits;
 
         int units = relativeWidths[rowIndex];
         float width = singleWidth * units + UICommon.Margin * (units - 1);
         if (DebugMod.bindsByMethod.ContainsKey(effect.Method)) width -= UICommon.ControlHeight;
 
-        CanvasButton button = row.AppendFixed(new CanvasButton("Button"), width);
+        CanvasButton button = row.AppendFixed(new CanvasButton(name), width);
         button.Text.Text = name;
         button.OnClicked += effect;
         if (update != null) button.OnUpdate += () => update(button);
 
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
-            CanvasButton keybindButton = row.AppendSquare(new CanvasButton("Keybind"));
+            CanvasButton keybindButton = row.AppendSquare(new CanvasButton($"{name}Keybind"));
             keybindButton.SetImage(UICommon.images["Scrollbar_point"]);
             keybindButton.RemoveText();
             keybindButton.Border.Sides &= ~BorderSides.LEFT;
@@ -313,6 +321,7 @@ public class MainPanel : CanvasPanel
         rowIndex++;
         if (rowIndex == relativeWidths.Length)
         {
+            currentRow.Build();
             currentRow = null;
             relativeWidths = null;
             rowIndex = 0;
@@ -325,10 +334,10 @@ public class MainPanel : CanvasPanel
         return row;
     }
 
-    private CanvasStack AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
+    private PanelBuilder AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
 
     // TODO: replace this with checkbox
-    private CanvasStack AppendToggleControl(string name, Func<bool> getter, Action effect)
+    private PanelBuilder AppendToggleControl(string name, Func<bool> getter, Action effect)
     {
         return AppendButtonControl(name, effect, button =>
         {
@@ -337,7 +346,7 @@ public class MainPanel : CanvasPanel
     }
 
     // TODO: replace this with a slider or increment/decrement buttons
-    private CanvasStack AppendIncrementControl(string name, Func<int> getter, Action effect)
+    private PanelBuilder AppendIncrementControl(string name, Func<int> getter, Action effect)
     {
         return AppendButtonControl(name, effect, button =>
         {
@@ -347,6 +356,9 @@ public class MainPanel : CanvasPanel
 
     public override void Build()
     {
+        currentRow?.Build();
+        currentBuilder?.Build();
+
         float tabButtonWidth = (Size.x - UICommon.Margin * (tabs.Count - 1)) / tabs.Count;
         float tabX = 0;
 

@@ -14,7 +14,7 @@ public abstract class CanvasNode
     private Vector2 size;
     private bool activeSelf = true;
 
-    public string Name { get; }
+    public string Name { get; set; }
 
     public CanvasNode Parent
     {
