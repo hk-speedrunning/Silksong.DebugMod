@@ -22,11 +22,16 @@
     <!--Shortens and anonymizes paths in debug symbols relative to the project directory. Breakpoints will not work, however.-->
     <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/</PathMap>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/hk-speedrunning/Silksong.DebugMod</RepositoryUrl>
     <RootNamespace>DebugMod</RootNamespace>
   </PropertyGroup>
-  
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
+
   <ItemGroup>
     <None Remove="Images\**\*.png" />
   </ItemGroup>
@@ -103,6 +108,7 @@
         <ExportFolder>$(ThunderstoreDir)/dist</ExportFolder>
       </PropertyGroup>
       <MakeDir Directories="$(ExportFolder)" />
+      <Delete Files="$(ExportFolder)/$(TargetName)_MANUAL.zip" /> 
       <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName)_MANUAL.zip" Overwrite="True" />
   </Target>
     
