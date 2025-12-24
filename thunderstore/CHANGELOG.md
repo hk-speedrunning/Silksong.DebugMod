@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.2.3
+### v0.2.4
 
 - Repackaged for Thunderstore releases, allowing installation by Gale/r2modman.
 - Added alpha UI for renaming savestates in game.
