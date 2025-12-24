@@ -113,7 +113,12 @@ public static class UICommon
                 {
                     Stream imageStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res);
                     byte[] buffer = new byte[imageStream.Length];
-                    imageStream.Read(buffer, 0, buffer.Length);
+
+                    int offset = 0;
+                    while (offset < buffer.Length)
+                    {
+                        offset += imageStream.Read(buffer, offset, buffer.Length - offset);
+                    }
 
                     Texture2D tex = new Texture2D(1, 1);
                     tex.LoadImage(buffer.ToArray());

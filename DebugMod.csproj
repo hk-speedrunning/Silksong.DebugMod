@@ -9,11 +9,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisMode>recommended</AnalysisMode>
     <!-- Ignore warning about processor architecture mismatch with PlayMaker ConditionalExpression -->
-    <NoWarn>$(NoWarn);MSB3270</NoWarn>
+    <!-- Also ignore Harmony analyzer warning about modifying non-ref parameters because it's bugged -->
+    <NoWarn>$(NoWarn);MSB3270;Harmony003</NoWarn>
     <RootNamespace>DebugMod</RootNamespace>
 
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
@@ -39,27 +39,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all"/>
-    <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
-    <PackageReference Include="HarmonyX" Version="2.9.0"/>
-    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all"/>
-    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.25.0" PrivateAssets="all"/>
-    <PackageReference
-            Include="UnityEngine.Modules"
-            Version="6000.0.50"
-            IncludeAssets="compile"
-    />
-    <PackageReference
-            Include="Silksong.GameLibs"
-            Version="*-*"
-            PrivateAssets="all"
-    />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="HarmonyX" Version="2.9.0" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.25.0" PrivateAssets="all" />
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
+    <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Remove="thunderstore/temp;thunderstore/dist"/>
+    <Folder Remove="thunderstore/temp;thunderstore/dist" />
     <Folder Include="thunderstore\dist\" />
-    <None Include="README.md" Pack="True" PackagePath="README.md"/>
+    <None Include="README.md" Pack="True" PackagePath="README.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,29 +60,18 @@
 
   <Target Name="CopyAndPackageMod" AfterTargets="PostBuildEvent">
     <ItemGroup>
-      <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/"/>
-      <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/"/>
+      <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/" />
+      <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/" />
     </ItemGroup>
     <PropertyGroup>
       <ThunderstoreDir>$(ProjectDir)/thunderstore</ThunderstoreDir>
     </PropertyGroup>
-    <Copy
-            SourceFiles="@(Binaries)"
-            DestinationFolder="$(SilksongFolder)/BepInEx/plugins/hk_speedrunning-$(AssemblyTitle)/%(Binaries.LocalDir)"
-            Condition="'$(SilksongFolder)' != '' And Exists('$(SilksongFolder)')"
-    />
-    <RemoveDir Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist"/>
-    <MakeDir Directories="$(ThunderstoreDir)/temp"/>
-    <Copy
-            SourceFiles="@(Binaries)"
-            DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)"
-    />
-    <Exec Command="dotnet tool restore"/>
-    <Exec
-            Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;$(AssemblyTitle)&quot; --package-version $(Version)"
-            StandardOutputImportance="High"
-            StandardErrorImportance="High"
-    />
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongFolder)/BepInEx/plugins/hk_speedrunning-$(AssemblyTitle)/%(Binaries.LocalDir)" Condition="'$(SilksongFolder)' != '' And Exists('$(SilksongFolder)')" />
+    <RemoveDir Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist" />
+    <MakeDir Directories="$(ThunderstoreDir)/temp" />
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)" />
+    <Exec Command="dotnet tool restore" />
+    <Exec Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;$(AssemblyTitle)&quot; --package-version $(Version)" StandardOutputImportance="High" StandardErrorImportance="High" />
   </Target>
     
   <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
@@ -101,7 +82,7 @@
         <ModlistVersion>0.2.0</ModlistVersion>
         <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/v$(ModlistVersion)/silksong_modding-Modlist-$(ModlistVersion).zip/</ModlistUrl>
       </PropertyGroup>
-      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.zip"/>
+      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.zip" />
       <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
 
       <PropertyGroup>

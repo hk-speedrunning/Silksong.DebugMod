@@ -26,9 +26,7 @@ public partial class DebugMod : BaseUnityPlugin
     private static InputHandler _ih;
     private static HeroController _hc;
     private static GameObject _refKnight;
-    private static PlayMakerFSM _refKnightSlash;
     private static CameraController _refCamera;
-    private static PlayMakerFSM _refDreamNail;
     private static Collider2D _refHeroCollider;
     private static Collider2D _refHeroBox;
 

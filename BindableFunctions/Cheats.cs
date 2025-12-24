@@ -10,7 +10,7 @@ public static partial class BindableFunctions
     {
         int ctr = 0;
 
-        foreach (HealthManager hm in Object.FindObjectsOfType<HealthManager>())
+        foreach (HealthManager hm in Object.FindObjectsByType<HealthManager>(FindObjectsSortMode.None))
         {
             if (!hm.isDead)
             {

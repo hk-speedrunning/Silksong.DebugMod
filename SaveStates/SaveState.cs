@@ -120,7 +120,7 @@ public class SaveState
         data.savePos = HeroController.instance.gameObject.transform.position;
         data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
         data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
-        data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().isKinematic;
+        data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
 
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
@@ -283,7 +283,7 @@ public class SaveState
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
-        HeroController.instance.GetComponent<Rigidbody2D>().isKinematic = data.isKinematized;
+        if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         DebugMod.noclipPos = data.savePos;
 
         if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
@@ -297,7 +297,7 @@ public class SaveState
         HeroController.instance.FinishedEnteringScene(true, false);
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
-        
+
 
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
@@ -359,7 +359,7 @@ public class SaveState
             }
         }
     }
-    
+
     //these are toggleable, as they will prevent glitches from persisting
     private void SaveStateGlitchFixes()
     {
@@ -368,13 +368,13 @@ public class SaveState
         //float
         HeroController.instance.AffectedByGravity(true);
         rb2d.gravityScale = 0.79f;
-            
+
         //invuln
         HeroController.instance.gameObject.LocateMyFSM("Roar and Wound States").FsmVariables.FindFsmBool("Force Roar Lock").Value = false;
         HeroController.instance.cState.invulnerable = false;
 
         //no clip
-        rb2d.isKinematic = false;
+        rb2d.bodyType = RigidbodyType2D.Dynamic;
 
         //bench storage
         GameManager.instance.SetPlayerDataBool(nameof(PlayerData.atBench), false);

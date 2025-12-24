@@ -84,9 +84,9 @@ public class PanelBuilder : IDisposable
         {
             float length = entry.type switch
             {
-                LengthType.Fixed => entry.length,
                 LengthType.Square => Breadth(),
-                LengthType.Flex => flexLength
+                LengthType.Flex => flexLength,
+                _ => entry.length
             };
 
             if (entry.element != null)

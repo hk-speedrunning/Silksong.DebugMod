@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using HarmonyLib;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -24,8 +25,11 @@ public static class SceneWatcher
         LoadedSceneInfo d = new LoadedSceneInfo(scene.name, scene.name);
         scenes.Add(d);
 
-        if (checkSceneManager && Object.FindObjectsOfType<CustomSceneManager>().Any(m => m.gameObject.scene == scene))
+        if (checkSceneManager && Object.FindObjectsByType<CustomSceneManager>(FindObjectsSortMode.None)
+                .Any(m => m.gameObject.scene == scene))
+        {
             scenesWithManager.Add(scene, d.id);
+        }
     }
 
     public static void Init()
@@ -35,7 +39,7 @@ public static class SceneWatcher
 
         for (int i = 0; i < USceneManager.sceneCount; i++)
             AddScene(USceneManager.GetSceneAt(i), LoadSceneMode.Additive, false);
-        
+
         USceneManager.sceneLoaded += (scene, mode) => AddScene(scene, mode);
         USceneManager.sceneUnloaded += s => scenes.RemoveAt(scenes.FindIndex(d => d.name == s.name));
     }
@@ -60,7 +64,7 @@ public static class SceneWatcher
     {
         private static int counter = 0;
         public static LoadedSceneInfo activeInfo;
-        
+
         public readonly string name;
         public string activeSceneWhenLoaded { get; internal set; }
         public readonly int id;
