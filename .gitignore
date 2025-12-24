@@ -1,3 +1,13 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea/
+
+thunderstore/dist
+thunderstore/temp
+
 SilksongPath.props
 
 ## Ignore Visual Studio temporary files, build results, and

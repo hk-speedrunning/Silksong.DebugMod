@@ -1,0 +1,43 @@
+﻿[config]
+schemaVersion = "0.0.1"
+
+[package]
+# The name of the team you are publishing as
+namespace = "hk_speedrunning"
+# max 250 characters
+description = "The premier practice tool for Silksong, ported from Hollow Knight's DebugMod."
+
+# Replace this with a correct repo URL if the default is not accurate
+websiteUrl = "https://github.com/hk-speedrunning/Silksong.DebugMod"
+containsNsfwContent = false
+
+
+# dependencies are specified in the format AuthorName-PackageName = "version". You should always have at least BepInExPack_Silksong.
+[package.dependencies]
+BepInEx-BepInExPack_Silksong = "5.4.2304"
+silksong_modding-Modlist = "0.2.0"
+
+# in most cases you should not change this build block, or the first build.copy block; the dist and tmp directories are used
+# by other build scripts
+[build]
+icon = "./icon.png"
+readme = "../README.md"
+outdir = "./dist"
+
+[[build.copy]]
+source = "./temp"
+target = "/"
+
+# additional files and directories can be added to the package like this:
+[[build.copy]]
+source = "./CHANGELOG.md"
+target = "/"
+
+
+[publish]
+repository = "https://thunderstore.io"
+communities = [ "hollow-knight-silksong" ]
+
+[publish.categories]
+# available categories can be found at https://github.com/thunderstore-io/ecosystem-schema/blob/master/games/data/hollow-knight-silksong.yml
+hollow-knight-silksong = [ "mods", "utility" ]

@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- These properties will control the generated plugin info and Thunderstore manifest. -->
+    <!-- 
+    This is the name of your plugin as it would appear in-game and in a mod installer. 
+    Allowed characters are A-Z, a-z, 0-9 and _ 
+    -->
+    <AssemblyTitle>DebugMod</AssemblyTitle>
+    <!--
+    This is the version of your plugin as it would appear in-game and in a mod installer.
+    It should follow the format major.minor.patch (semantic versioning). If you publish your mod
+    as a library to NuGet, this version will also be used as the package version.
+    -->
+    <Version>0.2.2</Version>
+  </PropertyGroup>
+</Project>
