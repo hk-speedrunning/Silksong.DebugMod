@@ -105,7 +105,7 @@
       <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
 
       <PropertyGroup>
-        <ExportFolder>$(ThunderstoreDir)/dist</ExportFolder>
+        <ExportFolder>$(ThunderstoreDir)/manual</ExportFolder>
       </PropertyGroup>
       <MakeDir Directories="$(ExportFolder)" />
       <Delete Files="$(ExportFolder)/$(TargetName)_MANUAL.zip" /> 
