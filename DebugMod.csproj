@@ -1,0 +1,115 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- 
+      Imports silksong path properties only if present in order to allow CI builds. The file should be gitignored.
+      If you are checking out from git and need to create a new one, you can use `dotnet new silksongpath` to generate one.
+    -->
+    <Import Condition="Exists('SilksongPath.props')" Project="SilksongPath.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisMode>recommended</AnalysisMode>
+    <!-- Ignore warning about processor architecture mismatch with PlayMaker ConditionalExpression -->
+    <NoWarn>$(NoWarn);MSB3270</NoWarn>
+    <RootNamespace>DebugMod</RootNamespace>
+
+    <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
+    <!-- CI environment variable is automatically set by GitHub actions -->
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">True</RestoreLockedMode>
+
+    <!-- Allow access of private members at runtime -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+    <!--Shortens and anonymizes paths in debug symbols relative to the project directory. Breakpoints will not work, however.-->
+    <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/</PathMap>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/hk-speedrunning/Silksong.DebugMod</RepositoryUrl>
+    
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <None Remove="Images\**\*.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\**\*.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all"/>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
+    <PackageReference Include="HarmonyX" Version="2.9.0"/>
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.25.0" PrivateAssets="all"/>
+    <PackageReference
+            Include="UnityEngine.Modules"
+            Version="6000.0.50"
+            IncludeAssets="compile"
+    />
+    <PackageReference
+            Include="Silksong.GameLibs"
+            Version="*-*"
+            PrivateAssets="all"
+    />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Remove="thunderstore/temp;thunderstore/dist"/>
+    <Folder Include="thunderstore\dist\" />
+    <None Include="README.md" Pack="True" PackagePath="README.md"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include=".config\dotnet-tools.json" />
+  </ItemGroup>
+
+  <Target Name="CopyAndPackageMod" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/"/>
+      <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <ThunderstoreDir>$(ProjectDir)/thunderstore</ThunderstoreDir>
+    </PropertyGroup>
+    <Copy
+            SourceFiles="@(Binaries)"
+            DestinationFolder="$(SilksongFolder)/BepInEx/plugins/hk_speedrunning-$(AssemblyTitle)/%(Binaries.LocalDir)"
+            Condition="'$(SilksongFolder)' != '' And Exists('$(SilksongFolder)')"
+    />
+    <RemoveDir Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist"/>
+    <MakeDir Directories="$(ThunderstoreDir)/temp"/>
+    <Copy
+            SourceFiles="@(Binaries)"
+            DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)"
+    />
+    <Exec Command="dotnet tool restore"/>
+    <Exec
+            Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;$(AssemblyTitle)&quot; --package-version $(Version)"
+            StandardOutputImportance="High"
+            StandardErrorImportance="High"
+    />
+  </Target>
+    
+  <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
+      <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
+      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
+
+      <PropertyGroup>
+        <ModlistVersion>0.2.0</ModlistVersion>
+        <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/v$(ModlistVersion)/silksong_modding-Modlist-$(ModlistVersion).zip/</ModlistUrl>
+      </PropertyGroup>
+      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.zip"/>
+      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
+
+      <PropertyGroup>
+        <ExportFolder>$(ThunderstoreDir)/manual</ExportFolder>
+      </PropertyGroup>
+      <MakeDir Directories="$(ExportFolder)" />
+      <Delete Files="$(ExportFolder)/$(TargetName)_MANUAL.zip" /> 
+      <ZipDirectory SourceDirectory="$(IntermediateOutputPath)/archive" DestinationFile="$(ExportFolder)/$(TargetName)_MANUAL.zip" Overwrite="True" />
+  </Target>
+    
+</Project>

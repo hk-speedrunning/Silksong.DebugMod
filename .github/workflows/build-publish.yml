@@ -1,0 +1,179 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      force_thunderstore:
+        description: Force re-publishing to Thunderstore
+        required: true
+        default: false
+        type: boolean
+      force_nuget:
+        description: Force re-publishing to NuGet
+        required: true
+        default: false
+        type: boolean
+    
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      attestation-url: ${{ steps.attest.outputs.attestation-url }}
+      # when you are ready to publish your first release, change this to 'true'
+      allow-release: 'true'
+      is-new-version: ${{ !fromJSON(steps.needs-release.outputs.exists || 'true') }}
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.x
+    - name: Build
+      run: dotnet build -c Release --verbosity normal
+    - name: Pack
+      run: dotnet pack -o nuget/
+    - name: Get Version
+      id: version
+      run: |-
+        VERSION=$(dotnet build DebugMod.csproj -getProperty:Version)
+        echo Version is $VERSION
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Upload thunderstore artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: mod-bundle
+        path: thunderstore/dist
+    - name: Upload nuget artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: nuget
+        path: nuget/
+    - name: Check if release needed
+      id: needs-release
+      uses: mukunku/tag-exists-action@v1.6.0
+      if: github.event_name == 'push'
+      with:
+        tag: v${{ steps.version.outputs.version }}
+    - name: Generate attestation
+      id: attest
+      uses: actions/attest-build-provenance@v3
+      if: github.event_name == 'push' && steps.needs-release.outputs.exists == 'false'
+      with:
+        subject-path: |
+          thunderstore/dist/*.zip
+          nuget/*.nupkg
+
+  # Publish to Thunderstore to that users can install it
+  release-thunderstore:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: |
+      (
+        github.event_name == 'push' &&
+        needs.build.outputs.allow-release == 'true' &&
+        needs.build.outputs.is-new-version == 'true'
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.force_thunderstore == 'true'
+      )
+    # Do not substitute your Thunderstore API key in this workflow! Instead, add a secret to your repository.
+    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+    env:
+      THUNDERSTORE_API_KEY: ${{ secrets.THUNDERSTORE_API_KEY }}
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.x
+    - name: Restore tools
+      run: dotnet tool restore
+    - name: Download artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: mod-bundle
+        path: thunderstore/dist
+    - name: Publish to Thunderstore
+      if: env.THUNDERSTORE_API_KEY != ''
+      run: |-
+        dotnet tcli publish \
+          --config-path thunderstore/thunderstore.toml \
+          --file thunderstore/dist/*.zip \
+          --token $THUNDERSTORE_API_KEY
+
+  # Publish to NuGet so that other mods can depend on it in CI
+  release-nuget:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: |
+      (
+        github.event_name == 'push' && 
+        needs.build.outputs.allow-release == 'true' && 
+        needs.build.outputs.is-new-version == 'true'
+      ) ||
+      (
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.force_nuget == 'true'
+      )
+    # Do not substitute your NuGet API key in this workflow! Instead, add a secret to your repository
+    # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+    steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.x
+    - name: Download artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: nuget
+        path: nuget/
+    - name: Publish to NuGet
+      if: env.NUGET_API_KEY != ''
+      run: |-
+        dotnet nuget push nuget/*.nupkg \
+          --api-key $NUGET_API_KEY \
+          --source https://api.nuget.org/v3/index.json
+
+  # Publish to GitHub releases to keep release history on the repository (needed for this workflow to work properly
+  # but is also nice for multiple other reasons such as auto-tagging *after* a build success)
+  release-github:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && needs.build.outputs.allow-release == 'true' && needs.build.outputs.is-new-version == 'true'
+
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: mod-bundle
+        path: thunderstore/dist
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: false
+        generate_release_notes: true
+        fail_on_unmatched_files: true
+        tag_name: v${{ needs.build.outputs.version }}
+        body: |
+          Build attested at ${{ needs.build.outputs.attestation-url }}
+        files: |
+          thunderstore/dist/*.zip
