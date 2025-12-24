@@ -51,6 +51,7 @@
   <ItemGroup>
     <Folder Remove="thunderstore/temp;thunderstore/dist" />
     <Folder Include="thunderstore\dist\" />
+    <None Include="C:\projects\Silksong.DebugMod\.editorconfig" />
     <None Include="README.md" Pack="True" PackagePath="README.md" />
   </ItemGroup>
 

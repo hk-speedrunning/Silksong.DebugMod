@@ -1,6 +1,6 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections;
-using HarmonyLib;
 using UnityEngine;
 
 namespace DebugMod;

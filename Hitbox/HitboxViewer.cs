@@ -14,8 +14,8 @@ public class HitboxViewer
         State = DebugMod.settings.ShowHitBoxes;
         Unload();
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += CreateHitboxRender;
-        
-        
+
+
         ModHooks.ColliderCreateHook += UpdateHitboxRender;
 
         CreateHitboxRender();
@@ -25,7 +25,7 @@ public class HitboxViewer
     {
         State = DebugMod.settings.ShowHitBoxes;
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= CreateHitboxRender;
-        
+
         ModHooks.ColliderCreateHook -= UpdateHitboxRender;
         DestroyHitboxRender();
     }

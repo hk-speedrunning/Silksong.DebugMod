@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections;
-using HarmonyLib;
+﻿using HarmonyLib;
 using InControl;
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +18,7 @@ public class CanvasTextField : CanvasText
 
     protected override bool Interactable => true;
 
-    public CanvasTextField(string name) : base(name) {}
+    public CanvasTextField(string name) : base(name) { }
 
     public override void Build()
     {

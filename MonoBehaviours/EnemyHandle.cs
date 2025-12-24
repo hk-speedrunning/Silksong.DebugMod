@@ -1,7 +1,7 @@
-﻿using System;
-using DebugMod.UI;
+﻿using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;

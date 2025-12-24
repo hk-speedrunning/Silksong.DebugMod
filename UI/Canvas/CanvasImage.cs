@@ -13,7 +13,7 @@ public class CanvasImage : CanvasObject
     public CanvasBorder Border => border;
     public bool IsBackground { get; set; }
 
-    public CanvasImage(string name) : base(name) {}
+    public CanvasImage(string name) : base(name) { }
 
     public void SetImage(Texture2D tex, Rect subSprite = default)
     {

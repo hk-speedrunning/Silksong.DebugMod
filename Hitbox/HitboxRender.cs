@@ -1,6 +1,6 @@
-﻿using System;
+﻿using GlobalEnums;
+using System;
 using System.Collections.Generic;
-using GlobalEnums;
 using UnityEngine;
 
 namespace DebugMod.Hitbox;
@@ -8,7 +8,7 @@ namespace DebugMod.Hitbox;
 public class HitboxRender : MonoBehaviour
 {
     // ReSharper disable once StructCanBeMadeReadOnly
-    private struct HitboxType: IComparable<HitboxType>
+    private struct HitboxType : IComparable<HitboxType>
     {
         public static readonly HitboxType Knight = new(Color.yellow, 0);                     // yellow
         public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red      
@@ -17,10 +17,10 @@ public class HitboxRender : MonoBehaviour
         public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // blue
         public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 5); // pink
         public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 6); // dark blue
-        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f),7); // purple 
+        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple 
         public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 8); // orange
 
-        
+
         public readonly Color Color;
         public readonly int Depth;
 
@@ -70,7 +70,7 @@ public class HitboxRender : MonoBehaviour
     private Vector2 LocalToScreenPoint(Camera camera, Collider2D collider2D, Vector2 point)
     {
         Vector2 result = camera.WorldToScreenPoint((Vector2)collider2D.transform.TransformPoint(point + collider2D.offset));
-        return new Vector2((int) Math.Round(result.x), (int) Math.Round(Screen.height - result.y));
+        return new Vector2((int)Math.Round(result.x), (int)Math.Round(Screen.height - result.y));
     }
 
     private void TryAddHitboxes(Collider2D collider2D)
@@ -86,32 +86,32 @@ public class HitboxRender : MonoBehaviour
             if (collider2D.GetComponent<DamageHero>() || collider2D.gameObject.LocateMyFSM("damages_hero"))
             {
                 colliders[HitboxType.Enemy].Add(collider2D);
-            } 
-            else if (go.GetComponent<HealthManager>()||go.LocateMyFSM("health_manager_enemy") || go.LocateMyFSM("health_manager"))
+            }
+            else if (go.GetComponent<HealthManager>() || go.LocateMyFSM("health_manager_enemy") || go.LocateMyFSM("health_manager"))
             {
                 colliders[HitboxType.Other].Add(collider2D);
-            } 
-            else if (go.layer == (int) PhysLayers.TERRAIN)
+            }
+            else if (go.layer == (int)PhysLayers.TERRAIN)
             {
                 if (go.name.Contains("Breakable") || go.name.Contains("Collapse") || go.GetComponent<Breakable>() != null) colliders[HitboxType.Breakable].Add(collider2D);
                 else colliders[HitboxType.Terrain].Add(collider2D);
-            } 
+            }
             else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
             {
                 colliders[HitboxType.Knight].Add(collider2D);
-            } 
-            else if (go.GetComponent<DamageEnemies>()||go.LocateMyFSM("damages_enemy") || go.name == "Damager" && go.LocateMyFSM("Damage"))
+            }
+            else if (go.GetComponent<DamageEnemies>() || go.LocateMyFSM("damages_enemy") || go.name == "Damager" && go.LocateMyFSM("Damage"))
             {
                 colliders[HitboxType.Attack].Add(collider2D);
-            } 
+            }
             else if (collider2D.isTrigger && collider2D.GetComponent<HazardRespawnTrigger>())
             {
                 colliders[HitboxType.HazardRespawn].Add(collider2D);
-            } 
+            }
             else if (collider2D.isTrigger && collider2D.GetComponent<TransitionPoint>())
             {
                 colliders[HitboxType.Gate].Add(collider2D);
-            } 
+            }
             else if (collider2D.GetComponent<Breakable>())
             {
                 NonBouncer bounce = collider2D.GetComponent<NonBouncer>();
@@ -119,7 +119,7 @@ public class HitboxRender : MonoBehaviour
                 {
                     colliders[HitboxType.Trigger].Add(collider2D);
                 }
-            } 
+            }
             else if (HitboxViewer.State == 2)
             {
                 colliders[HitboxType.Other].Add(collider2D);
@@ -186,12 +186,12 @@ public class HitboxRender : MonoBehaviour
                     }
                     break;
             }
-        } 
+        }
         else if (collider2D is CircleCollider2D circleCollider2D)
         {
             Vector2 center = LocalToScreenPoint(camera, collider2D, Vector2.zero);
             Vector2 right = LocalToScreenPoint(camera, collider2D, Vector2.right * circleCollider2D.radius);
-            int radius = (int) Math.Round(Vector2.Distance(center, right));
+            int radius = (int)Math.Round(Vector2.Distance(center, right));
             Drawing.DrawCircle(center, radius, hitboxType.Color, lineWidth, true, Mathf.Clamp(radius / 16, 4, 32));
         }
 

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections;
-using DebugMod.MonoBehaviours;
+﻿using DebugMod.MonoBehaviours;
 using GlobalEnums;
+using System;
+using System.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

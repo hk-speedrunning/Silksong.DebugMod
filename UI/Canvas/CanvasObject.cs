@@ -1,5 +1,4 @@
 ﻿using System;
-using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -15,7 +14,7 @@ public abstract class CanvasObject : CanvasNode
 
     protected virtual bool Interactable => false;
 
-    protected CanvasObject(string name) : base(name) {}
+    protected CanvasObject(string name) : base(name) { }
 
     protected override void OnUpdatePosition()
     {

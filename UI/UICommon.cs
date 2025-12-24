@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DebugMod.UI.Canvas;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI;

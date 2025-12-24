@@ -5,7 +5,7 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-     [BindableMethod(name = "Quickslot (save)", category = "Savestates")]
+    [BindableMethod(name = "Quickslot (save)", category = "Savestates")]
     public static void SaveState()
     {
         SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());

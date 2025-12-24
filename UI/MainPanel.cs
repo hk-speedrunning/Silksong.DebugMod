@@ -1,7 +1,7 @@
+using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI;

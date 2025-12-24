@@ -74,7 +74,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public CanvasText(string name) : base(name) {}
+    public CanvasText(string name) : base(name) { }
 
     public override void Build()
     {

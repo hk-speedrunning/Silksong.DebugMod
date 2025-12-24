@@ -1,6 +1,6 @@
-using System;
 using DebugMod.UI.Canvas;
 using GlobalSettings;
+using System;
 using UnityEngine;
 
 namespace DebugMod.UI;

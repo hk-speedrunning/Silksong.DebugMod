@@ -8,7 +8,7 @@ public static class PlayerDeathWatcher
     }
 
     public static bool playerDead;
-    
+
     private static void SetPlayerDead()
     {
         playerDead = true;

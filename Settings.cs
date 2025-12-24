@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DebugMod;
@@ -23,7 +23,7 @@ public class Settings
     public bool SaveStatePanelVisible = true;
 
     public bool NumPadForSaveStates = false;
-    
+
     public int ShowHitBoxes;
 
     public int MaxSavePages = 10;

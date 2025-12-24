@@ -26,7 +26,8 @@ namespace DebugMod.Hitbox;
 // For a Google spreadsheet with full benchmark results, see:
 // https://docs.google.com/spreadsheet/ccc?key=0AvJlJlbRO26VdHhzeHNRMVF2UHZHMXFCTVFZN011V1E&usp=sharing
 
-public static class Drawing {
+public static class Drawing
+{
     private static Texture2D aaLineTex = null;
     private static Texture2D lineTex = null;
     private static Material blitMaterial = null;
@@ -49,15 +50,16 @@ public static class Drawing {
     // By working out the matrices and applying some trigonometry, the matrix calculation comes
     // out pretty simple. See https://app.box.com/s/xi08ow8o8ujymazg100j for a picture of my
     // notebook with the calculations.
-    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width, bool antiAlias) {
+    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width, bool antiAlias)
+    {
         // Normally the static initializer does this, but to handle texture reinitialization
         // after editor play mode stops we need this check in the Editor.
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
                  if (!lineTex)
                  {
                      Initialize();
                  }
-        #endif
+#endif
 
         // Note that theta = atan2(dy, dx) is the angle we want to rotate by, but instead
         // of calculating the angle we just use the sine (dy/len) and cosine (dx/len).
@@ -67,20 +69,24 @@ public static class Drawing {
 
         // Early out on tiny lines to avoid divide by zero.
         // Plus what's the point of drawing a line 1/1000th of a pixel long??
-        if (len < 0.001f) {
+        if (len < 0.001f)
+        {
             return;
         }
 
         // Pick texture and material (and tweak width) based on anti-alias setting.
         Texture2D tex;
         Material mat;
-        if (antiAlias) {
+        if (antiAlias)
+        {
             // Multiplying by three is fine for anti-aliasing width-1 lines, but make a wide "fringe"
             // for thicker lines, which may or may not be desirable.
             width = width * 3.0f;
             tex = aaLineTex;
             mat = blendMaterial;
-        } else {
+        }
+        else
+        {
             tex = lineTex;
             mat = blitMaterial;
         }
@@ -104,19 +110,22 @@ public static class Drawing {
 
         Graphics.DrawTexture(lineRect, tex, lineRect, 0, 0, 0, 0, color, mat);
         // 启用抗锯齿时颜色似乎是半透明的，所以重复绘制一次使其更清晰
-        if (antiAlias) {
+        if (antiAlias)
+        {
             Graphics.DrawTexture(lineRect, tex, lineRect, 0, 0, 0, 0, color, mat);
         }
 
         GL.PopMatrix();
     }
 
-    public static void DrawCircle(Vector2 center, int radius, Color color, float width, int segmentsPerQuarter) {
+    public static void DrawCircle(Vector2 center, int radius, Color color, float width, int segmentsPerQuarter)
+    {
         DrawCircle(center, radius, color, width, false, segmentsPerQuarter);
     }
 
-    public static void DrawCircle(Vector2 center, int radius, Color color, float width, bool antiAlias, int segmentsPerQuarter) {
-        float rh = (float) radius * 0.551915024494f;
+    public static void DrawCircle(Vector2 center, int radius, Color color, float width, bool antiAlias, int segmentsPerQuarter)
+    {
+        float rh = (float)radius * 0.551915024494f;
 
         Vector2 p1 = new Vector2(center.x, center.y - radius);
         Vector2 p1_tan_a = new Vector2(center.x - rh, center.y - radius);
@@ -142,35 +151,42 @@ public static class Drawing {
 
     // Other than method name, DrawBezierLine is unchanged from Linusmartensson's original implementation.
     public static void DrawBezierLine(Vector2 start, Vector2 startTangent, Vector2 end, Vector2 endTangent, Color color, float width,
-        bool antiAlias, int segments) {
+        bool antiAlias, int segments)
+    {
         Vector2 lastV = CubeBezier(start, startTangent, end, endTangent, 0);
-        for (int i = 1; i < segments + 1; ++i) {
-            Vector2 v = CubeBezier(start, startTangent, end, endTangent, i / (float) segments);
+        for (int i = 1; i < segments + 1; ++i)
+        {
+            Vector2 v = CubeBezier(start, startTangent, end, endTangent, i / (float)segments);
             DrawLine(lastV, v, color, width, antiAlias);
             lastV = v;
         }
     }
 
 
-    private static Vector2 CubeBezier(Vector2 s, Vector2 st, Vector2 e, Vector2 et, float t) {
+    private static Vector2 CubeBezier(Vector2 s, Vector2 st, Vector2 e, Vector2 et, float t)
+    {
         float rt = 1 - t;
         return rt * rt * rt * s + 3 * rt * rt * t * st + 3 * rt * t * t * et + t * t * t * e;
     }
 
     // This static initializer works for runtime, but apparently isn't called when
     // Editor play mode stops, so DrawLine will re-initialize if needed.
-    static Drawing() {
+    static Drawing()
+    {
         Initialize();
     }
 
-    private static void Initialize() {
-        if (lineTex == null) {
+    private static void Initialize()
+    {
+        if (lineTex == null)
+        {
             lineTex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
             lineTex.SetPixel(0, 1, Color.white);
             lineTex.Apply();
         }
 
-        if (aaLineTex == null) {
+        if (aaLineTex == null)
+        {
             // TODO: better anti-aliasing of wide lines with a larger texture? or use Graphics.DrawTexture with border settings
             aaLineTex = new Texture2D(1, 3, TextureFormat.ARGB32, false);
             aaLineTex.SetPixel(0, 0, new Color(1, 1, 1, 0));
@@ -181,7 +197,7 @@ public static class Drawing {
 
         // GUI.blitMaterial and GUI.blendMaterial are used internally by GUI.DrawTexture,
         // depending on the alphaBlend parameter. Use reflection to "borrow" these references.
-        blitMaterial = (Material) typeof(GUI).GetMethod("get_blitMaterial", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
-        blendMaterial = (Material) typeof(GUI).GetMethod("get_blendMaterial", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+        blitMaterial = (Material)typeof(GUI).GetMethod("get_blitMaterial", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+        blendMaterial = (Material)typeof(GUI).GetMethod("get_blendMaterial", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
     }
 }

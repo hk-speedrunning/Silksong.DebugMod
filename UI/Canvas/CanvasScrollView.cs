@@ -12,7 +12,7 @@ public class CanvasScrollView : CanvasNode
     public CanvasNode Content => content;
     public Vector2 Margin { get; set; } = new(UICommon.BORDER_THICKNESS, UICommon.BORDER_THICKNESS);
 
-    public CanvasScrollView(string name) : base(name) {}
+    public CanvasScrollView(string name) : base(name) { }
 
     public T SetContent<T>(T content) where T : CanvasNode
     {
