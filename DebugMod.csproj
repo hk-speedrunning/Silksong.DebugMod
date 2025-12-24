@@ -14,21 +14,20 @@
     <AnalysisMode>recommended</AnalysisMode>
     <!-- Ignore warning about processor architecture mismatch with PlayMaker ConditionalExpression -->
     <NoWarn>$(NoWarn);MSB3270</NoWarn>
+    <RootNamespace>DebugMod</RootNamespace>
+
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
     <!-- CI environment variable is automatically set by GitHub actions -->
     <RestoreLockedMode Condition="'$(CI)' == 'true'">True</RestoreLockedMode>
-    <!--Allow access of private members at runtime.-->
+
+    <!-- Allow access of private members at runtime -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
     <!--Shortens and anonymizes paths in debug symbols relative to the project directory. Breakpoints will not work, however.-->
     <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/</PathMap>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/hk-speedrunning/Silksong.DebugMod</RepositoryUrl>
-    <RootNamespace>DebugMod</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    
   </PropertyGroup>
 
 
@@ -59,6 +58,7 @@
 
   <ItemGroup>
     <Folder Remove="thunderstore/temp;thunderstore/dist"/>
+    <Folder Include="thunderstore\dist\" />
     <None Include="README.md" Pack="True" PackagePath="README.md"/>
   </ItemGroup>
 
