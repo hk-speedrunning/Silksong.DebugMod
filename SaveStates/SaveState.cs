@@ -135,6 +135,12 @@ public class SaveState
     //loadDuped is used by external mods
     public IEnumerator Load(bool loadDuped = false)
     {
+        if (!IsSet())
+        {
+            DebugMod.LogError("Attempted to load unset savestate");
+            yield break;
+        }
+
         // Second check is probably not necessary since it's already checked at the call sites the frame before,
         // but might as well be defensive and rule out any frame-perfect nonsense
         if (loadingSavestate != null && !DebugMod.overrideLoadLockout)
@@ -142,25 +148,88 @@ public class SaveState
             DebugMod.LogConsole($"Attempted to load savestate in {data.saveScene} while another is already loading, cancelling");
             yield break;
         }
+
+        System.Diagnostics.Stopwatch loadingStateTimer = new();
+        loadingStateTimer.Start();
+
         loadingSavestate = this;
 
+        IEnumerator enumerator = LoadImpl(loadDuped);
+        while (true)
+        {
+            try
+            {
+                if (!enumerator.MoveNext())
+                {
+                    break;
+                }
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Error loading savestate: {e}");
+                DebugMod.LogConsole("Critical error loading savestate, please create a bug report");
+
+                // Hopefully enough to work around most errors and keep the game playable
+                Time.timeScale = DebugMod.CurrentTimeScale;
+                loadingSavestate = null;
+
+                yield break;
+            }
+
+            yield return enumerator.Current;
+        }
+
+        loadingSavestate = null;
+
+        loadingStateTimer.Stop();
+        TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
+        DebugMod.LogConsole("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
+
+        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+        yield return null; // Not all HUD elements are ready immediately, wait one more frame
+        HUDFixes();
+
+        // Fix bench interactions
+        foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
+        {
+            if (!bench.GetComponent<HeroController>()) // Why, Team Cherry?
+            {
+                bench.gameObject.SetActive(false);
+                bench.gameObject.SetActive(true);
+            }
+        }
+
+        // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
+        foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
+        {
+            if (Physics2D.IsTouching(HeroController.instance.GetComponent<Collider2D>(), water.GetComponent<Collider2D>()))
+            {
+                yield return new WaitUntil(() => GameManager.instance.sceneLoad == null);
+                HeroController.instance.transform.position = data.savePos;
+                HeroController.instance.GetComponent<BoxCollider2D>().enabled = false;
+                HeroController.instance.GetComponent<BoxCollider2D>().enabled = true;
+                break;
+            }
+        }
+    }
+
+    private IEnumerator LoadImpl(bool loadDuped)
+    {
         bool stateondeath = DebugMod.stateOnDeath;
         DebugMod.stateOnDeath = false;
 
         //prevents silly things from happening
         Time.timeScale = 0;
 
-        //timer for loading savestates
-        System.Diagnostics.Stopwatch loadingStateTimer = new System.Diagnostics.Stopwatch();
-        loadingStateTimer.Start();
-
         //called here because this needs to be done here
         if (DebugMod.savestateFixes)
         {
             //TODO: Cleaner way to do this? Also get it to actually work
             //prevent hazard respawning
-            if (DebugMod.CurrentHazardCoro != null) HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
-            if (DebugMod.CurrentInvulnCoro != null) HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
+            if (DebugMod.CurrentHazardCoro != null)
+                HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
+            if (DebugMod.CurrentInvulnCoro != null)
+                HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
             DebugMod.CurrentHazardCoro = null;
             DebugMod.CurrentInvulnCoro = null;
             HeroController.instance.hazardInvulnRoutine = null;
@@ -255,6 +324,7 @@ public class SaveState
                 GameManager.instance.RefreshTilemapInfo(sceneData[i].name);
                 GameManager.instance.cameraCtrl.SceneInit();
             }
+
             GameManager.instance.BeginScene();
         }
 
@@ -304,6 +374,7 @@ public class SaveState
             DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);
             yield return RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
         }
+
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
 
@@ -317,47 +388,14 @@ public class SaveState
             {
                 HeroController.instance.UnPause();
             }
+
             MenuButtonList.ClearAllLastSelected();
             TimeManager.TimeScale = 1f;
         }
 
-        TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
-
         //set timescale back
         Time.timeScale = DebugMod.CurrentTimeScale;
         DebugMod.stateOnDeath = stateondeath;
-
-        loadingStateTimer.Stop();
-        loadingSavestate = null;
-
-        DebugMod.LogConsole("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
-
-        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
-        yield return null; // Not all HUD elements are ready immediately, wait one more frame
-        HUDFixes();
-
-        // Fix bench interactions
-        foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
-        {
-            if (!bench.GetComponent<HeroController>()) // Why, Team Cherry?
-            {
-                bench.gameObject.SetActive(false);
-                bench.gameObject.SetActive(true);
-            }
-        }
-
-        // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
-        foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
-        {
-            if (Physics2D.IsTouching(HeroController.instance.GetComponent<Collider2D>(), water.GetComponent<Collider2D>()))
-            {
-                yield return new WaitUntil(() => GameManager.instance.sceneLoad == null);
-                HeroController.instance.transform.position = data.savePos;
-                HeroController.instance.GetComponent<BoxCollider2D>().enabled = false;
-                HeroController.instance.GetComponent<BoxCollider2D>().enabled = true;
-                break;
-            }
-        }
     }
 
     //these are toggleable, as they will prevent glitches from persisting

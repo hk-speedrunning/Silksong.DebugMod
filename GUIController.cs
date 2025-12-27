@@ -51,8 +51,20 @@ public class GUIController : MonoBehaviour
     /// </summary>
     public static bool ForceHideUI()
     {
-        return DebugMod.GM.IsNonGameplayScene()
-            && !DebugMod.GM.IsCinematicScene(); // Show UI in cutscenes
+        // UI can be shown in cutscenes, but not other non-gameplay scenes
+        if (DebugMod.GM.IsNonGameplayScene() && !DebugMod.GM.IsCinematicScene())
+        {
+            return true;
+        }
+
+        // UI can be shown while loading, but it creates a weird visual glitch
+        // where the UI is rendered twice and it looks bad, so disable it
+        if (SaveState.loadingSavestate != null)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public void Awake()
