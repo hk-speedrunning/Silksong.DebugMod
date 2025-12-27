@@ -212,7 +212,7 @@ internal class SaveState
     public void NewLoadStateFromFile(bool loadDuped = false)
     {
         LoadStateFromFile(SaveStateManager.currentStateSlot);
-        LoadTempState(loadDuped);
+        if (IsSet()) LoadTempState(loadDuped);
     }
 
     public void LoadStateFromFile(int paramSlot)
@@ -409,7 +409,7 @@ internal class SaveState
         HeroController.instance.FinishedEnteringScene(true, false);
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
-        
+
 
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
@@ -471,7 +471,7 @@ internal class SaveState
             }
         }
     }
-    
+
     //these are toggleable, as they will prevent glitches from persisting
     private void SaveStateGlitchFixes()
     {
@@ -480,7 +480,7 @@ internal class SaveState
         //float
         HeroController.instance.AffectedByGravity(true);
         rb2d.gravityScale = 0.79f;
-            
+
         //invuln
         HeroController.instance.gameObject.LocateMyFSM("Roar and Wound States").FsmVariables.FindFsmBool("Force Roar Lock").Value = false;
         HeroController.instance.cState.invulnerable = false;
