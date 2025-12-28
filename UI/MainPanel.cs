@@ -2,6 +2,7 @@ using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -203,7 +204,7 @@ public class MainPanel : CanvasPanel
         {
             CanvasText header = AppendSectionHeader(category);
             header.FontSize = KeybindHeaderFontSize;
-            header.Alignment = TextAnchor.MiddleLeft;
+            header.Alignment = TextAlignmentOptions.Left;
 
             foreach (BindAction action in keybindData[category])
             {
@@ -212,10 +213,10 @@ public class MainPanel : CanvasPanel
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
                 keybindName.Text = action.Name;
-                keybindName.Alignment = TextAnchor.MiddleLeft;
+                keybindName.Alignment = TextAlignmentOptions.Left;
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
-                keycode.Alignment = TextAnchor.MiddleLeft;
+                keycode.Alignment = TextAlignmentOptions.Left;
                 keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
@@ -288,7 +289,7 @@ public class MainPanel : CanvasPanel
         text.Text = name;
         text.Font = UICommon.trajanNormal;
         text.FontSize = SectionHeaderFontSize;
-        text.Alignment = TextAnchor.MiddleCenter;
+        text.Alignment = TextAlignmentOptions.Center;
 
         return text;
     }

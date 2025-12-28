@@ -1,6 +1,7 @@
 ﻿using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -38,7 +39,7 @@ public class SaveStatesPanel : CanvasPanel
         quickslot.Horizontal = true;
 
         CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
-        quickslotLabel.Alignment = TextAnchor.MiddleLeft;
+        quickslotLabel.Alignment = TextAlignmentOptions.Left;
         quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
 
         CanvasButton quickslotSave = quickslot.AppendFixed(new CanvasButton("Save"), SaveLoadButtonWidth);
@@ -55,7 +56,7 @@ public class SaveStatesPanel : CanvasPanel
         pageControl.Horizontal = true;
 
         CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(70));
-        pageText.Alignment = TextAnchor.MiddleLeft;
+        pageText.Alignment = TextAlignmentOptions.Left;
         pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
         CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
@@ -76,11 +77,11 @@ public class SaveStatesPanel : CanvasPanel
             fileSlot.Horizontal = true;
 
             CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), 30f);
-            number.Alignment = TextAnchor.MiddleLeft;
+            number.Alignment = TextAlignmentOptions.Left;
             number.Text = $"{index}:";
 
             CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
-            name.Alignment = TextAnchor.MiddleLeft;
+            name.Alignment = TextAlignmentOptions.Left;
             name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 

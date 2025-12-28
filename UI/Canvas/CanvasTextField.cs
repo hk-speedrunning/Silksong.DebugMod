@@ -2,6 +2,7 @@
 using InControl;
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class CanvasTextField : CanvasText
 {
     public static bool AnyFieldFocused { get; private set; }
 
-    private InputField inputField;
+    private TMP_InputField inputField;
 
     public event Action<string> OnSubmit;
 
@@ -24,7 +25,7 @@ public class CanvasTextField : CanvasText
     {
         base.Build();
 
-        inputField = gameObject.AddComponent<InputField>();
+        inputField = gameObject.AddComponent<TMP_InputField>();
         inputField.textComponent = t;
         inputField.transition = Selectable.Transition.None;
         inputField.enabled = false;

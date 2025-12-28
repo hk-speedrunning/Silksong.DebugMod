@@ -1,17 +1,17 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using TMPro;
+using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
 public class CanvasText : CanvasObject
 {
-    protected Text t;
+    protected TMP_Text t;
 
     private string text;
-    private Font font = UICommon.arial;
-    private int fontSize = UICommon.FontSize;
-    private FontStyle fontStyle = FontStyle.Normal;
-    private TextAnchor alignment = TextAnchor.UpperLeft;
+    private TMP_FontAsset font = UICommon.arial;
+    private float fontSize = UICommon.FontSize;
+    private FontStyles fontStyle = FontStyles.Normal;
+    private TextAlignmentOptions alignment = TextAlignmentOptions.TopLeft;
     private Color color = UICommon.textColor;
 
     public string Text
@@ -24,7 +24,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public Font Font
+    public TMP_FontAsset Font
     {
         get => font;
         set
@@ -34,7 +34,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public int FontSize
+    public float FontSize
     {
         get => fontSize;
         set
@@ -44,7 +44,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public FontStyle FontStyle
+    public FontStyles FontStyle
     {
         get => fontStyle;
         set
@@ -54,7 +54,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public TextAnchor Alignment
+    public TextAlignmentOptions Alignment
     {
         get => alignment;
         set
@@ -80,7 +80,7 @@ public class CanvasText : CanvasObject
     {
         base.Build();
 
-        t = gameObject.AddComponent<Text>();
+        t = gameObject.AddComponent<TMP_Text>();
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;

@@ -1,6 +1,7 @@
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -38,7 +39,7 @@ public class EnemiesPanel : CanvasPanel
         panelTitle.Text = "Enemies";
         panelTitle.Font = UICommon.trajanBold;
         panelTitle.FontSize = UICommon.ScaleHeight(30);
-        panelTitle.Alignment = TextAnchor.UpperCenter;
+        panelTitle.Alignment = TextAlignmentOptions.Top;
 
         while (builder.GetCurrentLength() + ListingHeight + UICommon.Margin <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
         {
@@ -52,11 +53,11 @@ public class EnemiesPanel : CanvasPanel
             listingBuilder.Horizontal = true;
 
             CanvasText enemyName = listingBuilder.AppendFlex(new CanvasText("EnemyName"));
-            enemyName.Alignment = TextAnchor.MiddleLeft;
+            enemyName.Alignment = TextAlignmentOptions.Left;
             enemyName.OnUpdate += () => enemyName.Text = enemyPool[index].Name;
 
             CanvasText enemyHp = listingBuilder.AppendFixed(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
-            enemyHp.Alignment = TextAnchor.MiddleLeft;
+            enemyHp.Alignment = TextAlignmentOptions.Left;
             enemyHp.OnUpdate += () => enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
 
             CanvasButton delete = listingBuilder.AppendSquare(new CanvasButton("Delete"));

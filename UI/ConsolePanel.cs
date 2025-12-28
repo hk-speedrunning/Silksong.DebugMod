@@ -83,16 +83,13 @@ public class ConsolePanel : CanvasPanel
 
     private int WrapIndex(string message)
     {
-        int totalLength = 0;
+        float totalLength = 0;
 
         char[] arr = message.ToCharArray();
 
         for (int i = 0; i < arr.Length; i++)
         {
-            char c = arr[i];
-            text.Font.GetCharacterInfo(c, out CharacterInfo characterInfo, text.FontSize);
-            totalLength += characterInfo.advance;
-
+            totalLength += text.Font.glyphLookupTable[arr[i]].metrics.horizontalAdvance;
             if (totalLength >= text.Size.x) return i;
         }
 

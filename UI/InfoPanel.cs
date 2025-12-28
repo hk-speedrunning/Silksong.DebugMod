@@ -1,6 +1,7 @@
 using DebugMod.UI.Canvas;
 using GlobalSettings;
 using System;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -93,14 +94,14 @@ public class InfoPanel : CanvasPanel
         CanvasText labelText = Add(new CanvasText($"Label{counter}"));
         labelText.LocalPosition = new Vector2(x, y);
         labelText.Size = new Vector2(labelWidth, ListingHeight);
-        labelText.Alignment = TextAnchor.MiddleLeft;
+        labelText.Alignment = TextAlignmentOptions.Left;
         labelText.Text = label;
 
         CanvasText infoText = Add(new CanvasText($"Info{counter}"));
         infoText.LocalPosition = new Vector2(x + labelWidth, y);
         infoText.Size = new Vector2(infoWidth, ListingHeight);
         infoText.Font = UICommon.trajanNormal;
-        infoText.Alignment = TextAnchor.MiddleLeft;
+        infoText.Alignment = TextAlignmentOptions.Left;
         infoText.OnUpdate += () => infoText.Text = info();
 
         counter++;

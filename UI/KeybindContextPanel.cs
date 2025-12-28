@@ -1,4 +1,5 @@
 ﻿using DebugMod.UI.Canvas;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -37,13 +38,13 @@ public class KeybindContextPanel : CanvasPanel
         nameText = Add(new CanvasText("BindName"));
         nameText.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
         nameText.Size = new Vector2(PanelWidth, RowHeight);
-        nameText.Alignment = TextAnchor.MiddleCenter;
+        nameText.Alignment = TextAlignmentOptions.Center;
 
         // TODO: replace this with uneditable text field
         keycodeText = Add(new CanvasText("Keycode"));
         keycodeText.LocalPosition = new Vector2(UICommon.Margin, RowHeight + UICommon.Margin * 2);
         keycodeText.Size = new Vector2(KeycodeTextWidth, RowHeight);
-        keycodeText.Alignment = TextAnchor.MiddleLeft;
+        keycodeText.Alignment = TextAlignmentOptions.Left;
 
         CanvasButton editButton = Add(new CanvasButton("Edit"));
         editButton.LocalPosition = new Vector2(KeycodeTextWidth + UICommon.Margin * 2, RowHeight + UICommon.Margin * 2);

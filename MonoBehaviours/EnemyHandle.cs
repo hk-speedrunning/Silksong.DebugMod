@@ -2,6 +2,7 @@
 using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
@@ -84,7 +85,7 @@ public class EnemyHandle : MonoBehaviour
                 CanvasText text = hpBar.Add(new CanvasText("HP"));
                 text.Size = hpBar.Size;
                 text.FontSize = 20;
-                text.Alignment = TextAnchor.MiddleCenter;
+                text.Alignment = TextAlignmentOptions.Center;
 
                 hpBar.Build();
             }

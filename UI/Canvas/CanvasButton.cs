@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -37,7 +38,7 @@ public class CanvasButton : CanvasImage
 
         text = new CanvasText("ButtonText");
         text.Parent = this;
-        text.Alignment = TextAnchor.MiddleCenter;
+        text.Alignment = TextAlignmentOptions.Center;
 
         hoverBorder = new CanvasBorder("HoverBorder");
         hoverBorder.Parent = this;

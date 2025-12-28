@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -38,9 +39,9 @@ public static class UICommon
     public static readonly Texture2D panelStrongBG = SolidColor(strongColor);
     public static readonly Texture2D contextPanelBG = SolidColor(baseColor);
 
-    public static Font trajanBold;
-    public static Font trajanNormal;
-    public static Font arial;
+    public static TMP_FontAsset trajanBold;
+    public static TMP_FontAsset trajanNormal;
+    public static TMP_FontAsset arial;
 
     public static readonly Dictionary<string, Texture2D> images = new();
 
@@ -75,18 +76,18 @@ public static class UICommon
         {
             if (f != null && f.name == "TrajanPro-Bold")
             {
-                trajanBold = f;
+                trajanBold = TMP_FontAsset.CreateFontAsset(f);
             }
 
             if (f != null && f.name == "TrajanPro-Regular")
             {
-                trajanNormal = f;
+                trajanNormal = TMP_FontAsset.CreateFontAsset(f);
             }
 
             //Just in case for some reason the computer doesn't have arial
             if (f != null && f.name == "Perpetua")
             {
-                arial = f;
+                arial = TMP_FontAsset.CreateFontAsset(f);
             }
         }
 
@@ -94,12 +95,12 @@ public static class UICommon
         {
             if (font.ToLower().Contains("arial"))
             {
-                arial = Font.CreateDynamicFontFromOSFont(font, 13);
+                Font f = Font.CreateDynamicFontFromOSFont(font, 13);
+                f.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
+                arial = TMP_FontAsset.CreateFontAsset(f);
                 break;
             }
         }
-
-        arial?.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
 
         if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
 
