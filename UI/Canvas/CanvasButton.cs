@@ -32,7 +32,7 @@ public class CanvasButton : CanvasImage
 
     public CanvasButton(string name) : base(name)
     {
-        SetImage(UICommon.buttonBG);
+        SetImage(UICommon.panelBG);
         AddBorder();
 
         text = new CanvasText("ButtonText");
@@ -84,6 +84,16 @@ public class CanvasButton : CanvasImage
         base.OnUpdatePosition();
     }
 
+    protected override void OnUpdateActive()
+    {
+        if (!ActiveInHierarchy)
+        {
+            hoverBorder?.ActiveSelf = false;
+        }
+
+        base.OnUpdateActive();
+    }
+
     public override void Build()
     {
         // Expand hover border to cover borders of adjacent buttons if it wouldn't already
@@ -125,6 +135,6 @@ public class CanvasButton : CanvasImage
 
     private void UpdateToggled()
     {
-        text?.Color = toggled ? UICommon.blueColor : UICommon.textColor;
+        SetImage(toggled ? UICommon.panelStrongBG : UICommon.panelBG);
     }
 }

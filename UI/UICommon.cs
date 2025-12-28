@@ -35,7 +35,7 @@ public static class UICommon
     public static readonly Color textColor = Color.white;
 
     public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
-    public static readonly Texture2D buttonBG = SolidColor(strongColor);
+    public static readonly Texture2D panelStrongBG = SolidColor(strongColor);
     public static readonly Texture2D contextPanelBG = SolidColor(baseColor);
 
     public static Font trajanBold;

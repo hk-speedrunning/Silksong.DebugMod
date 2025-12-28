@@ -372,6 +372,7 @@ public class MainPanel : CanvasPanel
             button.Border.Sides &= ~BorderSides.BOTTOM;
             button.Text.Text = tab.Name;
             button.OnClicked += () => currentTab = tab.Name;
+            button.OnUpdate += () => button.Toggled = currentTab == tab.Name;
 
             tabX += tabButtonWidth + UICommon.Margin;
         }
