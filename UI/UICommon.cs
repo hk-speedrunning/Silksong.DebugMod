@@ -72,39 +72,23 @@ public static class UICommon
 
     public static void LoadResources()
     {
-        /*
-        foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
+        foreach (TMP_FontAsset f in Resources.FindObjectsOfTypeAll<TMP_FontAsset>())
         {
-            if (f != null && f.name == "TrajanPro-Bold")
+            switch (f.name)
             {
-                trajanBold = TMP_FontAsset.CreateFontAsset(f);
-            }
-
-            if (f != null && f.name == "TrajanPro-Regular")
-            {
-                trajanNormal = TMP_FontAsset.CreateFontAsset(f);
-            }
-
-            //Just in case for some reason the computer doesn't have arial
-            if (f != null && f.name == "Perpetua")
-            {
-                arial = TMP_FontAsset.CreateFontAsset(f);
-            }
-        }
-
-        foreach (string font in Font.GetOSInstalledFontNames())
-        {
-            if (font.ToLower().Contains("arial"))
-            {
-                Font f = Font.CreateDynamicFontFromOSFont(font, 13);
-                f.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
-                arial = TMP_FontAsset.CreateFontAsset(f);
-                break;
+                case "trajan_bold_tmpro" when trajanBold == null:
+                    trajanBold = f;
+                    break;
+                case "perpetua_tmpro" when trajanNormal == null:
+                    trajanNormal = f;
+                    break;
+                case "ARIAL SDF" when arial == null:
+                    arial = f;
+                    break;
             }
         }
 
         if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
-        */
 
         string[] resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
