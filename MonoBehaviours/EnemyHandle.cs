@@ -2,7 +2,7 @@
 using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;

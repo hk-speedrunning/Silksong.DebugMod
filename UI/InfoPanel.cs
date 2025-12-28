@@ -1,7 +1,7 @@
 using DebugMod.UI.Canvas;
 using GlobalSettings;
 using System;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.UI;

@@ -1,5 +1,5 @@
 ﻿using DebugMod.UI.Canvas;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.UI;

@@ -1,11 +1,11 @@
-﻿using TMPro;
+﻿using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
 
 public class CanvasText : CanvasObject
 {
-    protected TMP_Text t;
+    protected TextMeshProUGUI t;
 
     private string text;
     private TMP_FontAsset font = UICommon.arial;
@@ -80,7 +80,7 @@ public class CanvasText : CanvasObject
     {
         base.Build();
 
-        t = gameObject.AddComponent<TMP_Text>();
+        t = gameObject.AddComponent<TextMeshProUGUI>();
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;

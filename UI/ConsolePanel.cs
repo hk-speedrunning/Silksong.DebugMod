@@ -89,7 +89,7 @@ public class ConsolePanel : CanvasPanel
 
         for (int i = 0; i < arr.Length; i++)
         {
-            totalLength += text.Font.glyphLookupTable[arr[i]].metrics.horizontalAdvance;
+            totalLength += text.Font.characterDictionary[arr[i]].xAdvance;
             if (totalLength >= text.Size.x) return i;
         }
 

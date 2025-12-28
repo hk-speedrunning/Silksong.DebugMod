@@ -2,7 +2,7 @@ using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.UI;

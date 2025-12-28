@@ -1,7 +1,7 @@
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
 using System.Collections.Generic;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using TMPro;
+using TMProOld;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -72,6 +72,7 @@ public static class UICommon
 
     public static void LoadResources()
     {
+        /*
         foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
         {
             if (f != null && f.name == "TrajanPro-Bold")
@@ -103,6 +104,7 @@ public static class UICommon
         }
 
         if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
+        */
 
         string[] resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
