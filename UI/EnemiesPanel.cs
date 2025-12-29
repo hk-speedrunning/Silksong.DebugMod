@@ -64,7 +64,7 @@ public class EnemiesPanel : CanvasPanel
             listingBuilder.AppendPadding(UICommon.Margin);
 
             CanvasButton clone = listingBuilder.AppendSquare(new CanvasButton("Clone"));
-            clone.ImageOnly(UICommon.images["ButtonPlus"]);
+            clone.ImageOnly(UICommon.images["IconPlus"]);
             clone.OnClicked += () =>
             {
                 EnemyHandle handle = enemyPool[index];

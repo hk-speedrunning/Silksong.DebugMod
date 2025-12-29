@@ -62,9 +62,9 @@ public class SaveStatesPanel : CanvasPanel
             quickslot.AppendPadding(UICommon.Margin);
 
             CanvasButton toggleViewButton = quickslot.AppendSquare(new CanvasButton("ToggleView"));
-            toggleViewButton.ImageOnly(UICommon.images["ButtonPlus"]);
+            toggleViewButton.ImageOnly(UICommon.images["IconPlus"]);
             toggleViewButton.OnUpdate += () => toggleViewButton.SetImage(
-                ShouldBeExpanded ? UICommon.images["ButtonDel"] : UICommon.images["ButtonPlus"]);
+                ShouldBeExpanded ? UICommon.images["IconMinus"] : UICommon.images["IconPlus"]);
             toggleViewButton.OnClicked += ToggleView;
         }
 
@@ -94,13 +94,13 @@ public class SaveStatesPanel : CanvasPanel
             pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
             CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
-            prevPage.ImageOnly(UICommon.images["ButtonDel"]);
+            prevPage.ImageOnly(UICommon.images["IconMinus"]);
             prevPage.OnClicked += PrevPage;
 
             pageControl.AppendPadding(UICommon.Margin);
 
             CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
-            nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
+            nextPage.ImageOnly(UICommon.images["IconPlus"]);
             nextPage.OnClicked += NextPage;
 
             CanvasText currentOperation = pageControl.AppendFlex(new CanvasText("CurrentOperation"));
@@ -115,7 +115,7 @@ public class SaveStatesPanel : CanvasPanel
             using PanelBuilder fileSlot = new(builder.AppendFixed(new CanvasPanel(index.ToString()), UICommon.ControlHeight));
             fileSlot.Horizontal = true;
 
-            CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), 30f);
+            CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), UICommon.ScaleWidth(30));
             number.Alignment = TextAnchor.MiddleLeft;
             number.Text = index.ToString();
             number.OnUpdate += () => number.Color = InSelectState ? UICommon.yellowColor : UICommon.textColor;
