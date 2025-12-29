@@ -96,8 +96,9 @@ public class InfoPanel : CanvasPanel
         labelText.Alignment = TextAnchor.MiddleLeft;
         labelText.Text = label;
 
+        // Info text is offset slightly downward so the different fonts (approximately) line up
         CanvasText infoText = Add(new CanvasText($"Info{counter}"));
-        infoText.LocalPosition = new Vector2(x + labelWidth, y);
+        infoText.LocalPosition = new Vector2(x + labelWidth, y + UICommon.FontSize / 4f);
         infoText.Size = new Vector2(infoWidth, ListingHeight);
         infoText.Font = UICommon.trajanNormal;
         infoText.Alignment = TextAnchor.MiddleLeft;
