@@ -220,7 +220,7 @@ public class MainPanel : CanvasPanel
                 keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
-                edit.ImageOnly(UICommon.images["Scrollbar_point"]);
+                edit.ImageOnly(UICommon.images["IconDot"]);
                 edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
 
                 CanvasButton clear = builder.AppendSquare(new CanvasButton("Clear"));
@@ -313,9 +313,20 @@ public class MainPanel : CanvasPanel
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
             CanvasButton keybindButton = row.AppendSquare(new CanvasButton($"{name}Keybind"));
-            keybindButton.SetImage(UICommon.images["Scrollbar_point"]);
+            keybindButton.SetImage(UICommon.images["IconDotOutline"]);
             keybindButton.RemoveText();
             keybindButton.Border.Sides &= ~BorderSides.LEFT;
+            keybindButton.OnUpdate += () =>
+            {
+                if (DebugMod.settings.binds.ContainsKey(action.Name) && DebugMod.settings.binds[action.Name] != KeyCode.None)
+                {
+                    keybindButton.SetImage(UICommon.images["IconDot"]);
+                }
+                else
+                {
+                    keybindButton.SetImage(UICommon.images["IconDotOutline"]);
+                }
+            };
             keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
         }
 

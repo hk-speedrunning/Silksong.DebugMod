@@ -30,25 +30,26 @@ public class InfoPanel : CanvasPanel
 
         x = UICommon.Margin;
         y = UICommon.Margin;
-        labelWidth = 140f;
-        infoWidth = 150f;
+        labelWidth = UICommon.ScaleWidth(140);
+        infoWidth = UICommon.ScaleHeight(150);
+        int sectionBreak = UICommon.ScaleHeight(15);
 
         AppendInfo("Scene Name", DebugMod.GetSceneName);
         AppendInfo("Position", GetHeroPos);
         AppendInfo("Velocity", () => HeroController.instance.current_velocity);
 
-        y += 15f;
+        y += sectionBreak;
 
         AppendInfo("Move Vector", () => DebugMod.IH.inputActions.MoveVector.Vector);
         AppendInfo("Hero State", () => HeroController.instance.hero_state);
         AppendInfo("Damage State", () => HeroController.instance.damageMode);
 
-        y += 15f;
+        y += sectionBreak;
 
         AppendInfo("Health", () => $"{PlayerData.instance.health}/{PlayerData.instance.maxHealth}");
         AppendInfo("Silk", () => $"{PlayerData.instance.silk}/{PlayerData.instance.CurrentSilkMaxBasic}");
 
-        y += 15f;
+        y += sectionBreak;
 
         AppendInfo("Needle Base", () => PlayerData.instance.nailDamage);
         AppendInfo("Last Damage", () => DebugMod.lastHit != null ?
@@ -56,7 +57,7 @@ public class InfoPanel : CanvasPanel
         AppendInfo("Last Type", () => DebugMod.lastHit?.AttackType.ToString() ?? "None");
         AppendInfo("Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "None");
 
-        y += 15f;
+        y += sectionBreak;
 
         AppendInfo("Completion", () => $"{PlayerData.instance.completionPercentage}%");
         AppendInfo("Fleas", () => $"{Gameplay.FleasCollectedCount} / 30");
@@ -64,6 +65,7 @@ public class InfoPanel : CanvasPanel
 
         x += labelWidth + infoWidth;
         y = UICommon.Margin;
+        sectionBreak = UICommon.ScaleHeight(30);
 
         AppendInfo("Dashing", () => HeroController.instance.cState.dashing);
         AppendInfo("Sprinting", () => HeroController.instance.cState.isSprinting);
@@ -74,12 +76,12 @@ public class InfoPanel : CanvasPanel
         AppendInfo("Swimming", () => HeroController.instance.cState.swimming);
         AppendInfo("Recoiling", () => HeroController.instance.cState.recoiling);
 
-        y += 30f;
+        y += sectionBreak;
 
         AppendInfo("Invulnerable", () => HeroController.instance.cState.Invulnerable);
         AppendInfo("Invincible", () => PlayerData.instance.isInvincible);
 
-        y += 30f;
+        y += sectionBreak;
 
         AppendInfo("Attacking", () => HeroController.instance.cState.attacking);
         AppendInfo("Can Cast", () => HeroController.instance.CanCast());
