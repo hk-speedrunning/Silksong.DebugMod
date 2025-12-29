@@ -22,6 +22,8 @@ public class Settings
 
     public bool SaveStatePanelVisible = true;
 
+    public bool SaveStatePanelExpanded = false;
+
     public bool NumPadForSaveStates = false;
 
     public int ShowHitBoxes;

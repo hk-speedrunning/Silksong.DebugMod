@@ -13,15 +13,9 @@ public class SaveStatesPanel : CanvasPanel
     public static SaveStatesPanel Instance { get; private set; }
 
     public static bool ShouldBeVisible => DebugMod.settings.SaveStatePanelVisible || InSelectState;
-    public static bool InSelectState => Instance?.selectStateOperation != SelectOperation.None;
+    public static bool ShouldBeExpanded => DebugMod.settings.SaveStatePanelExpanded || InSelectState;
+    public static bool InSelectState => Instance != null && Instance.selectStateOperation != SelectOperation.None;
 
-    private readonly CanvasPanel collapsed;
-    private readonly CanvasPanel expanded;
-    private readonly CanvasImage collapsedBackground;
-    private readonly CanvasImage expandedBackground;
-    private readonly CanvasButton toggleViewButton;
-
-    private bool isExpanded;
     private SelectOperation selectStateOperation;
     private int currentPage;
 
@@ -36,10 +30,10 @@ public class SaveStatesPanel : CanvasPanel
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
 
-        expandedBackground = UICommon.AddBackground(this);
-        expandedBackground.ActiveSelf = false;
+        CanvasImage expandedBackground = UICommon.AddBackground(this);
+        OnUpdate += () => expandedBackground.ActiveSelf = ShouldBeExpanded;
 
-        collapsed = Add(new CanvasPanel("Collapsed"));
+        CanvasPanel collapsed = Add(new CanvasPanel("Collapsed"));
         collapsed.Size = Size;
         collapsed.CollapseMode = CollapseMode.Deny;
 
@@ -67,18 +61,22 @@ public class SaveStatesPanel : CanvasPanel
 
             quickslot.AppendPadding(UICommon.Margin);
 
-            toggleViewButton = quickslot.AppendSquare(new CanvasButton("ToggleView"));
+            CanvasButton toggleViewButton = quickslot.AppendSquare(new CanvasButton("ToggleView"));
             toggleViewButton.ImageOnly(UICommon.images["ButtonPlus"]);
+            toggleViewButton.OnUpdate += () => toggleViewButton.SetImage(
+                ShouldBeExpanded ? UICommon.images["ButtonDel"] : UICommon.images["ButtonPlus"]);
             toggleViewButton.OnClicked += ToggleView;
         }
 
         builder.Build();
-        collapsedBackground = UICommon.AddBackground(collapsed);
 
-        expanded = Add(new CanvasPanel("Expanded"));
+        CanvasImage collapsedBackground = UICommon.AddBackground(collapsed);
+        OnUpdate += () => collapsedBackground.ActiveSelf = !ShouldBeExpanded;
+
+        CanvasPanel expanded = Add(new CanvasPanel("Expanded"));
         expanded.Size = Size;
-        expanded.ActiveSelf = false;
         expanded.CollapseMode = CollapseMode.Deny;
+        OnUpdate += () => expanded.ActiveSelf = ShouldBeExpanded;
 
         builder = new(expanded);
         builder.DynamicLength = true;
@@ -120,7 +118,7 @@ public class SaveStatesPanel : CanvasPanel
             CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), 30f);
             number.Alignment = TextAnchor.MiddleLeft;
             number.Text = index.ToString();
-            number.OnUpdate += () => number.Color = selectStateOperation == SelectOperation.None ? UICommon.textColor : UICommon.yellowColor;
+            number.OnUpdate += () => number.Color = InSelectState ? UICommon.yellowColor : UICommon.textColor;
 
             CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
             name.Alignment = TextAnchor.MiddleLeft;
@@ -177,6 +175,19 @@ public class SaveStatesPanel : CanvasPanel
         base.Update();
     }
 
+    public void ToggleView()
+    {
+        if (InSelectState)
+        {
+            DebugMod.settings.SaveStatePanelExpanded = false;
+            selectStateOperation = SelectOperation.None;
+        }
+        else
+        {
+            DebugMod.settings.SaveStatePanelExpanded = !DebugMod.settings.SaveStatePanelExpanded;
+        }
+    }
+
     private void DoSelectOperation(int index)
     {
         switch (selectStateOperation)
@@ -227,18 +238,11 @@ public class SaveStatesPanel : CanvasPanel
         if (selectStateOperation == operation)
         {
             selectStateOperation = SelectOperation.None;
-            return;
         }
-
-        selectStateOperation = operation;
-    }
-
-    private void ToggleView()
-    {
-        isExpanded = !isExpanded;
-        expanded.ActiveSelf = expandedBackground.ActiveSelf = isExpanded;
-        collapsedBackground.ActiveSelf = !isExpanded;
-        toggleViewButton.SetImage(isExpanded ? UICommon.images["ButtonDel"] : UICommon.images["ButtonPlus"]);
+        else
+        {
+            selectStateOperation = operation;
+        }
     }
 }
 

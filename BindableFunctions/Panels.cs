@@ -1,4 +1,6 @@
-﻿namespace DebugMod;
+﻿using DebugMod.UI;
+
+namespace DebugMod;
 
 public static partial class BindableFunctions
 {
@@ -49,6 +51,12 @@ public static partial class BindableFunctions
     public static void ToggleSaveStatePanel()
     {
         DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
+    }
+
+    [BindableMethod(name = "Expand/Collapse Savestates", category = "Mod UI")]
+    public static void ToggleExpandedSaveStatePanel()
+    {
+        SaveStatesPanel.Instance.ToggleView();
     }
 
     [BindableMethod(name = "Toggle Cursor", category = "Mod UI")]

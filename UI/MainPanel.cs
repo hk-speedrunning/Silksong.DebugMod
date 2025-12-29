@@ -127,8 +127,9 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Toggle Console Panel", BindableFunctions.ToggleConsolePanel);
         AppendRow(1, 1);
         AppendBasicControl("Toggle Savestates Panel", BindableFunctions.ToggleSaveStatePanel);
+        AppendBasicControl("Expand/Collapse Savestates", BindableFunctions.ToggleExpandedSaveStatePanel);
+        AppendRow(1, 1);
         AppendBasicControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
-        AppendRow(1);
         AppendBasicControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
 
         AppendSectionHeader("Misc");
