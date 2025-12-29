@@ -220,7 +220,7 @@ public class MainPanel : CanvasPanel
                 keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
-                edit.ImageOnly(UICommon.images["IconDot"]);
+                edit.ImageOnly(UICommon.images["IconDotCircled"]);
                 edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
 
                 builder.AppendPadding(UICommon.Margin);
