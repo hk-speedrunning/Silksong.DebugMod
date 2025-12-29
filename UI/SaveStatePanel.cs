@@ -34,7 +34,7 @@ public class SaveStatesPanel : CanvasPanel
     public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
-        Size = new Vector2(UICommon.SaveStatePanelWidth, UICommon.SaveStatePanelHeight);
+        Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
 
         expandedBackground = UICommon.AddBackground(this);
         expandedBackground.ActiveSelf = false;
@@ -81,6 +81,7 @@ public class SaveStatesPanel : CanvasPanel
         expanded.CollapseMode = CollapseMode.Deny;
 
         builder = new(expanded);
+        builder.DynamicLength = true;
         builder.Padding = UICommon.Margin;
 
         // Positions builder at the bottom of the collapsed elements
@@ -103,18 +104,23 @@ public class SaveStatesPanel : CanvasPanel
             CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
             nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
             nextPage.OnClicked += NextPage;
+
+            CanvasText currentOperation = pageControl.AppendFlex(new CanvasText("CurrentOperation"));
+            currentOperation.Alignment = TextAnchor.MiddleRight;
+            currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
         }
 
         for (int i = 0; i < SaveStateManager.STATES_PER_PAGE; i++)
         {
-            int index = i; // lambda capturing reasons
+            int index = i; // Need immutable variable to capture in lambda functions
 
-            using PanelBuilder fileSlot = new(builder.AppendFixed(new CanvasPanel(i.ToString()), UICommon.ControlHeight));
+            using PanelBuilder fileSlot = new(builder.AppendFixed(new CanvasPanel(index.ToString()), UICommon.ControlHeight));
             fileSlot.Horizontal = true;
 
             CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), 30f);
             number.Alignment = TextAnchor.MiddleLeft;
-            number.Text = $"{index}:";
+            number.Text = index.ToString();
+            number.OnUpdate += () => number.Color = selectStateOperation == SelectOperation.None ? UICommon.textColor : UICommon.yellowColor;
 
             CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
             name.Alignment = TextAnchor.MiddleLeft;
@@ -138,20 +144,18 @@ public class SaveStatesPanel : CanvasPanel
             write.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
         }
 
-        CanvasText currentOperation = builder.AppendFixed(new CanvasText("CurrentOperation"), UICommon.ScaleWidth(15));
-        currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
-
         builder.Build();
+        Size = expanded.Size;
     }
 
     private static string PrettyPrintSelectOperation(SelectOperation operation)
     {
         return operation switch
         {
-            SelectOperation.QuickslotToFile => "Saving quickslot to file slot",
-            SelectOperation.FileToQuickslot => "Loading file slot to quickslot",
-            SelectOperation.SaveToFile => "Saving to file slot",
-            SelectOperation.LoadFromFile => "Loading from file slot",
+            SelectOperation.QuickslotToFile => "Writing quickslot to file slot",
+            SelectOperation.FileToQuickslot => "Reading file slot to quickslot",
+            SelectOperation.SaveToFile => "Saving directly to file slot",
+            SelectOperation.LoadFromFile => "Loading directly from file slot",
             _ => null
         };
     }

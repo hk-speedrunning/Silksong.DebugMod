@@ -9,7 +9,6 @@ namespace DebugMod.UI;
 public class EnemiesPanel : CanvasPanel
 {
     public static int ListingHeight => UICommon.ScaleHeight(15);
-    public static int ButtonWidth => UICommon.ScaleWidth(100);
 
     public static EnemiesPanel Instance { get; private set; }
     public static readonly List<EnemyHandle> enemyPool = [];
@@ -33,12 +32,6 @@ public class EnemiesPanel : CanvasPanel
 
         using PanelBuilder builder = new(this);
         builder.Padding = UICommon.Margin;
-
-        CanvasText panelTitle = builder.AppendFixed(new CanvasText("PanelTitle"), UICommon.ScaleHeight(30));
-        panelTitle.Text = "Enemies";
-        panelTitle.Font = UICommon.trajanBold;
-        panelTitle.FontSize = UICommon.ScaleHeight(30);
-        panelTitle.Alignment = TextAnchor.UpperCenter;
 
         while (builder.GetCurrentLength() + ListingHeight + UICommon.Margin <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
         {
@@ -91,12 +84,34 @@ public class EnemiesPanel : CanvasPanel
             };
         }
 
-        CanvasText overflow = builder.AppendFixed(new CanvasText("Overflow"), ListingHeight);
-        overflow.OnUpdate += () => overflow.Text = enemyPool.Count > listings.Count ? $"... and {enemyPool.Count - listings.Count} more" : "";
+        CanvasPanel footer = Add(new CanvasPanel("Footer"));
+        footer.LocalPosition = new Vector2(UICommon.Margin, Size.y - UICommon.Margin - UICommon.ControlHeight);
+        footer.Size = new Vector2(Size.x - UICommon.Margin * 2, UICommon.ControlHeight);
 
-        CanvasButton hpBarsButton = Add(new CanvasButton("HPBars"));
-        hpBarsButton.LocalPosition = new Vector2(Size.x - UICommon.Margin - ButtonWidth, Size.y - UICommon.Margin - UICommon.ControlHeight);
-        hpBarsButton.Size = new Vector2(ButtonWidth, UICommon.ControlHeight);
+        using PanelBuilder footerBuilder = new(footer);
+        footerBuilder.Horizontal = true;
+
+        footerBuilder.AppendPadding(UICommon.Margin);
+
+        CanvasText overflow = footerBuilder.AppendFlex(new CanvasText("Overflow"));
+        overflow.Alignment = TextAnchor.MiddleLeft;
+        overflow.OnUpdate += () =>
+        {
+            if (enemyPool.Count == 0)
+            {
+                overflow.Text = "No enemies detected";
+            }
+            else if (enemyPool.Count > listings.Count)
+            {
+                overflow.Text = $"... and {enemyPool.Count - listings.Count} more";
+            }
+            else
+            {
+                overflow.Text = "";
+            }
+        };
+
+        CanvasButton hpBarsButton = footerBuilder.AppendFixed(new CanvasButton("HPBars"), UICommon.ScaleWidth(100));
         hpBarsButton.Text.Text = "HP Bars";
         hpBarsButton.OnClicked += () =>
         {

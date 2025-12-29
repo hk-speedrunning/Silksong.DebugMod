@@ -20,17 +20,17 @@ public static class UICommon
     public static int ConsoleHeight => ScaleHeight(250);
     public static int InfoPanelHeight => ScaleHeight(400);
     public static int SaveStatePanelWidth => ScaleWidth(500);
-    public static int SaveStatePanelHeight => ScaleHeight(400);
     public static int Margin => ScaleHeight(6);
     public static int ScreenMargin => ScaleHeight(10);
     public static int ControlHeight => ScaleHeight(25);
     public static int FontSize => ScaleHeight(13);
 
-    // Catppuccin Mocha
+    // Catppuccin Mocha: https://catppuccin.com/palette
     public static readonly Color baseColor = RGB(36, 39, 58);
     public static readonly Color strongColor = RGB(54, 58, 79);
     public static readonly Color borderColor = RGB(205, 214, 244);
     public static readonly Color blueColor = RGB(137, 180, 250);
+    public static readonly Color yellowColor = RGB(249, 226, 175);
 
     public static readonly Color textColor = Color.white;
 
