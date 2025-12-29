@@ -126,7 +126,7 @@ public class SaveStatesPanel : CanvasPanel
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 
             CanvasButton rename = fileSlot.AppendSquare(new CanvasButton("Rename"));
-            rename.ImageOnly(UICommon.images["ButtonRun"]);
+            rename.ImageOnly(UICommon.images["IconRun"]);
             rename.OnClicked += () => name.Activate();
 
             fileSlot.AppendPadding(UICommon.Margin);

@@ -8,7 +8,7 @@ namespace DebugMod.UI;
 
 public class EnemiesPanel : CanvasPanel
 {
-    public static int ListingHeight => UICommon.ScaleHeight(15);
+    public static int ListingHeight => UICommon.ScaleHeight(16);
 
     public static EnemiesPanel Instance { get; private set; }
     public static readonly List<EnemyHandle> enemyPool = [];
@@ -53,7 +53,7 @@ public class EnemiesPanel : CanvasPanel
             enemyHp.OnUpdate += () => enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
 
             CanvasButton delete = listingBuilder.AppendSquare(new CanvasButton("Delete"));
-            delete.ImageOnly(UICommon.images["ButtonDel"]);
+            delete.ImageOnly(UICommon.images["IconX"]);
             delete.OnClicked += () =>
             {
                 EnemyHandle handle = enemyPool[index];
@@ -75,7 +75,7 @@ public class EnemiesPanel : CanvasPanel
             listingBuilder.AppendPadding(UICommon.Margin);
 
             CanvasButton infHealth = listingBuilder.AppendSquare(new CanvasButton("InfiniteHealth"));
-            infHealth.ImageOnly(UICommon.images["ButtonInf"]);
+            infHealth.ImageOnly(UICommon.images["IconShield"]);
             infHealth.OnClicked += () =>
             {
                 EnemyHandle handle = enemyPool[index];

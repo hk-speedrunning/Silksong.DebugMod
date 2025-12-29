@@ -14,7 +14,7 @@ public class MainPanel : CanvasPanel
     public static int SectionHeaderFontSize => UICommon.ScaleHeight(30);
     public static int SectionHeaderHeight => UICommon.ScaleHeight(30);
     public static int KeybindHeaderFontSize => UICommon.ScaleHeight(20);
-    public static int KeybindListingHeight => UICommon.ScaleHeight(15);
+    public static int KeybindListingHeight => UICommon.ScaleHeight(16);
 
     public static MainPanel Instance { get; private set; }
 
@@ -223,12 +223,16 @@ public class MainPanel : CanvasPanel
                 edit.ImageOnly(UICommon.images["IconDot"]);
                 edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
 
+                builder.AppendPadding(UICommon.Margin);
+
                 CanvasButton clear = builder.AppendSquare(new CanvasButton("Clear"));
-                clear.ImageOnly(UICommon.images["ButtonDel"]);
+                clear.ImageOnly(UICommon.images["IconX"]);
                 clear.OnClicked += () => DebugMod.settings.binds.Remove(action.Name);
 
+                builder.AppendPadding(UICommon.Margin);
+
                 CanvasButton run = builder.AppendSquare(new CanvasButton("Run"));
-                run.ImageOnly(UICommon.images["ButtonRun"]);
+                run.ImageOnly(UICommon.images["IconRun"]);
                 run.OnClicked += action.Action;
             }
         }

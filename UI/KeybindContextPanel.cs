@@ -54,7 +54,7 @@ public class KeybindContextPanel : CanvasPanel
         CanvasButton clearButton = Add(new CanvasButton("Clear"));
         clearButton.LocalPosition = new Vector2(KeycodeTextWidth + RowHeight + UICommon.Margin * 3, RowHeight + UICommon.Margin * 2);
         clearButton.Size = new Vector2(RowHeight, RowHeight);
-        clearButton.ImageOnly(UICommon.images["ButtonDel"]);
+        clearButton.ImageOnly(UICommon.images["IconX"]);
         clearButton.OnClicked += () => DebugMod.settings.binds.Remove(bindAction.Name);
     }
 
