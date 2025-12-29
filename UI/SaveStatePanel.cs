@@ -7,13 +7,21 @@ namespace DebugMod.UI;
 
 public class SaveStatesPanel : CanvasPanel
 {
-    public static int SaveLoadButtonWidth => UICommon.ScaleWidth(60);
+    public static int QuickSlotButtonWidth => UICommon.ScaleWidth(80);
+    public static int FileSlotButtonWidth => UICommon.ScaleWidth(60);
 
     public static SaveStatesPanel Instance { get; private set; }
 
     public static bool ShouldBeVisible => DebugMod.settings.SaveStatePanelVisible || InSelectState;
     public static bool InSelectState => Instance?.selectStateOperation != SelectOperation.None;
 
+    private readonly CanvasPanel collapsed;
+    private readonly CanvasPanel expanded;
+    private readonly CanvasImage collapsedBackground;
+    private readonly CanvasImage expandedBackground;
+    private readonly CanvasButton toggleViewButton;
+
+    private bool isExpanded;
     private SelectOperation selectStateOperation;
     private int currentPage;
 
@@ -28,45 +36,74 @@ public class SaveStatesPanel : CanvasPanel
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, UICommon.SaveStatePanelHeight);
 
-        UICommon.AddBackground(this);
+        expandedBackground = UICommon.AddBackground(this);
+        expandedBackground.ActiveSelf = false;
 
-        using PanelBuilder builder = new(this);
+        collapsed = Add(new CanvasPanel("Collapsed"));
+        collapsed.Size = Size;
+        collapsed.CollapseMode = CollapseMode.Deny;
+
+        PanelBuilder builder = new(collapsed);
         builder.DynamicLength = true;
         builder.Padding = UICommon.Margin;
 
-        using PanelBuilder quickslot = new(builder.AppendFixed(new CanvasPanel("Quickslot"), UICommon.ControlHeight));
-        quickslot.Horizontal = true;
+        {
+            using PanelBuilder quickslot = new(builder.AppendFixed(new CanvasPanel("Quickslot"), UICommon.ControlHeight));
+            quickslot.Horizontal = true;
 
-        CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
-        quickslotLabel.Alignment = TextAnchor.MiddleLeft;
-        quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
+            CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
+            quickslotLabel.Alignment = TextAnchor.MiddleLeft;
+            quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
 
-        CanvasButton quickslotSave = quickslot.AppendFixed(new CanvasButton("Save"), SaveLoadButtonWidth);
-        quickslotSave.Text.Text = "Save";
-        quickslotSave.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
+            CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth);
+            save.Text.Text = "Save";
+            save.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
 
-        quickslot.AppendPadding(UICommon.Margin);
+            quickslot.AppendPadding(UICommon.Margin);
 
-        CanvasButton quickslotLoad = quickslot.AppendFixed(new CanvasButton("Load"), SaveLoadButtonWidth);
-        quickslotLoad.Text.Text = "Load";
-        quickslotLoad.OnClicked += () => SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth);
+            load.Text.Text = "Load";
+            load.OnClicked += () => SaveStateManager.LoadState(SaveStateManager.GetQuickState());
 
-        using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
-        pageControl.Horizontal = true;
+            quickslot.AppendPadding(UICommon.Margin);
 
-        CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(70));
-        pageText.Alignment = TextAnchor.MiddleLeft;
-        pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
+            toggleViewButton = quickslot.AppendSquare(new CanvasButton("ToggleView"));
+            toggleViewButton.ImageOnly(UICommon.images["ButtonPlus"]);
+            toggleViewButton.OnClicked += ToggleView;
+        }
 
-        CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
-        prevPage.ImageOnly(UICommon.images["ButtonDel"]);
-        prevPage.OnClicked += PrevPage;
+        builder.Build();
+        collapsedBackground = UICommon.AddBackground(collapsed);
 
-        pageControl.AppendPadding(UICommon.Margin);
+        expanded = Add(new CanvasPanel("Expanded"));
+        expanded.Size = Size;
+        expanded.ActiveSelf = false;
+        expanded.CollapseMode = CollapseMode.Deny;
 
-        CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
-        nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
-        nextPage.OnClicked += NextPage;
+        builder = new(expanded);
+        builder.Padding = UICommon.Margin;
+
+        // Positions builder at the bottom of the collapsed elements
+        builder.AppendPadding(collapsed.Size.y - builder.Padding * 2);
+
+        {
+            using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
+            pageControl.Horizontal = true;
+
+            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(70));
+            pageText.Alignment = TextAnchor.MiddleLeft;
+            pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
+
+            CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
+            prevPage.ImageOnly(UICommon.images["ButtonDel"]);
+            prevPage.OnClicked += PrevPage;
+
+            pageControl.AppendPadding(UICommon.Margin);
+
+            CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
+            nextPage.ImageOnly(UICommon.images["ButtonPlus"]);
+            nextPage.OnClicked += NextPage;
+        }
 
         for (int i = 0; i < SaveStateManager.STATES_PER_PAGE; i++)
         {
@@ -90,19 +127,21 @@ public class SaveStatesPanel : CanvasPanel
 
             fileSlot.AppendPadding(UICommon.Margin);
 
-            CanvasButton save = fileSlot.AppendFixed(new CanvasButton("Save"), SaveLoadButtonWidth);
-            save.Text.Text = "Save";
-            save.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+            CanvasButton read = fileSlot.AppendFixed(new CanvasButton("Read"), FileSlotButtonWidth);
+            read.Text.Text = "Read";
+            read.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
 
             fileSlot.AppendPadding(UICommon.Margin);
 
-            CanvasButton load = fileSlot.AppendFixed(new CanvasButton("Load"), SaveLoadButtonWidth);
-            load.Text.Text = "Load";
-            load.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
+            CanvasButton write = fileSlot.AppendFixed(new CanvasButton("Write"), FileSlotButtonWidth);
+            write.Text.Text = "Write";
+            write.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
         }
 
         CanvasText currentOperation = builder.AppendFixed(new CanvasText("CurrentOperation"), UICommon.ScaleWidth(15));
         currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
+
+        builder.Build();
     }
 
     private static string PrettyPrintSelectOperation(SelectOperation operation)
@@ -188,6 +227,14 @@ public class SaveStatesPanel : CanvasPanel
         }
 
         selectStateOperation = operation;
+    }
+
+    private void ToggleView()
+    {
+        isExpanded = !isExpanded;
+        expanded.ActiveSelf = expandedBackground.ActiveSelf = isExpanded;
+        collapsedBackground.ActiveSelf = !isExpanded;
+        toggleViewButton.SetImage(isExpanded ? UICommon.images["ButtonDel"] : UICommon.images["ButtonPlus"]);
     }
 }
 
