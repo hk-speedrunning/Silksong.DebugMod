@@ -14,6 +14,8 @@ public class Settings
 
     public bool MainPanelVisible = true;
 
+    public string MainPanelCurrentTab;
+
     public bool EnemiesPanelVisible = true;
 
     public bool ConsoleVisible = true;

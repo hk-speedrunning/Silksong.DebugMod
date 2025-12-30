@@ -36,10 +36,9 @@ public class MainPanel : CanvasPanel
     ];
 
     private readonly List<CanvasPanel> tabs = [];
-    private string currentTab;
 
     // Convenience fields for building
-    private PanelBuilder currentBuilder;
+    private PanelBuilder currentTab;
     private PanelBuilder currentRow;
     private int rowCounter;
     private int[] relativeWidths;
@@ -208,7 +207,7 @@ public class MainPanel : CanvasPanel
 
             foreach (BindAction action in keybindData[category])
             {
-                using PanelBuilder builder = new(currentBuilder.AppendFixed(new CanvasPanel(action.Name), KeybindListingHeight));
+                using PanelBuilder builder = new(currentTab.AppendFixed(new CanvasPanel(action.Name), KeybindListingHeight));
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
@@ -263,15 +262,15 @@ public class MainPanel : CanvasPanel
         builder.DynamicLength = true;
         builder.Padding = UICommon.Margin;
 
-        currentBuilder?.Build();
-        currentBuilder = builder;
+        currentTab?.Build();
+        currentTab = builder;
         rowCounter = 0;
         return builder;
     }
 
     private PanelBuilder AppendRow(params int[] widths)
     {
-        CanvasPanel row = currentBuilder.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
+        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
         row.CollapseMode = CollapseMode.AllowNoRenaming;
 
         PanelBuilder builder = new(row);
@@ -287,9 +286,9 @@ public class MainPanel : CanvasPanel
 
     private CanvasText AppendSectionHeader(string name)
     {
-        currentBuilder.AppendPadding(SectionEndPadding);
+        currentTab.AppendPadding(SectionEndPadding);
 
-        CanvasText text = currentBuilder.AppendFixed(new CanvasText(name), SectionHeaderHeight);
+        CanvasText text = currentTab.AppendFixed(new CanvasText(name), SectionHeaderHeight);
         text.Text = name;
         text.Font = UICommon.trajanNormal;
         text.FontSize = SectionHeaderFontSize;
@@ -373,7 +372,7 @@ public class MainPanel : CanvasPanel
     public override void Build()
     {
         currentRow?.Build();
-        currentBuilder?.Build();
+        currentTab?.Build();
 
         float tabButtonWidth = (Size.x - UICommon.Margin * (tabs.Count - 1)) / tabs.Count;
         float tabX = 0;
@@ -387,22 +386,36 @@ public class MainPanel : CanvasPanel
             button.SetImage(UICommon.panelBG);
             button.Border.Sides &= ~BorderSides.BOTTOM;
             button.Text.Text = tab.Name;
-            button.OnClicked += () => currentTab = tab.Name;
-            button.OnUpdate += () => button.Toggled = currentTab == tab.Name;
+            button.OnClicked += () => DebugMod.settings.MainPanelCurrentTab = tab.Name;
+            button.OnUpdate += () => button.Toggled = DebugMod.settings.MainPanelCurrentTab == tab.Name;
 
             tabX += tabButtonWidth + UICommon.Margin;
         }
-
-        currentTab = tabs[0].Name;
 
         base.Build();
     }
 
     public override void Update()
     {
+        bool needsReset = true;
+
         foreach (CanvasPanel tab in tabs)
         {
-            tab.ActiveSelf = currentTab == tab.Name;
+            if (DebugMod.settings.MainPanelCurrentTab == tab.Name)
+            {
+                tab.ActiveSelf = true;
+                needsReset = false;
+            }
+            else
+            {
+                tab.ActiveSelf = false;
+            }
+        }
+
+        if (needsReset)
+        {
+            DebugMod.settings.MainPanelCurrentTab = tabs[0].Name;
+            tabs[0].ActiveSelf = true;
         }
 
         base.Update();
