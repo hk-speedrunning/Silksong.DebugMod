@@ -1,4 +1,5 @@
 ﻿using DebugMod.UI.Canvas;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class ConsolePanel : CanvasPanel
     public static ConsolePanel Instance { get; private set; }
     private static readonly List<string> history = [];
 
-    private readonly CanvasText text;
+    private readonly List<CanvasText> lines = [];
 
     public static void BuildPanel()
     {
@@ -26,24 +27,30 @@ public class ConsolePanel : CanvasPanel
 
         UICommon.AddBackground(this);
 
-        text = Add(new CanvasText("Text"));
-        text.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
-        text.Size = new Vector2(Size.x - UICommon.Margin * 2, Size.y - UICommon.Margin * 2);
+        float lineHeight = (Size.y - UICommon.Margin * 2) / MAX_LINES;
+        for (int i = 0; i < MAX_LINES; i++)
+        {
+            CanvasText line = Add(new CanvasText(i.ToString()));
+            line.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin + lineHeight * i);
+            line.Size = new Vector2(Size.x - UICommon.Margin * 2, lineHeight);
+            lines.Add(line);
+        }
     }
 
     public override void Update()
     {
-        string consoleString = "";
-        int lineCount = 0;
-
-        for (int i = history.Count - 1; i >= 0; i--)
+        int line = 0;
+        for (int i = Math.Max(history.Count - MAX_LINES, 0); i < history.Count; i++)
         {
-            if (lineCount >= MAX_LINES) break;
-            consoleString = history[i] + "\n" + consoleString;
-            lineCount++;
+            lines[line].Text = history[i];
+            line++;
         }
 
-        text.Text = consoleString;
+        while (line < MAX_LINES)
+        {
+            lines[line].Text = "";
+            line++;
+        }
 
         base.Update();
     }
@@ -83,6 +90,7 @@ public class ConsolePanel : CanvasPanel
 
     private int WrapIndex(string message)
     {
+        CanvasText text = lines[0];
         int totalLength = 0;
 
         char[] arr = message.ToCharArray();
