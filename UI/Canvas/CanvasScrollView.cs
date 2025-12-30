@@ -48,7 +48,7 @@ public class CanvasScrollView : CanvasNode
     public void SetScrollPercentage(float percentage)
     {
         percentage = Mathf.Clamp01(percentage);
-        content.LocalPosition = new Vector2(content.LocalPosition.x, -percentage * GetScrollableHeight());
+        content.LocalPosition = new Vector2(content.LocalPosition.x, Mathf.Round(-percentage * GetScrollableHeight()));
     }
 
     public float GetScrollableHeight() => content.Size.y - Size.y;
