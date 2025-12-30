@@ -76,6 +76,22 @@ public class CanvasText : CanvasObject
 
     public CanvasText(string name) : base(name) { }
 
+    protected override void OnUpdatePosition()
+    {
+        // Absolute position needs to be integers or the text looks blurry
+        Vector2 current = new(Position.x + Size.x / 2f, Position.y + Size.y / 2f);
+        Vector2 desired = new(Mathf.Round(current.x), Mathf.Round(current.y));
+
+        if (current != desired)
+        {
+            // Recursively calls base method
+            LocalPosition += desired - current;
+            return;
+        }
+
+        base.OnUpdatePosition();
+    }
+
     public override void Build()
     {
         base.Build();
