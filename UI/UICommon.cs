@@ -33,6 +33,7 @@ public static class UICommon
     public static readonly Color yellowColor = RGB(249, 226, 175);
 
     public static readonly Color textColor = Color.white;
+    public static readonly Color iconColor = MakeGrayscale(borderColor);
 
     public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
     public static readonly Texture2D panelStrongBG = SolidColor(strongColor);
@@ -50,6 +51,12 @@ public static class UICommon
     private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
     private static Color RGBA(int r, int g, int b, int a) => new(r / 255f, g / 255f, b / 255f, a / 255f);
     private static Color WithAlpha(Color color, int a) => color with { a = a / 255f };
+
+    private static Color MakeGrayscale(Color color)
+    {
+        Color.RGBToHSV(color, out _, out _, out float v);
+        return new Color(v, v, v);
+    }
 
     private static Texture2D SolidColor(Color color, int a = 255)
     {

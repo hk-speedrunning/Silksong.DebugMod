@@ -9,6 +9,7 @@ public class SaveStatesPanel : CanvasPanel
 {
     public static int QuickSlotButtonWidth => UICommon.ScaleWidth(80);
     public static int FileSlotButtonWidth => UICommon.ScaleWidth(60);
+    public static int IconPadding => UICommon.ScaleHeight(4);
 
     public static SaveStatesPanel Instance { get; private set; }
 
@@ -61,7 +62,11 @@ public class SaveStatesPanel : CanvasPanel
 
             quickslot.AppendPadding(UICommon.Margin);
 
-            CanvasButton toggleViewButton = quickslot.AppendSquare(new CanvasButton("ToggleView"));
+            CanvasPanel toggleViewWrapper = quickslot.AppendSquare(new CanvasPanel("ToggleViewWrapper"));
+            using PanelBuilder wrapper = new(toggleViewWrapper);
+            wrapper.Padding = IconPadding;
+
+            CanvasButton toggleViewButton = wrapper.AppendFlex(new CanvasButton("ToggleView"));
             toggleViewButton.ImageOnly(UICommon.images["IconPlus"]);
             toggleViewButton.OnUpdate += () => toggleViewButton.SetImage(
                 ShouldBeExpanded ? UICommon.images["IconMinus"] : UICommon.images["IconPlus"]);
@@ -125,7 +130,11 @@ public class SaveStatesPanel : CanvasPanel
             name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 
-            CanvasButton rename = fileSlot.AppendSquare(new CanvasButton("Rename"));
+            CanvasPanel renameWrapper = fileSlot.AppendSquare(new CanvasPanel("RenameWrapper"));
+            using PanelBuilder wrapper = new(renameWrapper);
+            wrapper.Padding = IconPadding;
+
+            CanvasButton rename = wrapper.AppendFlex(new CanvasButton("Rename"));
             rename.ImageOnly(UICommon.images["IconEditText"]);
             rename.OnClicked += () => name.Activate();
 

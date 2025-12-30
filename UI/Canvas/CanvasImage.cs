@@ -79,7 +79,9 @@ public class CanvasImage : CanvasObject
 
     private void UpdateSprite()
     {
-        gameObject.GetComponent<Image>().sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+        Image image = gameObject.GetComponent<Image>();
+        image.sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+        image.color = UICommon.iconColor;
     }
 
     private void UpdateScale()

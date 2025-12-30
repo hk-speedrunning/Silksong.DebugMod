@@ -34,7 +34,12 @@ public class PanelBuilder : IDisposable
             panel.Add(element);
 
             // Set the breadth now since it is unlikely to change later and other code might rely on it
-            float breadth = Breadth() - Padding * 2;
+            float breadth = ChildBreadth();
+            if (type == LengthType.Square)
+            {
+                length = breadth;
+            }
+
             element?.Size = Horizontal ? new Vector2(length, breadth) : new Vector2(breadth, length);
         }
 
@@ -59,7 +64,7 @@ public class PanelBuilder : IDisposable
                     totalFixedLength += entry.length;
                     break;
                 case LengthType.Square:
-                    totalFixedLength += Breadth();
+                    totalFixedLength += ChildBreadth();
                     break;
                 case LengthType.Flex:
                     flexCount++;
@@ -84,7 +89,7 @@ public class PanelBuilder : IDisposable
         {
             float length = entry.type switch
             {
-                LengthType.Square => Breadth(),
+                LengthType.Square => ChildBreadth(),
                 LengthType.Flex => flexLength,
                 _ => entry.length
             };
@@ -93,7 +98,7 @@ public class PanelBuilder : IDisposable
             {
                 float x = Padding;
                 float y = t;
-                float width = Breadth() - Padding * 2;
+                float width = ChildBreadth();
                 float height = length;
                 if (Horizontal) (x, y, width, height) = (y, x, height, width);
 
@@ -122,7 +127,7 @@ public class PanelBuilder : IDisposable
                     length += entry.length;
                     break;
                 case LengthType.Square:
-                    length += Breadth();
+                    length += ChildBreadth();
                     break;
                 case LengthType.Flex:
                     throw new Exception("Current length is meaningless if the panel contains flex elements");
@@ -134,6 +139,7 @@ public class PanelBuilder : IDisposable
 
     public float Length() => Horizontal ? panel.Size.x : panel.Size.y;
     public float Breadth() => Horizontal ? panel.Size.y : panel.Size.x;
+    public float ChildBreadth() => Breadth() - Padding * 2;
 
     public void Dispose()
     {

@@ -322,13 +322,13 @@ public class MainPanel : CanvasPanel
             keybindButton.Border.Sides &= ~BorderSides.LEFT;
             keybindButton.OnUpdate += () =>
             {
-                if (DebugMod.settings.binds.ContainsKey(action.Name) && DebugMod.settings.binds[action.Name] != KeyCode.None)
-                {
-                    keybindButton.SetImage(UICommon.images["IconDot"]);
-                }
-                else
+                if (!DebugMod.settings.binds.ContainsKey(action.Name))
                 {
                     keybindButton.SetImage(UICommon.images["IconDotOutline"]);
+                }
+                else if (DebugMod.settings.binds[action.Name] != KeyCode.None)
+                {
+                    keybindButton.SetImage(UICommon.images["IconDot"]);
                 }
             };
             keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);

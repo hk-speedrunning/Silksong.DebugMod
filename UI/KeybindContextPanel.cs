@@ -6,7 +6,7 @@ namespace DebugMod.UI;
 public class KeybindContextPanel : CanvasPanel
 {
     public static int KeycodeTextWidth => UICommon.ScaleWidth(90);
-    public static int RowHeight => UICommon.ScaleHeight(20);
+    public static int RowHeight => UICommon.ScaleHeight(18);
     public static int PanelWidth => KeycodeTextWidth + RowHeight * 2 + UICommon.Margin * 2;
     public static int PanelHeight => RowHeight * 2 + UICommon.Margin;
 
@@ -106,14 +106,14 @@ public class KeybindContextPanel : CanvasPanel
         bindAction = DebugMod.bindActions[action];
         nameText.Text = bindAction.Name;
 
-        float x = (int)(anchor.Position.x + anchor.Size.x / 2);
+        float x = (int)(anchor.Position.x + anchor.Size.x * 0.8f);
         float xOver = x + Size.x - (Screen.width - UICommon.Margin);
         if (xOver > 0)
         {
             x -= xOver;
         }
 
-        float y = (int)(anchor.Position.y + anchor.Size.y / 2);
+        float y = (int)(anchor.Position.y + anchor.Size.y * 0.8f);
         float yOver = y + Size.y - (Screen.height - UICommon.Margin);
         if (yOver > 0)
         {
