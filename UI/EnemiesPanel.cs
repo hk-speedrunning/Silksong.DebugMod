@@ -31,9 +31,10 @@ public static class EnemiesPanel
 
         for (int i = 1; i <= 14; i++)
         {
-            panel.GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
-            panel.GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
-            panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(i), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
+            int index = i; // Need immutable variable for lambda capturing
+            panel.GetPanel("Pause").AddButton("Del" + i, GUIController.Instance.images["ButtonDel"], new Vector2(20f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => DelClicked(index), new Rect(0, 0, GUIController.Instance.images["ButtonDel"].width, GUIController.Instance.images["ButtonDel"].height));
+            panel.GetPanel("Pause").AddButton("Clone" + i, GUIController.Instance.images["ButtonPlus"], new Vector2(40f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => CloneClicked(index), new Rect(0, 0, GUIController.Instance.images["ButtonPlus"].width, GUIController.Instance.images["ButtonPlus"].height));
+            panel.GetPanel("Pause").AddButton("Inf" + i, GUIController.Instance.images["ButtonInf"], new Vector2(60f, 20f + (i - 1) * 15f), new Vector2(12f, 12f), () => InfClicked(index), new Rect(0, 0, GUIController.Instance.images["ButtonInf"].width, GUIController.Instance.images["ButtonInf"].height));
         }
 
         panel.GetPanel("Pause").AddButton("HP Bars", GUIController.Instance.images["ButtonRect"], new Vector2(30f, 250f), Vector2.zero, HPBarsClicked, new Rect(0, 0, GUIController.Instance.images["ButtonRect"].width, GUIController.Instance.images["ButtonRect"].height), GUIController.Instance.trajanBold, "HP Bars");
@@ -75,7 +76,7 @@ public static class EnemiesPanel
     }
 
     private static void HPBarsClicked() => BindableFunctions.ToggleEnemyHPBars();
-    
+
     public static void Update()
     {
         if (panel == null)
