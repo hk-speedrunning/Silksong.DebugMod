@@ -531,14 +531,7 @@ internal class SaveState
             }
         }
 
-        bool isInfiniteHp = DebugMod.infiniteHP;
-        DebugMod.infiniteHP = false;
-        // PlayerData.instance.hasXunFlower = false;
         PlayerData.instance.health = data.savedPd.health;
-        HeroController.instance.TakeHealth(1);
-        HeroController.instance.AddHealth(1);
-        // PlayerData.instance.hasXunFlower = data.savedPd.hasXunFlower;
-        DebugMod.infiniteHP = isInfiniteHp;
 
         // Resets maggots
         HeroController.instance.ClearEffects();
