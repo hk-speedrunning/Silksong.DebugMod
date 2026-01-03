@@ -51,8 +51,7 @@ public class GUIController : MonoBehaviour
     /// </summary>
     public static bool ForceHideUI()
     {
-        // UI can be shown in cutscenes, but not other non-gameplay scenes
-        if (DebugMod.GM.IsNonGameplayScene() && !DebugMod.GM.IsCinematicScene())
+        if (DebugMod.GM.IsNonGameplayScene())
         {
             return true;
         }
@@ -100,7 +99,7 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
-        if (resolution.width != Screen.currentResolution.width || resolution.height != Screen.currentResolution.height)
+        if (canvas && (resolution.width != Screen.currentResolution.width || resolution.height != Screen.currentResolution.height))
         {
             resolution = Screen.currentResolution;
             BuildMenus();
