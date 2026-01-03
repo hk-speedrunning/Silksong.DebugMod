@@ -247,12 +247,13 @@ public class MainPanel : CanvasPanel
         tabs.Add(tab);
 
         CanvasScrollView scrollView = tab.Add(new CanvasScrollView("ScrollView"));
-        scrollView.Margin = new Vector2(UICommon.BORDER_THICKNESS, UICommon.BORDER_THICKNESS);
-        scrollView.Size = new Vector2(tab.Size.x - UICommon.BORDER_THICKNESS - UICommon.Margin - ScrollbarWidth, tab.Size.y);
+        scrollView.LocalPosition = new Vector2(tab.ContentMargin(), tab.ContentMargin());
+        scrollView.Size = new Vector2(tab.Size.x - tab.ContentMargin() * 2 - UICommon.Margin - ScrollbarWidth,
+            tab.Size.y - tab.ContentMargin() * 2);
 
         CanvasScrollbar scrollbar = tab.Add(new CanvasScrollbar("Scrollbar"));
-        scrollbar.LocalPosition = new Vector2(scrollView.Size.x, UICommon.Margin);
-        scrollbar.Size = new Vector2(ScrollbarWidth, tab.Size.y - UICommon.Margin * 2);
+        scrollbar.LocalPosition = new Vector2(tab.ContentMargin() + scrollView.Size.x, tab.ContentMargin(UICommon.Margin));
+        scrollbar.Size = new Vector2(ScrollbarWidth, tab.Size.y - tab.ContentMargin(UICommon.Margin) * 2);
         scrollbar.ScrollView = scrollView;
 
         CanvasPanel panel = scrollView.SetContent(new CanvasPanel("Panel"));
@@ -290,7 +291,7 @@ public class MainPanel : CanvasPanel
 
         CanvasText text = currentTab.AppendFixed(new CanvasText(name), SectionHeaderHeight);
         text.Text = name;
-        text.Font = UICommon.trajanNormal;
+        text.Font = UICommon.trajanBold;
         text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
 
@@ -305,7 +306,7 @@ public class MainPanel : CanvasPanel
         float singleWidth = (row.Length() - UICommon.Margin * (widthUnits - 1)) / widthUnits;
 
         int units = relativeWidths[rowIndex];
-        float width = singleWidth * units + UICommon.Margin * (units - 1);
+        float width = Mathf.Ceil(singleWidth * units + UICommon.Margin * (units - 1));
         if (DebugMod.bindsByMethod.ContainsKey(effect.Method)) width -= UICommon.ControlHeight;
 
         CanvasButton button = row.AppendFixed(new CanvasButton(name), width);

@@ -13,7 +13,17 @@ public class PanelBuilder : IDisposable
 
     public bool Horizontal { get; set; }
     public bool DynamicLength { get; set; }
-    public float Padding { get; set; }
+    public float OuterPadding { get; set; }
+    public float InnerPadding { get; set; }
+
+    public float Padding
+    {
+        set
+        {
+            OuterPadding = value;
+            InnerPadding = value;
+        }
+    }
 
     public PanelBuilder(CanvasPanel panel)
     {
@@ -53,7 +63,7 @@ public class PanelBuilder : IDisposable
 
     public void Build()
     {
-        float totalFixedLength = Padding * (entries.Count + 1);
+        float totalFixedLength = OuterPadding * 2 + InnerPadding * (entries.Count - 1);
         int flexCount = 0;
 
         foreach (Entry entry in entries)
@@ -83,7 +93,7 @@ public class PanelBuilder : IDisposable
         }
 
         float flexLength = (Length() - totalFixedLength) / flexCount;
-        float t = Padding;
+        float t = OuterPadding;
 
         foreach (Entry entry in entries)
         {
@@ -96,7 +106,7 @@ public class PanelBuilder : IDisposable
 
             if (entry.element != null)
             {
-                float x = Padding;
+                float x = OuterPadding;
                 float y = t;
                 float width = ChildBreadth();
                 float height = length;
@@ -106,8 +116,11 @@ public class PanelBuilder : IDisposable
                 entry.element.Size = new Vector2(width, height);
             }
 
-            t += length + Padding;
+            t += length + InnerPadding;
         }
+
+        t -= InnerPadding;
+        t += OuterPadding;
 
         if (DynamicLength)
         {
@@ -117,7 +130,7 @@ public class PanelBuilder : IDisposable
 
     public float GetCurrentLength()
     {
-        float length = Padding * (entries.Count + 1);
+        float length = OuterPadding * 2 + InnerPadding * (entries.Count - 1);
 
         foreach (Entry entry in entries)
         {
@@ -139,7 +152,7 @@ public class PanelBuilder : IDisposable
 
     public float Length() => Horizontal ? panel.Size.x : panel.Size.y;
     public float Breadth() => Horizontal ? panel.Size.y : panel.Size.x;
-    public float ChildBreadth() => Breadth() - Padding * 2;
+    public float ChildBreadth() => Breadth() - OuterPadding * 2;
 
     public void Dispose()
     {

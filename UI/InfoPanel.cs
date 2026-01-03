@@ -28,8 +28,8 @@ public class InfoPanel : CanvasPanel
         LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ConsoleHeight - UICommon.InfoPanelHeight - UICommon.ScreenMargin * 2);
         Size = new Vector2(UICommon.LeftSideWidth, UICommon.InfoPanelHeight);
 
-        x = UICommon.Margin;
-        y = UICommon.Margin;
+        x = ContentMargin();
+        y = ContentMargin();
         labelWidth = UICommon.ScaleWidth(140);
         infoWidth = UICommon.ScaleHeight(150);
         int sectionBreak = UICommon.ScaleHeight(15);
@@ -64,7 +64,7 @@ public class InfoPanel : CanvasPanel
         AppendInfo("Quest Points", GetQuestPoints);
 
         x += labelWidth + infoWidth;
-        y = UICommon.Margin;
+        y = ContentMargin();
         sectionBreak = UICommon.ScaleHeight(30);
 
         AppendInfo("Dashing", () => HeroController.instance.cState.dashing);

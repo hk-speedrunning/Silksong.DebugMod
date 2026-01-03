@@ -40,7 +40,8 @@ public class SaveStatesPanel : CanvasPanel
 
         PanelBuilder builder = new(collapsed);
         builder.DynamicLength = true;
-        builder.Padding = UICommon.Margin;
+        builder.OuterPadding = ContentMargin(UICommon.Margin);
+        builder.InnerPadding = UICommon.Margin;
 
         {
             using PanelBuilder quickslot = new(builder.AppendFixed(new CanvasPanel("Quickslot"), UICommon.ControlHeight));
@@ -63,6 +64,7 @@ public class SaveStatesPanel : CanvasPanel
             quickslot.AppendPadding(UICommon.Margin);
 
             CanvasPanel toggleViewWrapper = quickslot.AppendSquare(new CanvasPanel("ToggleViewWrapper"));
+            toggleViewWrapper.CollapseMode = CollapseMode.AllowNoRenaming;
             using PanelBuilder wrapper = new(toggleViewWrapper);
             wrapper.Padding = IconPadding;
 
@@ -85,10 +87,11 @@ public class SaveStatesPanel : CanvasPanel
 
         builder = new(expanded);
         builder.DynamicLength = true;
+        builder.OuterPadding = ContentMargin(UICommon.Margin);
         builder.Padding = UICommon.Margin;
 
         // Positions builder at the bottom of the collapsed elements
-        builder.AppendPadding(collapsed.Size.y - builder.Padding * 2);
+        builder.AppendPadding(collapsed.Size.y - builder.OuterPadding * 2);
 
         {
             using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
@@ -131,6 +134,7 @@ public class SaveStatesPanel : CanvasPanel
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 
             CanvasPanel renameWrapper = fileSlot.AppendSquare(new CanvasPanel("RenameWrapper"));
+            renameWrapper.CollapseMode = CollapseMode.AllowNoRenaming;
             using PanelBuilder wrapper = new(renameWrapper);
             wrapper.Padding = IconPadding;
 

@@ -19,9 +19,20 @@ public class CanvasPanel : CanvasNode
         return element;
     }
 
-    public T Get<T>(string name) where T : CanvasNode => elements[name] as T;
+    public T Get<T>(string name) where T : CanvasNode => elements.GetValueOrDefault(name) as T;
 
     public void Remove(string name) => elements.Remove(name);
+
+    public int ContentMargin(int baseMargin = 0)
+    {
+        CanvasImage background = Get<CanvasImage>("Background");
+        if (background != null && background.IsBackground && background.Border != null)
+        {
+            return baseMargin + background.Border.Thickness;
+        }
+
+        return baseMargin;
+    }
 
     public override void Build()
     {

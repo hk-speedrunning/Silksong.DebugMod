@@ -31,7 +31,8 @@ public class EnemiesPanel : CanvasPanel
         UICommon.AddBackground(this);
 
         using PanelBuilder builder = new(this);
-        builder.Padding = UICommon.Margin;
+        builder.OuterPadding = ContentMargin(UICommon.Margin);
+        builder.InnerPadding = UICommon.Margin;
 
         while (builder.GetCurrentLength() + ListingHeight + UICommon.Margin <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
         {
