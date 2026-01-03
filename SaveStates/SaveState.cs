@@ -545,6 +545,9 @@ internal class SaveState
         HudHelper.RefreshMasks();
         HudHelper.RefreshSpool();
 
+        // Spawns tool icons if they weren't already visible
+        EventRegister.SendEvent("LAST HP ADDED");
+
         // Update active crest behind health display
         Object.FindAnyObjectByType<BindOrbHudFrame>().AlreadyAppeared();
     }
