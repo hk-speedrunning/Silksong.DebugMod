@@ -375,8 +375,6 @@ internal class SaveState
             GameManager.instance.cameraCtrl.LockToArea(data.lockArea as CameraLockArea);
         }
 
-        GameManager.instance.FadeSceneIn();
-
         HeroController.instance.CharmUpdate();
 
         // invalidates caches
