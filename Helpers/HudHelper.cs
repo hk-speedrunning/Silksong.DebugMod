@@ -62,5 +62,7 @@ public static class HudHelper
 
         // Loading save states breaks this FSM for some reason
         fleaEgg.GetComponent<SpriteRenderer>().enabled = ToolItemManager.GetToolByName("Flea Charm").IsEquippedHud;
+
+        HeroController.instance.hasSilkSpoolAppeared = true;
     }
 }

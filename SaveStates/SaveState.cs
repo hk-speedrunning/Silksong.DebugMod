@@ -333,8 +333,6 @@ public class SaveState
             GameManager.instance.cameraCtrl.LockToArea(data.lockArea as CameraLockArea);
         }
 
-        GameManager.instance.FadeSceneIn();
-
         HeroController.instance.CharmUpdate();
 
         // invalidates caches
@@ -457,14 +455,7 @@ public class SaveState
             }
         }
 
-        bool isInfiniteHp = DebugMod.infiniteHP;
-        DebugMod.infiniteHP = false;
-        // PlayerData.instance.hasXunFlower = false;
         PlayerData.instance.health = data.savedPd.health;
-        HeroController.instance.TakeHealth(1);
-        HeroController.instance.AddHealth(1);
-        // PlayerData.instance.hasXunFlower = data.savedPd.hasXunFlower;
-        DebugMod.infiniteHP = isInfiniteHp;
 
         // Resets maggots
         HeroController.instance.ClearEffects();
@@ -477,6 +468,9 @@ public class SaveState
 
         HudHelper.RefreshMasks();
         HudHelper.RefreshSpool();
+
+        // Spawns tool icons if they weren't already visible
+        EventRegister.SendEvent("LAST HP ADDED");
 
         // Update active crest behind health display
         Object.FindAnyObjectByType<BindOrbHudFrame>().AlreadyAppeared();
