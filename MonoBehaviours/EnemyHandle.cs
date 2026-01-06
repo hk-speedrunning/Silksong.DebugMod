@@ -102,8 +102,10 @@ public class EnemyHandle : MonoBehaviour
 
             barPos = Camera.main.WorldToScreenPoint(barPos);
             barPos.x -= HPBAR_WIDTH / 2f;
+            barPos.y = Screen.height - barPos.y - hpBar.Size.y;
 
             hpBar.LocalPosition = barPos;
+            hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
         }
 

@@ -61,11 +61,11 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1, 1);
         AppendToggleControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
         AppendToggleControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
-        AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
+        AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
         AppendRow(1, 1, 1);
+        AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
         AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
         AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
-        AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
         AppendRow(2, 1);
         AppendBasicControl("Toggle Hero Collider", BindableFunctions.ToggleHeroCollider);
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
