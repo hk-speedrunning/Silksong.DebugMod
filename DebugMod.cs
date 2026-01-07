@@ -72,6 +72,9 @@ public partial class DebugMod : BaseUnityPlugin
     internal static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
     internal static int extraNailDamage;
+    internal static bool forcePaused;
+    internal static bool frameAdvanceActive;
+    internal static bool advancingFrame;
 
     internal static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();

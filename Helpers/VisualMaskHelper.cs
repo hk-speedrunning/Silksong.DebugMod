@@ -9,8 +9,8 @@ namespace DebugMod.Helpers;
 
 public static class VisualMaskHelper
 {
-    private static bool MasksDisabled = false;
-    private static bool VignetteDisabled = false;
+    internal static bool MasksDisabled = false;
+    internal static bool VignetteDisabled = false;
 
     private static bool ReEnableVignette = false;
 

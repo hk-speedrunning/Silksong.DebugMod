@@ -1,3 +1,5 @@
+using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
@@ -67,7 +69,7 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
         AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         AppendRow(2, 1);
-        AppendBasicControl("Toggle Hero Collider", BindableFunctions.ToggleHeroCollider);
+        AppendToggleControl("Toggle Hero Collider", () => !DebugMod.RefHeroCollider.enabled, BindableFunctions.ToggleHeroCollider);
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
         AppendSectionHeader("Player");
@@ -87,29 +89,35 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Increase Timescale", BindableFunctions.TimescaleUp);
         AppendBasicControl("Decrease Timescale", BindableFunctions.TimescaleDown);
         AppendRow(1, 1);
-        AppendBasicControl("Freeze Game", BindableFunctions.PauseGameNoUI);
-        AppendBasicControl("Force Pause", BindableFunctions.ForcePause);
+        AppendToggleControl("Freeze Game", () => DebugMod.PauseGameNoUIActive, BindableFunctions.PauseGameNoUI);
+        AppendToggleControl("Force Pause", () =>
+            DebugMod.forcePaused && GameManager.instance.isPaused, BindableFunctions.ForcePause);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Frame Advance", BindableFunctions.ToggleFrameAdvance);
+        AppendToggleControl("Toggle Frame Advance", () =>
+            DebugMod.frameAdvanceActive && (Time.timeScale == 0 || DebugMod.advancingFrame), BindableFunctions.ToggleFrameAdvance);
         AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
         AppendRow(1);
         AppendBasicControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);
 
         AppendSectionHeader("Visual");
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Hitboxes", BindableFunctions.ShowHitboxes);
-        AppendBasicControl("Force Camera Follow", BindableFunctions.ForceCameraFollow);
+        AppendToggleControl("Toggle Hitboxes", () => DebugMod.settings.ShowHitBoxes != 0, BindableFunctions.ShowHitboxes);
+        AppendToggleControl("Force Camera Follow", () => DebugMod.cameraFollow, BindableFunctions.ForceCameraFollow);
         AppendRow(1, 1);
-        AppendBasicControl("Preview Cocoon Position", BindableFunctions.PreviewCocoonPosition);
-        AppendBasicControl("Hide Hero", BindableFunctions.HideHero);
+        AppendToggleControl("Preview Cocoon Position", () =>
+            GameManager.instance.GetComponent<CocoonPreviewer>()?.previewEnabled ?? false, BindableFunctions.PreviewCocoonPosition);
+        AppendToggleControl("Hide Hero", () =>
+            Math.Abs(DebugMod.RefKnight.GetComponent<tk2dSprite>().color.a) == 0, BindableFunctions.HideHero);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle HUD", BindableFunctions.ToggleHUD);
-        AppendBasicControl("Toggle Vignette", BindableFunctions.ToggleVignette);
+        AppendToggleControl("Toggle HUD", () =>
+            !GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy, BindableFunctions.ToggleHUD);
+        AppendToggleControl("Toggle Vignette", () => VisualMaskHelper.VignetteDisabled, BindableFunctions.ToggleVignette);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Hero Light", BindableFunctions.ToggleHeroLight);
-        AppendBasicControl("Toggle Camera Shake", BindableFunctions.ToggleCameraShake);
+        AppendToggleControl("Toggle Hero Light", () => Math.Abs(DebugMod.RefKnight.transform.Find("HeroLight").gameObject
+                .GetComponent<SpriteRenderer>().color.a) == 0, BindableFunctions.ToggleHeroLight);
+        AppendToggleControl("Toggle Camera Shake", () => !GameCameras.instance.cameraShakeFSM.enabled, BindableFunctions.ToggleCameraShake);
         AppendRow(1, 1);
-        AppendBasicControl("Deactivate Visual Masks", BindableFunctions.DoDeactivateVisualMasks);
+        AppendToggleControl("Deactivate Visual Masks", () => VisualMaskHelper.MasksDisabled, BindableFunctions.DoDeactivateVisualMasks);
         AppendBasicControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
         AppendRow(1, 1, 1);
         AppendBasicControl("Zoom In", BindableFunctions.ZoomIn);
@@ -119,25 +127,25 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("Mod UI");
         AppendRow(1, 1);
-        AppendBasicControl("Toggle All UI", BindableFunctions.ToggleAllPanels);
-        AppendBasicControl("Toggle Main Panel", BindableFunctions.ToggleMainPanel);
+        AppendToggleControl("Toggle All UI", () => true, BindableFunctions.ToggleAllPanels);
+        AppendToggleControl("Toggle Main Panel", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Enemies Panel", BindableFunctions.ToggleEnemiesPanel);
-        AppendBasicControl("Toggle Console Panel", BindableFunctions.ToggleConsolePanel);
+        AppendToggleControl("Toggle Enemies Panel", () => DebugMod.settings.EnemiesPanelVisible, BindableFunctions.ToggleEnemiesPanel);
+        AppendToggleControl("Toggle Console Panel", () => DebugMod.settings.ConsoleVisible, BindableFunctions.ToggleConsolePanel);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Savestates Panel", BindableFunctions.ToggleSaveStatePanel);
-        AppendBasicControl("Expand/Collapse Savestates", BindableFunctions.ToggleExpandedSaveStatePanel);
+        AppendToggleControl("Toggle Savestates Panel", () => DebugMod.settings.SaveStatePanelVisible, BindableFunctions.ToggleSaveStatePanel);
+        AppendToggleControl("Expand/Collapse Savestates", () => DebugMod.settings.SaveStatePanelExpanded, BindableFunctions.ToggleExpandedSaveStatePanel);
         AppendRow(1, 1);
-        AppendBasicControl("Toggle Info Panel", BindableFunctions.ToggleInfoPanel);
-        AppendBasicControl("Always Show Cursor", BindableFunctions.ToggleAlwaysShowCursor);
+        AppendToggleControl("Toggle Info Panel", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
+        AppendToggleControl("Always Show Cursor", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
         AppendSectionHeader("Misc");
         AppendRow(1, 1);
         AppendBasicControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
         AppendBasicControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
         AppendRow(1, 1, 1);
-        AppendBasicControl("Toggle Act 3", BindableFunctions.ToggleAct3);
-        AppendBasicControl("Lock Keybinds", BindableFunctions.ToggleLockKeyBinds);
+        AppendToggleControl("Toggle Act 3", () => PlayerData.instance.blackThreadWorld, BindableFunctions.ToggleAct3);
+        AppendToggleControl("Lock Keybinds", () => DebugMod.KeyBindLock, BindableFunctions.ToggleLockKeyBinds);
         AppendBasicControl("Reset All", BindableFunctions.Reset);
 
         AddTab("Items");

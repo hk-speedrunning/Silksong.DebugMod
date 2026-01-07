@@ -122,6 +122,8 @@ public static partial class BindableFunctions
                 DebugMod.LogConsole("Game does not report that Pause is disabled, requesting it normally.");
                 UIManager.instance.TogglePauseGame();
             }
+
+            DebugMod.forcePaused = !GameManager.instance.isPaused;
         }
         catch (Exception e)
         {
@@ -136,6 +138,7 @@ public static partial class BindableFunctions
         frameCounter = 0;
         if (Time.timeScale != 0)
         {
+            DebugMod.frameAdvanceActive = true;
             if (GameManager.instance.GetComponent<TimeScale>() == null)
                 GameManager.instance.gameObject.AddComponent<TimeScale>();
             Time.timeScale = 0f;
@@ -146,6 +149,7 @@ public static partial class BindableFunctions
         }
         else
         {
+            DebugMod.frameAdvanceActive = false;
             DebugMod.CurrentTimeScale = timeScaleDuringFrameAdvance;
             Time.timeScale = DebugMod.CurrentTimeScale;
             DebugMod.LogConsole("Stopping frame by frame advance on keybind press");
@@ -163,9 +167,12 @@ public static partial class BindableFunctions
     private static IEnumerator AdvanceMyFrame()
     {
         DebugMod.CurrentTimeScale = Time.timeScale = 1f;
+        DebugMod.advancingFrame = true;
+
         yield return new WaitForFixedUpdate();
 
         DebugMod.CurrentTimeScale = Time.timeScale = 0f;
+        DebugMod.advancingFrame = false;
     }
 
     [BindableMethod(name = "Reset Frame Counter", category = "Time")]

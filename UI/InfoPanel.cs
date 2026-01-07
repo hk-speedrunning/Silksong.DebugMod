@@ -46,8 +46,8 @@ public class InfoPanel : CanvasPanel
 
         y += sectionBreak;
 
-        AppendInfo("Health", () => $"{PlayerData.instance.health}/{PlayerData.instance.maxHealth}");
-        AppendInfo("Silk", () => $"{PlayerData.instance.silk}/{PlayerData.instance.CurrentSilkMaxBasic}");
+        AppendInfo("Health", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
+        AppendInfo("Silk", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
 
         y += sectionBreak;
 
@@ -129,7 +129,7 @@ public class InfoPanel : CanvasPanel
     private static string GetQuestPoints()
     {
         QuestCompleteTotalGroup group = QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0];
-        return $"{group.CurrentValueCount}/{group.target}";
+        return $"{group.CurrentValueCount} / {group.target}";
     }
 
     private static string GetStringForBool(bool b)
