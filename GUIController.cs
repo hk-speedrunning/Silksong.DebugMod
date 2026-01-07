@@ -74,27 +74,34 @@ public class GUIController : MonoBehaviour
 
     public void BuildMenus()
     {
-        if (canvas)
+        try
         {
-            Destroy(canvas);
+            if (canvas)
+            {
+                Destroy(canvas);
+            }
+
+            canvas = new GameObject("DebugModCanvas");
+            canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.AddComponent<GraphicRaycaster>();
+
+            DontDestroyOnLoad(canvas);
+
+            MainPanel.BuildPanel();
+            EnemiesPanel.BuildPanel();
+            ConsolePanel.BuildPanel();
+            InfoPanel.BuildPanel();
+            SaveStatesPanel.BuildPanel();
+            KeybindContextPanel.BuildPanel();
+
+            CanvasButton.BuildHoverBorder();
+
+            resolution = Screen.currentResolution;
         }
-
-        canvas = new GameObject("DebugModCanvas");
-        canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.AddComponent<GraphicRaycaster>();
-
-        DontDestroyOnLoad(canvas);
-
-        MainPanel.BuildPanel();
-        EnemiesPanel.BuildPanel();
-        ConsolePanel.BuildPanel();
-        InfoPanel.BuildPanel();
-        SaveStatesPanel.BuildPanel();
-        KeybindContextPanel.BuildPanel();
-
-        CanvasButton.BuildHoverBorder();
-
-        resolution = Screen.currentResolution;
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error building UI: {e}");
+        }
     }
 
     public void Update()
@@ -107,11 +114,11 @@ public class GUIController : MonoBehaviour
             BuildMenus();
         }
 
-        MainPanel.Instance.ActiveSelf = DebugMod.settings.MainPanelVisible;
-        EnemiesPanel.Instance.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
-        ConsolePanel.Instance.ActiveSelf = DebugMod.settings.ConsoleVisible;
-        InfoPanel.Instance.ActiveSelf = DebugMod.settings.InfoPanelVisible;
-        SaveStatesPanel.Instance.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
+        MainPanel.Instance?.ActiveSelf = DebugMod.settings.MainPanelVisible;
+        EnemiesPanel.Instance?.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
+        ConsolePanel.Instance?.ActiveSelf = DebugMod.settings.ConsoleVisible;
+        InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
+        SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
 
         foreach (CanvasNode root in CanvasNode.rootNodes)
         {

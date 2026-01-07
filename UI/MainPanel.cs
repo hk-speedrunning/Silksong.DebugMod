@@ -69,7 +69,13 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
         AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         AppendRow(2, 1);
-        AppendToggleControl("Toggle Hero Collider", () => !DebugMod.RefHeroCollider.enabled, BindableFunctions.ToggleHeroCollider);
+        AppendToggleControl("Toggle Hero Collider", HeroColliderToggled, BindableFunctions.ToggleHeroCollider);
+        static bool HeroColliderToggled()
+        {
+            Collider2D heroCollider = DebugMod.RefHeroCollider;
+            if (!heroCollider) return false;
+            return !heroCollider.enabled;
+        }
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
         AppendSectionHeader("Player");
@@ -104,18 +110,51 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("Toggle Hitboxes", () => DebugMod.settings.ShowHitBoxes != 0, BindableFunctions.ShowHitboxes);
         AppendToggleControl("Force Camera Follow", () => DebugMod.cameraFollow, BindableFunctions.ForceCameraFollow);
         AppendRow(1, 1);
-        AppendToggleControl("Preview Cocoon Position", () =>
-            GameManager.instance.GetComponent<CocoonPreviewer>()?.previewEnabled ?? false, BindableFunctions.PreviewCocoonPosition);
-        AppendToggleControl("Hide Hero", () =>
-            Math.Abs(DebugMod.RefKnight.GetComponent<tk2dSprite>().color.a) == 0, BindableFunctions.HideHero);
+        AppendToggleControl("Preview Cocoon Position", CocoonPreviewToggled, BindableFunctions.PreviewCocoonPosition);
+        static bool CocoonPreviewToggled()
+        {
+            CocoonPreviewer previewer = GameManager.instance.GetComponent<CocoonPreviewer>();
+            if (!previewer) return false;
+            return previewer.previewEnabled;
+        }
+        AppendToggleControl("Hide Hero", HideHeroToggled, BindableFunctions.HideHero);
+        static bool HideHeroToggled()
+        {
+            GameObject hero = DebugMod.RefKnight;
+            if (!hero) return false;
+            tk2dSprite sprite = hero.GetComponent<tk2dSprite>();
+            if (!sprite) return false;
+            return Math.Abs(sprite.color.a) == 0;
+        }
         AppendRow(1, 1);
-        AppendToggleControl("Toggle HUD", () =>
-            !GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy, BindableFunctions.ToggleHUD);
+        AppendToggleControl("Toggle HUD", HUDToggled, BindableFunctions.ToggleHUD);
+        static bool HUDToggled()
+        {
+            PlayMakerFSM hud = GameCameras.instance.hudCanvasSlideOut;
+            if (!hud) return false;
+            return !hud.gameObject.activeInHierarchy;
+        }
         AppendToggleControl("Toggle Vignette", () => VisualMaskHelper.VignetteDisabled, BindableFunctions.ToggleVignette);
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Hero Light", () => Math.Abs(DebugMod.RefKnight.transform.Find("HeroLight").gameObject
-                .GetComponent<SpriteRenderer>().color.a) == 0, BindableFunctions.ToggleHeroLight);
-        AppendToggleControl("Toggle Camera Shake", () => !GameCameras.instance.cameraShakeFSM.enabled, BindableFunctions.ToggleCameraShake);
+        AppendToggleControl("Toggle Hero Light", HeroLightToggled, BindableFunctions.ToggleHeroLight);
+        static bool HeroLightToggled()
+        {
+            // Null propagation doesn't work on Unity objects
+            GameObject hero = DebugMod.RefKnight;
+            if (!hero) return false;
+            Transform heroLight = hero.transform.Find("HeroLight");
+            if (!heroLight) return false;
+            SpriteRenderer renderer = heroLight.GetComponent<SpriteRenderer>();
+            if (!renderer) return false;
+            return Math.Abs(renderer.color.a) == 0;
+        }
+        AppendToggleControl("Toggle Camera Shake", CameraShakeToggled, BindableFunctions.ToggleCameraShake);
+        static bool CameraShakeToggled()
+        {
+            PlayMakerFSM cameraShake = GameCameras.instance.cameraShakeFSM;
+            if (!cameraShake) return false;
+            return !cameraShake.enabled;
+        }
         AppendRow(1, 1);
         AppendToggleControl("Deactivate Visual Masks", () => VisualMaskHelper.MasksDisabled, BindableFunctions.DoDeactivateVisualMasks);
         AppendBasicControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
@@ -319,8 +358,33 @@ public class MainPanel : CanvasPanel
 
         CanvasButton button = row.AppendFixed(new CanvasButton(name), width);
         button.Text.Text = name;
-        button.OnClicked += effect;
-        if (update != null) button.OnUpdate += () => update(button);
+
+        button.OnClicked += () =>
+        {
+            try
+            {
+                effect();
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Error clicking button {button.GetQualifiedName()}: {e}");
+            }
+        };
+
+        if (update != null)
+        {
+            button.OnUpdate += () =>
+            {
+                try
+                {
+                    update(button);
+                }
+                catch (Exception e)
+                {
+                    DebugMod.LogError($"Error updating button {button.GetQualifiedName()}: {e}");
+                }
+            };
+        }
 
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
