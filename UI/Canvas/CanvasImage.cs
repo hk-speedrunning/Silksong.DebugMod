@@ -17,12 +17,12 @@ public class CanvasImage : CanvasObject
 
     public void SetImage(Texture2D tex, Rect subSprite = default)
     {
-        if (this.tex == tex && this.subSprite == subSprite) return;
-
         if (subSprite.width == 0 || subSprite.height == 0)
         {
             subSprite = new Rect(0, 0, tex.width, tex.height);
         }
+
+        if (this.tex == tex && this.subSprite == subSprite) return;
 
         this.tex = tex;
         this.subSprite = subSprite;
