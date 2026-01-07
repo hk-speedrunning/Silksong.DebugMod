@@ -72,7 +72,7 @@ public class CanvasBorder : CanvasObject
             LocalPosition += truncated - Position;
         }
 
-        if (Size.x == 0 || Size.y == 0)
+        if ((Size.x == 0 || Size.y == 0) && Parent != null)
         {
             Size = Parent.Size;
         }

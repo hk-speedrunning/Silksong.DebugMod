@@ -7,9 +7,23 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
+    private static CanvasBorder hoverBorder;
+    private static CanvasButton currentlyHovering;
+
+    internal static void BuildHoverBorder()
+    {
+        hoverBorder = new CanvasBorder("HoverBorder");
+        hoverBorder.Size = new Vector2(1, 1);
+        hoverBorder.Color = UICommon.blueColor;
+        hoverBorder.ActiveSelf = false;
+        hoverBorder.Build();
+    }
+
     private CanvasText text;
-    private CanvasBorder hoverBorder;
     private bool toggled;
+    private bool useHoverBorder = true;
+    private Vector2 hoverBorderPosition;
+    private Vector2 hoverBorderSize;
 
     public CanvasText Text => text;
 
@@ -38,11 +52,6 @@ public class CanvasButton : CanvasImage
         text = new CanvasText("ButtonText");
         text.Parent = this;
         text.Alignment = TextAnchor.MiddleCenter;
-
-        hoverBorder = new CanvasBorder("HoverBorder");
-        hoverBorder.Parent = this;
-        hoverBorder.Color = UICommon.blueColor;
-        hoverBorder.ActiveSelf = false;
     }
 
     public void RemoveText()
@@ -52,7 +61,7 @@ public class CanvasButton : CanvasImage
 
     public void RemoveHoverBorder()
     {
-        hoverBorder = null;
+        useHoverBorder = false;
     }
 
     public void ImageOnly(Texture2D tex, Rect subSprite = default)
@@ -70,7 +79,6 @@ public class CanvasButton : CanvasImage
             yield return child;
         }
 
-        if (hoverBorder != null) yield return hoverBorder;
         if (text != null) yield return text;
     }
 
@@ -86,9 +94,9 @@ public class CanvasButton : CanvasImage
 
     protected override void OnUpdateActive()
     {
-        if (!ActiveInHierarchy)
+        if (!ActiveInHierarchy && currentlyHovering == this)
         {
-            hoverBorder?.ActiveSelf = false;
+            hoverBorder.ActiveSelf = false;
         }
 
         base.OnUpdateActive();
@@ -97,29 +105,39 @@ public class CanvasButton : CanvasImage
     public override void Build()
     {
         // Expand hover border to cover borders of adjacent buttons if it wouldn't already
-        if (Border != null && hoverBorder != null)
+        if (Border != null && useHoverBorder)
         {
-            Vector2 pos = Vector2.zero;
-            Vector2 sz = Size;
+            hoverBorderPosition = Vector2.zero;
+            hoverBorderSize = Size;
 
-            if ((Border.Sides & BorderSides.LEFT) == 0) pos -= new Vector2(Border.Thickness, 0);
-            if ((Border.Sides & BorderSides.RIGHT) == 0) sz += new Vector2(Border.Thickness, 0);
-            if ((Border.Sides & BorderSides.TOP) == 0) pos -= new Vector2(0, Border.Thickness);
-            if ((Border.Sides & BorderSides.BOTTOM) == 0) sz += new Vector2(0, Border.Thickness);
+            if ((Border.Sides & BorderSides.LEFT) == 0) hoverBorderPosition -= new Vector2(Border.Thickness, 0);
+            if ((Border.Sides & BorderSides.RIGHT) == 0) hoverBorderSize += new Vector2(Border.Thickness, 0);
+            if ((Border.Sides & BorderSides.TOP) == 0) hoverBorderPosition -= new Vector2(0, Border.Thickness);
+            if ((Border.Sides & BorderSides.BOTTOM) == 0) hoverBorderSize += new Vector2(0, Border.Thickness);
 
-            sz -= pos;
-            hoverBorder.LocalPosition = pos;
-            hoverBorder.Size = sz;
+            hoverBorderSize -= hoverBorderPosition;
         }
 
         base.Build();
 
         AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());
 
-        if (hoverBorder != null)
+        if (useHoverBorder)
         {
-            AddEventTrigger(EventTriggerType.PointerEnter, _ => hoverBorder.ActiveSelf = true);
-            AddEventTrigger(EventTriggerType.PointerExit, _ => hoverBorder.ActiveSelf = false);
+            AddEventTrigger(EventTriggerType.PointerEnter, _ =>
+            {
+                hoverBorder.LocalPosition = Position + hoverBorderPosition;
+                hoverBorder.Size = hoverBorderSize;
+                hoverBorder.ActiveSelf = true;
+                currentlyHovering = this;
+            });
+            AddEventTrigger(EventTriggerType.PointerExit, _ =>
+            {
+                if (currentlyHovering == this)
+                {
+                    hoverBorder.ActiveSelf = false;
+                }
+            });
         }
     }
 
