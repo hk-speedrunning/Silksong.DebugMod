@@ -7,7 +7,7 @@ namespace DebugMod.UI;
 
 public class SaveStatesPanel : CanvasPanel
 {
-    public static int QuickSlotButtonWidth => UICommon.ScaleWidth(80);
+    public static int QuickSlotButtonWidth => UICommon.ScaleWidth(90);
     public static int FileSlotButtonWidth => UICommon.ScaleWidth(60);
     public static int IconPadding => UICommon.ScaleHeight(4);
 
@@ -51,7 +51,7 @@ public class SaveStatesPanel : CanvasPanel
             quickslotLabel.Alignment = TextAnchor.MiddleLeft;
             quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
 
-            CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth);
+            CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth - UICommon.ControlHeight);
             load.Text.Text = "Load";
             load.OnClicked += BindableFunctions.LoadState;
 
@@ -59,7 +59,7 @@ public class SaveStatesPanel : CanvasPanel
 
             quickslot.AppendPadding(UICommon.Margin);
 
-            CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth);
+            CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth - UICommon.ControlHeight);
             save.Text.Text = "Save";
             save.OnClicked += BindableFunctions.SaveState;
 

@@ -55,7 +55,7 @@ public static partial class BindableFunctions
         SaveStatesPanel.Instance.PrevPage();
     }
 
-    [BindableMethod(name = "Load Savestate On Death", category = "Savestates")]
+    [BindableMethod(name = "Load Quickslot On Death", category = "Savestates")]
     public static void LoadStateOnDeath()
     {
         DebugMod.stateOnDeath = !DebugMod.stateOnDeath;
