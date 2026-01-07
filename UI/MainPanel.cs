@@ -268,13 +268,13 @@ public class MainPanel : CanvasPanel
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
                 edit.ImageOnly(UICommon.images["IconDotCircled"]);
-                edit.OnClicked += () => DebugMod.settings.binds[action.Name] = KeyCode.None;
+                edit.OnClicked += () => DebugMod.UpdateBind(action.Name, KeyCode.None);
 
                 builder.AppendPadding(UICommon.Margin);
 
                 CanvasButton clear = builder.AppendSquare(new CanvasButton("Clear"));
                 clear.ImageOnly(UICommon.images["IconX"]);
-                clear.OnClicked += () => DebugMod.settings.binds.Remove(action.Name);
+                clear.OnClicked += () => DebugMod.UpdateBind(action.Name, null);
 
                 builder.AppendPadding(UICommon.Margin);
 

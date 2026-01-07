@@ -79,21 +79,35 @@ public static class UICommon
     public static CanvasButton AppendKeybindButton(PanelBuilder builder, BindAction action)
     {
         CanvasButton keybindButton = builder.AppendSquare(new CanvasButton($"{action.Name} Keybind"));
-        keybindButton.SetImage(images["IconDotOutline"]);
+
+        if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
+        {
+            keybindButton.SetImage(images["IconDot"]);
+        }
+        else
+        {
+            keybindButton.SetImage(images["IconDotOutline"]);
+        }
+
         keybindButton.RemoveText();
         keybindButton.Border.Sides &= ~BorderSides.LEFT;
-        keybindButton.OnUpdate += () =>
+        keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
+
+        DebugMod.bindUpdated += (name, key) =>
         {
-            if (!DebugMod.settings.binds.ContainsKey(action.Name))
+            if (name == action.Name)
             {
-                keybindButton.SetImage(images["IconDotOutline"]);
-            }
-            else if (DebugMod.settings.binds[action.Name] != KeyCode.None)
-            {
-                keybindButton.SetImage(images["IconDot"]);
+                if (!key.HasValue)
+                {
+                    keybindButton.SetImage(images["IconDotOutline"]);
+                }
+                else if (key != KeyCode.None)
+                {
+                    keybindButton.SetImage(images["IconDot"]);
+                }
             }
         };
-        keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
+
         return keybindButton;
     }
 

@@ -79,6 +79,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
     internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
+    internal static event Action<string, KeyCode?> bindUpdated;
 
     public void Awake()
     {
@@ -195,6 +196,19 @@ public partial class DebugMod : BaseUnityPlugin
         {
             LogError($"Error saving settings: {e}");
         }
+    }
+
+    public static void UpdateBind(string name, KeyCode? key)
+    {
+        if (key.HasValue)
+        {
+            settings.binds[name] = key.Value;
+        }
+        else
+        {
+            settings.binds.Remove(name);
+        }
+        bindUpdated?.Invoke(name, key);
     }
 
     private int PlayerDamaged(int damageAmount)

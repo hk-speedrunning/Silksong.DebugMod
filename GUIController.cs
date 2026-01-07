@@ -295,13 +295,13 @@ public class GUIController : MonoBehaviour
                             //remove bind
                             if (kc == KeyCode.Escape)
                             {
-                                DebugMod.settings.binds.Remove(bindName);
+                                DebugMod.UpdateBind(bindName, null);
                                 i--;
                                 DebugMod.LogWarn($"The key {Enum.GetName(typeof(KeyCode), kc)} has been unbound from {bindName}");
                             }
                             else if (kc != KeyCode.Escape)
                             {
-                                DebugMod.settings.binds[bindName] = kc;
+                                DebugMod.UpdateBind(bindName, kc);
                             }
 
                             break;
