@@ -61,7 +61,7 @@ jobs:
         path: nuget/
     - name: Check if release needed
       id: needs-release
-      uses: mukunku/tag-exists-action@v1.6.0
+      uses: mukunku/tag-exists-action@v1.7.0
       if: github.event_name == 'push'
       with:
         tag: v${{ steps.version.outputs.version }}
