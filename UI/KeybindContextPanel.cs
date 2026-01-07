@@ -30,6 +30,7 @@ public class KeybindContextPanel : CanvasPanel
     {
         ActiveSelf = false;
         Size = new Vector2(PanelWidth + UICommon.Margin * 2, PanelHeight + UICommon.Margin * 2);
+        OnUpdate += Update;
 
         UICommon.AddBackground(this);
         Get<CanvasImage>("Background").SetImage(UICommon.contextPanelBG);
@@ -58,7 +59,7 @@ public class KeybindContextPanel : CanvasPanel
         clearButton.OnClicked += () => DebugMod.settings.binds.Remove(bindAction.Name);
     }
 
-    public override void Update()
+    private void Update()
     {
         keycodeText.Text = GetKeycodeText(bindAction.Name);
 
@@ -75,8 +76,6 @@ public class KeybindContextPanel : CanvasPanel
         {
             initialClickEnded = true;
         }
-
-        base.Update();
     }
 
     public static string GetKeycodeText(string action)

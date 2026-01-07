@@ -12,7 +12,10 @@ public class CanvasScrollView : CanvasNode
     public CanvasNode Content => content;
     public Vector2 Margin { get; set; } = new(UICommon.BORDER_THICKNESS, UICommon.BORDER_THICKNESS);
 
-    public CanvasScrollView(string name) : base(name) { }
+    public CanvasScrollView(string name) : base(name)
+    {
+        OnUpdate += Update;
+    }
 
     public T SetContent<T>(T content) where T : CanvasNode
     {
@@ -33,7 +36,7 @@ public class CanvasScrollView : CanvasNode
         return true;
     }
 
-    public override void Update()
+    private void Update()
     {
         if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && IsMouseOver())
         {
@@ -41,8 +44,6 @@ public class CanvasScrollView : CanvasNode
             y = Mathf.Clamp(y, Mathf.Min(-GetScrollableHeight(), 0f), 0f);
             content.LocalPosition = new Vector2(content.LocalPosition.x, y);
         }
-
-        base.Update();
     }
 
     public void SetScrollPercentage(float percentage)

@@ -37,7 +37,7 @@ public class ConsolePanel : CanvasPanel
         }
     }
 
-    public override void Update()
+    private void UpdateText()
     {
         int line = 0;
         for (int i = Math.Max(history.Count - MAX_LINES, 0); i < history.Count; i++)
@@ -51,13 +51,12 @@ public class ConsolePanel : CanvasPanel
             lines[line].Text = "";
             line++;
         }
-
-        base.Update();
     }
 
     public void Reset()
     {
         history.Clear();
+        UpdateText();
     }
 
     public void AddLine(string chatLine)
@@ -86,6 +85,7 @@ public class ConsolePanel : CanvasPanel
         }
 
         history.Add(chatLine);
+        UpdateText();
     }
 
     private int WrapIndex(string message)

@@ -8,11 +8,19 @@ namespace DebugMod.UI.Canvas;
 public abstract class CanvasNode
 {
     internal static readonly HashSet<CanvasNode> rootNodes = [];
+    private static event Action allUpdates;
+
+    public static void UpdateAll()
+    {
+        allUpdates?.Invoke();
+    }
 
     private CanvasNode parent;
     private Vector2 localPosition;
     private Vector2 size;
     private bool activeSelf = true;
+    private event Action onUpdate;
+    private bool updateHooked;
 
     public string Name { get; set; }
 
@@ -83,7 +91,19 @@ public abstract class CanvasNode
 
     public bool ActiveInHierarchy => ActiveSelf && (Parent?.ActiveInHierarchy ?? true);
 
-    public event Action OnUpdate;
+    public event Action OnUpdate
+    {
+        add
+        {
+            onUpdate += value;
+            CheckUpdateHook();
+        }
+        remove
+        {
+            onUpdate -= value;
+            CheckUpdateHook();
+        }
+    }
 
     protected CanvasNode(string name)
     {
@@ -119,6 +139,7 @@ public abstract class CanvasNode
 
     protected virtual void OnUpdateActive()
     {
+        CheckUpdateHook();
         foreach (CanvasNode child in ChildList())
         {
             child.OnUpdateActive();
@@ -133,14 +154,23 @@ public abstract class CanvasNode
         }
     }
 
-    public virtual void Update()
+    private void CheckUpdateHook()
     {
-        OnUpdate?.Invoke();
-
-        foreach (CanvasNode child in ChildList())
+        if (onUpdate != null && ActiveInHierarchy && !updateHooked)
         {
-            if (child.ActiveSelf) child.Update();
+            allUpdates += Update;
+            updateHooked = true;
         }
+        else if (updateHooked)
+        {
+            allUpdates -= Update;
+            updateHooked = false;
+        }
+    }
+
+    private void Update()
+    {
+        onUpdate?.Invoke();
     }
 
     public virtual void Destroy()
@@ -154,6 +184,9 @@ public abstract class CanvasNode
         {
             rootNodes.Remove(this);
         }
+
+        ActiveSelf = false;
+        CheckUpdateHook();
     }
 
     protected virtual bool GetClipRect(out Rect clipRect)

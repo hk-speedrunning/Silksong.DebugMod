@@ -141,16 +141,6 @@ public class CanvasButton : CanvasImage
         }
     }
 
-    public override void Update()
-    {
-        if (EventSystem.current.currentSelectedGameObject == gameObject)
-        {
-            EventSystem.current.SetSelectedGameObject(null);
-        }
-
-        base.Update();
-    }
-
     private void UpdateToggled()
     {
         SetImage(toggled ? UICommon.panelStrongBG : UICommon.panelBG);

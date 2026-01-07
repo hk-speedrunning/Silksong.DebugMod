@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace DebugMod;
@@ -120,16 +121,22 @@ public class GUIController : MonoBehaviour
         InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
         SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
 
-        foreach (CanvasNode root in CanvasNode.rootNodes)
+        if (ForceHideUI())
         {
-            if (ForceHideUI())
+            foreach (CanvasNode root in CanvasNode.rootNodes)
             {
                 root.ActiveSelf = false;
             }
-            else if (root.ActiveSelf)
-            {
-                root.Update();
-            }
+        }
+        else
+        {
+            CanvasNode.UpdateAll();
+        }
+
+        if (EventSystem.current.currentSelectedGameObject != null &&
+            EventSystem.current.currentSelectedGameObject.transform.parent.gameObject == canvas)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
         }
 
         if (DebugMod.GetSceneName() == "Menu_Title") return;

@@ -30,6 +30,7 @@ public class SaveStatesPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
+        OnUpdate += Update;
 
         CanvasImage expandedBackground = UICommon.AddBackground(this);
         OnUpdate += () => expandedBackground.ActiveSelf = ShouldBeExpanded;
@@ -175,7 +176,7 @@ public class SaveStatesPanel : CanvasPanel
         };
     }
 
-    public override void Update()
+    private void Update()
     {
         if (InSelectState)
         {
@@ -188,8 +189,6 @@ public class SaveStatesPanel : CanvasPanel
                 }
             }
         }
-
-        base.Update();
     }
 
     public void ToggleView()

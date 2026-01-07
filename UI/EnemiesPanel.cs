@@ -27,6 +27,7 @@ public class EnemiesPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.MainPanelHeight + UICommon.ScreenMargin * 2);
         Size = new Vector2(UICommon.RightSideWidth, Screen.height - UICommon.MainPanelHeight - UICommon.ScreenMargin * 3);
+        OnUpdate += Update;
 
         UICommon.AddBackground(this);
 
@@ -47,19 +48,34 @@ public class EnemiesPanel : CanvasPanel
 
             CanvasText enemyName = listingBuilder.AppendFlex(new CanvasText("EnemyName"));
             enemyName.Alignment = TextAnchor.MiddleLeft;
-            enemyName.OnUpdate += () => enemyName.Text = enemyPool[index].Name;
+            enemyName.OnUpdate += () =>
+            {
+                if (enemyPool.Count > index)
+                {
+                    enemyName.Text = enemyPool[index].Name;
+                }
+            };
 
             CanvasText enemyHp = listingBuilder.AppendFixed(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
             enemyHp.Alignment = TextAnchor.MiddleLeft;
-            enemyHp.OnUpdate += () => enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
+            enemyHp.OnUpdate += () =>
+            {
+                if (enemyPool.Count > index)
+                {
+                    enemyHp.Text = $"{enemyPool[index].HP}/{enemyPool[index].MaxHP}";
+                }
+            };
 
             CanvasButton delete = listingBuilder.AppendSquare(new CanvasButton("Delete"));
             delete.ImageOnly(UICommon.images["IconX"]);
             delete.OnClicked += () =>
             {
-                EnemyHandle handle = enemyPool[index];
-                Object.DestroyImmediate(handle.gameObject);
-                DebugMod.LogConsole($"Destroyed {handle.Name}");
+                if (enemyPool.Count > index)
+                {
+                    EnemyHandle handle = enemyPool[index];
+                    Object.DestroyImmediate(handle.gameObject);
+                    DebugMod.LogConsole($"Destroyed {handle.Name}");
+                }
             };
 
             listingBuilder.AppendPadding(UICommon.Margin);
@@ -68,9 +84,12 @@ public class EnemiesPanel : CanvasPanel
             clone.ImageOnly(UICommon.images["IconPlus"]);
             clone.OnClicked += () =>
             {
-                EnemyHandle handle = enemyPool[index];
-                Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
-                DebugMod.LogConsole($"Cloned {handle.Name}");
+                if (enemyPool.Count > index)
+                {
+                    EnemyHandle handle = enemyPool[index];
+                    Object.Instantiate(handle.gameObject, handle.transform.position, handle.transform.rotation);
+                    DebugMod.LogConsole($"Cloned {handle.Name}");
+                }
             };
 
             listingBuilder.AppendPadding(UICommon.Margin);
@@ -79,9 +98,12 @@ public class EnemiesPanel : CanvasPanel
             infHealth.ImageOnly(UICommon.images["IconShield"]);
             infHealth.OnClicked += () =>
             {
-                EnemyHandle handle = enemyPool[index];
-                handle.HP = 9999;
-                DebugMod.LogConsole($"Set {handle.Name} HP to 9999");
+                if (enemyPool.Count > index)
+                {
+                    EnemyHandle handle = enemyPool[index];
+                    handle.HP = 9999;
+                    DebugMod.LogConsole($"Set {handle.Name} HP to 9999");
+                }
             };
         }
 
@@ -120,7 +142,7 @@ public class EnemiesPanel : CanvasPanel
         UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["Toggle HP Bars"]);
     }
 
-    public override void Update()
+    private void Update()
     {
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 
@@ -130,8 +152,6 @@ public class EnemiesPanel : CanvasPanel
         {
             listings[i].ActiveSelf = i < enemyCount;
         }
-
-        base.Update();
     }
 
     public static bool ActivelyUpdating()

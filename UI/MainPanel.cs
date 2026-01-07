@@ -56,6 +56,7 @@ public class MainPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight);
+        OnUpdate += Update;
 
         AddTab("Gameplay");
 
@@ -453,7 +454,7 @@ public class MainPanel : CanvasPanel
         base.Build();
     }
 
-    public override void Update()
+    private void Update()
     {
         bool needsReset = true;
 
@@ -475,7 +476,5 @@ public class MainPanel : CanvasPanel
             DebugMod.settings.MainPanelCurrentTab = tabs[0].Name;
             tabs[0].ActiveSelf = true;
         }
-
-        base.Update();
     }
 }
