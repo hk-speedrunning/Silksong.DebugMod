@@ -2,6 +2,7 @@
 using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
@@ -87,6 +88,15 @@ public class EnemyHandle : MonoBehaviour
                 text.Alignment = TextAnchor.MiddleCenter;
 
                 hpBar.Build();
+
+                // Move HP bar behind UI
+                foreach (CanvasNode node in hpBar.Subtree().Reverse())
+                {
+                    if (node is CanvasObject obj)
+                    {
+                        obj.GameObject.transform.SetAsFirstSibling();
+                    }
+                }
             }
 
             if (HP != lastHP)

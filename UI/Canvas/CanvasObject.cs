@@ -12,6 +12,8 @@ public abstract class CanvasObject : CanvasNode
     protected RectTransform transform;
     protected EventTrigger eventTrigger;
 
+    public GameObject GameObject => gameObject;
+
     protected virtual bool Interactable => false;
 
     protected CanvasObject(string name) : base(name) { }

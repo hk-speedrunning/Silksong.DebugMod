@@ -96,6 +96,19 @@ public abstract class CanvasNode
         yield break;
     }
 
+    public IEnumerable<CanvasNode> Subtree()
+    {
+        yield return this;
+
+        foreach (CanvasNode child in ChildList())
+        {
+            foreach (CanvasNode node in child.Subtree())
+            {
+                yield return node;
+            }
+        }
+    }
+
     protected virtual void OnUpdatePosition()
     {
         foreach (CanvasNode child in ChildList())
