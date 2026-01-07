@@ -53,13 +53,17 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth);
             load.Text.Text = "Load";
-            load.OnClicked += () => SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            load.OnClicked += BindableFunctions.LoadState;
+
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (load)"]);
 
             quickslot.AppendPadding(UICommon.Margin);
 
             CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth);
             save.Text.Text = "Save";
-            save.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
+            save.OnClicked += BindableFunctions.SaveState;
+
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (save)"]);
 
             quickslot.AppendPadding(UICommon.Margin);
 

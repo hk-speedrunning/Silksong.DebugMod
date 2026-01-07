@@ -114,11 +114,10 @@ public class EnemiesPanel : CanvasPanel
 
         CanvasButton hpBarsButton = footerBuilder.AppendFixed(new CanvasButton("HPBars"), UICommon.ScaleWidth(100));
         hpBarsButton.Text.Text = "HP Bars";
-        hpBarsButton.OnClicked += () =>
-        {
-            BindableFunctions.ToggleEnemyHPBars();
-            hpBarsButton.Toggled = hpBars;
-        };
+        hpBarsButton.OnUpdate += () => hpBarsButton.Toggled = hpBars;
+        hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
+
+        UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["Toggle HP Bars"]);
     }
 
     public override void Update()

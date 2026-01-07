@@ -76,6 +76,27 @@ public static class UICommon
         return background;
     }
 
+    public static CanvasButton AppendKeybindButton(PanelBuilder builder, BindAction action)
+    {
+        CanvasButton keybindButton = builder.AppendSquare(new CanvasButton($"{action.Name} Keybind"));
+        keybindButton.SetImage(images["IconDotOutline"]);
+        keybindButton.RemoveText();
+        keybindButton.Border.Sides &= ~BorderSides.LEFT;
+        keybindButton.OnUpdate += () =>
+        {
+            if (!DebugMod.settings.binds.ContainsKey(action.Name))
+            {
+                keybindButton.SetImage(images["IconDotOutline"]);
+            }
+            else if (DebugMod.settings.binds[action.Name] != KeyCode.None)
+            {
+                keybindButton.SetImage(images["IconDot"]);
+            }
+        };
+        keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
+        return keybindButton;
+    }
+
     public static void LoadResources()
     {
         foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())

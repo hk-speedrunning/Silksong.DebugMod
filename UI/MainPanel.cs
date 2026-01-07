@@ -316,22 +316,7 @@ public class MainPanel : CanvasPanel
 
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
-            CanvasButton keybindButton = row.AppendSquare(new CanvasButton($"{name}Keybind"));
-            keybindButton.SetImage(UICommon.images["IconDotOutline"]);
-            keybindButton.RemoveText();
-            keybindButton.Border.Sides &= ~BorderSides.LEFT;
-            keybindButton.OnUpdate += () =>
-            {
-                if (!DebugMod.settings.binds.ContainsKey(action.Name))
-                {
-                    keybindButton.SetImage(UICommon.images["IconDotOutline"]);
-                }
-                else if (DebugMod.settings.binds[action.Name] != KeyCode.None)
-                {
-                    keybindButton.SetImage(UICommon.images["IconDot"]);
-                }
-            };
-            keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
+            UICommon.AppendKeybindButton(row, action);
         }
 
         rowIndex++;
