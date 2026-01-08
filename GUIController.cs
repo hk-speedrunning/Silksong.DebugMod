@@ -133,8 +133,8 @@ public class GUIController : MonoBehaviour
             CanvasNode.UpdateAll();
         }
 
-        if (EventSystem.current.currentSelectedGameObject != null &&
-            EventSystem.current.currentSelectedGameObject.transform.parent.gameObject == canvas)
+        GameObject selected = EventSystem.current.currentSelectedGameObject;
+        if (selected && selected.transform.parent.gameObject == canvas && !selected.GetComponent<InputField>())
         {
             EventSystem.current.SetSelectedGameObject(null);
         }

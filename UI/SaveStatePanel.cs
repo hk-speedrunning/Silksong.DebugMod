@@ -54,7 +54,11 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth - UICommon.ControlHeight);
             load.Text.Text = "Load";
-            load.OnClicked += BindableFunctions.LoadState;
+            load.OnClicked += () =>
+            {
+                CancelSelectState();
+                SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            };
 
             UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (load)"]);
 
@@ -62,7 +66,11 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth - UICommon.ControlHeight);
             save.Text.Text = "Save";
-            save.OnClicked += BindableFunctions.SaveState;
+            save.OnClicked += () =>
+            {
+                CancelSelectState();
+                SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
+            };
 
             UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (save)"]);
 
@@ -145,19 +153,53 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton rename = wrapper.AppendFlex(new CanvasButton("Rename"));
             rename.ImageOnly(UICommon.images["IconEditText"]);
-            rename.OnClicked += () => name.Activate();
+            rename.OnClicked += () =>
+            {
+                CancelSelectState();
+                name.Activate();
+            };
 
             fileSlot.AppendPadding(UICommon.Margin);
 
             CanvasButton read = fileSlot.AppendFixed(new CanvasButton("Read"), FileSlotButtonWidth);
             read.Text.Text = "Read";
-            read.OnClicked += () => SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
+            read.OnUpdate += () => read.Border.Color = IsReadOperation() ? UICommon.yellowColor : UICommon.borderColor;
+            read.OnClicked += () =>
+            {
+                if (IsReadOperation())
+                {
+                    DoSelectOperation(index);
+                }
+                else if (InSelectState)
+                {
+                    CancelSelectState();
+                }
+                else
+                {
+                    SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
+                }
+            };
 
             fileSlot.AppendPadding(UICommon.Margin);
 
             CanvasButton write = fileSlot.AppendFixed(new CanvasButton("Write"), FileSlotButtonWidth);
             write.Text.Text = "Write";
-            write.OnClicked += () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+            write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.yellowColor : UICommon.borderColor;
+            write.OnClicked += () =>
+            {
+                if (IsWriteOperation())
+                {
+                    DoSelectOperation(index);
+                }
+                else if (InSelectState)
+                {
+                    CancelSelectState();
+                }
+                else
+                {
+                    SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+                }
+            };
         }
 
         builder.Build();
@@ -176,9 +218,19 @@ public class SaveStatesPanel : CanvasPanel
         };
     }
 
+    private bool IsReadOperation()
+    {
+        return selectStateOperation is SelectOperation.FileToQuickslot or SelectOperation.LoadFromFile;
+    }
+
+    private bool IsWriteOperation()
+    {
+        return selectStateOperation is SelectOperation.QuickslotToFile or SelectOperation.SaveToFile;
+    }
+
     private void Update()
     {
-        if (InSelectState)
+        if (InSelectState && !CanvasTextField.AnyFieldFocused)
         {
             foreach (KeyValuePair<KeyCode, int> pair in DebugMod.alphaKeyDict)
             {
@@ -196,7 +248,7 @@ public class SaveStatesPanel : CanvasPanel
         if (InSelectState)
         {
             DebugMod.settings.SaveStatePanelExpanded = false;
-            selectStateOperation = SelectOperation.None;
+            CancelSelectState();
         }
         else
         {
@@ -222,7 +274,7 @@ public class SaveStatesPanel : CanvasPanel
                 break;
         }
 
-        selectStateOperation = SelectOperation.None;
+        CancelSelectState();
     }
 
     public void NextPage()
@@ -253,12 +305,17 @@ public class SaveStatesPanel : CanvasPanel
     {
         if (selectStateOperation == operation)
         {
-            selectStateOperation = SelectOperation.None;
+            CancelSelectState();
         }
         else
         {
             selectStateOperation = operation;
         }
+    }
+
+    public void CancelSelectState()
+    {
+        selectStateOperation = SelectOperation.None;
     }
 }
 

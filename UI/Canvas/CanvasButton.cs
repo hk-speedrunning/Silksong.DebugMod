@@ -96,7 +96,6 @@ public class CanvasButton : CanvasImage
     {
         if (!ActiveInHierarchy && hoverBorder?.Parent == this)
         {
-            hoverBorder.Parent = null;
             hoverBorder.ActiveSelf = false;
         }
 
@@ -137,7 +136,6 @@ public class CanvasButton : CanvasImage
             {
                 if (hoverBorder.Parent == this)
                 {
-                    hoverBorder.Parent = null;
                     hoverBorder.ActiveSelf = false;
                 }
 

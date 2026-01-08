@@ -51,6 +51,10 @@ public static partial class BindableFunctions
     public static void ToggleSaveStatePanel()
     {
         DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
+        if (!DebugMod.settings.SaveStatePanelVisible)
+        {
+            SaveStatesPanel.Instance.CancelSelectState();
+        }
     }
 
     [BindableMethod(name = "Expand/Collapse Savestates", category = "Mod UI")]
