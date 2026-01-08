@@ -13,7 +13,7 @@ public class CanvasButton : CanvasImage
     {
         hoverBorder = new CanvasBorder("HoverBorder");
         hoverBorder.Size = new Vector2(1, 1);
-        hoverBorder.Color = UICommon.blueColor;
+        hoverBorder.Color = UICommon.accentColor;
         hoverBorder.ActiveSelf = false;
         hoverBorder.Build();
     }

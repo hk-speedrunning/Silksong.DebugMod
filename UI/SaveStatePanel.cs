@@ -139,7 +139,7 @@ public class SaveStatesPanel : CanvasPanel
             CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), UICommon.ScaleWidth(30));
             number.Alignment = TextAnchor.MiddleLeft;
             number.Text = index.ToString();
-            number.OnUpdate += () => number.Color = InSelectState ? UICommon.yellowColor : UICommon.textColor;
+            number.OnUpdate += () => number.Color = InSelectState ? UICommon.highlightColor : UICommon.textColor;
 
             CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
             name.Alignment = TextAnchor.MiddleLeft;
@@ -163,7 +163,7 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton read = fileSlot.AppendFixed(new CanvasButton("Read"), FileSlotButtonWidth);
             read.Text.Text = "Read";
-            read.OnUpdate += () => read.Border.Color = IsReadOperation() ? UICommon.yellowColor : UICommon.borderColor;
+            read.OnUpdate += () => read.Border.Color = IsReadOperation() ? UICommon.highlightColor : UICommon.borderColor;
             read.OnClicked += () =>
             {
                 if (IsReadOperation())
@@ -184,7 +184,7 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasButton write = fileSlot.AppendFixed(new CanvasButton("Write"), FileSlotButtonWidth);
             write.Text.Text = "Write";
-            write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.yellowColor : UICommon.borderColor;
+            write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.highlightColor : UICommon.borderColor;
             write.OnClicked += () =>
             {
                 if (IsWriteOperation())

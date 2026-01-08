@@ -27,10 +27,10 @@ public static class UICommon
 
     // Catppuccin Macchiato: https://catppuccin.com/palette
     public static readonly Color baseColor = RGB(36, 39, 58);
-    public static readonly Color strongColor = RGB(54, 58, 79);
+    public static readonly Color strongColor = RGB(73, 77, 100);
     public static readonly Color borderColor = RGB(202, 211, 245);
-    public static readonly Color blueColor = RGB(138, 173, 244);
-    public static readonly Color yellowColor = RGB(238, 212, 159);
+    public static readonly Color accentColor = RGB(138, 173, 244);
+    public static readonly Color highlightColor = RGB(245, 169, 127);
 
     public static readonly Color textColor = Color.white;
     public static readonly Color iconColor = MakeGrayscale(borderColor);
