@@ -3,12 +3,10 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public class KeybindContextPanel : CanvasPanel
+public class KeybindContextPanel : CanvasContextPanel
 {
-    public static int KeycodeTextWidth => UICommon.ScaleWidth(90);
+    public static int PanelWidth => UICommon.ScaleWidth(150);
     public static int RowHeight => UICommon.ScaleHeight(18);
-    public static int PanelWidth => KeycodeTextWidth + RowHeight * 2 + UICommon.Margin * 2;
-    public static int PanelHeight => RowHeight * 2 + UICommon.Margin;
 
     public static KeybindContextPanel Instance { get; private set; }
 
@@ -16,9 +14,6 @@ public class KeybindContextPanel : CanvasPanel
     private readonly CanvasText keycodeText;
 
     private BindAction bindAction;
-    private CanvasNode anchor;
-    private Vector2 anchorPos;
-    private bool initialClickEnded;
 
     public static void BuildPanel()
     {
@@ -28,54 +23,31 @@ public class KeybindContextPanel : CanvasPanel
 
     public KeybindContextPanel() : base(nameof(KeybindContextPanel))
     {
-        ActiveSelf = false;
-        Size = new Vector2(PanelWidth + UICommon.Margin * 2, PanelHeight + UICommon.Margin * 2);
-        OnUpdate += Update;
+        Size = new Vector2(PanelWidth, 0);
 
-        UICommon.AddBackground(this);
-        Get<CanvasImage>("Background").SetImage(UICommon.contextPanelBG);
+        using PanelBuilder builder = new(this);
+        builder.Padding = UICommon.Margin;
+        builder.DynamicLength = true;
 
-        nameText = Add(new CanvasText("BindName"));
-        nameText.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin);
-        nameText.Size = new Vector2(PanelWidth, RowHeight);
+        nameText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
         nameText.Alignment = TextAnchor.MiddleCenter;
 
-        // TODO: replace this with uneditable text field
-        keycodeText = Add(new CanvasText("Keycode"));
-        keycodeText.LocalPosition = new Vector2(UICommon.Margin, RowHeight + UICommon.Margin * 2);
-        keycodeText.Size = new Vector2(KeycodeTextWidth, RowHeight);
-        keycodeText.Alignment = TextAnchor.MiddleLeft;
+        using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
+        row.Horizontal = true;
+        row.InnerPadding = UICommon.Margin;
 
-        CanvasButton editButton = Add(new CanvasButton("Edit"));
-        editButton.LocalPosition = new Vector2(KeycodeTextWidth + UICommon.Margin * 2, RowHeight + UICommon.Margin * 2);
-        editButton.Size = new Vector2(RowHeight, RowHeight);
+        // TODO: replace this with uneditable text field
+        keycodeText = row.AppendFlex(new CanvasText("Keycode"));
+        keycodeText.Alignment = TextAnchor.MiddleLeft;
+        keycodeText.OnUpdate += () => keycodeText.Text = GetKeycodeText(bindAction.Name);
+
+        CanvasButton editButton = row.AppendSquare(new CanvasButton("Edit"));
         editButton.ImageOnly(UICommon.images["IconDotCircled"]);
         editButton.OnClicked += () => DebugMod.UpdateBind(bindAction.Name, KeyCode.None);
 
-        CanvasButton clearButton = Add(new CanvasButton("Clear"));
-        clearButton.LocalPosition = new Vector2(KeycodeTextWidth + RowHeight + UICommon.Margin * 3, RowHeight + UICommon.Margin * 2);
-        clearButton.Size = new Vector2(RowHeight, RowHeight);
+        CanvasButton clearButton = row.AppendSquare(new CanvasButton("Clear"));
         clearButton.ImageOnly(UICommon.images["IconX"]);
         clearButton.OnClicked += () => DebugMod.UpdateBind(bindAction.Name, null);
-    }
-
-    private void Update()
-    {
-        keycodeText.Text = GetKeycodeText(bindAction.Name);
-
-        if (initialClickEnded && !IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
-        {
-            Hide();
-        }
-        else if (anchor != null && (anchor.Position != anchorPos || !anchor.ActiveInHierarchy))
-        {
-            Hide();
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            initialClickEnded = true;
-        }
     }
 
     public static string GetKeycodeText(string action)
@@ -92,40 +64,10 @@ public class KeybindContextPanel : CanvasPanel
 
     public void Toggle(CanvasNode anchor, string action)
     {
-        if (ActiveInHierarchy && bindAction != null && bindAction.Name == action)
+        if (TryToggle(anchor, action))
         {
-            Hide();
-            return;
+            bindAction = DebugMod.bindActions[action];
+            nameText.Text = bindAction.Name;
         }
-
-        this.anchor = anchor;
-        anchorPos = anchor.Position;
-        initialClickEnded = false;
-
-        bindAction = DebugMod.bindActions[action];
-        nameText.Text = bindAction.Name;
-
-        float x = (int)(anchor.Position.x + anchor.Size.x * 0.8f);
-        float xOver = x + Size.x - (Screen.width - UICommon.Margin);
-        if (xOver > 0)
-        {
-            x -= xOver;
-        }
-
-        float y = (int)(anchor.Position.y + anchor.Size.y * 0.8f);
-        float yOver = y + Size.y - (Screen.height - UICommon.Margin);
-        if (yOver > 0)
-        {
-            y -= yOver;
-        }
-
-        LocalPosition = new Vector2(x, y);
-        ActiveSelf = true;
-    }
-
-    public void Hide()
-    {
-        anchor = null;
-        ActiveSelf = false;
     }
 }
