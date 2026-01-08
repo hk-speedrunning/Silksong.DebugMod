@@ -24,15 +24,14 @@ public class MainPanel : CanvasPanel
     [
         "Cheats",
         "Savestates",
-        "Player",
+        "Mod UI",
         "Time",
-        "Enemy Panel",
+        "Enemies",
         "Skills",
+        "Upgrades",
         "Tools",
-        "Items",
         "Consumables",
         "Masks & Spools",
-        "Mod UI",
         "Visual",
         "Misc",
     ];
@@ -79,17 +78,19 @@ public class MainPanel : CanvasPanel
         }
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
-        AppendSectionHeader("Player");
+        AppendSectionHeader("Mod UI");
         AppendRow(1, 1);
-        AppendBasicControl("Increase Needle Damage", BindableFunctions.IncreaseNeedleDamage);
-        AppendBasicControl("Decrease Needle Damage", BindableFunctions.DecreaseNeedleDamage);
+        AppendToggleControl("Toggle All UI", () => true, BindableFunctions.ToggleAllPanels);
+        AppendToggleControl("Toggle Main Panel", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
         AppendRow(1, 1);
-        AppendBasicControl("Set Hazard Respawn", BindableFunctions.SetHazardRespawn);
-        AppendBasicControl("Hazard Respawn", BindableFunctions.Respawn);
-        AppendRow(1, 1, 1);
-        AppendBasicControl("Damage Self", BindableFunctions.SelfDamage);
-        AppendBasicControl("Kill Self", BindableFunctions.KillSelf);
-        AppendBasicControl("Break Cocoon", BindableFunctions.BreakCocoon);
+        AppendToggleControl("Toggle Enemies Panel", () => DebugMod.settings.EnemiesPanelVisible, BindableFunctions.ToggleEnemiesPanel);
+        AppendToggleControl("Toggle Console Panel", () => DebugMod.settings.ConsoleVisible, BindableFunctions.ToggleConsolePanel);
+        AppendRow(1, 1);
+        AppendToggleControl("Toggle Savestates Panel", () => DebugMod.settings.SaveStatePanelVisible, BindableFunctions.ToggleSaveStatePanel);
+        AppendToggleControl("Expand/Collapse Savestates", () => DebugMod.settings.SaveStatePanelExpanded, BindableFunctions.ToggleExpandedSaveStatePanel);
+        AppendRow(1, 1);
+        AppendToggleControl("Toggle Info Panel", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
+        AppendToggleControl("Always Show Cursor", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
         AppendSectionHeader("Time");
         AppendRow(1, 1);
@@ -164,22 +165,14 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Zoom Out", BindableFunctions.ZoomOut);
         AppendBasicControl("Reset Zoom", BindableFunctions.ResetZoom);
 
-
-        AppendSectionHeader("Mod UI");
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle All UI", () => true, BindableFunctions.ToggleAllPanels);
-        AppendToggleControl("Toggle Main Panel", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle Enemies Panel", () => DebugMod.settings.EnemiesPanelVisible, BindableFunctions.ToggleEnemiesPanel);
-        AppendToggleControl("Toggle Console Panel", () => DebugMod.settings.ConsoleVisible, BindableFunctions.ToggleConsolePanel);
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle Savestates Panel", () => DebugMod.settings.SaveStatePanelVisible, BindableFunctions.ToggleSaveStatePanel);
-        AppendToggleControl("Expand/Collapse Savestates", () => DebugMod.settings.SaveStatePanelExpanded, BindableFunctions.ToggleExpandedSaveStatePanel);
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle Info Panel", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
-        AppendToggleControl("Always Show Cursor", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
-
         AppendSectionHeader("Misc");
+        AppendRow(1, 1);
+        AppendBasicControl("Set Hazard Respawn", BindableFunctions.SetHazardRespawn);
+        AppendBasicControl("Hazard Respawn", BindableFunctions.Respawn);
+        AppendRow(1, 1, 1);
+        AppendBasicControl("Damage Self", BindableFunctions.SelfDamage);
+        AppendBasicControl("Kill Self", BindableFunctions.KillSelf);
+        AppendBasicControl("Break Cocoon", BindableFunctions.BreakCocoon);
         AppendRow(1, 1);
         AppendBasicControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
         AppendBasicControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
@@ -191,42 +184,65 @@ public class MainPanel : CanvasPanel
         AddTab("Items");
 
         AppendSectionHeader("Skills");
+        AppendRow(1);
         AppendBasicControl("All Skills", BindableFunctions.GiveAllSkills);
-        AppendIncrementControl("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart);
+        AppendRow(1, 1);
         AppendToggleControl("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep);
+        AppendToggleControl("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar);
+        AppendRow(1, 1);
         AppendToggleControl("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak);
+        AppendToggleControl("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike);
+        AppendRow(1, 1);
         AppendToggleControl("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip);
         AppendToggleControl("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin);
+        AppendRow(1, 1);
         AppendToggleControl("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline);
-        AppendToggleControl("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak);
-        AppendToggleControl("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar);
         AppendToggleControl("Beastling Call", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall);
+        AppendRow(1, 1);
+        AppendToggleControl("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak);
         AppendToggleControl("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep);
-        AppendToggleControl("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike);
 
-        AppendSectionHeader("Tools");
-        AppendBasicControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
-        AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
+        AppendSectionHeader("Upgrades");
+        AppendRow(1, 1);
+        AppendBasicControl("Increase Needle Damage", BindableFunctions.IncreaseNeedleDamage);
+        AppendBasicControl("Decrease Needle Damage", BindableFunctions.DecreaseNeedleDamage);
+        AppendRow(1, 1);
         AppendIncrementControl("Tool Pouches", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches);
         AppendIncrementControl("Crafting Kits", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits);
+        AppendRow(1);
+        AppendIncrementControl("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart);
+
+        AppendSectionHeader("Tools");
+        AppendRow(1, 1);
+        AppendBasicControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
+        AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
+        AppendRow(1);
         AppendBasicControl("Craft Tools", BindableFunctions.CraftTools);
 
         AppendSectionHeader("Consumables");
+        AppendRow(1, 1);
         AppendBasicControl("Give Rosaries", BindableFunctions.GiveRosaries);
         AppendBasicControl("Give Shell Shards", BindableFunctions.GiveShellShards);
+        AppendRow(1, 1);
         AppendBasicControl("Give All Memory Lockets", BindableFunctions.GiveMemoryLockets);
         AppendBasicControl("Give All Craftmetal", BindableFunctions.GiveCraftmetal);
+        AppendRow(1);
         AppendBasicControl("Give Silkeater", BindableFunctions.GiveSilkeater);
 
         AppendSectionHeader("Masks and Spools");
+        AppendRow(1, 1);
         AppendBasicControl("Give Mask", BindableFunctions.GiveMask);
         AppendBasicControl("Take Mask", BindableFunctions.TakeAwayMask);
+        AppendRow(1, 1);
         AppendBasicControl("Give Spool", BindableFunctions.GiveSpool);
         AppendBasicControl("Take Spool", BindableFunctions.TakeAwaySpool);
+        AppendRow(1, 1);
         AppendBasicControl("Give Health", BindableFunctions.AddHealth);
         AppendBasicControl("Take Health", BindableFunctions.TakeHealth);
+        AppendRow(1, 1);
         AppendBasicControl("Give Silk", BindableFunctions.AddSilk);
         AppendBasicControl("Take Silk", BindableFunctions.TakeSilk);
+        AppendRow(1);
         AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
 
         AddTab("Keybinds");

@@ -5,8 +5,6 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Give All", category = "Skills")]
     public static void GiveAllSkills()
     {
-        PlayerData.instance.silkRegenMax = 3;
-
         PlayerData.instance.hasDash = true;
         PlayerData.instance.hasBrolly = true;
         PlayerData.instance.hasWalljump = true;
@@ -20,22 +18,13 @@ public static partial class BindableFunctions
 
         PlayerData.instance.hasChargeSlash = true;
 
-        DebugMod.LogConsole("Giving player all skills");
-    }
+        PlayerData.instance.nailUpgrades = 4;
+        PlayerData.instance.silkRegenMax = 3;
+        PlayerData.instance.ToolKitUpgrades = 4;
+        PlayerData.instance.ToolPouchUpgrades = 4;
+        DebugMod.extraNailDamage = 0;
 
-    [BindableMethod(name = "Give Silk Heart", category = "Skills")]
-    public static void IncrementSilkHeart()
-    {
-        if (PlayerData.instance.silkRegenMax < 3)
-        {
-            PlayerData.instance.silkRegenMax++;
-            DebugMod.LogConsole($"Giving player Silk Heart (now {PlayerData.instance.silkRegenMax})");
-        }
-        else
-        {
-            PlayerData.instance.silkRegenMax = 0;
-            DebugMod.LogConsole("Taking away all Silk Hearts");
-        }
+        DebugMod.LogConsole("Giving player all skills and upgrades");
     }
 
     [BindableMethod(name = "Give Swift Step", category = "Skills")]
