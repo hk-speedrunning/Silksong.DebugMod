@@ -473,7 +473,8 @@ public class SaveState
         EventRegister.SendEvent("LAST HP ADDED");
 
         // Update active crest behind health display
-        Object.FindAnyObjectByType<BindOrbHudFrame>().AlreadyAppeared();
+        BindOrbHudFrame bindOrb = Object.FindAnyObjectByType<BindOrbHudFrame>();
+        if (bindOrb) bindOrb.AlreadyAppeared();
     }
     #endregion
 
