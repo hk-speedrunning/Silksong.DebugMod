@@ -56,7 +56,7 @@ public class SaveStatesPanel : CanvasPanel
             load.Text.Text = "Load";
             load.OnClicked += () =>
             {
-                CancelSelectState();
+                CancelSelectState(true);
                 SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             };
 
@@ -68,7 +68,7 @@ public class SaveStatesPanel : CanvasPanel
             save.Text.Text = "Save";
             save.OnClicked += () =>
             {
-                CancelSelectState();
+                CancelSelectState(true);
                 SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
             };
 
@@ -155,7 +155,7 @@ public class SaveStatesPanel : CanvasPanel
             rename.ImageOnly(UICommon.images["IconEditText"]);
             rename.OnClicked += () =>
             {
-                CancelSelectState();
+                CancelSelectState(true);
                 name.Activate();
             };
 
@@ -172,7 +172,7 @@ public class SaveStatesPanel : CanvasPanel
                 }
                 else if (InSelectState)
                 {
-                    CancelSelectState();
+                    CancelSelectState(true);
                 }
                 else
                 {
@@ -193,7 +193,7 @@ public class SaveStatesPanel : CanvasPanel
                 }
                 else if (InSelectState)
                 {
-                    CancelSelectState();
+                    CancelSelectState(true);
                 }
                 else
                 {
@@ -313,8 +313,14 @@ public class SaveStatesPanel : CanvasPanel
         }
     }
 
-    public void CancelSelectState()
+    public void CancelSelectState(bool leavePanelOpen = false)
     {
+        if (InSelectState && leavePanelOpen)
+        {
+            DebugMod.settings.SaveStatePanelVisible = true;
+            DebugMod.settings.SaveStatePanelExpanded = true;
+        }
+
         selectStateOperation = SelectOperation.None;
     }
 }
