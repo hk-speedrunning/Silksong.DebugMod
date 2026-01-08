@@ -371,6 +371,7 @@ public class MainPanel : CanvasPanel
 
         int units = relativeWidths[rowIndex];
         float width = Mathf.Ceil(singleWidth * units + UICommon.Margin * (units - 1));
+        width = Mathf.Min(width, row.Length() - row.GetCurrentLength());
         if (DebugMod.bindsByMethod.ContainsKey(effect.Method)) width -= UICommon.ControlHeight;
 
         CanvasButton button = row.AppendFixed(new CanvasButton(name), width);
