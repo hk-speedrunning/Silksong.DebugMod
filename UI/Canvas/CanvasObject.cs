@@ -28,13 +28,6 @@ public abstract class CanvasObject : CanvasNode
         base.OnUpdatePosition();
     }
 
-    private void AnchorToCenter()
-    {
-        Vector2 anchor = new((Position.x + Size.x / 2f) / Screen.width, 1f - (Position.y + Size.y / 2f) / Screen.height);
-        transform.anchorMin = transform.anchorMax = anchor;
-        transform.sizeDelta = Size;
-    }
-
     protected override void OnUpdateActive()
     {
         if (gameObject)
@@ -45,19 +38,23 @@ public abstract class CanvasObject : CanvasNode
         base.OnUpdateActive();
     }
 
+    protected override void OnUpdateParent()
+    {
+        if (gameObject)
+        {
+            UpdateClipRect();
+        }
+
+        base.OnUpdateParent();
+    }
+
     public override void Build()
     {
         gameObject = new GameObject(GetQualifiedName());
         gameObject.transform.SetParent(GUIController.Instance.canvas.transform, false);
 
-        CanvasRenderer renderer = gameObject.AddComponent<CanvasRenderer>();
-        if (ShouldClip(out Rect clipRect))
-        {
-            renderer.EnableRectClipping(clipRect);
-        }
-
+        gameObject.AddComponent<CanvasRenderer>();
         transform = gameObject.AddComponent<RectTransform>();
-        AnchorToCenter();
 
         if (!Interactable)
         {
@@ -68,7 +65,27 @@ public abstract class CanvasObject : CanvasNode
 
         gameObject.SetActive(ActiveInHierarchy);
 
+        AnchorToCenter();
+        UpdateClipRect();
+
         base.Build();
+    }
+
+    private void AnchorToCenter()
+    {
+        Vector2 anchor = new((Position.x + Size.x / 2f) / Screen.width, 1f - (Position.y + Size.y / 2f) / Screen.height);
+        transform.anchorMin = transform.anchorMax = anchor;
+        transform.sizeDelta = Size;
+    }
+
+    private void UpdateClipRect()
+    {
+        CanvasRenderer renderer = gameObject.GetComponent<CanvasRenderer>();
+        renderer.DisableRectClipping();
+        if (ShouldClip(out Rect clipRect))
+        {
+            renderer.EnableRectClipping(clipRect);
+        }
     }
 
     public override void Destroy()

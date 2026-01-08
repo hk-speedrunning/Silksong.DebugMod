@@ -44,6 +44,7 @@ public abstract class CanvasNode
 
                 OnUpdatePosition();
                 OnUpdateActive();
+                OnUpdateParent();
             }
         }
     }
@@ -146,6 +147,14 @@ public abstract class CanvasNode
         }
     }
 
+    protected virtual void OnUpdateParent()
+    {
+        foreach (CanvasNode child in ChildList())
+        {
+            child.OnUpdateParent();
+        }
+    }
+
     public virtual void Build()
     {
         foreach (CanvasNode child in ChildList())
@@ -156,12 +165,13 @@ public abstract class CanvasNode
 
     private void CheckUpdateHook()
     {
-        if (onUpdate != null && ActiveInHierarchy && !updateHooked)
+        bool shouldUpdate = onUpdate != null && ActiveInHierarchy;
+        if (shouldUpdate && !updateHooked)
         {
             allUpdates += Update;
             updateHooked = true;
         }
-        else if (updateHooked)
+        else if (!shouldUpdate && updateHooked)
         {
             allUpdates -= Update;
             updateHooked = false;
@@ -208,7 +218,7 @@ public abstract class CanvasNode
         return clip;
     }
 
-    protected bool IsMouseOver()
+    public bool IsMouseOver()
     {
         Rect bounds = new Rect(Position.x, Screen.height - Position.y - Size.y, Size.x, Size.y);
         if (ShouldClip(out Rect clipRect))
@@ -216,6 +226,12 @@ public abstract class CanvasNode
             clipRect = new Rect(clipRect.position + new Vector2(Screen.width / 2f, Screen.height / 2f), clipRect.size);
             bounds = Intersect(bounds, clipRect);
         }
+
+        // Add some tolerance, Unity seems to do the same with some of its pointer events
+        bounds.x--;
+        bounds.y--;
+        bounds.width += 2;
+        bounds.height += 2;
 
         return bounds.Contains(Input.mousePosition);
     }

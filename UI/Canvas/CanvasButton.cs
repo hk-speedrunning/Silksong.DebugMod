@@ -8,7 +8,6 @@ namespace DebugMod.UI.Canvas;
 public class CanvasButton : CanvasImage
 {
     private static CanvasBorder hoverBorder;
-    private static CanvasButton currentlyHovering;
 
     internal static void BuildHoverBorder()
     {
@@ -79,6 +78,7 @@ public class CanvasButton : CanvasImage
             yield return child;
         }
 
+        if (hoverBorder?.Parent == this) yield return hoverBorder;
         if (text != null) yield return text;
     }
 
@@ -94,8 +94,9 @@ public class CanvasButton : CanvasImage
 
     protected override void OnUpdateActive()
     {
-        if (!ActiveInHierarchy && currentlyHovering == this)
+        if (!ActiveInHierarchy && hoverBorder?.Parent == this)
         {
+            hoverBorder.Parent = null;
             hoverBorder.ActiveSelf = false;
         }
 
@@ -126,17 +127,21 @@ public class CanvasButton : CanvasImage
         {
             AddEventTrigger(EventTriggerType.PointerEnter, _ =>
             {
-                hoverBorder.LocalPosition = Position + hoverBorderPosition;
+                hoverBorder.Parent = this;
+                hoverBorder.LocalPosition = hoverBorderPosition;
                 hoverBorder.Size = hoverBorderSize;
-                hoverBorder.ActiveSelf = true;
-                currentlyHovering = this;
+                hoverBorder.ActiveSelf = IsMouseOver();
+                OnUpdate += UpdateHoverBorder;
             });
             AddEventTrigger(EventTriggerType.PointerExit, _ =>
             {
-                if (currentlyHovering == this)
+                if (hoverBorder.Parent == this)
                 {
+                    hoverBorder.Parent = null;
                     hoverBorder.ActiveSelf = false;
                 }
+
+                OnUpdate -= UpdateHoverBorder;
             });
         }
     }
@@ -144,5 +149,13 @@ public class CanvasButton : CanvasImage
     private void UpdateToggled()
     {
         SetImage(toggled ? UICommon.panelStrongBG : UICommon.panelBG);
+    }
+
+    private void UpdateHoverBorder()
+    {
+        if (hoverBorder.Parent == this)
+        {
+            hoverBorder.ActiveSelf = IsMouseOver();
+        }
     }
 }
