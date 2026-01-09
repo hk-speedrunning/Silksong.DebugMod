@@ -92,6 +92,7 @@ public static class UICommon
         }
 
         keybindButton.RemoveText();
+        keybindButton.Border.Sides &= ~BorderSides.LEFT;
         keybindButton.OnClicked += () => KeybindDialog.Instance.Toggle(keybindButton, action.Name);
 
         DebugMod.bindUpdated += (name, key) =>

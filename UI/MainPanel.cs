@@ -304,8 +304,8 @@ public class MainPanel : CanvasPanel
     private PanelBuilder AddTab(string name)
     {
         CanvasPanel tab = Add(new CanvasPanel(name));
-        tab.LocalPosition = new Vector2(0, TabButtonHeight);
-        tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - TabButtonHeight);
+        tab.LocalPosition = new Vector2(0, TabButtonHeight - UICommon.BORDER_THICKNESS);
+        tab.Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight - tab.LocalPosition.y);
         tab.CollapseMode = CollapseMode.Deny;
         UICommon.AddBackground(tab);
         tabs.Add(tab);
@@ -473,7 +473,6 @@ public class MainPanel : CanvasPanel
             button.LocalPosition = new Vector2(tabX, 0);
             button.Size = new Vector2(tabButtonWidth, TabButtonHeight);
             button.SetImage(UICommon.panelBG);
-            button.Border.Sides &= ~BorderSides.BOTTOM;
             button.Text.Text = tab.Name;
             button.OnClicked += () => DebugMod.settings.MainPanelCurrentTab = tab.Name;
             button.OnUpdate += () => button.Toggled = DebugMod.settings.MainPanelCurrentTab == tab.Name;

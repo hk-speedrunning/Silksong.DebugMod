@@ -21,8 +21,6 @@ public class CanvasButton : CanvasImage
     private CanvasText text;
     private bool toggled;
     private bool useHoverBorder = true;
-    private Vector2 hoverBorderPosition;
-    private Vector2 hoverBorderSize;
 
     public CanvasText Text => text;
 
@@ -104,20 +102,6 @@ public class CanvasButton : CanvasImage
 
     public override void Build()
     {
-        // Expand hover border to cover borders of adjacent buttons if it wouldn't already
-        if (Border != null && useHoverBorder)
-        {
-            hoverBorderPosition = Vector2.zero;
-            hoverBorderSize = Size;
-
-            if ((Border.Sides & BorderSides.LEFT) == 0) hoverBorderPosition -= new Vector2(Border.Thickness, 0);
-            if ((Border.Sides & BorderSides.RIGHT) == 0) hoverBorderSize += new Vector2(Border.Thickness, 0);
-            if ((Border.Sides & BorderSides.TOP) == 0) hoverBorderPosition -= new Vector2(0, Border.Thickness);
-            if ((Border.Sides & BorderSides.BOTTOM) == 0) hoverBorderSize += new Vector2(0, Border.Thickness);
-
-            hoverBorderSize -= hoverBorderPosition;
-        }
-
         base.Build();
 
         AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());
@@ -127,8 +111,7 @@ public class CanvasButton : CanvasImage
             AddEventTrigger(EventTriggerType.PointerEnter, _ =>
             {
                 hoverBorder.Parent = this;
-                hoverBorder.LocalPosition = hoverBorderPosition;
-                hoverBorder.Size = hoverBorderSize;
+                hoverBorder.Size = Size;
                 hoverBorder.ActiveSelf = IsMouseOver();
 
                 GameObject sibling = Border != null ? Border.GameObject : GameObject;
