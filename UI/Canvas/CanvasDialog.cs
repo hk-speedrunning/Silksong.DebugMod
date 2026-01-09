@@ -3,20 +3,19 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public class CanvasContextPanel : CanvasPanel
+public class CanvasDialog : CanvasPanel
 {
     private CanvasNode anchor;
-    private string key;
     private Vector2 anchorPos;
     private bool initialClickEnded;
 
-    public CanvasContextPanel(string name) : base(name)
+    public CanvasDialog(string name) : base(name)
     {
         ActiveSelf = false;
         OnUpdate += Update;
 
         UICommon.AddBackground(this);
-        Get<CanvasImage>("Background").SetImage(UICommon.contextPanelBG);
+        Get<CanvasImage>("Background").SetImage(UICommon.dialogBG);
     }
 
     private void Update()
@@ -36,27 +35,26 @@ public class CanvasContextPanel : CanvasPanel
         }
     }
 
-    protected bool TryToggle(CanvasNode anchor, string key)
+    protected bool TryToggle(CanvasNode anchor)
     {
-        if (ActiveInHierarchy && this.key == key)
+        if (ActiveInHierarchy && this.anchor == anchor)
         {
             Hide();
             return false;
         }
 
         this.anchor = anchor;
-        this.key = key;
         anchorPos = anchor.Position;
         initialClickEnded = false;
 
-        float x = (int)(anchor.Position.x + anchor.Size.x * 0.8f);
+        float x = (int)(anchor.Position.x + anchor.Size.x - UICommon.Margin);
         float xOver = x + Size.x - (Screen.width - UICommon.Margin);
         if (xOver > 0)
         {
             x -= xOver;
         }
 
-        float y = (int)(anchor.Position.y + anchor.Size.y * 0.8f);
+        float y = (int)(anchor.Position.y + anchor.Size.y - UICommon.Margin);
         float yOver = y + Size.y - (Screen.height - UICommon.Margin);
         if (yOver > 0)
         {
@@ -69,7 +67,7 @@ public class CanvasContextPanel : CanvasPanel
         return true;
     }
 
-    public virtual void Hide()
+    public void Hide()
     {
         anchor = null;
         ActiveSelf = false;

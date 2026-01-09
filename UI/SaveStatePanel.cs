@@ -1,5 +1,6 @@
 ﻿using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -110,7 +111,7 @@ public class SaveStatesPanel : CanvasPanel
             using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
             pageControl.Horizontal = true;
 
-            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(70));
+            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(75));
             pageText.Alignment = TextAnchor.MiddleLeft;
             pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
@@ -187,17 +188,29 @@ public class SaveStatesPanel : CanvasPanel
             write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.highlightColor : UICommon.borderColor;
             write.OnClicked += () =>
             {
-                if (IsWriteOperation())
-                {
-                    DoSelectOperation(index);
-                }
-                else if (InSelectState)
+                if (InSelectState && !IsWriteOperation())
                 {
                     CancelSelectState(true);
+                    return;
+                }
+
+                if (selectStateOperation != SelectOperation.SaveToFile && !SaveStateManager.GetQuickState().IsSet())
+                {
+                    DebugMod.LogConsole("Save a state to the quickslot before copying to a file slot");
+                    return;
+                }
+
+                Action action = InSelectState
+                    ? () => DoSelectOperation(index)
+                    : () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+
+                if (SaveStateManager.GetFileState(currentPage, index).IsSet())
+                {
+                    ConfirmDialog.Instance.Toggle(write, "Overwrite file slot?", action, () => CancelSelectState(true));
                 }
                 else
                 {
-                    SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+                    action();
                 }
             };
         }

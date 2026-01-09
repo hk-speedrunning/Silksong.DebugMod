@@ -280,7 +280,7 @@ public class MainPanel : CanvasPanel
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
                 keycode.Alignment = TextAnchor.MiddleLeft;
-                keycode.OnUpdate += () => keycode.Text = KeybindContextPanel.GetKeycodeText(action.Name);
+                keycode.OnUpdate += () => keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
                 edit.ImageOnly(UICommon.images["IconDotCircled"]);

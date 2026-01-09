@@ -95,7 +95,8 @@ public class GUIController : MonoBehaviour
             SaveStatesPanel.BuildPanel();
 
             CanvasButton.BuildHoverBorder();
-            KeybindContextPanel.BuildPanel();
+            KeybindDialog.BuildPanel();
+            ConfirmDialog.BuildPanel();
 
             resolution = Screen.currentResolution;
         }

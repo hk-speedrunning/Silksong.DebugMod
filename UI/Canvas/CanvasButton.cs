@@ -130,6 +130,10 @@ public class CanvasButton : CanvasImage
                 hoverBorder.LocalPosition = hoverBorderPosition;
                 hoverBorder.Size = hoverBorderSize;
                 hoverBorder.ActiveSelf = IsMouseOver();
+
+                GameObject sibling = Border != null ? Border.GameObject : GameObject;
+                hoverBorder.GameObject.transform.SetSiblingIndex(sibling.transform.GetSiblingIndex() + 1);
+
                 OnUpdate += UpdateHoverBorder;
             });
             AddEventTrigger(EventTriggerType.PointerExit, _ =>

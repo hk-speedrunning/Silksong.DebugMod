@@ -37,7 +37,7 @@ public static class UICommon
 
     public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
     public static readonly Texture2D panelStrongBG = SolidColor(strongColor);
-    public static readonly Texture2D contextPanelBG = SolidColor(baseColor);
+    public static readonly Texture2D dialogBG = SolidColor(baseColor);
 
     public static Font trajanBold;
     public static Font trajanNormal;
@@ -91,7 +91,7 @@ public static class UICommon
 
         keybindButton.RemoveText();
         keybindButton.Border.Sides &= ~BorderSides.LEFT;
-        keybindButton.OnClicked += () => KeybindContextPanel.Instance.Toggle(keybindButton, action.Name);
+        keybindButton.OnClicked += () => KeybindDialog.Instance.Toggle(keybindButton, action.Name);
 
         DebugMod.bindUpdated += (name, key) =>
         {

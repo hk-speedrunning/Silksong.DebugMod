@@ -3,25 +3,24 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
-public class KeybindContextPanel : CanvasContextPanel
+public class KeybindDialog : CanvasDialog
 {
     public static int PanelWidth => UICommon.ScaleWidth(150);
     public static int RowHeight => UICommon.ScaleHeight(18);
 
-    public static KeybindContextPanel Instance { get; private set; }
+    public static KeybindDialog Instance { get; private set; }
 
     private readonly CanvasText nameText;
-    private readonly CanvasText keycodeText;
 
     private BindAction bindAction;
 
     public static void BuildPanel()
     {
-        Instance = new KeybindContextPanel();
+        Instance = new KeybindDialog();
         Instance.Build();
     }
 
-    public KeybindContextPanel() : base(nameof(KeybindContextPanel))
+    public KeybindDialog() : base(nameof(KeybindDialog))
     {
         Size = new Vector2(PanelWidth, 0);
 
@@ -37,7 +36,7 @@ public class KeybindContextPanel : CanvasContextPanel
         row.InnerPadding = UICommon.Margin;
 
         // TODO: replace this with uneditable text field
-        keycodeText = row.AppendFlex(new CanvasText("Keycode"));
+        CanvasText keycodeText = row.AppendFlex(new CanvasText("Keycode"));
         keycodeText.Alignment = TextAnchor.MiddleLeft;
         keycodeText.OnUpdate += () => keycodeText.Text = GetKeycodeText(bindAction.Name);
 
@@ -64,7 +63,7 @@ public class KeybindContextPanel : CanvasContextPanel
 
     public void Toggle(CanvasNode anchor, string action)
     {
-        if (TryToggle(anchor, action))
+        if (TryToggle(anchor))
         {
             bindAction = DebugMod.bindActions[action];
             nameText.Text = bindAction.Name;
