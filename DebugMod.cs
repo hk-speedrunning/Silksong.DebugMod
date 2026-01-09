@@ -85,7 +85,10 @@ public partial class DebugMod : BaseUnityPlugin
     {
         LoadSettings();
 
-        if (settings.LogUnityExceptions)
+        if (settings.LogUnityExceptions
+            // If there's an existing unity log source, then messages are logged already
+            // so no need to log them separately
+            && !BepInEx.Logging.Logger.Sources.Any(x => x is BepInEx.Logging.UnityLogSource))
         {
             Application.logMessageReceived += (condition, stackTrace, type) =>
             {
