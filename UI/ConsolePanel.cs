@@ -25,8 +25,6 @@ public class ConsolePanel : CanvasPanel
         LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ScreenMargin - UICommon.ConsoleHeight);
         Size = new Vector2(UICommon.LeftSideWidth, UICommon.ConsoleHeight);
 
-        UICommon.AddBackground(this);
-
         float lineHeight = (Size.y - UICommon.Margin * 2) / MAX_LINES;
         for (int i = 0; i < MAX_LINES; i++)
         {
