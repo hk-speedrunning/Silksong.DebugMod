@@ -102,10 +102,10 @@ public class SaveStatesPanel : CanvasPanel
         builder = new(expanded);
         builder.DynamicLength = true;
         builder.OuterPadding = ContentMargin(UICommon.Margin);
-        builder.Padding = UICommon.Margin;
+        builder.InnerPadding = UICommon.Margin;
 
         // Positions builder at the bottom of the collapsed elements
-        builder.AppendPadding(collapsed.Size.y - builder.OuterPadding * 2);
+        builder.AppendPadding((int)collapsed.Size.y - builder.OuterPadding * 2);
 
         {
             using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));

@@ -78,6 +78,8 @@ public static class UICommon
 
     public static CanvasButton AppendKeybindButton(PanelBuilder builder, BindAction action)
     {
+        builder.AppendPadding(-BORDER_THICKNESS);
+
         CanvasButton keybindButton = builder.AppendSquare(new CanvasButton($"{action.Name} Keybind"));
 
         if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
@@ -90,7 +92,6 @@ public static class UICommon
         }
 
         keybindButton.RemoveText();
-        keybindButton.Border.Sides &= ~BorderSides.LEFT;
         keybindButton.OnClicked += () => KeybindDialog.Instance.Toggle(keybindButton, action.Name);
 
         DebugMod.bindUpdated += (name, key) =>

@@ -108,8 +108,8 @@ public class EnemiesPanel : CanvasPanel
         }
 
         CanvasPanel footer = Add(new CanvasPanel("Footer"));
-        footer.LocalPosition = new Vector2(UICommon.Margin, Size.y - UICommon.Margin - UICommon.ControlHeight);
-        footer.Size = new Vector2(Size.x - UICommon.Margin * 2, UICommon.ControlHeight);
+        footer.LocalPosition = new Vector2(ContentMargin(UICommon.Margin), Size.y - ContentMargin(UICommon.Margin) - UICommon.ControlHeight);
+        footer.Size = new Vector2(Size.x - ContentMargin(UICommon.Margin) * 2, UICommon.ControlHeight);
 
         using PanelBuilder footerBuilder = new(footer);
         footerBuilder.Horizontal = true;

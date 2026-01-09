@@ -42,7 +42,7 @@ public class MainPanel : CanvasPanel
     private PanelBuilder currentTab;
     private PanelBuilder currentRow;
     private int rowCounter;
-    private int[] relativeWidths;
+    private int[] rowWidths;
     private int rowIndex;
 
     public static void BuildPanel()
@@ -341,11 +341,21 @@ public class MainPanel : CanvasPanel
         PanelBuilder builder = new(row);
         builder.Horizontal = true;
 
+        int totalWidth = (int)row.Size.x;
+        int widthUnits = widths.Sum();
+        int singleWidth = (totalWidth - UICommon.Margin * (widthUnits - 1)) / widthUnits;
+
+        rowWidths = new int[widths.Length];
+        for (int i = 0; i < widths.Length; i++)
+        {
+            rowWidths[i] = singleWidth * widths[i] + UICommon.Margin * (widths[i] - 1);
+        }
+
         currentRow?.Build();
         currentRow = builder;
         rowCounter++;
-        relativeWidths = widths;
         rowIndex = 0;
+
         return builder;
     }
 
@@ -366,13 +376,16 @@ public class MainPanel : CanvasPanel
     {
         PanelBuilder row = currentRow ?? AppendRow(1);
 
-        int widthUnits = relativeWidths.Sum();
-        float singleWidth = (row.Length() - UICommon.Margin * (widthUnits - 1)) / widthUnits;
+        int width = rowWidths[rowIndex];
+        if (rowIndex == rowWidths.Length - 1)
+        {
+            width = (int)(row.Length() - row.GetCurrentLength());
+        }
 
-        int units = relativeWidths[rowIndex];
-        float width = Mathf.Ceil(singleWidth * units + UICommon.Margin * (units - 1));
-        width = Mathf.Min(width, row.Length() - row.GetCurrentLength());
-        if (DebugMod.bindsByMethod.ContainsKey(effect.Method)) width -= UICommon.ControlHeight;
+        if (DebugMod.bindsByMethod.ContainsKey(effect.Method))
+        {
+            width -= UICommon.ControlHeight - UICommon.BORDER_THICKNESS;
+        }
 
         CanvasButton button = row.AppendFixed(new CanvasButton(name), width);
         button.Text.Text = name;
@@ -410,11 +423,11 @@ public class MainPanel : CanvasPanel
         }
 
         rowIndex++;
-        if (rowIndex == relativeWidths.Length)
+        if (rowIndex == rowWidths.Length)
         {
             currentRow.Build();
             currentRow = null;
-            relativeWidths = null;
+            rowWidths = null;
             rowIndex = 0;
         }
         else
