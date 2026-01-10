@@ -16,6 +16,7 @@ public class EnemiesPanel : CanvasPanel
     public static bool hpBars;
 
     private readonly List<CanvasPanel> listings = [];
+    private readonly CanvasPanel listingsPanel;
 
     public static void BuildPanel()
     {
@@ -35,18 +36,28 @@ public class EnemiesPanel : CanvasPanel
         builder.OuterPadding = ContentMargin(UICommon.Margin);
         builder.InnerPadding = UICommon.Margin;
 
-        while (builder.GetCurrentLength() + ListingHeight + UICommon.Margin <= Size.y - UICommon.ControlHeight - UICommon.Margin * 2)
+        CanvasScrollView scrollView = builder.AppendFlex(new CanvasScrollView("ListingsScrollView"));
+        scrollView.Margin = new Vector2(-UICommon.BORDER_THICKNESS, -UICommon.BORDER_THICKNESS);
+
+        listingsPanel = scrollView.SetContent(new CanvasPanel("Listings"));
+        listingsPanel.Size = scrollView.Size;
+
+        using PanelBuilder listingBuilder = new(listingsPanel);
+        listingBuilder.DynamicLength = true;
+        listingBuilder.InnerPadding = UICommon.Margin;
+
+        for (int i = 0; i < 100; i++)
         {
             int index = listings.Count;
 
-            CanvasPanel listing = builder.AppendFixed(new CanvasPanel($"{index + 1}"), ListingHeight);
+            CanvasPanel listing = listingBuilder.AppendFixed(new CanvasPanel($"{index + 1}"), ListingHeight);
             listing.CollapseMode = CollapseMode.Deny;
             listings.Add(listing);
 
-            using PanelBuilder listingBuilder = new(listing);
-            listingBuilder.Horizontal = true;
+            using PanelBuilder row = new(listing);
+            row.Horizontal = true;
 
-            CanvasText enemyName = listingBuilder.AppendFlex(new CanvasText("EnemyName"));
+            CanvasText enemyName = row.AppendFlex(new CanvasText("EnemyName"));
             enemyName.Alignment = TextAnchor.MiddleLeft;
             enemyName.OnUpdate += () =>
             {
@@ -56,7 +67,7 @@ public class EnemiesPanel : CanvasPanel
                 }
             };
 
-            CanvasText enemyHp = listingBuilder.AppendFixed(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
+            CanvasText enemyHp = row.AppendFixed(new CanvasText("EnemyHP"), UICommon.ScaleWidth(80));
             enemyHp.Alignment = TextAnchor.MiddleLeft;
             enemyHp.OnUpdate += () =>
             {
@@ -66,7 +77,7 @@ public class EnemiesPanel : CanvasPanel
                 }
             };
 
-            CanvasButton delete = listingBuilder.AppendSquare(new CanvasButton("Delete"));
+            CanvasButton delete = row.AppendSquare(new CanvasButton("Delete"));
             delete.ImageOnly(UICommon.images["IconX"]);
             delete.OnClicked += () =>
             {
@@ -78,9 +89,9 @@ public class EnemiesPanel : CanvasPanel
                 }
             };
 
-            listingBuilder.AppendPadding(UICommon.Margin);
+            row.AppendPadding(UICommon.Margin);
 
-            CanvasButton clone = listingBuilder.AppendSquare(new CanvasButton("Clone"));
+            CanvasButton clone = row.AppendSquare(new CanvasButton("Clone"));
             clone.ImageOnly(UICommon.images["IconPlus"]);
             clone.OnClicked += () =>
             {
@@ -92,9 +103,9 @@ public class EnemiesPanel : CanvasPanel
                 }
             };
 
-            listingBuilder.AppendPadding(UICommon.Margin);
+            row.AppendPadding(UICommon.Margin);
 
-            CanvasButton infHealth = listingBuilder.AppendSquare(new CanvasButton("InfiniteHealth"));
+            CanvasButton infHealth = row.AppendSquare(new CanvasButton("InfiniteHealth"));
             infHealth.ImageOnly(UICommon.images["IconShield"]);
             infHealth.OnClicked += () =>
             {
@@ -107,10 +118,7 @@ public class EnemiesPanel : CanvasPanel
             };
         }
 
-        CanvasPanel footer = Add(new CanvasPanel("Footer"));
-        footer.LocalPosition = new Vector2(ContentMargin(UICommon.Margin), Size.y - ContentMargin(UICommon.Margin) - UICommon.ControlHeight);
-        footer.Size = new Vector2(Size.x - ContentMargin(UICommon.Margin) * 2, UICommon.ControlHeight);
-
+        CanvasPanel footer = builder.AppendFixed(new CanvasPanel("Footer"), UICommon.ControlHeight);
         using PanelBuilder footerBuilder = new(footer);
         footerBuilder.Horizontal = true;
 
@@ -152,6 +160,9 @@ public class EnemiesPanel : CanvasPanel
         {
             listings[i].ActiveSelf = i < enemyCount;
         }
+
+        CanvasPanel lastListing = enemyPool.Count > 0 ? listings[enemyPool.Count - 1] : listings[0];
+        listingsPanel.Size = new Vector2(listingsPanel.Size.x, lastListing.LocalPosition.y + lastListing.Size.y);
     }
 
     public static bool ActivelyUpdating()
