@@ -84,9 +84,7 @@ public class CanvasText : CanvasObject
 
         if (current != desired)
         {
-            // Recursively calls base method
-            LocalPosition += desired - current;
-            return;
+            localPosition += desired - current;
         }
 
         base.OnUpdatePosition();
