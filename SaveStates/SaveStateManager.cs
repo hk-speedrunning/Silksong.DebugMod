@@ -158,12 +158,6 @@ public static class SaveStateManager
             return false;
         }
 
-        if (HeroController.instance.transform.parent != null)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when on elevators");
-            return false;
-        }
-
         if (loadingSavestate != null)
         {
             if (DebugMod.overrideLoadLockout)

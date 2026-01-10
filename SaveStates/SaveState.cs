@@ -264,6 +264,12 @@ public class SaveState
             }
         }
 
+        if (HeroController.instance.transform.parent)
+        {
+            HeroController.instance.transform.SetParent(null, true);
+            Object.DontDestroyOnLoad(HeroController.instance);
+        }
+
         GameManager.instance.entryGateName = "dreamGate";
         GameManager.instance.startedOnThisScene = true;
 
