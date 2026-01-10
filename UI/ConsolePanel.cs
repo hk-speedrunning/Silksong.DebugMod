@@ -7,7 +7,7 @@ namespace DebugMod.UI;
 
 public class ConsolePanel : CanvasPanel
 {
-    public const int MAX_LINES = 16;
+    public const int MAX_LINES = 15;
 
     public static ConsolePanel Instance { get; private set; }
     private static readonly List<string> history = [];
@@ -24,6 +24,12 @@ public class ConsolePanel : CanvasPanel
     {
         LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ScreenMargin - UICommon.ConsoleHeight);
         Size = new Vector2(UICommon.LeftSideWidth, UICommon.ConsoleHeight);
+
+        CanvasBorder border = Add(new CanvasBorder("Border"));
+        border.LocalPosition = new Vector2(0, UICommon.Margin / 2f);
+        border.Size = new Vector2(Size.x, Size.y - UICommon.Margin);
+        border.Sides = BorderSides.LEFT;
+        border.Color = UICommon.iconColor;
 
         float lineHeight = (Size.y - UICommon.Margin * 2) / MAX_LINES;
         for (int i = 0; i < MAX_LINES; i++)

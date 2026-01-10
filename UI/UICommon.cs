@@ -127,19 +127,9 @@ public static class UICommon
                 trajanNormal = f;
             }
 
-            //Just in case for some reason the computer doesn't have arial
-            if (f != null && f.name == "Perpetua")
+            if (f != null && f.name == "ARIAL")
             {
                 arial = f;
-            }
-        }
-
-        foreach (string font in Font.GetOSInstalledFontNames())
-        {
-            if (font.ToLower().Contains("arial"))
-            {
-                arial = Font.CreateDynamicFontFromOSFont(font, 13);
-                break;
             }
         }
 
