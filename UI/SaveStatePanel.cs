@@ -292,7 +292,7 @@ public class SaveStatesPanel : CanvasPanel
 
     public void NextPage()
     {
-        if (ActiveInHierarchy)
+        if (ShouldBeVisible && ShouldBeExpanded)
         {
             currentPage++;
             if (currentPage >= SaveStateManager.NumPages)
@@ -304,7 +304,7 @@ public class SaveStatesPanel : CanvasPanel
 
     public void PrevPage()
     {
-        if (ActiveInHierarchy)
+        if (ShouldBeVisible && ShouldBeExpanded)
         {
             currentPage--;
             if (currentPage < 0)
