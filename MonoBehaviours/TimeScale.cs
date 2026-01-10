@@ -1,18 +1,18 @@
-﻿using System;
+﻿using HarmonyLib;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using HarmonyLib;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
 
 [HarmonyPatch]
-public class TimeScale:MonoBehaviour
+public class TimeScale : MonoBehaviour
 {
     private static bool hooksActive;
 
@@ -29,12 +29,12 @@ public class TimeScale:MonoBehaviour
         {
             _coroutineHooks[idx] = new ILHook(coro, ScaleFreeze);
         }
-        
+
     }
-    
+
     public void OnDestroy()
     {
-        
+
         foreach (ILHook hook in _coroutineHooks)
             hook.Dispose();
 
@@ -43,7 +43,7 @@ public class TimeScale:MonoBehaviour
 
         hooksActive = false;
     }
-     
+
     private readonly MethodInfo[] FreezeCoroutines = (
         from method in typeof(GameManager).GetMethods()
         where method.Name.StartsWith("FreezeMoment") || method.Name.StartsWith("SetTimeScale")
@@ -95,7 +95,7 @@ public class TimeScale:MonoBehaviour
         float temp = newTimeScale;
         if (__instance.timeSlowedCount > 1)
             temp = Math.Min(temp, TimeManager.TimeScale);
-        
+
         TimeManager.TimeScale = (temp <= 0.01f ? 0f : temp) * DebugMod.CurrentTimeScale;
         return false;
     }

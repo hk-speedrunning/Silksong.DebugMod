@@ -1,9 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using BepInEx;
 using DebugMod.Helpers;
 using DebugMod.SaveStates;
@@ -11,8 +5,13 @@ using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
 using JetBrains.Annotations;
-using MonoMod.ModInterop;
 using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,13 +26,11 @@ public partial class DebugMod : BaseUnityPlugin
     private static InputHandler _ih;
     private static HeroController _hc;
     private static GameObject _refKnight;
-    private static PlayMakerFSM _refKnightSlash;
     private static CameraController _refCamera;
-    private static PlayMakerFSM _refDreamNail;
     private static Collider2D _refHeroCollider;
     private static Collider2D _refHeroBox;
 
-    internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager.instance);
+    internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager.SilentInstance);
     internal static InputHandler IH => _ih != null ? _ih : (_ih = GM.inputHandler);
     internal static HeroController HC => _hc != null ? _hc : (_hc = HeroController.instance);
     internal static GameObject RefKnight => _refKnight != null ? _refKnight : (_refKnight = HC.gameObject);
@@ -68,7 +65,6 @@ public partial class DebugMod : BaseUnityPlugin
     internal static bool noclip;
     internal static Vector3 noclipPos;
     internal static bool cameraFollow;
-    internal static SaveStateManager saveStateManager;
     public static bool KeyBindLock;
     internal static bool TimeScaleActive;
     internal static float CurrentTimeScale = 1f;
@@ -76,9 +72,14 @@ public partial class DebugMod : BaseUnityPlugin
     internal static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
     internal static int extraNailDamage;
+    internal static bool forcePaused;
+    internal static bool frameAdvanceActive;
+    internal static bool advancingFrame;
 
     internal static readonly Dictionary<string, BindAction> bindActions = new();
+    internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
     internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
+    internal static event Action<string, KeyCode?> bindUpdated;
 
     public void Awake()
     {
@@ -104,7 +105,9 @@ public partial class DebugMod : BaseUnityPlugin
             if (attributes.Any())
             {
                 BindableMethod attr = (BindableMethod)attributes[0];
-                bindActions.Add(attr.name, new BindAction(attr, method));
+                BindAction action = new(attr, method);
+                bindActions.Add(attr.name, action);
+                bindsByMethod.Add(method, action);
             }
         }
 
@@ -126,7 +129,7 @@ public partial class DebugMod : BaseUnityPlugin
             alphaKeyDict.Add((KeyCode)(alphaStart + i), i);
         }
 
-        saveStateManager = new SaveStateManager();
+        SaveStateManager.Initialize();
 
         Harmony harmony = new(Id);
         harmony.PatchAll();
@@ -138,14 +141,9 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.TakeHealthHook += PlayerDamaged;
         ModHooks.ApplicationQuitHook += SaveSettings;
 
-        if (settings.ShowCursorWhileUnpaused)
-        {
-            BindableFunctions.SetAlwaysShowCursor();
-        }
-
         ModHooks.FinishedLoadingModsHook += () =>
         {
-            BossHandler.PopulateBossLists();
+            UICommon.LoadResources();
             GUIController.Instance.BuildMenus();
             SceneWatcher.Init();
 
@@ -161,8 +159,6 @@ public partial class DebugMod : BaseUnityPlugin
     public DebugMod()
     {
         instance = this;
-        // Register exports early so other mods can use them when initializing
-        typeof(DebugExport).ModInterop();
     }
 
     private void LoadSettings()
@@ -202,13 +198,26 @@ public partial class DebugMod : BaseUnityPlugin
         }
     }
 
+    public static void UpdateBind(string name, KeyCode? key)
+    {
+        if (key.HasValue)
+        {
+            settings.binds[name] = key.Value;
+        }
+        else
+        {
+            settings.binds.Remove(name);
+        }
+        bindUpdated?.Invoke(name, key);
+    }
+
     private int PlayerDamaged(int damageAmount)
     {
 
         int damage = infiniteHP ? 0 : damageAmount;
         if (stateOnDeath && (PlayerData.instance.health - damage <= 0))
         {
-            saveStateManager.LoadSaveState(SaveStateType.Memory);
+            SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             LogConsole("Lethal damage prevented, savestate loading");
             return 0;
         }
@@ -234,7 +243,7 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void LoadCharacter(SaveGameData saveGameData)
     {
-        ConsolePanel.Reset();
+        ConsolePanel.Instance?.Reset();
 
         playerInvincible = false;
         infiniteHP = false;
@@ -267,7 +276,6 @@ public partial class DebugMod : BaseUnityPlugin
             _loadTime = Time.realtimeSinceStartup;
             LogConsole("New scene loaded: " + sceneName);
             PlayerDeathWatcher.Reset();
-            BossHandler.LookForBoss(sceneName);
             VisualMaskHelper.OnSceneChange(sceneTo);
         }
     }
@@ -434,6 +442,6 @@ public partial class DebugMod : BaseUnityPlugin
 
     public static void LogConsole(string message)
     {
-        ConsolePanel.AddLine(message);
+        ConsolePanel.Instance.AddLine(message);
     }
 }

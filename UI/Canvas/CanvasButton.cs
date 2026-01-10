@@ -1,39 +1,146 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
+    private static CanvasBorder hoverBorder;
+
+    internal static void BuildHoverBorder()
+    {
+        hoverBorder = new CanvasBorder("HoverBorder");
+        hoverBorder.Size = new Vector2(1, 1);
+        hoverBorder.Color = UICommon.accentColor;
+        hoverBorder.ActiveSelf = false;
+        hoverBorder.Build();
+    }
+
     private CanvasText text;
+    private bool toggled;
+    private bool useHoverBorder = true;
+
+    public CanvasText Text => text;
+
+    public bool Toggled
+    {
+        get => toggled;
+        set
+        {
+            if (toggled != value)
+            {
+                toggled = value;
+                UpdateToggled();
+            }
+        }
+    }
+
+    public event Action OnClicked;
 
     protected override bool Interactable => true;
 
-    public CanvasButton(string name, CanvasNode parent, Vector2 position, Vector2 size, Action clicked, Texture2D tex, Rect subSprite)
-        : base(name, parent, position, size, tex, subSprite)
+    public CanvasButton(string name) : base(name)
     {
-        obj.AddComponent<Button>().onClick.AddListener(() => clicked());
+        SetImage(UICommon.panelBG);
+        AddBorder();
+
+        text = new CanvasText("ButtonText");
+        text.Parent = this;
+        text.Alignment = TextAnchor.MiddleCenter;
+    }
+
+    public void RemoveText()
+    {
+        text = null;
+    }
+
+    public void RemoveHoverBorder()
+    {
+        useHoverBorder = false;
+    }
+
+    public void ImageOnly(Texture2D tex, Rect subSprite = default)
+    {
+        SetImage(tex, subSprite);
+        RemoveText();
+        RemoveBorder();
+        RemoveHoverBorder();
     }
 
     protected override IEnumerable<CanvasNode> ChildList()
     {
+        foreach (CanvasNode child in base.ChildList())
+        {
+            yield return child;
+        }
+
+        if (hoverBorder?.Parent == this) yield return hoverBorder;
         if (text != null) yield return text;
     }
 
-    public void SetText(string t, Font font, int fontSize = 13,
-        FontStyle style = FontStyle.Normal, TextAnchor alignment = TextAnchor.UpperLeft)
+    protected override void OnUpdatePosition()
     {
-        text = new CanvasText("ButtonText", this, Vector2.zero, Size, t, font, fontSize, style, alignment);
+        if (text != null)
+        {
+            text.Size = Size;
+        }
+
+        base.OnUpdatePosition();
     }
 
-    public void UpdateText(string t) => text.UpdateText(t);
-    public void SetTextColor(Color color) => text.SetTextColor(color);
-
-    public void MoveToTop()
+    protected override void OnUpdateActive()
     {
-        obj.transform.SetAsLastSibling();
-        text?.MoveToTop();
+        if (!ActiveInHierarchy && hoverBorder?.Parent == this)
+        {
+            hoverBorder.ActiveSelf = false;
+        }
+
+        base.OnUpdateActive();
+    }
+
+    public override void Build()
+    {
+        base.Build();
+
+        AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());
+
+        if (useHoverBorder)
+        {
+            AddEventTrigger(EventTriggerType.PointerEnter, _ =>
+            {
+                hoverBorder.Parent = this;
+                hoverBorder.Size = Size;
+                hoverBorder.ActiveSelf = IsMouseOver();
+
+                GameObject sibling = Border != null ? Border.GameObject : GameObject;
+                hoverBorder.GameObject.transform.SetSiblingIndex(sibling.transform.GetSiblingIndex() + 1);
+
+                OnUpdate += UpdateHoverBorder;
+            });
+            AddEventTrigger(EventTriggerType.PointerExit, _ =>
+            {
+                if (hoverBorder.Parent == this)
+                {
+                    hoverBorder.ActiveSelf = false;
+                }
+
+                OnUpdate -= UpdateHoverBorder;
+            });
+        }
+    }
+
+    private void UpdateToggled()
+    {
+        SetImage(toggled ? UICommon.panelStrongBG : UICommon.panelBG);
+    }
+
+    private void UpdateHoverBorder()
+    {
+        if (hoverBorder.Parent == this)
+        {
+            hoverBorder.ActiveSelf = IsMouseOver();
+        }
     }
 }

@@ -1,83 +1,348 @@
-﻿using System.Collections.Generic;
-using DebugMod.SaveStates;
+﻿using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DebugMod.UI;
 
-public static class SaveStatesPanel
+public class SaveStatesPanel : CanvasPanel
 {
-    private static CanvasPanel statePanel;
+    public static int QuickSlotButtonWidth => UICommon.ScaleWidth(90);
+    public static int FileSlotButtonWidth => UICommon.ScaleWidth(60);
+    public static int IconPadding => UICommon.ScaleHeight(4);
 
-    public static void BuildMenu(GameObject canvas)
+    public static SaveStatesPanel Instance { get; private set; }
+
+    public static bool ShouldBeVisible => DebugMod.settings.SaveStatePanelVisible || InSelectState;
+    public static bool ShouldBeExpanded => DebugMod.settings.SaveStatePanelExpanded || InSelectState;
+    public static bool InSelectState => Instance != null && Instance.selectStateOperation != SelectOperation.None;
+
+    private SelectOperation selectStateOperation;
+    private int currentPage;
+
+    public static void BuildPanel()
     {
-        statePanel = new CanvasPanel(
-            nameof(SaveStatesPanel),
-            null,
-            new Vector2(720f, 40f),
-            Vector2.zero,
-            GUIController.Instance.images["BlankVertical"],
-            new Rect(
-                0f,
-                0f,
-                GUIController.Instance.images["BlankVertical"].width,
-                GUIController.Instance.images["BlankVertical"].height
-            )
-        );
-        statePanel.AddText("CurrentFolder", "Page: " + (SaveStateManager.currentStateFolder + 1).ToString(), new Vector2(8, 0), Vector2.zero, GUIController.Instance.arial, 15);
-        statePanel.AddText("Mode", "mode: ", new Vector2(8, 20), Vector2.zero, GUIController.Instance.arial, 15);
-        statePanel.AddText("currentmode", "-", new Vector2(60, 20), Vector2.zero, GUIController.Instance.arial, 15);
-
-        for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
-        {
-            int index = i; // lambda capturing reasons
-
-            statePanel.AddButton($"Rename{i}", GUIController.Instance.images["ButtonRun"], new Vector2(-5, i * 20 + 42), new Vector2(12, 12),
-                () => SaveStateManager.RenameSaveState(index), new Rect(0, 0, GUIController.Instance.images["ButtonRun"].width, GUIController.Instance.images["ButtonRun"].height));
-
-            //Labels - these shouldn't be modified
-            statePanel.AddText($"Slot{i}", i.ToString(), new Vector2(10, i * 20 + 40), Vector2.zero, GUIController.Instance.arial, 15);
-
-            //Values
-            statePanel.AddText(i.ToString(), "", new Vector2(50, i * 20 + 40), Vector2.zero, GUIController.Instance.arial, 15);
-        }
+        Instance = new SaveStatesPanel();
+        Instance.Build();
     }
 
-    public static void Update()
+    public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
-        if (statePanel == null)
+        LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
+        Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
+        OnUpdate += Update;
+
+        CanvasImage expandedBackground = UICommon.AddBackground(this);
+        OnUpdate += () => expandedBackground.ActiveSelf = ShouldBeExpanded;
+
+        CanvasPanel collapsed = Add(new CanvasPanel("Collapsed"));
+        collapsed.Size = Size;
+        collapsed.CollapseMode = CollapseMode.Deny;
+
+        PanelBuilder builder = new(collapsed);
+        builder.DynamicLength = true;
+        builder.OuterPadding = ContentMargin(UICommon.Margin);
+        builder.InnerPadding = UICommon.Margin;
+
         {
-            return;
-        }
+            using PanelBuilder quickslot = new(builder.AppendFixed(new CanvasPanel("Quickslot"), UICommon.ControlHeight));
+            quickslot.Horizontal = true;
 
-        if (GUIController.ForceHideUI())
-        {
-            statePanel.ActiveSelf = false;
-            return;
-        }
+            CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
+            quickslotLabel.Alignment = TextAnchor.MiddleLeft;
+            quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
 
-        statePanel.ActiveSelf = DebugMod.settings.SaveStatePanelVisible;
-
-        if (statePanel.ActiveInHierarchy)
-        {
-            statePanel.GetText("currentmode").UpdateText(SaveStateManager.currentStateOperation);
-            statePanel.GetText("CurrentFolder").UpdateText($"Page: {SaveStateManager.currentStateFolder+1}/{SaveStateManager.savePages}");
-
-            Dictionary<int, string[]> info = SaveStateManager.GetSaveStatesInfo();
-
-            for (int i = 0; i < SaveStateManager.maxSaveStates; i++)
+            CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth - UICommon.ControlHeight);
+            load.Text.Text = "Load";
+            load.OnClicked += () =>
             {
-                if (info.TryGetValue(i, out string[] array))
+                CancelSelectState(true);
+                SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            };
+
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (load)"]);
+
+            quickslot.AppendPadding(UICommon.Margin);
+
+            CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth - UICommon.ControlHeight);
+            save.Text.Text = "Save";
+            save.OnClicked += () =>
+            {
+                CancelSelectState(true);
+                SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
+            };
+
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Quickslot (save)"]);
+
+            quickslot.AppendPadding(UICommon.Margin);
+
+            CanvasPanel toggleViewWrapper = quickslot.AppendSquare(new CanvasPanel("ToggleViewWrapper"));
+            toggleViewWrapper.CollapseMode = CollapseMode.AllowNoRenaming;
+            using PanelBuilder wrapper = new(toggleViewWrapper);
+            wrapper.Padding = IconPadding;
+
+            CanvasButton toggleViewButton = wrapper.AppendFlex(new CanvasButton("ToggleView"));
+            toggleViewButton.ImageOnly(UICommon.images["IconPlus"]);
+            toggleViewButton.OnUpdate += () => toggleViewButton.SetImage(
+                ShouldBeExpanded ? UICommon.images["IconMinus"] : UICommon.images["IconPlus"]);
+            toggleViewButton.OnClicked += ToggleView;
+        }
+
+        builder.Build();
+
+        CanvasImage collapsedBackground = UICommon.AddBackground(collapsed);
+        OnUpdate += () => collapsedBackground.ActiveSelf = !ShouldBeExpanded;
+
+        CanvasPanel expanded = Add(new CanvasPanel("Expanded"));
+        expanded.Size = Size;
+        expanded.CollapseMode = CollapseMode.Deny;
+        OnUpdate += () => expanded.ActiveSelf = ShouldBeExpanded;
+
+        builder = new(expanded);
+        builder.DynamicLength = true;
+        builder.OuterPadding = ContentMargin(UICommon.Margin);
+        builder.InnerPadding = UICommon.Margin;
+
+        // Positions builder at the bottom of the collapsed elements
+        builder.AppendPadding((int)collapsed.Size.y - builder.OuterPadding * 2);
+
+        {
+            using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
+            pageControl.Horizontal = true;
+
+            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(75));
+            pageText.Alignment = TextAnchor.MiddleLeft;
+            pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
+
+            CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
+            prevPage.ImageOnly(UICommon.images["IconMinus"]);
+            prevPage.OnClicked += PrevPage;
+
+            pageControl.AppendPadding(UICommon.Margin);
+
+            CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
+            nextPage.ImageOnly(UICommon.images["IconPlus"]);
+            nextPage.OnClicked += NextPage;
+
+            CanvasText currentOperation = pageControl.AppendFlex(new CanvasText("CurrentOperation"));
+            currentOperation.Alignment = TextAnchor.MiddleRight;
+            currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
+        }
+
+        for (int i = 0; i < SaveStateManager.STATES_PER_PAGE; i++)
+        {
+            int index = i; // Need immutable variable to capture in lambda functions
+
+            using PanelBuilder fileSlot = new(builder.AppendFixed(new CanvasPanel(index.ToString()), UICommon.ControlHeight));
+            fileSlot.Horizontal = true;
+
+            CanvasText number = fileSlot.AppendFixed(new CanvasText("Number"), UICommon.ScaleWidth(30));
+            number.Alignment = TextAnchor.MiddleLeft;
+            number.Text = index.ToString();
+            number.OnUpdate += () => number.Color = InSelectState ? UICommon.highlightColor : UICommon.textColor;
+
+            CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
+            name.Alignment = TextAnchor.MiddleLeft;
+            name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
+            name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
+
+            CanvasPanel renameWrapper = fileSlot.AppendSquare(new CanvasPanel("RenameWrapper"));
+            renameWrapper.CollapseMode = CollapseMode.AllowNoRenaming;
+            using PanelBuilder wrapper = new(renameWrapper);
+            wrapper.Padding = IconPadding;
+
+            CanvasButton rename = wrapper.AppendFlex(new CanvasButton("Rename"));
+            rename.ImageOnly(UICommon.images["IconEditText"]);
+            rename.OnClicked += () =>
+            {
+                CancelSelectState(true);
+                name.Activate();
+            };
+
+            fileSlot.AppendPadding(UICommon.Margin);
+
+            CanvasButton read = fileSlot.AppendFixed(new CanvasButton("Read"), FileSlotButtonWidth);
+            read.Text.Text = "Read";
+            read.OnUpdate += () => read.Border.Color = IsReadOperation() ? UICommon.highlightColor : UICommon.borderColor;
+            read.OnClicked += () =>
+            {
+                if (IsReadOperation())
                 {
-                    statePanel.GetText(i.ToString()).UpdateText($"{array[0]} - {array[1]}");
-                    statePanel.GetButton($"Rename{i}").ActiveSelf = true;
+                    DoSelectOperation(index);
+                }
+                else if (InSelectState)
+                {
+                    CancelSelectState(true);
                 }
                 else
                 {
-                    statePanel.GetText(i.ToString()).UpdateText("open");
-                    statePanel.GetButton($"Rename{i}").ActiveSelf = false;
+                    SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
+                }
+            };
+
+            fileSlot.AppendPadding(UICommon.Margin);
+
+            CanvasButton write = fileSlot.AppendFixed(new CanvasButton("Write"), FileSlotButtonWidth);
+            write.Text.Text = "Write";
+            write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.highlightColor : UICommon.borderColor;
+            write.OnClicked += () =>
+            {
+                if (InSelectState && !IsWriteOperation())
+                {
+                    CancelSelectState(true);
+                    return;
+                }
+
+                if (selectStateOperation != SelectOperation.SaveToFile && !SaveStateManager.GetQuickState().IsSet())
+                {
+                    DebugMod.LogConsole("Save a state to the quickslot before copying to a file slot");
+                    return;
+                }
+
+                Action action = InSelectState
+                    ? () => DoSelectOperation(index)
+                    : () => SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+
+                if (SaveStateManager.GetFileState(currentPage, index).IsSet())
+                {
+                    ConfirmDialog.Instance.Toggle(write, "Overwrite file slot?", action, () => CancelSelectState(true));
+                }
+                else
+                {
+                    action();
+                }
+            };
+        }
+
+        builder.Build();
+        Size = expanded.Size;
+    }
+
+    private static string PrettyPrintSelectOperation(SelectOperation operation)
+    {
+        return operation switch
+        {
+            SelectOperation.QuickslotToFile => "Writing quickslot to file slot",
+            SelectOperation.FileToQuickslot => "Reading file slot to quickslot",
+            SelectOperation.SaveToFile => "Saving directly to file slot",
+            SelectOperation.LoadFromFile => "Loading directly from file slot",
+            _ => null
+        };
+    }
+
+    private bool IsReadOperation()
+    {
+        return selectStateOperation is SelectOperation.FileToQuickslot or SelectOperation.LoadFromFile;
+    }
+
+    private bool IsWriteOperation()
+    {
+        return selectStateOperation is SelectOperation.QuickslotToFile or SelectOperation.SaveToFile;
+    }
+
+    private void Update()
+    {
+        if (InSelectState && !CanvasTextField.AnyFieldFocused)
+        {
+            foreach (KeyValuePair<KeyCode, int> pair in DebugMod.alphaKeyDict)
+            {
+                if (Input.GetKeyDown(pair.Key))
+                {
+                    DoSelectOperation(pair.Value);
+                    break;
                 }
             }
         }
     }
+
+    public void ToggleView()
+    {
+        if (InSelectState)
+        {
+            DebugMod.settings.SaveStatePanelExpanded = false;
+            CancelSelectState();
+        }
+        else
+        {
+            DebugMod.settings.SaveStatePanelExpanded = !DebugMod.settings.SaveStatePanelExpanded;
+        }
+    }
+
+    private void DoSelectOperation(int index)
+    {
+        switch (selectStateOperation)
+        {
+            case SelectOperation.QuickslotToFile:
+                SaveStateManager.SetFileState(SaveStateManager.GetQuickState(), currentPage, index);
+                break;
+            case SelectOperation.FileToQuickslot:
+                SaveStateManager.SetQuickState(SaveStateManager.GetFileState(currentPage, index));
+                break;
+            case SelectOperation.SaveToFile:
+                SaveStateManager.SetFileState(SaveStateManager.SaveNewState(), currentPage, index);
+                break;
+            case SelectOperation.LoadFromFile:
+                SaveStateManager.LoadState(SaveStateManager.GetFileState(currentPage, index));
+                break;
+        }
+
+        CancelSelectState();
+    }
+
+    public void NextPage()
+    {
+        if (ShouldBeVisible && ShouldBeExpanded)
+        {
+            currentPage++;
+            if (currentPage >= SaveStateManager.NumPages)
+            {
+                currentPage -= SaveStateManager.NumPages;
+            }
+        }
+    }
+
+    public void PrevPage()
+    {
+        if (ShouldBeVisible && ShouldBeExpanded)
+        {
+            currentPage--;
+            if (currentPage < 0)
+            {
+                currentPage += SaveStateManager.NumPages;
+            }
+        }
+    }
+
+    public void EnterSelectState(SelectOperation operation)
+    {
+        if (selectStateOperation == operation)
+        {
+            CancelSelectState();
+        }
+        else
+        {
+            selectStateOperation = operation;
+        }
+    }
+
+    public void CancelSelectState(bool leavePanelOpen = false)
+    {
+        if (InSelectState && leavePanelOpen)
+        {
+            DebugMod.settings.SaveStatePanelVisible = true;
+            DebugMod.settings.SaveStatePanelExpanded = true;
+        }
+
+        selectStateOperation = SelectOperation.None;
+    }
+}
+
+public enum SelectOperation
+{
+    None,
+    QuickslotToFile,
+    FileToQuickslot,
+    SaveToFile,
+    LoadFromFile
 }

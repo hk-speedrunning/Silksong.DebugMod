@@ -1,5 +1,5 @@
-﻿using System;
-using DebugMod.Helpers;
+﻿using DebugMod.Helpers;
+using System;
 
 namespace DebugMod;
 
@@ -21,7 +21,7 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("You have the maximum number of masks");
         }
     }
-    
+
     [BindableMethod(name = "Give Spool", category = "Masks & Spools")]
     public static void GiveSpool()
     {
@@ -40,7 +40,7 @@ public static partial class BindableFunctions
         PlayerData.instance.IsSilkSpoolBroken = false;
         EventRegister.SendEvent("SPOOL UNBROKEN");
     }
-    
+
     [BindableMethod(name = "Take Away Mask", category = "Masks & Spools")]
     public static void TakeAwayMask()
     {
@@ -122,7 +122,7 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("Took health");
         }
     }
-    
+
     [BindableMethod(name = "Add Silk", category = "Masks & Spools")]
     public static void AddSilk()
     {

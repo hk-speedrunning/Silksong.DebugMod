@@ -1,78 +1,76 @@
-﻿using System;
+﻿using DebugMod.UI.Canvas;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI;
 
-public static class ConsolePanel
+public class ConsolePanel : CanvasPanel
 {
-    private static CanvasPanel panel;
-    private static List<string> history = new List<string>();
-    private static Vector2 scrollPosition = Vector2.zero;
+    public const int MAX_LINES = 15;
 
-    public static void BuildMenu(GameObject canvas)
+    public static ConsolePanel Instance { get; private set; }
+    private static readonly List<string> history = [];
+
+    private readonly List<CanvasText> lines = [];
+
+    public static void BuildPanel()
     {
-        panel = new CanvasPanel(
-            nameof(ConsolePanel),
-            null,
-            new Vector2(1275, 800),
-            Vector2.zero,
-            GUIController.Instance.images["ConsoleBg"],
-            new Rect(0, 0, GUIController.Instance.images["ConsoleBg"].width, GUIController.Instance.images["ConsoleBg"].height)
-        );
-        panel.AddText("Console", "", new Vector2(10f, 25f), Vector2.zero, GUIController.Instance.arial);
-        panel.FixRenderOrder();
-
-        GUIController.Instance.arial.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
+        Instance = new ConsolePanel();
+        Instance.Build();
     }
 
-    public static void Update()
+    public ConsolePanel() : base(nameof(ConsolePanel))
     {
-        if (panel == null)
+        LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ScreenMargin - UICommon.ConsoleHeight);
+        Size = new Vector2(UICommon.LeftSideWidth, UICommon.ConsoleHeight);
+
+        CanvasBorder border = Add(new CanvasBorder("Border"));
+        border.LocalPosition = new Vector2(0, UICommon.Margin / 2f);
+        border.Size = new Vector2(Size.x, Size.y - UICommon.Margin);
+        border.Sides = BorderSides.LEFT;
+        border.Color = UICommon.iconColor;
+
+        float lineHeight = (Size.y - UICommon.Margin * 2) / MAX_LINES;
+        for (int i = 0; i < MAX_LINES; i++)
         {
-            return;
-        }
-
-        if (GUIController.ForceHideUI())
-        {
-            panel.ActiveSelf = false;
-            return;
-        }
-
-        panel.ActiveSelf = DebugMod.settings.ConsoleVisible;
-
-        if (panel.ActiveInHierarchy)
-        {
-            string consoleString = "";
-            int lineCount = 0;
-
-            for (int i = history.Count - 1; i >= 0; i--)
-            {
-                if (lineCount >= 8) break;
-                consoleString = history[i] + "\n" + consoleString;
-                lineCount++;
-            }
-
-            panel.GetText("Console").UpdateText(consoleString);
+            CanvasText line = Add(new CanvasText(i.ToString()));
+            line.LocalPosition = new Vector2(UICommon.Margin, UICommon.Margin + lineHeight * i);
+            line.Size = new Vector2(Size.x - UICommon.Margin * 2, lineHeight);
+            lines.Add(line);
         }
     }
 
-    public static void Reset()
+    private void UpdateText()
+    {
+        int line = 0;
+        for (int i = Math.Max(history.Count - MAX_LINES, 0); i < history.Count; i++)
+        {
+            lines[line].Text = history[i];
+            line++;
+        }
+
+        while (line < MAX_LINES)
+        {
+            lines[line].Text = "";
+            line++;
+        }
+    }
+
+    public void Reset()
     {
         history.Clear();
-        scrollPosition = Vector2.zero;
+        UpdateText();
     }
 
-    public static void AddLine(string chatLine)
+    public void AddLine(string chatLine)
     {
         while (history.Count > 1000)
         {
             history.RemoveAt(0);
         }
 
-        int wrap = WrapIndex(GUIController.Instance.arial, 13, chatLine);
+        int wrap = WrapIndex(chatLine);
 
         while (wrap != -1)
         {
@@ -82,7 +80,7 @@ public static class ConsolePanel
             {
                 history.Add(chatLine.Substring(0, index));
                 chatLine = chatLine.Substring(index + 1);
-                wrap = WrapIndex(GUIController.Instance.arial, 13, chatLine);
+                wrap = WrapIndex(chatLine);
             }
             else
             {
@@ -91,26 +89,12 @@ public static class ConsolePanel
         }
 
         history.Add(chatLine);
-
-        scrollPosition.y = scrollPosition.y + 50f;
+        UpdateText();
     }
 
-    public static void SaveHistory()
+    private int WrapIndex(string message)
     {
-        try
-        {
-            File.WriteAllLines("console.txt", history.ToArray());
-            AddLine("Written history to console.txt");
-        }
-        catch (Exception arg)
-        {
-            DebugMod.LogError("[CONSOLE] Unable to write console history: " + arg);
-            AddLine("Unable to write console history");
-        }
-    }
-
-    private static int WrapIndex(Font font, int fontSize, string message)
-    {
+        CanvasText text = lines[0];
         int totalLength = 0;
 
         char[] arr = message.ToCharArray();
@@ -118,10 +102,10 @@ public static class ConsolePanel
         for (int i = 0; i < arr.Length; i++)
         {
             char c = arr[i];
-            font.GetCharacterInfo(c, out CharacterInfo characterInfo, fontSize);
+            text.Font.GetCharacterInfo(c, out CharacterInfo characterInfo, text.FontSize);
             totalLength += characterInfo.advance;
 
-            if (totalLength >= 564) return i;
+            if (totalLength >= text.Size.x) return i;
         }
 
         return -1;

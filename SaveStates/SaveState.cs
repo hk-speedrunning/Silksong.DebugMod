@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using DebugMod.Helpers;
+﻿using DebugMod.Helpers;
 using DebugMod.Hitbox;
 using GlobalEnums;
 using HarmonyLib;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
@@ -20,7 +19,7 @@ namespace DebugMod.SaveStates;
 /// Handles struct SaveStateData and individual SaveState operations
 /// </summary>
 [HarmonyPatch]
-internal class SaveState
+public class SaveState
 {
     // Some mods (ItemChanger) check type to detect vanilla scene loads.
     private class DebugModSaveStateSceneLoadInfo : GameManager.SceneLoadInfo { }
@@ -38,7 +37,6 @@ internal class SaveState
         public SceneData savedSd;
         public Vector3 savePos;
         public FieldInfo cameraLockArea;
-        public string filePath;
         public bool isKinematized;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
@@ -82,7 +80,11 @@ internal class SaveState
                     loadedSceneActiveScenes[i] = loadedScenes[i];
                 }
             }
+        }
 
+        public SaveStateData DeepCopy()
+        {
+            return new SaveStateData(this);
         }
     }
 
@@ -96,13 +98,12 @@ internal class SaveState
     }
 
     #region saving
-
-    public bool SaveTempState()
+    public bool Save()
     {
         //save level state before savestates so levers and dead enemies persist properly
         GameManager.instance.SaveLevelState();
         data.saveScene = GameManager.instance.GetSceneNameString();
-        data.saveStateIdentifier = $"(tmp)_{data.saveScene}-{DateTime.Now.ToString("H:mm_d-MMM")}";
+        data.saveStateIdentifier = $"{data.saveScene}-{DateTime.Now:H:mm_d-MMM}";
 
         //implementation so room specifics can be automatically saved
         try
@@ -119,7 +120,7 @@ internal class SaveState
         data.savePos = HeroController.instance.gameObject.transform.position;
         data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
         data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
-        data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().isKinematic;
+        data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
 
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
@@ -128,125 +129,18 @@ internal class SaveState
         DebugMod.LogConsole("Saved temp state");
         return true;
     }
-
-    public void NewSaveStateToFile(int paramSlot)
-    {
-        if (SaveTempState())
-        {
-            SaveStateToFile(paramSlot);
-        }
-    }
-
-    public void SaveStateToFile(int paramSlot)
-    {
-        try
-        {
-            if (data.saveStateIdentifier.StartsWith("(tmp)_"))
-            {
-                data.saveStateIdentifier = data.saveStateIdentifier.Substring(6);
-            }
-            else if (String.IsNullOrEmpty(data.saveStateIdentifier))
-            {
-                throw new Exception("No temp save state set");
-            }
-
-            string saveStateFile = Path.Combine(SaveStateManager.path, $"savestate{paramSlot}.json");
-            File.WriteAllText(saveStateFile,
-                JsonUtility.ToJson(data, prettyPrint: true)
-            );
-        }
-        catch (Exception ex)
-        {
-            DebugMod.LogDebug(ex.Message);
-            throw ex;
-        }
-    }
     #endregion
 
     #region loading
-
     //loadDuped is used by external mods
-    public void LoadTempState(bool loadDuped = false)
+    public IEnumerator Load(bool loadDuped = false)
     {
-        if (CanLoadState())
+        if (!IsSet())
         {
-            GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
-        }
-        else if (DebugMod.overrideLoadLockout)
-        {
-            DebugMod.LogConsole("Attempting savestate load override");
-            GameManager.instance.StartCoroutine(LoadStateCoro(loadDuped));
-        }
-    }
-
-    private bool CanLoadState()
-    {
-        if (PlayerDeathWatcher.playerDead)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when dead");
-            return false;
+            DebugMod.LogError("Attempted to load unset savestate");
+            yield break;
         }
 
-        if (HeroController.instance.cState.transitioning)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when transitioning");
-            return false;
-        }
-
-        if (HeroController.instance.transform.parent != null)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when on elevators");
-            return false;
-        }
-
-        if (loadingSavestate != null)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when another savestate is loading");
-            return false;
-        }
-
-        return true;
-    }
-
-    //loadDuped is used by external mods
-    public void NewLoadStateFromFile(bool loadDuped = false)
-    {
-        LoadStateFromFile(SaveStateManager.currentStateSlot);
-        if (IsSet()) LoadTempState(loadDuped);
-    }
-
-    public void LoadStateFromFile(int paramSlot)
-    {
-        try
-        {
-            data.filePath = Path.Combine(SaveStateManager.path, $"savestate{paramSlot}.json");
-
-            if (File.Exists(data.filePath))
-            {
-                //DebugMod.Log("checked filepath: " + data.filePath);
-                SaveStateData tmpData = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(data.filePath));
-                try
-                {
-                    data = new SaveStateData(tmpData);
-
-                    DebugMod.Log("Load SaveState ready: " + data.saveStateIdentifier);
-                }
-                catch (Exception ex)
-                {
-                    DebugMod.LogError("Error applying save state data: " + ex);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            DebugMod.LogDebug(ex.Message);
-            throw;
-        }
-    }
-
-    //loadDuped is used by external mods
-    private IEnumerator LoadStateCoro(bool loadDuped)
-    {
         // Second check is probably not necessary since it's already checked at the call sites the frame before,
         // but might as well be defensive and rule out any frame-perfect nonsense
         if (loadingSavestate != null && !DebugMod.overrideLoadLockout)
@@ -254,25 +148,88 @@ internal class SaveState
             DebugMod.LogConsole($"Attempted to load savestate in {data.saveScene} while another is already loading, cancelling");
             yield break;
         }
+
+        System.Diagnostics.Stopwatch loadingStateTimer = new();
+        loadingStateTimer.Start();
+
         loadingSavestate = this;
 
+        IEnumerator enumerator = LoadImpl(loadDuped);
+        while (true)
+        {
+            try
+            {
+                if (!enumerator.MoveNext())
+                {
+                    break;
+                }
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Error loading savestate: {e}");
+                DebugMod.LogConsole("Critical error loading savestate, please create a bug report");
+
+                // Hopefully enough to work around most errors and keep the game playable
+                Time.timeScale = DebugMod.CurrentTimeScale;
+                loadingSavestate = null;
+
+                yield break;
+            }
+
+            yield return enumerator.Current;
+        }
+
+        loadingSavestate = null;
+
+        loadingStateTimer.Stop();
+        TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
+        DebugMod.LogConsole("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
+
+        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+        yield return null; // Not all HUD elements are ready immediately, wait one more frame
+        HUDFixes();
+
+        // Fix bench interactions
+        foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
+        {
+            if (!bench.GetComponent<HeroController>()) // Why, Team Cherry?
+            {
+                bench.gameObject.SetActive(false);
+                bench.gameObject.SetActive(true);
+            }
+        }
+
+        // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
+        foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
+        {
+            if (Physics2D.IsTouching(HeroController.instance.GetComponent<Collider2D>(), water.GetComponent<Collider2D>()))
+            {
+                yield return new WaitUntil(() => GameManager.instance.sceneLoad == null);
+                HeroController.instance.transform.position = data.savePos;
+                HeroController.instance.GetComponent<BoxCollider2D>().enabled = false;
+                HeroController.instance.GetComponent<BoxCollider2D>().enabled = true;
+                break;
+            }
+        }
+    }
+
+    private IEnumerator LoadImpl(bool loadDuped)
+    {
         bool stateondeath = DebugMod.stateOnDeath;
         DebugMod.stateOnDeath = false;
 
         //prevents silly things from happening
         Time.timeScale = 0;
 
-        //timer for loading savestates
-        System.Diagnostics.Stopwatch loadingStateTimer = new System.Diagnostics.Stopwatch();
-        loadingStateTimer.Start();
-
         //called here because this needs to be done here
         if (DebugMod.savestateFixes)
         {
             //TODO: Cleaner way to do this? Also get it to actually work
             //prevent hazard respawning
-            if (DebugMod.CurrentHazardCoro != null) HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
-            if (DebugMod.CurrentInvulnCoro != null) HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
+            if (DebugMod.CurrentHazardCoro != null)
+                HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
+            if (DebugMod.CurrentInvulnCoro != null)
+                HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
             DebugMod.CurrentHazardCoro = null;
             DebugMod.CurrentInvulnCoro = null;
             HeroController.instance.hazardInvulnRoutine = null;
@@ -305,6 +262,12 @@ internal class SaveState
             {
                 surface.Detach(false);
             }
+        }
+
+        if (HeroController.instance.transform.parent)
+        {
+            HeroController.instance.transform.SetParent(null, true);
+            Object.DontDestroyOnLoad(HeroController.instance);
         }
 
         GameManager.instance.entryGateName = "dreamGate";
@@ -367,6 +330,7 @@ internal class SaveState
                 GameManager.instance.RefreshTilemapInfo(sceneData[i].name);
                 GameManager.instance.cameraCtrl.SceneInit();
             }
+
             GameManager.instance.BeginScene();
         }
 
@@ -393,7 +357,7 @@ internal class SaveState
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
-        HeroController.instance.GetComponent<Rigidbody2D>().isKinematic = data.isKinematized;
+        if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         DebugMod.noclipPos = data.savePos;
 
         if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
@@ -414,6 +378,7 @@ internal class SaveState
             DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);
             yield return RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
         }
+
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
 
@@ -427,47 +392,14 @@ internal class SaveState
             {
                 HeroController.instance.UnPause();
             }
+
             MenuButtonList.ClearAllLastSelected();
             TimeManager.TimeScale = 1f;
         }
 
-        TimeSpan loadingStateTime = loadingStateTimer.Elapsed;
-
         //set timescale back
         Time.timeScale = DebugMod.CurrentTimeScale;
         DebugMod.stateOnDeath = stateondeath;
-
-        loadingStateTimer.Stop();
-        loadingSavestate = null;
-
-        DebugMod.LogConsole("Loaded savestate in " + loadingStateTime.ToString(@"ss\.fff") + "s");
-
-        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
-        yield return null; // Not all HUD elements are ready immediately, wait one more frame
-        HUDFixes();
-
-        // Fix bench interactions
-        foreach (RestBench bench in Object.FindObjectsByType<RestBench>(FindObjectsSortMode.None))
-        {
-            if (!bench.GetComponent<HeroController>()) // Why, Team Cherry?
-            {
-                bench.gameObject.SetActive(false);
-                bench.gameObject.SetActive(true);
-            }
-        }
-
-        // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
-        foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
-        {
-            if (Physics2D.IsTouching(HeroController.instance.GetComponent<Collider2D>(), water.GetComponent<Collider2D>()))
-            {
-                yield return new WaitUntil(() => GameManager.instance.sceneLoad == null);
-                HeroController.instance.transform.position = data.savePos;
-                HeroController.instance.GetComponent<BoxCollider2D>().enabled = false;
-                HeroController.instance.GetComponent<BoxCollider2D>().enabled = true;
-                break;
-            }
-        }
     }
 
     //these are toggleable, as they will prevent glitches from persisting
@@ -484,7 +416,7 @@ internal class SaveState
         HeroController.instance.cState.invulnerable = false;
 
         //no clip
-        rb2d.isKinematic = false;
+        rb2d.bodyType = RigidbodyType2D.Dynamic;
 
         //bench storage
         GameManager.instance.SetPlayerDataBool(nameof(PlayerData.atBench), false);
@@ -547,39 +479,18 @@ internal class SaveState
         EventRegister.SendEvent("LAST HP ADDED");
 
         // Update active crest behind health display
-        Object.FindAnyObjectByType<BindOrbHudFrame>().AlreadyAppeared();
+        BindOrbHudFrame bindOrb = Object.FindAnyObjectByType<BindOrbHudFrame>();
+        if (bindOrb) bindOrb.AlreadyAppeared();
     }
     #endregion
 
     #region helper functionality
+    public bool IsSet() => !string.IsNullOrEmpty(data.saveStateIdentifier);
 
-    public bool IsSet()
-    {
-        bool isSet = !String.IsNullOrEmpty(data.saveStateIdentifier);
-        return isSet;
-    }
-
-    public string GetSaveStateID()
-    {
-        return data.saveStateIdentifier;
-    }
-
-    public string[] GetSaveStateInfo()
-    {
-        return new string[]
-        {
-            data.saveStateIdentifier,
-            data.saveScene
-        };
-    }
-    public SaveState.SaveStateData DeepCopy()
-    {
-        return new SaveState.SaveStateData(this.data);
-    }
+    public override string ToString() => IsSet() ? data.saveStateIdentifier : "Empty";
     #endregion
 
     #region patches
-
     // Bring back dream gate transitions >:(
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.FindEntryPoint))]
     [HarmonyPrefix]
@@ -593,6 +504,5 @@ internal class SaveState
 
         return true;
     }
-
     #endregion
 }

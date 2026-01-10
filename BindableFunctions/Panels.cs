@@ -8,60 +8,73 @@ public static partial class BindableFunctions
     public static void ToggleAllPanels()
     {
         bool active = !(
-            DebugMod.settings.HelpPanelVisible ||
             DebugMod.settings.InfoPanelVisible ||
             DebugMod.settings.EnemiesPanelVisible ||
-            DebugMod.settings.TopMenuVisible ||
+            DebugMod.settings.MainPanelVisible ||
             DebugMod.settings.ConsoleVisible ||
             DebugMod.settings.SaveStatePanelVisible
             );
 
         DebugMod.settings.InfoPanelVisible = active;
-        DebugMod.settings.TopMenuVisible = active;
+        DebugMod.settings.MainPanelVisible = active;
         DebugMod.settings.EnemiesPanelVisible = active;
         DebugMod.settings.ConsoleVisible = active;
-        DebugMod.settings.HelpPanelVisible = active;
-
-        if (!active)
-        {
-            DebugMod.settings.ClearSaveStatePanel = true;
-        }
+        DebugMod.settings.SaveStatePanelVisible = active;
     }
 
-    [BindableMethod(name = "Toggle Binds", category = "Mod UI")]
-    public static void ToggleHelpPanel()
+    [BindableMethod(name = "Toggle Main Panel", category = "Mod UI")]
+    public static void ToggleMainPanel()
     {
-        DebugMod.settings.HelpPanelVisible = !DebugMod.settings.HelpPanelVisible;
+        DebugMod.settings.MainPanelVisible = !DebugMod.settings.MainPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Info", category = "Mod UI")]
+
+    [BindableMethod(name = "Toggle Enemies Panel", category = "Mod UI")]
+    public static void ToggleEnemiesPanel()
+    {
+        DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
+    }
+
+    [BindableMethod(name = "Toggle Console Panel", category = "Mod UI")]
+    public static void ToggleConsolePanel()
+    {
+        DebugMod.settings.ConsoleVisible = !DebugMod.settings.ConsoleVisible;
+    }
+
+    [BindableMethod(name = "Toggle Info Panel", category = "Mod UI")]
     public static void ToggleInfoPanel()
     {
         DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Top Menu", category = "Mod UI")]
-    public static void ToggleTopRightPanel()
+    [BindableMethod(name = "Toggle Savestates Panel", category = "Mod UI")]
+    public static void ToggleSaveStatePanel()
     {
-        DebugMod.settings.TopMenuVisible = !DebugMod.settings.TopMenuVisible;
+        DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
+        if (!DebugMod.settings.SaveStatePanelVisible)
+        {
+            SaveStatesPanel.Instance.CancelSelectState();
+        }
     }
 
-    [BindableMethod(name = "Toggle Console", category = "Mod UI")]
-    public static void ToggleConsole()
+    [BindableMethod(name = "Expand/Collapse Savestates", category = "Mod UI")]
+    public static void ToggleExpandedSaveStatePanel()
     {
-        DebugMod.settings.ConsoleVisible = !DebugMod.settings.ConsoleVisible;
+        SaveStatesPanel.Instance.ToggleView();
     }
 
-    [BindableMethod(name = "Toggle Enemy Panel", category = "Mod UI")]
-    public static void ToggleEnemyPanel()
+    [BindableMethod(name = "Toggle Cursor", category = "Mod UI")]
+    public static void ToggleAlwaysShowCursor()
     {
-        DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
-    }
+        DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;
 
-    // View handled in the InfoPanel classes
-    [BindableMethod(name = "Info Panel Switch", category = "Mod UI")]
-    public static void SwitchActiveInfoPanel()
-    {
-        InfoPanel.ToggleActivePanel();
+        if (DebugMod.settings.ShowCursorWhileUnpaused)
+        {
+            DebugMod.LogConsole("Showing cursor while unpaused");
+        }
+        else
+        {
+            DebugMod.LogConsole("Not showing cursor while unpaused");
+        }
     }
 }

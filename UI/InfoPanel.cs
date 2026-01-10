@@ -1,179 +1,138 @@
-using System;
-using System.Collections.Generic;
 using DebugMod.UI.Canvas;
-using JetBrains.Annotations;
+using GlobalSettings;
+using System;
 using UnityEngine;
 
 namespace DebugMod.UI;
 
-/// <summary>
-/// Represents an info panel in the style of the standard info panel
-/// </summary>
-public abstract class InfoPanel
+public class InfoPanel : CanvasPanel
 {
-    public const string MainInfoPanelName = "DebugMod.MainInfoPanel";
-    public const string MinimalInfoPanelName = "DebugMod.MinimalInfoPanel";
+    public static int ListingHeight => UICommon.ScaleHeight(20);
 
-    protected CanvasPanel panel = null;
+    public static InfoPanel Instance { get; private set; }
 
-    /// <summary>
-    /// Determine whether the panel should be displayed.
-    /// </summary>
-    public abstract bool Active { get; }
+    private float x;
+    private float y;
+    private float labelWidth;
+    private float infoWidth;
+    private int counter;
 
-    /// <summary>
-    /// Called once to set up the panel.
-    /// </summary>
-    public abstract void BuildPanel(GameObject canvas);
-    /// <summary>
-    /// Called every frame to change the text on the panel.
-    /// </summary>
-    public abstract void UpdatePanel();
-
-
-    private static Dictionary<string, InfoPanel> AllPanels = new()
+    public static void BuildPanel()
     {
-        ["DebugMod.BottomRightInfoPanel"] = new BottomRightInfoPanel(),
-        [MainInfoPanelName] = CustomInfoPanel.GetMainInfoPanel(),
-        [MinimalInfoPanelName] = CustomInfoPanel.GetMinimalInfoPanel(),
-    };
-    private static List<string> TogglablePanelNames = new() { MainInfoPanelName, MinimalInfoPanelName };
-
-    public static void ToggleActivePanel()
-    {
-        int i = TogglablePanelNames.IndexOf(DebugMod.settings.CurrentInfoPanelName);
-        i = (i + 1) % TogglablePanelNames.Count;
-        DebugMod.settings.CurrentInfoPanelName = TogglablePanelNames[i];
+        Instance = new InfoPanel();
+        Instance.Build();
     }
 
-    public static void BuildInfoPanels(GameObject canvas)
+    public InfoPanel() : base(nameof(InfoPanel))
     {
-        foreach (InfoPanel panel in AllPanels.Values)
-        {
-            panel.BuildPanel(canvas);
-        }
+        LocalPosition = new Vector2(UICommon.ScreenMargin, Screen.height - UICommon.ConsoleHeight - UICommon.InfoPanelHeight - UICommon.ScreenMargin * 2);
+        Size = new Vector2(UICommon.LeftSideWidth, UICommon.InfoPanelHeight);
 
-        if (!TogglablePanelNames.Contains(DebugMod.settings.CurrentInfoPanelName))
-        {
-            DebugMod.settings.CurrentInfoPanelName = MainInfoPanelName;
-        }
-    }
-    public static void Update()
-    {
-        if (GUIController.ForceHideUI() || !DebugMod.settings.InfoPanelVisible)
-        {
-            foreach (InfoPanel infoPanel in AllPanels.Values)
-            {
-                if (infoPanel.panel != null)
-                {
-                    infoPanel.panel.ActiveSelf = false;
-                }
-            }
-            return;
-        }
+        x = ContentMargin();
+        y = ContentMargin();
+        labelWidth = UICommon.ScaleWidth(140);
+        infoWidth = UICommon.ScaleHeight(150);
+        int sectionBreak = UICommon.ScaleHeight(15);
 
-        foreach (InfoPanel infoPanel in AllPanels.Values)
-        {
-            if (infoPanel.panel != null && infoPanel.Active != infoPanel.panel.ActiveSelf)
-            {
-                infoPanel.panel.ActiveSelf = infoPanel.Active;
-            }
+        AppendInfo("Scene Name", DebugMod.GetSceneName);
+        AppendInfo("Position", GetHeroPos);
+        AppendInfo("Velocity", () => HeroController.instance.current_velocity);
 
-            if (infoPanel.Active)
-            {
-                infoPanel.UpdatePanel();
-            }
-        }
-    }
+        y += sectionBreak;
 
-    #region Custom Panel API
-    /// <summary>
-    /// Create a new Custom Info Panel with the given name.
-    /// </summary>
-    /// <param name="Name">The name of the panel - this will not be displayed.</param>
-    /// <param name="ShowSprite">Whether to place the panel on the background sprite.</param>
-    [PublicAPI]
-    public static void CreateCustomInfoPanel(string Name, bool ShowSprite)
-    {
-        AddInfoPanel(Name, new CustomInfoPanel(Name, ShowSprite));
-    }
+        AppendInfo("Move Vector", () => DebugMod.IH.inputActions.MoveVector.Vector);
+        AppendInfo("Hero State", () => HeroController.instance.hero_state);
+        AppendInfo("Damage State", () => HeroController.instance.damageMode);
 
-    /// <summary>
-    /// Add an info entry to the specified info panel.
-    /// </summary>
-    /// <param name="Name">The name of the panel.</param>
-    /// <param name="xLabel">The x coordinate of the label.</param>
-    /// <param name="xInfo">The x coordinate of the info string.</param>
-    /// <param name="y">The y coordinate of the entry.</param>
-    /// <param name="label">The text to display on the label.</param>
-    /// <param name="textFunc">A function that returns the text to show on the info string; will be called every frame.</param>
-    [PublicAPI]
-    public static void AddInfoToPanel(string Name, float xLabel, float xInfo, float y, string label, Func<string> textFunc)
-    {
-        ((CustomInfoPanel)AllPanels[Name]).AddInfo(xLabel, xInfo, y, label, textFunc);
-    }
+        y += sectionBreak;
 
-    /// <summary>
-    /// Create a new Simple Info Panel with the given name.
-    /// </summary>
-    /// <param name="Name">The name of the panel - this will not be displayed.</param>
-    /// <param name="sep">The separation between the columns.</param>
-    [PublicAPI]
-    public static void CreateSimpleInfoPanel(string Name, float sep)
-    {
-        AddInfoPanel(Name, new SimpleInfoPanel(Name, sep));
+        AppendInfo("Health", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
+        AppendInfo("Silk", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
+
+        y += sectionBreak;
+
+        AppendInfo("Needle Base", () => PlayerData.instance.nailDamage);
+        AppendInfo("Last Damage", () => DebugMod.lastHit != null ?
+            $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "None");
+        AppendInfo("Last Type", () => DebugMod.lastHit?.AttackType.ToString() ?? "None");
+        AppendInfo("Last Scaling", () => DebugMod.lastHit != null ? DebugMod.lastScaling.ToString() : "None");
+
+        y += sectionBreak;
+
+        AppendInfo("Completion", () => $"{PlayerData.instance.completionPercentage}%");
+        AppendInfo("Fleas", () => $"{Gameplay.FleasCollectedCount} / 30");
+        AppendInfo("Quest Points", GetQuestPoints);
+
+        x += labelWidth + infoWidth;
+        y = ContentMargin();
+        sectionBreak = UICommon.ScaleHeight(30);
+
+        AppendInfo("Dashing", () => HeroController.instance.cState.dashing);
+        AppendInfo("Sprinting", () => HeroController.instance.cState.isSprinting);
+        AppendInfo("Jumping", () => HeroController.instance.cState.jumping || HeroController.instance.cState.doubleJumping);
+        AppendInfo("Super Jumping", () => HeroController.instance.cState.superDashing);
+        AppendInfo("Falling", () => HeroController.instance.cState.falling);
+        AppendInfo("Hardland", () => HeroController.instance.cState.willHardLand);
+        AppendInfo("Swimming", () => HeroController.instance.cState.swimming);
+        AppendInfo("Recoiling", () => HeroController.instance.cState.recoiling);
+
+        y += sectionBreak;
+
+        AppendInfo("Invulnerable", () => HeroController.instance.cState.Invulnerable);
+        AppendInfo("Invincible", () => PlayerData.instance.isInvincible);
+
+        y += sectionBreak;
+
+        AppendInfo("Attacking", () => HeroController.instance.cState.attacking);
+        AppendInfo("Can Cast", () => HeroController.instance.CanCast());
+        AppendInfo("Can Super Jump", () => HeroController.instance.CanSuperJump());
+        AppendInfo("Can Quickmap", () => HeroController.instance.CanQuickMap());
+        AppendInfo("Can Inventory", () => HeroController.instance.CanOpenInventory());
     }
 
-    /// <summary>
-    /// Add an info entry to the specified simple info panel.
-    /// </summary>
-    /// <param name="Name">The name of the panel.</param>
-    /// <param name="label">The text to display on the label.</param>
-    /// <param name="textFunc">A function that returns the text to show on the info string; will be called every frame.</param>
-    [PublicAPI]
-    public static void AddInfoToSimplePanel(string Name, string label, Func<string> textFunc)
+    private void AppendInfo(string label, Func<string> info)
     {
-        ((SimpleInfoPanel)AllPanels[Name]).AddInfo(label, textFunc);
+        CanvasText labelText = Add(new CanvasText($"Label{counter}"));
+        labelText.LocalPosition = new Vector2(x, y);
+        labelText.Size = new Vector2(labelWidth, ListingHeight);
+        labelText.Alignment = TextAnchor.MiddleLeft;
+        labelText.Text = label;
+
+        // Info text is offset slightly downward so the different fonts (approximately) line up
+        CanvasText infoText = Add(new CanvasText($"Info{counter}"));
+        infoText.LocalPosition = new Vector2(x + labelWidth, y + ListingHeight / 10f);
+        infoText.Size = new Vector2(infoWidth, ListingHeight);
+        infoText.Font = UICommon.trajanBold;
+        infoText.Alignment = TextAnchor.MiddleLeft;
+        infoText.OnUpdate += () => infoText.Text = info();
+
+        counter++;
+        y += ListingHeight;
     }
 
-    /// <summary>
-    /// Add an info panel to the rotation. Must be done during mod initialization.
-    /// </summary>
-    /// <param name="Name">The name of the panel.</param>
-    /// <param name="p">The panel to add.</param>
-    /// <exception cref="InvalidOperationException">A panel with this name already exists.</exception>
-    [PublicAPI]
-    public static void AddInfoPanel(string Name, TogglableInfoPanel p)
-    {
-        if (AllPanels.ContainsKey(Name))
-        {
-            throw new InvalidOperationException("A panel with this name already exists");
-        }
+    private void AppendInfo(string label, Func<bool> info) => AppendInfo(label, () => GetStringForBool(info()));
+    private void AppendInfo<T>(string label, Func<T> info) => AppendInfo(label, () => info().ToString());
 
-        AllPanels.Add(Name, p);
-        TogglablePanelNames.Add(Name);
-    }
-    #endregion
-
-    public static string GetTransState()
-    {
-        string transState = HeroController.instance.transitionState.ToString();
-        if (transState == "WAITING_TO_ENTER_LEVEL") transState = "LOADING";
-        if (transState == "WAITING_TO_TRANSITION") transState = "WAITING";
-        return transState;
-    }
-    public static string GetHeroPos()
+    private static string GetHeroPos()
     {
         if (DebugMod.RefKnight == null)
         {
             return string.Empty;
         }
-        float HeroX = DebugMod.RefKnight.transform.position.x;
-        float HeroY = DebugMod.RefKnight.transform.position.y;
 
-        return $"({HeroX}, {HeroY})";
+        float heroX = DebugMod.RefKnight.transform.position.x;
+        float heroY = DebugMod.RefKnight.transform.position.y;
+
+        return $"({heroX}, {heroY})";
     }
-    public static string GetStringForBool(bool b)
+
+    private static string GetQuestPoints()
+    {
+        QuestCompleteTotalGroup group = QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0];
+        return $"{group.CurrentValueCount} / {group.target}";
+    }
+
+    private static string GetStringForBool(bool b)
     {
         return b ? "✓" : "X";
     }

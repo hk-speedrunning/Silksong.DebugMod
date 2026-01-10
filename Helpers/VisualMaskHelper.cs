@@ -9,8 +9,8 @@ namespace DebugMod.Helpers;
 
 public static class VisualMaskHelper
 {
-    private static bool MasksDisabled = false;
-    private static bool VignetteDisabled = false;
+    internal static bool MasksDisabled = false;
+    internal static bool VignetteDisabled = false;
 
     private static bool ReEnableVignette = false;
 
@@ -19,7 +19,7 @@ public static class VisualMaskHelper
         MasksDisabled = !MasksDisabled;
         if (MasksDisabled)
         {
-            DeactivateVisualMasks(Object.FindObjectsOfType<GameObject>());
+            DeactivateVisualMasks(Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None));
             DebugMod.LogConsole("Disabled all visual masks");
         }
         else
@@ -59,7 +59,7 @@ public static class VisualMaskHelper
             DelayInvoke(3, () => DeactivateVisualMasks(GetGameObjectsInScene(s)));
             return;
         }
-        
+
         if (VignetteDisabled)
         {
             DelayInvoke(3, () => DisableVignette(false));
@@ -167,12 +167,12 @@ public static class VisualMaskHelper
     public static void DisableVignette(bool includeChildren = true)
     {
         DebugMod.HC.vignette.enabled = false;
-        
+
         if (!includeChildren)
         {
             return;
         }
-        
+
         // Not suitable for toggle vignette because not easily reversible
         foreach (Renderer r in DebugMod.HC.vignette.GetComponentsInChildren<Renderer>())
         {

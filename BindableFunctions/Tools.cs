@@ -34,43 +34,6 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Unlocked all crests");
     }
 
-    [BindableMethod(name = "Increment Tool Pouch", category = "Tools")]
-    public static void IncrementPouches()
-    {
-        if (PlayerData.instance.ToolPouchUpgrades < 4)
-        {
-            PlayerData.instance.ToolPouchUpgrades++;
-            DebugMod.LogConsole($"Increasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
-        }
-        else
-        {
-            PlayerData.instance.ToolPouchUpgrades = 0;
-            DebugMod.LogConsole("Resetting tool pouch level");
-        }
-    }
-
-    [BindableMethod(name = "Increment Crafting Kit", category = "Tools")]
-    public static void IncrementKits()
-    {
-        if (PlayerData.instance.ToolKitUpgrades < 4)
-        {
-            PlayerData.instance.ToolKitUpgrades++;
-            DebugMod.LogConsole($"Increasing crafting kit level (now {PlayerData.instance.ToolKitUpgrades})");
-        }
-        else
-        {
-            PlayerData.instance.ToolKitUpgrades = 0;
-            DebugMod.LogConsole("Resetting crafting kit level");
-        }
-    }
-
-    [BindableMethod(name = "Infinite Tools", category = "Tools")]
-    public static void ToggleInfiniteTools()
-    {
-        DebugMod.infiniteTools = !DebugMod.infiniteTools;
-        DebugMod.LogConsole("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
-    }
-
     [BindableMethod(name = "Craft Tools", category = "Tools")]
     public static void CraftTools()
     {
