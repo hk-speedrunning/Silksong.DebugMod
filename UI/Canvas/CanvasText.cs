@@ -78,21 +78,26 @@ public class CanvasText : CanvasObject
 
     protected override void OnUpdatePosition()
     {
-        // Absolute position needs to be integers or the text looks blurry
-        Vector2 current = new(Position.x + Size.x / 2f, Position.y + Size.y / 2f);
-        Vector2 desired = new(Mathf.Round(current.x), Mathf.Round(current.y));
-
-        if (current != desired)
-        {
-            localPosition += desired - current;
-        }
-
         base.OnUpdatePosition();
+
+        if (GameObject)
+        {
+            RoundPosition();
+        }
+    }
+
+    private void RoundPosition()
+    {
+        // Absolute position needs to be integers or the text looks blurry
+        Vector2 pos = GameObject.transform.position;
+        GameObject.transform.position = new(Mathf.Round(pos.x), Mathf.Round(pos.y));
     }
 
     public override void Build()
     {
         base.Build();
+
+        RoundPosition();
 
         t = gameObject.AddComponent<Text>();
         t.text = text;

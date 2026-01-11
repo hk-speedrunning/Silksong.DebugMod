@@ -15,10 +15,10 @@ public abstract class CanvasNode
         allUpdates?.Invoke();
     }
 
-    protected CanvasNode parent;
-    protected Vector2 localPosition;
-    protected Vector2 size;
-    protected bool activeSelf = true;
+    private CanvasNode parent;
+    private Vector2 localPosition;
+    private Vector2 size;
+    private bool activeSelf = true;
 
     private event Action onUpdate;
     private bool updateHooked;
