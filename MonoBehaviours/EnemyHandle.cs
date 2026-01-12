@@ -18,7 +18,6 @@ public class EnemyHandle : MonoBehaviour
     private BoxCollider2D collider;
     private CanvasPanel hpBar;
     private Texture2D barTexture;
-    private int lastHP = -100000;
     private int maxHP;
 
     public int HP
@@ -99,12 +98,6 @@ public class EnemyHandle : MonoBehaviour
                 }
             }
 
-            if (HP != lastHP)
-            {
-                hpBar.Get<CanvasImage>("Background").Size = new Vector2(HPBAR_WIDTH * (float)HP / MaxHP, HPBAR_HEIGHT);
-                lastHP = HP;
-            }
-
             Vector2 barPos = transform.position;
 
             Bounds bounds = sprite?.GetBounds() ?? collider?.bounds ?? new(transform.position, new Vector3(1, 1, 0));
@@ -115,6 +108,7 @@ public class EnemyHandle : MonoBehaviour
             barPos.y = Screen.height - barPos.y - hpBar.Size.y;
 
             hpBar.LocalPosition = barPos;
+            hpBar.Get<CanvasImage>("Background").Size = new Vector2(HPBAR_WIDTH * Mathf.Clamp01(HP / (float)MaxHP), HPBAR_HEIGHT);
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
         }

@@ -89,8 +89,10 @@ public class CanvasText : CanvasObject
     private void RoundPosition()
     {
         // Absolute position needs to be integers or the text looks blurry
-        Vector2 pos = GameObject.transform.position;
-        GameObject.transform.position = new(Mathf.Round(pos.x), Mathf.Round(pos.y));
+        Vector2 pos = transform.anchorMin;
+        float x = Mathf.RoundToMultipleOf(pos.x, 1f / Screen.width);
+        float y = Mathf.RoundToMultipleOf(pos.y, 1f / Screen.height);
+        transform.anchorMin = transform.anchorMax = new(x, y);
     }
 
     public override void Build()
