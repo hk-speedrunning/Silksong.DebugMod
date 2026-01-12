@@ -40,8 +40,9 @@ public class MainPanel : CanvasPanel
 
     // Convenience fields for building
     private PanelBuilder currentTab;
-    private PanelBuilder currentRow;
+    private CanvasPanel currentRow;
     private int rowCounter;
+    private int[] rowPositions;
     private int[] rowWidths;
     private int rowIndex;
 
@@ -333,30 +334,32 @@ public class MainPanel : CanvasPanel
         return builder;
     }
 
-    private PanelBuilder AppendRow(params int[] widths)
+    private CanvasPanel AppendRow(params int[] widths)
     {
         CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
         row.CollapseMode = CollapseMode.AllowNoRenaming;
-
-        PanelBuilder builder = new(row);
-        builder.Horizontal = true;
 
         int totalWidth = (int)row.Size.x;
         int widthUnits = widths.Sum();
         int singleWidth = (totalWidth - UICommon.Margin * (widthUnits - 1)) / widthUnits;
 
+        int x = 0;
+        rowPositions = new int[widths.Length];
         rowWidths = new int[widths.Length];
         for (int i = 0; i < widths.Length; i++)
         {
+            rowPositions[i] = x;
             rowWidths[i] = singleWidth * widths[i] + UICommon.Margin * (widths[i] - 1);
+            x += rowWidths[i] + UICommon.Margin;
         }
 
-        currentRow?.Build();
-        currentRow = builder;
+        rowWidths[widths.Length - 1] = totalWidth - rowPositions[widths.Length - 1];
+
+        currentRow = row;
         rowCounter++;
         rowIndex = 0;
 
-        return builder;
+        return row;
     }
 
     private CanvasText AppendSectionHeader(string name)
@@ -374,20 +377,16 @@ public class MainPanel : CanvasPanel
 
     private PanelBuilder AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        PanelBuilder row = currentRow ?? AppendRow(1);
+        CanvasPanel row = currentRow ?? AppendRow(1);
 
-        int width = rowWidths[rowIndex];
-        if (rowIndex == rowWidths.Length - 1)
-        {
-            width = (int)(row.Length() - row.GetCurrentLength());
-        }
+        CanvasPanel controlPanel = row.Add(new CanvasPanel(name));
+        controlPanel.LocalPosition = new Vector2(rowPositions[rowIndex], 0);
+        controlPanel.Size = new Vector2(rowWidths[rowIndex], row.Size.y);
 
-        if (DebugMod.bindsByMethod.ContainsKey(effect.Method))
-        {
-            width -= UICommon.ControlHeight - UICommon.BORDER_THICKNESS;
-        }
+        PanelBuilder control = new(controlPanel);
+        control.Horizontal = true;
 
-        CanvasButton button = row.AppendFixed(new CanvasButton(name), width);
+        CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
         button.Text.Text = name;
 
         button.OnClicked += () =>
@@ -419,23 +418,21 @@ public class MainPanel : CanvasPanel
 
         if (DebugMod.bindsByMethod.TryGetValue(effect.Method, out BindAction action))
         {
-            UICommon.AppendKeybindButton(row, action);
+            UICommon.AppendKeybindButton(control, action);
         }
 
+        control.Build();
+
         rowIndex++;
-        if (rowIndex == rowWidths.Length)
+        if (rowIndex == rowPositions.Length)
         {
-            currentRow.Build();
             currentRow = null;
+            rowPositions = null;
             rowWidths = null;
             rowIndex = 0;
         }
-        else
-        {
-            row.AppendPadding(UICommon.Margin);
-        }
 
-        return row;
+        return control;
     }
 
     private PanelBuilder AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
@@ -460,7 +457,6 @@ public class MainPanel : CanvasPanel
 
     public override void Build()
     {
-        currentRow?.Build();
         currentTab?.Build();
 
         float tabButtonWidth = (Size.x - UICommon.Margin * (tabs.Count - 1)) / tabs.Count;

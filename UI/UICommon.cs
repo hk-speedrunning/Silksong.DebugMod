@@ -78,13 +78,13 @@ public static class UICommon
 
     public static CanvasButton AppendKeybindButton(PanelBuilder builder, BindAction action)
     {
-        CanvasPanel keybindBackground = builder.AppendSquare(new CanvasPanel($"{action.Name} Keybind"));
+        CanvasPanel keybindBackground = builder.AppendFixed(new CanvasPanel($"{action.Name} Keybind"), builder.ChildBreadth() - BORDER_THICKNESS);
         keybindBackground.CollapseMode = CollapseMode.Deny; // Would cause background to incorrectly resize
         AddBackground(keybindBackground).RemoveBorder();
 
         CanvasButton keybindButton = keybindBackground.Add(new CanvasButton("Button"));
         keybindButton.LocalPosition = new Vector2(-BORDER_THICKNESS, 0);
-        keybindButton.Size = keybindBackground.Size;
+        keybindButton.Size = keybindBackground.Size - keybindButton.LocalPosition;
 
         if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
         {
