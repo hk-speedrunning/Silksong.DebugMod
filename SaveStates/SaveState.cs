@@ -273,6 +273,8 @@ public class SaveState
             Object.DontDestroyOnLoad(HeroController.instance);
         }
 
+        string previousScene = GameManager.instance.GetSceneNameString();
+
         GameManager.instance.entryGateName = "dreamGate";
         GameManager.instance.startedOnThisScene = true;
 
@@ -284,7 +286,8 @@ public class SaveState
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
-        StaticVariableList.ClearSceneTransitions(); // clears cached data like quest board contents
+        StaticVariableList.ClearSceneTransitions(); // Clears cached data like quest board contents
+        GameManager.ReportUnload(previousScene); // Clears object pools in case the same scene is reloaded
 
         yield return null;
 
