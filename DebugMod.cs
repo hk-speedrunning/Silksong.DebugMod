@@ -55,7 +55,8 @@ public partial class DebugMod : BaseUnityPlugin
 
     internal static HitInstance? lastHit;
     internal static int lastDamage;
-    internal static float lastScaling;
+    [CanBeNull] internal static HealthManager.DamageScalingConfig lastScaling;
+    internal static int lastScaleLevel;
 
     internal static bool stateOnDeath;
     internal static bool infiniteHP;
@@ -256,7 +257,8 @@ public partial class DebugMod : BaseUnityPlugin
 
         lastHit = null;
         lastDamage = 0;
-        lastScaling = 0f;
+        lastScaling = null;
+        lastScaleLevel = 0;
 
         _loadingChar = true;
     }
@@ -322,6 +324,8 @@ public partial class DebugMod : BaseUnityPlugin
         HitInstance scaled = __instance.ApplyDamageScaling(hitInstance);
         lastHit = scaled;
         lastDamage = __instance.damageOverride ? 1 : Mathf.RoundToInt(scaled.DamageDealt * scaled.Multiplier);
+        
+        lastScaling = __instance.damageScaling;
 
         int scaleLevel = hitInstance.DamageScalingLevel - 1;
         if (hitInstance.IsUsingNeedleDamageMult)
@@ -332,7 +336,7 @@ public partial class DebugMod : BaseUnityPlugin
         {
             scaleLevel = PlayerData.instance.ToolKitUpgrades;
         }
-        lastScaling = __instance.damageScaling.GetMultFromLevel(scaleLevel);
+        lastScaleLevel = scaleLevel;
     }
 
     // Prevents clipping through water when invincible
