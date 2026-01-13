@@ -263,6 +263,9 @@ public class SaveState
                 surface.Detach(false);
             }
         }
+        
+        // Prevent silk spool regen from continuing after (or during!) the load.
+        HeroController.instance.ResetSilkRegen();
 
         if (HeroController.instance.transform.parent)
         {
