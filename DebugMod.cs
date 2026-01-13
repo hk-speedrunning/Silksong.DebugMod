@@ -1,5 +1,6 @@
 using BepInEx;
 using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using GlobalEnums;
@@ -66,9 +67,9 @@ public partial class DebugMod : BaseUnityPlugin
     internal static Vector3 noclipPos;
     internal static bool cameraFollow;
     public static bool KeyBindLock;
-    internal static bool TimeScaleActive;
-    internal static float CurrentTimeScale = 1f;
-    internal static bool PauseGameNoUIActive = false;
+    internal static bool TimeScaleActive => Mathf.Approximately(CurrentTimeScale, 1f);
+    internal static float CurrentTimeScale => TimeScale.CustomTimeScale;
+    internal static bool PauseGameNoUIActive => TimeScale.Frozen;
     internal static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
     internal static int extraNailDamage;
@@ -133,6 +134,7 @@ public partial class DebugMod : BaseUnityPlugin
         }
 
         SaveStateManager.Initialize();
+        TimeScale.Initialize();
 
         Harmony harmony = new(Id);
         harmony.PatchAll();
@@ -154,10 +156,12 @@ public partial class DebugMod : BaseUnityPlugin
         };
 
         KeyBindLock = false;
-        TimeScaleActive = false;
 
         Log("Initialized");
     }
+
+    private void OnEnable() => TimeScale.Initialize();
+    private void OnDisable() => TimeScale.Release();
 
     public DebugMod()
     {

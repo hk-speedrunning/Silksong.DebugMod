@@ -172,10 +172,7 @@ public static partial class BindableFunctions
         component.color = color;
 
         //rest all is self explanatory
-        if (GameManager.instance.GetComponent<TimeScale>() != null)
-        {
-            Object.Destroy(GameManager.instance.gameObject.GetComponent<TimeScale>());
-        }
+        TimeScale.Reset();
         GC.tk2dCam.ZoomFactor = 1f;
         HC.vignette.enabled = false;
         EnemiesPanel.hpBars = false;

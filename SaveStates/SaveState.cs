@@ -1,5 +1,6 @@
 ﻿using DebugMod.Helpers;
 using DebugMod.Hitbox;
+using DebugMod.MonoBehaviours;
 using GlobalEnums;
 using HarmonyLib;
 using System;
@@ -170,7 +171,7 @@ public class SaveState
                 DebugMod.LogConsole("Critical error loading savestate, please create a bug report");
 
                 // Hopefully enough to work around most errors and keep the game playable
-                Time.timeScale = DebugMod.CurrentTimeScale;
+                TimeScale.Frozen = false;
                 loadingSavestate = null;
 
                 yield break;
@@ -219,7 +220,7 @@ public class SaveState
         DebugMod.stateOnDeath = false;
 
         //prevents silly things from happening
-        Time.timeScale = 0;
+        TimeScale.Frozen = true;
 
         //called here because this needs to be done here
         if (DebugMod.savestateFixes)
@@ -398,7 +399,7 @@ public class SaveState
         }
 
         //set timescale back
-        Time.timeScale = DebugMod.CurrentTimeScale;
+        TimeScale.Frozen = false;
         DebugMod.stateOnDeath = stateondeath;
     }
 

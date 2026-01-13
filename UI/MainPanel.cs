@@ -103,7 +103,7 @@ public class MainPanel : CanvasPanel
             DebugMod.forcePaused && GameManager.instance.isPaused, BindableFunctions.ForcePause);
         AppendRow(1, 1);
         AppendToggleControl("Toggle Frame Advance", () =>
-            DebugMod.frameAdvanceActive && (Time.timeScale == 0 || DebugMod.advancingFrame), BindableFunctions.ToggleFrameAdvance);
+            DebugMod.frameAdvanceActive && (TimeScale.Frozen || DebugMod.advancingFrame), BindableFunctions.ToggleFrameAdvance);
         AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
         AppendRow(1);
         AppendBasicControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);

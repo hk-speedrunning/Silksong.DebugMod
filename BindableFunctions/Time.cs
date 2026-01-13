@@ -9,82 +9,21 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-    private static float timeScaleDuringFrameAdvance = 0f;
     internal static int frameCounter = 0;
 
     [BindableMethod(name = "Increase Timescale", category = "Time")]
-    public static void TimescaleUp()
-    {
-        if (DebugMod.GM.IsGamePaused())
-        {
-            DebugMod.LogConsole("Cannot change timescale when paused");
-            return;
-        }
-        float oldScale = Time.timeScale;
-        bool wasTimeScaleActive = DebugMod.TimeScaleActive;
-        Time.timeScale = Time.timeScale = Mathf.Round(Time.timeScale * 10 + 1f) / 10f;
-        DebugMod.CurrentTimeScale = Time.timeScale;
-
-        DebugMod.TimeScaleActive = Math.Abs(DebugMod.CurrentTimeScale - 1f) > Mathf.Epsilon;
-
-        switch (DebugMod.TimeScaleActive)
-        {
-            case true when wasTimeScaleActive == false:
-                if (GameManager.instance.GetComponent<TimeScale>() == null) GameManager.instance.gameObject.AddComponent<TimeScale>();
-                break;
-            case false when wasTimeScaleActive:
-                if (GameManager.instance.GetComponent<TimeScale>() != null)
-                {
-                    Object.Destroy(GameManager.instance.gameObject.GetComponent<TimeScale>());
-                }
-
-                break;
-        }
-        DebugMod.LogConsole("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
-    }
+    public static void TimescaleUp() => TimeScale.CustomTimeScale = Mathf.Round(TimeScale.CustomTimeScale * 10 + 1f) / 10f;
 
     [BindableMethod(name = "Decrease Timescale", category = "Time")]
-    public static void TimescaleDown()
-    {
-        //This needs to be added because the game sets timescale to 0 when paused to pause the game if this is changed to a
-        //non-zero value, the game continues to play even tho the pause menu is up which is scuffed so this makes it less skuffed
-        if (DebugMod.GM.IsGamePaused())
-        {
-            DebugMod.LogConsole("Cannot change timescale when paused");
-            return;
-        }
-        float oldScale = Time.timeScale;
-        bool wasTimeScaleActive = DebugMod.TimeScaleActive;
-        Time.timeScale = Time.timeScale = Mathf.Round(Time.timeScale * 10 - 1f) / 10f;
-        DebugMod.CurrentTimeScale = Time.timeScale;
-
-        DebugMod.TimeScaleActive = Math.Abs(DebugMod.CurrentTimeScale - 1f) > Mathf.Epsilon;
-
-        switch (DebugMod.TimeScaleActive)
-        {
-            case true when wasTimeScaleActive == false:
-                if (GameManager.instance.GetComponent<TimeScale>() == null) GameManager.instance.gameObject.AddComponent<TimeScale>();
-                break;
-            case false when wasTimeScaleActive:
-                if (GameManager.instance.GetComponent<TimeScale>() != null)
-                {
-                    Object.Destroy(GameManager.instance.gameObject.GetComponent<TimeScale>());
-                }
-
-                break;
-        }
-
-        DebugMod.LogConsole("New TimeScale value: " + DebugMod.CurrentTimeScale + " Old value: " + oldScale);
-    }
+    public static void TimescaleDown() => TimeScale.CustomTimeScale = Mathf.Round(TimeScale.CustomTimeScale * 10 - 1f) / 10f;
 
     [BindableMethod(name = "Freeze Game", category = "Time")]
     public static void PauseGameNoUI()
     {
-        DebugMod.PauseGameNoUIActive = !DebugMod.PauseGameNoUIActive;
+        TimeScale.Frozen = !TimeScale.Frozen; // <- this will set timescale accordingly
 
-        if (DebugMod.PauseGameNoUIActive)
+        if (TimeScale.Frozen)
         {
-            Time.timeScale = 0;
             GameCameras.instance.StopCameraShake();
             DebugMod.LogConsole("Game was Frozen");
         }
@@ -95,9 +34,7 @@ public static partial class BindableFunctions
             GameManager.instance.ui.SetState(UIState.PLAYING);
             GameManager.instance.SetState(GameState.PLAYING);
             if (HeroController.instance != null) HeroController.instance.UnPause();
-            Time.timeScale = DebugMod.CurrentTimeScale;
             GameManager.instance.inputHandler.AllowPause();
-
             DebugMod.LogConsole("Game was Unfrozen");
         }
     }
@@ -136,22 +73,16 @@ public static partial class BindableFunctions
     public static void ToggleFrameAdvance()
     {
         frameCounter = 0;
-        if (Time.timeScale != 0)
+        if (TimeScale.Frozen == false || DebugMod.frameAdvanceActive == false)
         {
             DebugMod.frameAdvanceActive = true;
-            if (GameManager.instance.GetComponent<TimeScale>() == null)
-                GameManager.instance.gameObject.AddComponent<TimeScale>();
-            Time.timeScale = 0f;
-            timeScaleDuringFrameAdvance = DebugMod.CurrentTimeScale;
-            DebugMod.CurrentTimeScale = 0;
-            DebugMod.TimeScaleActive = true;
+            TimeScale.Frozen = true;
             DebugMod.LogConsole("Starting frame by frame advance on keybind press");
         }
         else
         {
             DebugMod.frameAdvanceActive = false;
-            DebugMod.CurrentTimeScale = timeScaleDuringFrameAdvance;
-            Time.timeScale = DebugMod.CurrentTimeScale;
+            TimeScale.Frozen = false;
             DebugMod.LogConsole("Stopping frame by frame advance on keybind press");
         }
     }
@@ -159,19 +90,17 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Advance Frame", category = "Time")]
     public static void AdvanceFrame()
     {
-        if (Time.timeScale != 0) ToggleFrameAdvance();
+        if (TimeScale.Frozen == false) ToggleFrameAdvance();
         frameCounter++;
         GameManager.instance.StartCoroutine(AdvanceMyFrame());
     }
 
     private static IEnumerator AdvanceMyFrame()
     {
-        DebugMod.CurrentTimeScale = Time.timeScale = 1f;
+        TimeScale.Frozen = false;
         DebugMod.advancingFrame = true;
-
         yield return new WaitForFixedUpdate();
-
-        DebugMod.CurrentTimeScale = Time.timeScale = 0f;
+        TimeScale.Frozen = true;
         DebugMod.advancingFrame = false;
     }
 
