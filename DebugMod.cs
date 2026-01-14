@@ -161,7 +161,8 @@ public partial class DebugMod : BaseUnityPlugin
     }
 
     private void OnEnable() => TimeScale.Initialize();
-    private void OnDisable() => TimeScale.Release();
+    private void OnDisable() => TimeScale.Reset();
+    private void OnDestroy() => TimeScale.Release();
 
     public DebugMod()
     {

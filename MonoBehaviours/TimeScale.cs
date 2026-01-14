@@ -65,12 +65,8 @@ public static class TimeScale
 
     internal static void Release()
     {
-        // Reset to default behavior if this mod/component is disabled
-        tScale?.Release();
-        tScale = null;
         tFreeze?.Release();
-        tFreeze = null;
-        UnhookFreezeCoroutines();
+        tScale?.Release();
     }
 
     // This allows DebugMod to control timescale independently of Silksong,
