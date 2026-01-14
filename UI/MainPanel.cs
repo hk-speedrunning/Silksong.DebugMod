@@ -98,14 +98,11 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Increase Timescale", BindableFunctions.TimescaleUp);
         AppendBasicControl("Decrease Timescale", BindableFunctions.TimescaleDown);
         AppendRow(1, 1);
-        AppendToggleControl("Freeze Game", () => DebugMod.PauseGameNoUIActive, BindableFunctions.PauseGameNoUI);
+        AppendToggleControl("Freeze Game", () => TimeScale.Frozen, BindableFunctions.PauseGameNoUI);
+        AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
+        AppendRow(1, 1);
         AppendToggleControl("Force Pause", () =>
             DebugMod.forcePaused && GameManager.instance.isPaused, BindableFunctions.ForcePause);
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle Frame Advance", () =>
-            DebugMod.frameAdvanceActive && (Time.timeScale == 0 || DebugMod.advancingFrame), BindableFunctions.ToggleFrameAdvance);
-        AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
-        AppendRow(1);
         AppendBasicControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);
 
         AppendSectionHeader("Visual");
