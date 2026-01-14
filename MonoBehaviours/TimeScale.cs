@@ -27,12 +27,12 @@ public static class TimeScale
         set
         {
             float prevValue = CustomTimeScale;
-            if (value == prevValue)
+            if (value == prevValue || value < 0f)
                 return; // unchanged
-
-            // only set the time scale if the scale you want to set is not 1
-            tScale.TimeScale = Mathf.Max(0f, value);
-            DebugMod.LogConsole("New TimeScale value: " + CustomTimeScale + " Old value: " + prevValue);
+            
+            tScale.TimeScale = value;
+            string adjustmentText = value > prevValue ? "increased" : "decreased";
+            DebugMod.LogConsole($"Timescale {adjustmentText}: {CustomTimeScale:0.0} (was {prevValue:0.0})");
             CheckHookRequirement();
         }
     }
@@ -49,24 +49,17 @@ public static class TimeScale
                 return; // no change
             tFreeze.TimeScale = value ? 0f : 1f;
 
-            bool heroExists = HeroController.UnsafeInstance != null;
             bool cameraExistsAndIsntPaused = GameManager.UnsafeInstance != null && GameCameras.instance != null && GameManager.instance.isPaused == false;
 
             if (value) // freeze
             {
-                if (heroExists)
-                    HeroController.instance.inputBlockers.Add(tFreeze);
                 if (cameraExistsAndIsntPaused)
                     GameCameras.instance.StopCameraShake();
-                DebugMod.LogConsole("Game was Frozen");
             }
             else // unfreeze
             {
-                if (heroExists)
-                    HeroController.instance.inputBlockers.Remove(tFreeze);
                 if (cameraExistsAndIsntPaused)
                     GameCameras.instance.ResumeCameraShake();
-                DebugMod.LogConsole("Game was Unfrozen");
             }
 
             CheckHookRequirement();

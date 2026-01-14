@@ -19,8 +19,16 @@ public static partial class BindableFunctions
     public static void PauseGameNoUI()
     {
         TimeScale.Frozen = !TimeScale.Frozen; // <- this will set timescale accordingly
+        // We need to log here since TimeScale.Frozen is used on Advance Frame
         if (TimeScale.Frozen)
+        {
             frameCounter = 0;
+            DebugMod.LogConsole("Game Frozen");
+        }
+        else
+        {
+            DebugMod.LogConsole("Game Unfrozen");
+        }
     }
 
     [BindableMethod(name = "Force Pause", category = "Time")]
@@ -71,6 +79,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Reset Frame Counter", category = "Time")]
     public static void ResetFrameCounter()
     {
+        DebugMod.LogConsole($"Frame Counter reset (was {frameCounter})");
         frameCounter = 0;
     }
 }
