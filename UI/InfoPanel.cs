@@ -33,7 +33,7 @@ public class InfoPanel : CanvasPanel
 
         x = ContentMargin();
         y = ContentMargin();
-        labelWidth = UICommon.ScaleWidth(130);
+        labelWidth = UICommon.ScaleWidth(120);
         infoWidth = UICommon.ScaleWidth(150);
         
         // Alt implementation:
