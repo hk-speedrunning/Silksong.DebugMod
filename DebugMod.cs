@@ -67,15 +67,10 @@ public partial class DebugMod : BaseUnityPlugin
     internal static Vector3 noclipPos;
     internal static bool cameraFollow;
     public static bool KeyBindLock;
-    internal static bool TimeScaleActive => Mathf.Approximately(CurrentTimeScale, 1f);
-    internal static float CurrentTimeScale => TimeScale.CustomTimeScale;
-    internal static bool PauseGameNoUIActive => TimeScale.Frozen;
     internal static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
     internal static int extraNailDamage;
     internal static bool forcePaused;
-    internal static bool frameAdvanceActive;
-    internal static bool advancingFrame;
 
     internal static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();

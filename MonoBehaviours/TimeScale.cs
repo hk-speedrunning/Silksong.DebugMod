@@ -45,7 +45,30 @@ public static class TimeScale
         get => tFreeze.TimeScale == 0f;
         set
         {
+            if (value == Frozen)
+                return; // no change
             tFreeze.TimeScale = value ? 0f : 1f;
+
+            bool heroExists = HeroController.UnsafeInstance != null;
+            bool cameraExistsAndIsntPaused = GameManager.UnsafeInstance != null && GameCameras.instance != null && GameManager.instance.isPaused == false;
+
+            if (value) // freeze
+            {
+                if (heroExists)
+                    HeroController.instance.inputBlockers.Add(tFreeze);
+                if (cameraExistsAndIsntPaused)
+                    GameCameras.instance.StopCameraShake();
+                DebugMod.LogConsole("Game was Frozen");
+            }
+            else // unfreeze
+            {
+                if (heroExists)
+                    HeroController.instance.inputBlockers.Remove(tFreeze);
+                if (cameraExistsAndIsntPaused)
+                    GameCameras.instance.ResumeCameraShake();
+                DebugMod.LogConsole("Game was Unfrozen");
+            }
+
             CheckHookRequirement();
         }
     }

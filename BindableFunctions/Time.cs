@@ -1,9 +1,7 @@
 ﻿using DebugMod.MonoBehaviours;
-using GlobalEnums;
 using System;
 using System.Collections;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace DebugMod;
 
@@ -21,22 +19,8 @@ public static partial class BindableFunctions
     public static void PauseGameNoUI()
     {
         TimeScale.Frozen = !TimeScale.Frozen; // <- this will set timescale accordingly
-
         if (TimeScale.Frozen)
-        {
-            GameCameras.instance.StopCameraShake();
-            DebugMod.LogConsole("Game was Frozen");
-        }
-        else
-        {
-            GameCameras.instance.ResumeCameraShake();
-            GameManager.instance.isPaused = false;
-            GameManager.instance.ui.SetState(UIState.PLAYING);
-            GameManager.instance.SetState(GameState.PLAYING);
-            if (HeroController.instance != null) HeroController.instance.UnPause();
-            GameManager.instance.inputHandler.AllowPause();
-            DebugMod.LogConsole("Game was Unfrozen");
-        }
+            frameCounter = 0;
     }
 
     [BindableMethod(name = "Force Pause", category = "Time")]
@@ -45,7 +29,7 @@ public static partial class BindableFunctions
         try
         {
             if (PlayerData.instance.disablePause || GameManager.instance.TimeSlowed ||
-                 UIManager.instance.ignoreUnpause && DebugMod.GetSceneName() != "Menu_Title" &&
+                UIManager.instance.ignoreUnpause && DebugMod.GetSceneName() != "Menu_Title" &&
                 DebugMod.GM.IsGameplayScene())
             {
                 GameManager.instance.timeSlowedCount = 0;
@@ -69,28 +53,10 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Start/End Frame Advance", category = "Time")]
-    public static void ToggleFrameAdvance()
-    {
-        frameCounter = 0;
-        if (TimeScale.Frozen == false || DebugMod.frameAdvanceActive == false)
-        {
-            DebugMod.frameAdvanceActive = true;
-            TimeScale.Frozen = true;
-            DebugMod.LogConsole("Starting frame by frame advance on keybind press");
-        }
-        else
-        {
-            DebugMod.frameAdvanceActive = false;
-            TimeScale.Frozen = false;
-            DebugMod.LogConsole("Stopping frame by frame advance on keybind press");
-        }
-    }
-
     [BindableMethod(name = "Advance Frame", category = "Time")]
     public static void AdvanceFrame()
     {
-        if (TimeScale.Frozen == false) ToggleFrameAdvance();
+        if (TimeScale.Frozen == false) TimeScale.Frozen = true;
         frameCounter++;
         GameManager.instance.StartCoroutine(AdvanceMyFrame());
     }
@@ -98,10 +64,8 @@ public static partial class BindableFunctions
     private static IEnumerator AdvanceMyFrame()
     {
         TimeScale.Frozen = false;
-        DebugMod.advancingFrame = true;
         yield return new WaitForFixedUpdate();
         TimeScale.Frozen = true;
-        DebugMod.advancingFrame = false;
     }
 
     [BindableMethod(name = "Reset Frame Counter", category = "Time")]
