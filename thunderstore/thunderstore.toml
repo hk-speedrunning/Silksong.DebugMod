@@ -5,7 +5,7 @@ schemaVersion = "0.0.1"
 # The name of the team you are publishing as
 namespace = "hk_speedrunning"
 # max 250 characters
-description = "The premier practice tool for Silksong, ported from Hollow Knight's DebugMod."
+description = "The premier practice tool for Silksong, with fully-featured savestates, cheats, and many more features. Based on Hollow Knight's DebugMod."
 
 # Replace this with a correct repo URL if the default is not accurate
 websiteUrl = "https://github.com/hk-speedrunning/Silksong.DebugMod"
