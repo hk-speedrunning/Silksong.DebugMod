@@ -108,7 +108,7 @@ jobs:
     - name: Restore tools
       run: dotnet tool restore
     - name: Download artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: mod-bundle
         path: thunderstore/dist
@@ -146,7 +146,7 @@ jobs:
       with:
         dotnet-version: 9.x
     - name: Download artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: nuget
         path: nuget/
@@ -167,12 +167,12 @@ jobs:
 
     steps:
     - name: Download thunderstore artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: mod-bundle
         path: thunderstore/dist
     - name: Download manual artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: manual-bundle
         path: thunderstore/manual
