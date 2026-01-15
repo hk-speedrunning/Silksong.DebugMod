@@ -39,4 +39,8 @@ public class Settings
     public bool SaveStateGlitchFixes = true;
 
     public bool LogUnityExceptions = true;
+
+    public bool AltInfoPanel = false;
+
+    public bool ExpandedInfoPanel = false;
 }

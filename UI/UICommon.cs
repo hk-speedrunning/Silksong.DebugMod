@@ -18,7 +18,10 @@ public static class UICommon
     public static int LeftSideWidth => ScaleWidth(450);
     public static int MainPanelHeight => ScaleHeight(650);
     public static int ConsoleHeight => ScaleHeight(250);
-    public static int InfoPanelHeight => ScaleHeight(400);
+    public static int InfoPanelExpandedHeight => ScaleHeight(470);
+    public static int InfoPanelBaseHeight => ScaleHeight(350);
+    public static int InfoPanelHeight =>
+        DebugMod.settings.ExpandedInfoPanel ? InfoPanelExpandedHeight : InfoPanelBaseHeight;
     public static int SaveStatePanelWidth => ScaleWidth(500);
     public static int Margin => ScaleHeight(6);
     public static int ScreenMargin => ScaleHeight(10);

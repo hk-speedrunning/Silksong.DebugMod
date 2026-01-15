@@ -13,6 +13,7 @@ public class CanvasText : CanvasObject
     private FontStyle fontStyle = FontStyle.Normal;
     private TextAnchor alignment = TextAnchor.UpperLeft;
     private Color color = UICommon.textColor;
+    private HorizontalWrapMode overflow;
 
     public string Text
     {
@@ -74,7 +75,11 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public CanvasText(string name) : base(name) { }
+    public CanvasText(string name, 
+        HorizontalWrapMode overflow = HorizontalWrapMode.Wrap) : base(name)
+    {
+        this.overflow = overflow;
+    }
 
     protected override void OnUpdatePosition()
     {
@@ -102,6 +107,7 @@ public class CanvasText : CanvasObject
         RoundPosition();
 
         t = gameObject.AddComponent<Text>();
+        t.horizontalOverflow = overflow;
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;
