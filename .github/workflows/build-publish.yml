@@ -59,6 +59,11 @@ jobs:
       with:
         name: nuget
         path: nuget/
+    - name: Upload manual artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: manual_bundle
+        path: thunderstore/manual
     - name: Check if release needed
       id: needs-release
       uses: mukunku/tag-exists-action@v1.7.0
@@ -161,11 +166,16 @@ jobs:
     if: github.event_name == 'push' && needs.build.outputs.allow-release == 'true' && needs.build.outputs.is-new-version == 'true'
 
     steps:
-    - name: Download artifact
+    - name: Download thunderstore artifact
       uses: actions/download-artifact@v6
       with:
         name: mod-bundle
         path: thunderstore/dist
+    - name: Download manual artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: manual-bundle
+        path: thunderstore/manual
     - name: Release
       uses: softprops/action-gh-release@v2.5.0
       with:
@@ -177,3 +187,4 @@ jobs:
           Build attested at ${{ needs.build.outputs.attestation-url }}
         files: |
           thunderstore/dist/*.zip
+          thunderstore/manual/*.zip
