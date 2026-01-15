@@ -278,22 +278,22 @@ public class InfoPanel : CanvasPanel
 
     private static string GetInputs()
     {
-        // This is the most disgusting solution ever, but it works :) - jamie
-        string l = DebugMod.IH.inputActions.Left.State ? "<" : "  ";
-        string u = DebugMod.IH.inputActions.Up.State ? "⋀" : "  ";
-        string d = DebugMod.IH.inputActions.Down.State ? "⋁" : "  ";
-        string r = DebugMod.IH.inputActions.Right.State ? ">" : "  ";
-        string j = DebugMod.IH.inputActions.Jump.State ? "j" : " ";
-        string s = DebugMod.IH.inputActions.Dash.State ? "s" : "  ";
-        string a = DebugMod.IH.inputActions.Attack.State ? "a" : "  ";
-        string h = DebugMod.IH.inputActions.SuperDash.State ? "h" : "   ";
-        string n = DebugMod.IH.inputActions.DreamNail.State ? "n" : "   ";
-        string c = DebugMod.IH.inputActions.QuickCast.State ? "c" : "  ";
-        string b = DebugMod.IH.inputActions.Cast.State ? "b" : "  ";
-        string t = DebugMod.IH.inputActions.Taunt.State ? "t" : "  ";
-        string m = DebugMod.IH.inputActions.QuickMap.State ? "m" : "   ";
-        string i = DebugMod.IH.inputActions.OpenInventory.State ? "i" : "  ";
-        string p = DebugMod.IH.inputActions.Pause.State ? "p" : "  ";
+        // NB: somewhat random spacing to try and work around lack of monospace font availability
+        string l = DebugMod.IH.inputActions.Left.State ? "<" : "  ";            // left
+        string u = DebugMod.IH.inputActions.Up.State ? "⋀" : "  ";              // up
+        string d = DebugMod.IH.inputActions.Down.State ? "⋁" : "  ";            // down
+        string r = DebugMod.IH.inputActions.Right.State ? ">" : "  ";           // right
+        string j = DebugMod.IH.inputActions.Jump.State ? "j" : " ";             // jump
+        string s = DebugMod.IH.inputActions.Dash.State ? "s" : "  ";            // sprint
+        string a = DebugMod.IH.inputActions.Attack.State ? "a" : "  ";          // attack
+        string h = DebugMod.IH.inputActions.SuperDash.State ? "h" : "   ";      // harpoon
+        string n = DebugMod.IH.inputActions.DreamNail.State ? "n" : "   ";      // needolin
+        string c = DebugMod.IH.inputActions.QuickCast.State ? "c" : "  ";       // cast
+        string b = DebugMod.IH.inputActions.Cast.State ? "b" : "  ";            // bind
+        string t = DebugMod.IH.inputActions.Taunt.State ? "t" : "  ";           // taunt
+        string m = DebugMod.IH.inputActions.QuickMap.State ? "m" : "   ";       // map
+        string i = DebugMod.IH.inputActions.OpenInventory.State ? "i" : "  ";   // inventory
+        string p = DebugMod.IH.inputActions.Pause.State ? "p" : "  ";           // pause
         
 
         return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{t} {m}{i}{p}";
