@@ -36,9 +36,9 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v5.1.0
       with:
-        dotnet-version: 9.x
+        dotnet-version: 10.x
     - name: Build
       run: dotnet build -c Release --verbosity normal
     - name: Pack
@@ -61,13 +61,13 @@ jobs:
         path: nuget/
     - name: Check if release needed
       id: needs-release
-      uses: mukunku/tag-exists-action@v1.6.0
+      uses: mukunku/tag-exists-action@v1.7.0
       if: github.event_name == 'push'
       with:
         tag: v${{ steps.version.outputs.version }}
     - name: Generate attestation
       id: attest
-      uses: actions/attest-build-provenance@v3
+      uses: actions/attest-build-provenance@v3.1.0
       if: github.event_name == 'push' && steps.needs-release.outputs.exists == 'false'
       with:
         subject-path: |
@@ -97,7 +97,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v5.1.0
       with:
         dotnet-version: 9.x
     - name: Restore tools
@@ -137,7 +137,7 @@ jobs:
 
     steps:
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v5.1.0
       with:
         dotnet-version: 9.x
     - name: Download artifact
@@ -167,7 +167,7 @@ jobs:
         name: mod-bundle
         path: thunderstore/dist
     - name: Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v2.5.0
       with:
         draft: false
         generate_release_notes: true

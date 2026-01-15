@@ -1,5 +1,18 @@
 ## Changelog
 
+### v0.3.2
+
+- Savestates:
+	- Fixed incorrectly regenerating silk chunks after loading a savestate (& likely also where silk chunks get stuck in the centre of the screen)
+	- Fixed loading savestates into a flame/lava hitbox causing flame effect to be applied every frame until taking damage.
+	- Fixed some projectiles & effects incorrectly persisting across same-room loads using Load Quickslot on Death.
+- Info panel has been reorganised to present more helpful information.
+	- Last Scaling now shows all multipliers belonging to the last hit enemy, not just the one that was applied.
+	- Added `ExtendedInfoPanel` setting to `<save files>/DebugModData/settings.json` to re-add fields removed in v0.3.0.
+	- Optional new look with `AltInfoPanel` setting (see above) that may assist legibility.
+- Timescale no longer resets on getting hit + other improvements (thanks Freya Holmér!)
+- Fixed HP bars sometimes gaining infinite length or becoming detached from their enemies.
+
 ### v0.3.1
 
 - Fixed a crash on MacOS
