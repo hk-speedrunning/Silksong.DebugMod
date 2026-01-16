@@ -179,6 +179,7 @@ public partial class DebugMod : BaseUnityPlugin
             if (File.Exists(path))
             {
                 settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
+                settings ??= new Settings();
                 Log("Loaded settings");
             }
         }
