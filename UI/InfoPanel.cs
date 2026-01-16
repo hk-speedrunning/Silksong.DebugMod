@@ -34,7 +34,7 @@ public class InfoPanel : CanvasPanel
         x = ContentMargin();
         y = ContentMargin();
         labelWidth = UICommon.ScaleWidth(120);
-        infoWidth = UICommon.ScaleWidth(150);
+        infoWidth = UICommon.ScaleWidth(160);
         
         // Alt implementation:
         if (DebugMod.settings.AltInfoPanel)
@@ -231,11 +231,11 @@ public class InfoPanel : CanvasPanel
         
         string[] scaleMultipliers =
         [
-            DebugMod.lastScaling.Level1Mult.ToString(),
-            DebugMod.lastScaling.Level2Mult.ToString(),
-            DebugMod.lastScaling.Level3Mult.ToString(),
-            DebugMod.lastScaling.Level4Mult.ToString(),
-            DebugMod.lastScaling.Level5Mult.ToString()
+            $"{DebugMod.lastScaling.Level1Mult:.###}",
+            $"{DebugMod.lastScaling.Level2Mult:.###}",
+            $"{DebugMod.lastScaling.Level3Mult:.###}",
+            $"{DebugMod.lastScaling.Level4Mult:.###}",
+            $"{DebugMod.lastScaling.Level5Mult:.###}"
         ];
         
         // Level from HealthManager.ApplyDamageScaling
@@ -245,7 +245,7 @@ public class InfoPanel : CanvasPanel
         if (level >= 0) // Game behaviour; sub-zero levels scale to 1f so don't highlight any multiplier
             scaleMultipliers[level] = $"({scaleMultipliers[level]})";
         
-        return string.Join(" · ", scaleMultipliers);
+        return string.Join("∶", scaleMultipliers);
     }
 
     private static string GetTransitionStates()
