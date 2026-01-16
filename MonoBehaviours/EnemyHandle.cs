@@ -10,7 +10,7 @@ namespace DebugMod.MonoBehaviours;
 [HarmonyPatch]
 public class EnemyHandle : MonoBehaviour
 {
-    private const int HPBAR_WIDTH = 120;
+    private const int HPBAR_WIDTH = 150;
     private const int HPBAR_HEIGHT = 40;
 
     private HealthManager hm;
@@ -69,7 +69,7 @@ public class EnemyHandle : MonoBehaviour
             {
                 barTexture = new Texture2D(HPBAR_WIDTH, 1);
                 Color[] colors = new Color[HPBAR_WIDTH];
-                Array.Fill(colors, Color.red);
+                Array.Fill(colors, Color.red.SetAlpha(0.5f));
                 barTexture.SetPixels(colors);
                 barTexture.Apply();
 
@@ -79,7 +79,7 @@ public class EnemyHandle : MonoBehaviour
                 CanvasImage background = UICommon.AddBackground(hpBar);
                 background.SetImage(barTexture);
                 background.Border.Size = hpBar.Size;
-                background.Border.Thickness = 3;
+                background.Border.Thickness = 2;
 
                 CanvasText text = hpBar.Add(new CanvasText("HP"));
                 text.Size = hpBar.Size;
