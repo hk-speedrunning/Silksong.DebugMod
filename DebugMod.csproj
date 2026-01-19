@@ -83,8 +83,8 @@
         <ModlistVersion>0.2.0</ModlistVersion>
         <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/v$(ModlistVersion)/silksong_modding-Modlist-$(ModlistVersion).zip/</ModlistUrl>
       </PropertyGroup>
-      <DownloadFile SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.zip" />
-      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
+      <DownloadFile Condition="!Exists('$(IntermediateOutputPath)/Silksong.Modlist.$(ModlistVersion).zip')" SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.$(ModlistVersion).zip" />
+      <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.$(ModlistVersion).zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
 
       <PropertyGroup>
         <ExportFolder>$(ThunderstoreDir)/manual</ExportFolder>
