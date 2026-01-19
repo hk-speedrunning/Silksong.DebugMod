@@ -253,8 +253,10 @@ public class SaveState
         QuestYesNoBox.ForceClose();
 
         EventRegister.SendEvent("REST AREA MUSIC STOP");
+        ToolItemManager.SetIsInCutscene(false);
         CameraBlurPlane.Spacing = 0f;
         CameraBlurPlane.Vibrancy = 0f;
+        CameraBlurPlane.MaskLerp = 0f;
 
         // Fix slopes
         foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
@@ -264,7 +266,7 @@ public class SaveState
                 surface.Detach(false);
             }
         }
-        
+
         // Prevent silk spool regen from continuing after (or during!) the load.
         HeroController.instance.ResetSilkRegen();
 
