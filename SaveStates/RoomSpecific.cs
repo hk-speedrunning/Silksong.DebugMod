@@ -11,7 +11,14 @@ public static class RoomSpecific
 {
     private static readonly List<string> scenesWithSpecialHandling =
     [
-        "Bone_East_08" // Fourth Chorus room
+        // Memories (not counting memory bosses which act normally)
+        "Memory_Silk_Heart_BellBeast",
+        "Memory_Silk_Heart_LaceTower",
+        "Memory_Silk_Heart_WardBoss",
+        "Memory_Needolin",
+        "Memory_Red",
+
+        "Bone_East_08", // Fourth Chorus room
     ];
 
     internal static string SaveRoomSpecific(string scene)
@@ -38,6 +45,23 @@ public static class RoomSpecific
         return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
     }
 
+    internal static PlayMakerFSM FindFSM(string goName, string fsmName)
+    {
+        return PlayMakerFSM.FindFsmOnGameObject(GameObject.Find(goName), fsmName);
+    }
+
+    internal static IEnumerator MemoryFixes()
+    {
+        HeroController.instance.SetSilkRegenBlocked(true);
+        DarknessRegion.SetDarknessLevel(0);
+        FindFSM("Memory Control", "Memory Control").SendEvent("DOOR GET UP FINISHED");
+
+        // TODO: find a way to remove the 1 second wait
+        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+        yield return new WaitForSecondsRealtime(1f);
+        GameCameras.instance.hudCanvasSlideOut.SendEvent("OUT");
+    }
+
     internal static IEnumerator DoRoomSpecific(string scene, string options)
     {
         string[] parts = options.Split('|');
@@ -53,6 +77,13 @@ public static class RoomSpecific
             case "Bone_East_08":
                 // Wait for lava platforms to load in so we don't fall through them
                 yield return new WaitUntil(() => !GameManager.instance.isLoading);
+                break;
+            case "Memory_Silk_Heart_BellBeast":
+            case "Memory_Silk_Heart_LaceTower":
+            case "Memory_Silk_Heart_WardBoss":
+            case "Memory_Needolin":
+            case "Memory_Red":
+                GameManager.instance.StartCoroutine(MemoryFixes());
                 break;
             default:
                 DebugMod.LogConsole("No Room Specific Function Found In: " + scene);
