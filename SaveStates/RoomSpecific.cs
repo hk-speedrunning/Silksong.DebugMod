@@ -9,18 +9,7 @@ namespace DebugMod.SaveStates;
 [HarmonyPatch]
 public static class RoomSpecific
 {
-    private static readonly List<string> scenesWithSpecialHandling =
-    [
-        // Memories (not counting memory bosses which act normally)
-        "Memory_Silk_Heart_BellBeast",
-        "Memory_Silk_Heart_LaceTower",
-        "Memory_Silk_Heart_WardBoss",
-        "Memory_Needolin",
-        "Memory_Red",
-
-        "Bone_East_08", // Fourth Chorus room
-    ];
-
+    #region roomspecifics
     internal static string SaveRoomSpecific(string scene)
     {
         foreach (BattleScene battleScene in Object.FindObjectsByType<BattleScene>(FindObjectsSortMode.None))
@@ -29,11 +18,6 @@ public static class RoomSpecific
             {
                 return SaveBattleScene(battleScene);
             }
-        }
-
-        if (scenesWithSpecialHandling.Contains(scene))
-        {
-            return scene;
         }
 
         return "";
@@ -50,18 +34,6 @@ public static class RoomSpecific
         return PlayMakerFSM.FindFsmOnGameObject(GameObject.Find(goName), fsmName);
     }
 
-    internal static IEnumerator MemoryFixes()
-    {
-        HeroController.instance.SetSilkRegenBlocked(true);
-        DarknessRegion.SetDarknessLevel(0);
-        FindFSM("Memory Control", "Memory Control").SendEvent("DOOR GET UP FINISHED");
-
-        // TODO: find a way to remove the 1 second wait
-        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
-        yield return new WaitForSecondsRealtime(1f);
-        GameCameras.instance.hudCanvasSlideOut.SendEvent("OUT");
-    }
-
     internal static IEnumerator DoRoomSpecific(string scene, string options)
     {
         string[] parts = options.Split('|');
@@ -72,23 +44,13 @@ public static class RoomSpecific
                 yield break;
         }
 
-        switch (scene)
+        if (options == scene)
         {
-            case "Bone_East_08":
-                // Wait for lava platforms to load in so we don't fall through them
-                yield return new WaitUntil(() => !GameManager.instance.isLoading);
-                break;
-            case "Memory_Silk_Heart_BellBeast":
-            case "Memory_Silk_Heart_LaceTower":
-            case "Memory_Silk_Heart_WardBoss":
-            case "Memory_Needolin":
-            case "Memory_Red":
-                GameManager.instance.StartCoroutine(MemoryFixes());
-                break;
-            default:
-                DebugMod.LogConsole("No Room Specific Function Found In: " + scene);
-                break;
+            // Legacy way of running generic fixes, no need to warn
+            yield break;
         }
+
+        DebugMod.LogConsole($"Invalid room-specific options for {scene}: {options}");
     }
 
     internal static void DoBattleScene(string scene, string objectName, int wave)
@@ -139,4 +101,38 @@ public static class RoomSpecific
 
         return matcher.InstructionEnumeration();
     }
+    #endregion
+
+    #region genericfixes
+    // Fixes specific to a room that do not require additional options
+    internal static IEnumerator DoGenericFixes(string scene)
+    {
+        switch (scene)
+        {
+            case "Bone_East_08":
+                // Wait for lava platforms to load in so we don't fall through them
+                yield return new WaitUntil(() => !GameManager.instance.isLoading);
+                break;
+            case "Memory_Silk_Heart_BellBeast":
+            case "Memory_Silk_Heart_LaceTower":
+            case "Memory_Silk_Heart_WardBoss":
+            case "Memory_Needolin":
+            case "Memory_Red":
+                GameManager.instance.StartCoroutine(MemoryFixes());
+                break;
+        }
+    }
+
+    internal static IEnumerator MemoryFixes()
+    {
+        HeroController.instance.SetSilkRegenBlocked(true);
+        DarknessRegion.SetDarknessLevel(0);
+        FindFSM("Memory Control", "Memory Control").SendEvent("DOOR GET UP FINISHED");
+
+        // TODO: find a way to remove the 1 second wait
+        yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
+        yield return new WaitForSecondsRealtime(1f);
+        GameCameras.instance.hudCanvasSlideOut.SendEvent("OUT");
+    }
+    #endregion
 }

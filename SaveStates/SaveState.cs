@@ -381,12 +381,13 @@ public class SaveState
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
 
-
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
             DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);
             yield return RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
         }
+
+        yield return RoomSpecific.DoGenericFixes(data.saveScene);
 
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
