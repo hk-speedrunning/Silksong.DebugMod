@@ -428,6 +428,23 @@ public partial class DebugMod : BaseUnityPlugin
         bindActions.Add(name, new BindAction(name, category, allowLock, method));
     }
 
+    [PublicAPI]
+    public enum InfoPanelColumn
+    {
+        LEFT,
+        RIGHT
+    }
+
+    /// <summary>
+    /// Add custom text to be displayed in the info panel.
+    /// </summary>
+    [PublicAPI]
+    public static void AddTextToInfoPanel(string label, Func<string> dataGenerator, InfoPanelColumn column = InfoPanelColumn.LEFT)
+    {
+        var list = column == InfoPanelColumn.LEFT ? InfoPanel.LeftColumnInjects : InfoPanel.RightColumnInjects;
+        list.Add(new(label, dataGenerator));
+    }
+
     public static void LogDebug(string message)
     {
         instance.Logger.LogDebug(message);
