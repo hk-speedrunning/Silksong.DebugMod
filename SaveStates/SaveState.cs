@@ -491,7 +491,12 @@ public class SaveState
 
         // Update active crest behind health display
         BindOrbHudFrame bindOrb = Object.FindAnyObjectByType<BindOrbHudFrame>();
-        if (bindOrb) bindOrb.AlreadyAppeared();
+        if (bindOrb)
+        {
+            bindOrb.isActive = true;
+            bindOrb.currentFrameCrest = null;
+            bindOrb.Refresh(true, false);
+        }
     }
     #endregion
 
