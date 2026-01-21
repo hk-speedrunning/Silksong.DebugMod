@@ -1,7 +1,9 @@
-﻿using HarmonyLib;
+﻿using DebugMod.Helpers;
+using HarmonyLib;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using TeamCherry.NestedFadeGroup;
 using UnityEngine;
 
 namespace DebugMod.SaveStates;
@@ -20,6 +22,11 @@ public static class RoomSpecific
             }
         }
 
+        if (scene == "Memory_Red")
+        {
+            return SaveRedMemory();
+        }
+
         return "";
     }
 
@@ -29,9 +36,29 @@ public static class RoomSpecific
         return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
     }
 
-    internal static PlayMakerFSM FindFSM(string goName, string fsmName)
+    // Red memory has four parts which each get activated when you reach the preceeding cutscene
+    internal static string SaveRedMemory()
     {
-        return PlayMakerFSM.FindFsmOnGameObject(GameObject.Find(goName), fsmName);
+        GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
+
+        if (Utils.FindChildObject(sceneryRoot, "End Scenery").activeSelf)
+        {
+            return "3";
+        }
+        else if (Utils.FindChildObject(sceneryRoot, "Hive Scenery").activeSelf)
+        {
+            return "2";
+        }
+        else if (Utils.FindChildObject(sceneryRoot, "Deepnest Scenery").activeSelf)
+        {
+            return "1";
+        }
+        else if (Utils.FindChildObject(sceneryRoot, "Entry Scenery").activeSelf)
+        {
+            return "0";
+        }
+
+        return "";
     }
 
     internal static IEnumerator DoRoomSpecific(string scene, string options)
@@ -42,6 +69,12 @@ public static class RoomSpecific
             case "BattleScene":
                 DoBattleScene(scene, parts[1], int.Parse(parts[2]));
                 yield break;
+        }
+
+        if (scene == "Memory_Red")
+        {
+            DoRedMemory(options);
+            yield break;
         }
 
         if (options == scene)
@@ -101,6 +134,33 @@ public static class RoomSpecific
 
         return matcher.InstructionEnumeration();
     }
+
+    internal static void DoRedMemory(string options)
+    {
+        int stage = int.Parse(options);
+
+        GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
+
+        string childName = stage switch
+        {
+            0 => "Entry Scenery",
+            1 => "Deepnest Scenery",
+            2 => "Hive Scenery",
+            3 => "End Scenery",
+            _ => null
+        };
+
+        Utils.FindChildObject(sceneryRoot, childName).SetActive(true);
+
+        static void FadeOutFadeGroup(string path)
+        {
+            Utils.FindGameObjectByPath(path).GetComponent<NestedFadeGroup>().FadeTo(0f, 0f);
+        }
+
+        FadeOutFadeGroup("Memory Control/Weaver_Memory_Lighting");
+        FadeOutFadeGroup("Memory Control/Beast_Memory_Lighting");
+        FadeOutFadeGroup("Memory Control/Hive_Memory_Lighting");
+    }
     #endregion
 
     #region genericfixes
@@ -127,7 +187,7 @@ public static class RoomSpecific
     {
         HeroController.instance.SetSilkRegenBlocked(true);
         DarknessRegion.SetDarknessLevel(0);
-        FindFSM("Memory Control", "Memory Control").SendEvent("DOOR GET UP FINISHED");
+        Utils.FindFSM("Memory Control", "Memory Control").SendEvent("DOOR GET UP FINISHED");
 
         // TODO: find a way to remove the 1 second wait
         yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);

@@ -257,6 +257,7 @@ public class SaveState
         CameraBlurPlane.Spacing = 0f;
         CameraBlurPlane.Vibrancy = 0f;
         CameraBlurPlane.MaskLerp = 0f;
+        ScreenFaderUtils.Fade(ScreenFaderUtils.GetColour(), Color.clear, 0f);
 
         // Fix slopes
         foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
