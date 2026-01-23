@@ -42,7 +42,7 @@ public class HitboxRender : MonoBehaviour
         {HitboxType.Enemy, new HashSet<Collider2D>()},
         {HitboxType.Attack, new HashSet<Collider2D>()},
         {HitboxType.Terrain, new HashSet<Collider2D>()},
-        {HitboxType.Trigger, new HashSet<Collider2D>()},
+        {HitboxType.Trigger, new HashSet<Collider2D>()}, // what does this category mean?
         {HitboxType.Breakable, new HashSet<Collider2D>()},
         {HitboxType.Gate, new HashSet<Collider2D>()},
         {HitboxType.HazardRespawn, new HashSet<Collider2D>()},
@@ -87,14 +87,9 @@ public class HitboxRender : MonoBehaviour
             {
                 colliders[HitboxType.Enemy].Add(collider2D);
             }
-            else if (go.GetComponent<HealthManager>() || go.LocateMyFSM("health_manager_enemy") || go.LocateMyFSM("health_manager"))
-            {
-                colliders[HitboxType.Other].Add(collider2D);
-            }
             else if (go.layer == (int)PhysLayers.TERRAIN)
             {
-                if (go.name.Contains("Breakable") || go.name.Contains("Collapse") || go.GetComponent<Breakable>() != null) colliders[HitboxType.Breakable].Add(collider2D);
-                else colliders[HitboxType.Terrain].Add(collider2D);
+                colliders[HitboxType.Terrain].Add(collider2D);
             }
             else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
             {
@@ -114,11 +109,11 @@ public class HitboxRender : MonoBehaviour
             }
             else if (collider2D.GetComponent<Breakable>())
             {
-                NonBouncer bounce = collider2D.GetComponent<NonBouncer>();
-                if (bounce == null || !bounce.active)
-                {
-                    colliders[HitboxType.Trigger].Add(collider2D);
-                }
+                colliders[HitboxType.Breakable].Add(collider2D);
+            }
+            else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<NonBouncer>())
+            {
+                colliders[HitboxType.Trigger].Add(collider2D);
             }
             else if (HitboxViewer.State == 2)
             {
