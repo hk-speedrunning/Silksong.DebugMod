@@ -325,7 +325,7 @@ public partial class DebugMod : BaseUnityPlugin
         HitInstance scaled = __instance.ApplyDamageScaling(hitInstance);
         lastHit = scaled;
         lastDamage = __instance.damageOverride ? 1 : Mathf.RoundToInt(scaled.DamageDealt * scaled.Multiplier);
-        
+
         lastScaling = __instance.damageScaling;
 
         int scaleLevel = hitInstance.DamageScalingLevel - 1;
@@ -384,6 +384,16 @@ public partial class DebugMod : BaseUnityPlugin
         }
 
         return true;
+    }
+
+    [HarmonyPatch(typeof(HeroController), nameof(HeroController.TakeSilk), typeof(int), typeof(SilkSpool.SilkTakeSource))]
+    [HarmonyPrefix]
+    private static void TakeSilk(ref int amount)
+    {
+        if (infiniteSilk)
+        {
+            amount = 0;
+        }
     }
 
     [HarmonyPatch(typeof(HeroController), nameof(HeroController.DoSpecialDamage))]
