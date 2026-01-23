@@ -325,6 +325,9 @@ public class SaveState
             Object.DontDestroyOnLoad(HeroController.instance);
         }
 
+        // If another scene load operation is in progress, loading the dummy scene will hang
+        yield return ScenePreloader.ForceEndPendingOperations();
+
         string previousScene = GameManager.instance.GetSceneNameString();
 
         GameManager.instance.entryGateName = "dreamGate";
