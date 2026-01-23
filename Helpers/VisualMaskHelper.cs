@@ -9,15 +9,15 @@ namespace DebugMod.Helpers;
 
 public static class VisualMaskHelper
 {
-    internal static bool MasksDisabled = false;
-    internal static bool VignetteDisabled = false;
+    internal static bool masksDisabled = false;
+    internal static bool vignetteDisabled = false;
 
-    private static bool ReEnableVignette = false;
+    private static bool reenableVignette = false;
 
     public static void ToggleAllMasks()
     {
-        MasksDisabled = !MasksDisabled;
-        if (MasksDisabled)
+        masksDisabled = !masksDisabled;
+        if (masksDisabled)
         {
             DeactivateVisualMasks(Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None));
             DebugMod.LogConsole("Disabled all visual masks");
@@ -27,14 +27,14 @@ public static class VisualMaskHelper
             DebugMod.LogConsole("No longer disabling all visual masks; reload the room to see changes");
             // Cannot reactivate most visual masks because it's impractical to find all that should be active;
             // Need to manually reenable the vignette, but do not do so immediately for consistency
-            ReEnableVignette = true;
+            reenableVignette = true;
         }
     }
 
     public static void ToggleVignette()
     {
-        VignetteDisabled = !VignetteDisabled;
-        if (VignetteDisabled)
+        vignetteDisabled = !vignetteDisabled;
+        if (vignetteDisabled)
         {
             DisableVignette(false);
             DebugMod.LogConsole("Disabled vignette");
@@ -43,34 +43,35 @@ public static class VisualMaskHelper
         {
             DebugMod.LogConsole("Enabled vignette");
             DebugMod.HC.vignette.enabled = true;
-            if (MasksDisabled)
+            if (masksDisabled)
             {
                 DebugMod.LogConsole("All visual masks were disabled; re-enabling");
-                MasksDisabled = false;
+                masksDisabled = false;
             }
         }
     }
 
     public static void OnSceneChange(Scene s)
     {
-        if (MasksDisabled)
+        if (masksDisabled)
         {
             // Delaying for 2f seems enough - wait for 3 just to be sure though.
             DelayInvoke(3, () => DeactivateVisualMasks(GetGameObjectsInScene(s)));
             return;
         }
 
-        if (VignetteDisabled)
+        if (vignetteDisabled)
         {
             DelayInvoke(3, () => DisableVignette(false));
         }
 
-        if (ReEnableVignette)
+        if (reenableVignette)
         {
+            reenableVignette = false;
+
             // Should not wait before reactivating these
             foreach (Renderer r in DebugMod.HC.vignette.GetComponentsInChildren<Renderer>())
             {
-                DebugMod.LogConsole(r.name);
                 r.enabled = true;
             }
         }
@@ -116,40 +117,27 @@ public static class VisualMaskHelper
     {
         int ctr = 0;
 
-        void disableMask(GameObject go)
+        bool IsMask(GameObject go)
         {
-            foreach (Renderer r in go.GetComponentsInChildren<Renderer>())
-            {
-                if (r.enabled)
-                {
-                    ctr++;
-                    r.enabled = false;
-                }
-            }
+            if (go.GetComponent<MaskerBase>()) return true;
+            if (go.GetComponent<OverMaskerBase>()) return true;
+            if (go.GetComponent<MaskerBlackout>()) return true;
+            if (go.GetComponent<BlurPlane>()) return true;
+            if (go.name.Contains("black_fader")) return true;
+            if (go.name.Contains("haze")) return true;
+            //if (go.name.Contains("SceneBorder")) return true; <-- does this count as a visual mask?
+
+            return false;
         }
 
         float knightZ = HeroController.instance.transform.position.z;
         foreach (GameObject go in gos)
         {
-            if (go.transform.position.z > knightZ) continue;
-
-            // A collection of ways to identify masks. It's possible some slip through the cracks I guess
-            if (go.name.StartsWith("msk_"))
-                disableMask(go);
-            else if (go.name.StartsWith("Tut_msk"))
-                disableMask(go);
-            else if (go.name.StartsWith("black_solid"))
-                disableMask(go);
-            else if (go.name.ToLower().Contains("vignette"))
-                disableMask(go);
-            else if (go.name.ToLower().Contains("secret mask"))
-                disableMask(go);
-            else if (go.LocateMyFSM("unmasker") is PlayMakerFSM)
-                disableMask(go);
-            else if (go.LocateMyFSM("remasker_inverse") is PlayMakerFSM)
-                disableMask(go);
-            else if (go.LocateMyFSM("remasker") is PlayMakerFSM)
-                disableMask(go);
+            if (IsMask(go))
+            {
+                go.SetActive(false);
+                ctr++;
+            }
         }
 
         DebugMod.LogConsole($"Deactivated {ctr} masks" + (HeroController.instance.vignette.enabled ? " and toggling vignette off" : string.Empty));
@@ -176,7 +164,6 @@ public static class VisualMaskHelper
         // Not suitable for toggle vignette because not easily reversible
         foreach (Renderer r in DebugMod.HC.vignette.GetComponentsInChildren<Renderer>())
         {
-            DebugMod.LogConsole(r.name);
             r.enabled = false;
         }
     }

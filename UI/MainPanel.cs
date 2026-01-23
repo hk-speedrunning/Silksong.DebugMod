@@ -117,25 +117,7 @@ public class MainPanel : CanvasPanel
             if (!previewer) return false;
             return previewer.previewEnabled;
         }
-        AppendToggleControl("Hide Hero", HideHeroToggled, BindableFunctions.HideHero);
-        static bool HideHeroToggled()
-        {
-            GameObject hero = DebugMod.RefKnight;
-            if (!hero) return false;
-            tk2dSprite sprite = hero.GetComponent<tk2dSprite>();
-            if (!sprite) return false;
-            return Math.Abs(sprite.color.a) == 0;
-        }
-        AppendRow(1, 1);
-        AppendToggleControl("Toggle HUD", HUDToggled, BindableFunctions.ToggleHUD);
-        static bool HUDToggled()
-        {
-            PlayMakerFSM hud = GameCameras.instance.hudCanvasSlideOut;
-            if (!hud) return false;
-            return !hud.gameObject.activeInHierarchy;
-        }
-        AppendToggleControl("Toggle Vignette", () => VisualMaskHelper.VignetteDisabled, BindableFunctions.ToggleVignette);
-        AppendRow(1, 1);
+
         AppendToggleControl("Toggle Hero Light", HeroLightToggled, BindableFunctions.ToggleHeroLight);
         static bool HeroLightToggled()
         {
@@ -148,6 +130,25 @@ public class MainPanel : CanvasPanel
             if (!renderer) return false;
             return Math.Abs(renderer.color.a) == 0;
         }
+        AppendRow(1, 1, 1);
+        AppendToggleControl("Toggle HUD", HUDToggled, BindableFunctions.ToggleHUD);
+        static bool HUDToggled()
+        {
+            PlayMakerFSM hud = GameCameras.instance.hudCanvasSlideOut;
+            if (!hud) return false;
+            return !hud.gameObject.activeInHierarchy;
+        }
+        AppendToggleControl("Toggle Vignette", () => VisualMaskHelper.vignetteDisabled, BindableFunctions.ToggleVignette);
+        AppendToggleControl("Hide Hero", HideHeroToggled, BindableFunctions.HideHero);
+        static bool HideHeroToggled()
+        {
+            GameObject hero = DebugMod.RefKnight;
+            if (!hero) return false;
+            tk2dSprite sprite = hero.GetComponent<tk2dSprite>();
+            if (!sprite) return false;
+            return Math.Abs(sprite.color.a) == 0;
+        }
+        AppendRow(1, 1);
         AppendToggleControl("Toggle Camera Shake", CameraShakeToggled, BindableFunctions.ToggleCameraShake);
         static bool CameraShakeToggled()
         {
@@ -155,9 +156,7 @@ public class MainPanel : CanvasPanel
             if (!cameraShake) return false;
             return !cameraShake.enabled;
         }
-        AppendRow(1, 1);
-        AppendToggleControl("Deactivate Visual Masks", () => VisualMaskHelper.MasksDisabled, BindableFunctions.DoDeactivateVisualMasks);
-        AppendBasicControl("Clear White Screen", BindableFunctions.ClearWhiteScreen);
+        AppendToggleControl("Deactivate Visual Masks", () => VisualMaskHelper.masksDisabled, BindableFunctions.DoDeactivateVisualMasks);
         AppendRow(1, 1, 1);
         AppendBasicControl("Zoom In", BindableFunctions.ZoomIn);
         AppendBasicControl("Zoom Out", BindableFunctions.ZoomOut);

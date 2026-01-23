@@ -61,18 +61,6 @@ public static partial class BindableFunctions
         VisualMaskHelper.ToggleAllMasks();
     }
 
-    // TODO: verify if this does anything in Silksong
-    [BindableMethod(name = "Clear White Screen", category = "Visual")]
-    public static void ClearWhiteScreen()
-    {
-        //fix white screen
-        PlayMakerFSM wakeFSM = HeroController.instance.gameObject.LocateMyFSM("Dream Return");
-        wakeFSM.SetState("GET UP");
-        wakeFSM.SendEvent("FINISHED");
-        GameObject.Find("Blanker White").LocateMyFSM("Blanker Control").SendEvent("FADE OUT");
-        HeroController.instance.EnableRenderer();
-    }
-
     [BindableMethod(name = "Toggle Hero Light", category = "Visual")]
     public static void ToggleHeroLight()
     {
