@@ -34,10 +34,12 @@ public class SaveState
         public string saveStateIdentifier;
         public string saveScene;
         public PlayerData savedPd;
-        public object lockArea;
         public SceneData savedSd;
+        public SceneData.SerializableBoolData[] semiPersistentBools;
+        public SceneData.SerializableIntData[] semiPersistentInts;
         public Vector3 savePos;
         public FieldInfo cameraLockArea;
+        public object lockArea;
         public bool isKinematized;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
@@ -58,6 +60,18 @@ public class SaveState
             lockArea = _data.lockArea;
             isKinematized = _data.isKinematized;
             roomSpecificOptions = _data.roomSpecificOptions;
+
+            if (_data.semiPersistentBools is not null)
+            {
+                semiPersistentBools = new SceneData.SerializableBoolData[_data.semiPersistentBools.Length];
+                Array.Copy(_data.semiPersistentBools, semiPersistentBools, _data.semiPersistentBools.Length);
+            }
+
+            if (_data.semiPersistentInts is not null)
+            {
+                semiPersistentInts = new SceneData.SerializableIntData[_data.semiPersistentInts.Length];
+                Array.Copy(_data.semiPersistentInts, semiPersistentInts, _data.semiPersistentInts.Length);
+            }
 
             if (_data.loadedScenes is not null)
             {
@@ -118,6 +132,8 @@ public class SaveState
 
         data.savedPd = JsonUtility.FromJson<PlayerData>(JsonUtility.ToJson(PlayerData.instance));
         data.savedSd = JsonUtility.FromJson<SceneData>(JsonUtility.ToJson(SceneData.instance));
+        data.semiPersistentBools = SaveSemiPersistent(SceneData.instance.persistentBools);
+        data.semiPersistentInts = SaveSemiPersistent(SceneData.instance.persistentInts);
         data.savePos = HeroController.instance.gameObject.transform.position;
         data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
         data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
@@ -129,6 +145,32 @@ public class SaveState
 
         DebugMod.LogConsole("Saved temp state");
         return true;
+    }
+
+    private static TContainer[] SaveSemiPersistent<TValue, TContainer>(SceneData.PersistentItemDataCollection<TValue, TContainer> collection)
+        where TContainer : SceneData.SerializableItemData<TValue>, new()
+    {
+        List<TContainer> list = [];
+
+        foreach (Dictionary<string, PersistentItemData<TValue>> scene in collection.scenes.Values)
+        {
+            foreach (PersistentItemData<TValue> item in scene.Values)
+            {
+                if (item.IsSemiPersistent)
+                {
+                    TContainer container = new()
+                    {
+                        SceneName = item.SceneName,
+                        ID = item.ID,
+                        Value = item.Value,
+                        Mutator = item.Mutator,
+                    };
+                    list.Add(container);
+                }
+            }
+        }
+
+        return list.ToArray();
     }
     #endregion
 
@@ -290,6 +332,9 @@ public class SaveState
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
+        RestoreSemiPersistent(data.semiPersistentBools, SceneData.instance.persistentBools);
+        RestoreSemiPersistent(data.semiPersistentInts, SceneData.instance.persistentInts);
+
         StaticVariableList.ClearSceneTransitions(); // Clears cached data like quest board contents
         GameManager.ReportUnload(previousScene); // Clears object pools in case the same scene is reloaded
 
@@ -303,9 +348,6 @@ public class SaveState
             .ToArray();
 
         sceneData[0].LoadHook();
-
-        //this kills enemies that were dead on the state, they respawn from previous code
-        JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
 
         GameManager.instance.BeginSceneTransition
         (
@@ -411,6 +453,30 @@ public class SaveState
         //set timescale back
         TimeScale.Frozen = false;
         DebugMod.stateOnDeath = stateondeath;
+    }
+
+    private static void RestoreSemiPersistent<TValue, TContainer>(TContainer[] list, SceneData.PersistentItemDataCollection<TValue, TContainer> collection)
+        where TContainer : SceneData.SerializableItemData<TValue>, new()
+    {
+        if (list != null)
+        {
+            foreach (TContainer container in list)
+            {
+                if (!collection.scenes.ContainsKey(container.SceneName))
+                {
+                    collection.scenes.Add(container.SceneName, []);
+                }
+
+                collection.scenes[container.SceneName][container.ID] = new PersistentItemData<TValue>
+                {
+                    SceneName = container.SceneName,
+                    ID = container.ID,
+                    Value = container.Value,
+                    Mutator = container.Mutator,
+                    IsSemiPersistent = true,
+                };
+            }
+        }
     }
 
     //these are toggleable, as they will prevent glitches from persisting

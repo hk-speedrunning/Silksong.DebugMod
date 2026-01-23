@@ -121,7 +121,7 @@ public static class RoomSpecific
     [HarmonyTranspiler]
     private static IEnumerable<CodeInstruction> DoStartBattle(IEnumerable<CodeInstruction> instructions)
     {
-        CodeMatcher matcher = new CodeMatcher(instructions);
+        CodeMatcher matcher = new(instructions);
 
         // StartWave(0) -> StartWave(currentWave)
         matcher.MatchForward(false,
