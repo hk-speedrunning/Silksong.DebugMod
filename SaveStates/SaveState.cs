@@ -41,6 +41,8 @@ public class SaveState
         public FieldInfo cameraLockArea;
         public object lockArea;
         public bool isKinematized;
+        public HeroController.HunterUpgCrestStateInfo evoState;
+        public bool isMaggoted;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
@@ -59,6 +61,8 @@ public class SaveState
             savePos = _data.savePos;
             lockArea = _data.lockArea;
             isKinematized = _data.isKinematized;
+            evoState = _data.evoState;
+            isMaggoted = _data.isMaggoted;
             roomSpecificOptions = _data.roomSpecificOptions;
 
             if (_data.semiPersistentBools is not null)
@@ -138,6 +142,8 @@ public class SaveState
         data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
         data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
         data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
+        data.evoState = HeroController.instance.hunterUpgState;
+        data.isMaggoted = HeroController.instance.cState.isMaggoted;
 
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
@@ -540,8 +546,17 @@ public class SaveState
 
         PlayerData.instance.health = data.savedPd.health;
 
-        // Resets maggots
+        // Resets maggots, lifeblood, buff tools, etc.
         HeroController.instance.ClearEffects();
+
+        // Need to be done after ClearEffects()
+        if (data.isMaggoted)
+        {
+            HeroController.instance.cState.isMaggoted = true; // Avoids sound effect
+            HeroController.instance.SetIsMaggoted(true);
+            Utils.FindFSM("Maggots", "Maggot Effect").SetState("Is Maggoted?");
+        }
+        HeroController.instance.hunterUpgState = data.evoState;
 
         int healthBlue = data.savedPd.healthBlue;
         for (int i = 0; i < healthBlue; i++)
