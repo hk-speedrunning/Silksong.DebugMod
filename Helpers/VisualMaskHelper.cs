@@ -125,6 +125,8 @@ public static class VisualMaskHelper
             if (go.GetComponent<BlurPlane>()) return true;
             if (go.name.Contains("black_fader")) return true;
             if (go.name.Contains("haze")) return true;
+            if (go.name.StartsWith("msk_")) return true;
+            if (go.name == "Mask") return true;
             //if (go.name.Contains("SceneBorder")) return true; <-- does this count as a visual mask?
 
             return false;

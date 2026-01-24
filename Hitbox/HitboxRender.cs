@@ -14,7 +14,7 @@ public class HitboxRender : MonoBehaviour
         public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red      
         public static readonly HitboxType Attack = new(Color.cyan, 2);                       // cyan
         public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0), 3);     // green
-        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // blue
+        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // lavender
         public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 5); // pink
         public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 6); // dark blue
         public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple 
