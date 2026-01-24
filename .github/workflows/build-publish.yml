@@ -62,7 +62,7 @@ jobs:
     - name: Upload manual artifact
       uses: actions/upload-artifact@v5
       with:
-        name: manual_bundle
+        name: manual-bundle
         path: thunderstore/manual
     - name: Check if release needed
       id: needs-release
