@@ -35,6 +35,7 @@ public class InfoPanel : CanvasPanel
     private float infoWidth;
     private float lineGap;  // Alt implementation
     private int counter;
+    private float injectedHeight;
 
     public static void BuildPanel()
     {
@@ -51,7 +52,7 @@ public class InfoPanel : CanvasPanel
         y = ContentMargin();
         labelWidth = UICommon.ScaleWidth(120);
         infoWidth = UICommon.ScaleWidth(160);
-        
+
         // Alt implementation:
         if (DebugMod.settings.AltInfoPanel)
         {
@@ -59,9 +60,9 @@ public class InfoPanel : CanvasPanel
             infoWidth = UICommon.ScaleWidth(140);
             lineGap = UICommon.ScaleWidth(10);
         }
-        
+
         int sectionBreak = UICommon.ScaleHeight(20);
-        
+
         AppendInfo("Position", GetHeroPos);
         AppendInfo("Velocity", () => HeroController.instance.current_velocity);
         AppendInfo("Inputs", GetInputs);
@@ -77,14 +78,15 @@ public class InfoPanel : CanvasPanel
         AppendInfo("Last Scaling", GetScaling);
 
         y += sectionBreak;
-        
+
         AppendInfo("Health", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
         AppendInfo("Silk", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
         AppendInfo("Completion", () => $"{PlayerData.instance.completionPercentage}%");
         AppendInfo("Fleas", () => $"{Gameplay.FleasCollectedCount} / 30");
         AppendInfo("Quest Points", GetQuestPoints);
 
-        if (DebugMod.settings.ExpandedInfoPanel) {
+        if (DebugMod.settings.ExpandedInfoPanel)
+        {
             y += sectionBreak;
 
             AppendInfo("Scene Name", DebugMod.GetSceneName);
@@ -106,11 +108,11 @@ public class InfoPanel : CanvasPanel
             leftLabelColumn.Thickness = UICommon.BORDER_THICKNESS;
             leftLabelColumn.Color = UICommon.iconColor;
         }
-        
+
         // Column 2 Start
         x += labelWidth + infoWidth;
         y = ContentMargin();
-        
+
         AppendInfo("Attacking", () => HeroController.instance.cState.attacking);
         AppendInfo("Sprinting", GetSprintFlags);
         AppendInfo("Jumping", GetJumpFlags);
@@ -119,9 +121,9 @@ public class InfoPanel : CanvasPanel
         AppendInfo("Swimming", () => HeroController.instance.cState.swimming);
         AppendInfo("Recoiling", () => HeroController.instance.cState.recoiling);
         AppendInfo("Soaring", () => HeroController.instance.cState.superDashing);
-        
+
         y += sectionBreak;
-        
+
         AppendInfo("Wall States", GetWallState);
         AppendInfo("Can Cast", () => HeroController.instance.CanCast());
         AppendInfo("Can Soar", () => HeroController.instance.CanSuperJump());
@@ -138,9 +140,9 @@ public class InfoPanel : CanvasPanel
             AppendInfo("At Bench", () => PlayerData.instance.atBench);
             AppendInfo("Invulnerable", () => HeroController.instance.cState.Invulnerable);
             AppendInfo("Invincible", () => PlayerData.instance.isInvincible);
-        
+
             y += sectionBreak;
-        
+
             AppendInfo("Camera Mode", GetCameraModes);
         }
         else
@@ -160,6 +162,9 @@ public class InfoPanel : CanvasPanel
             rightLabelColumn.Thickness = UICommon.BORDER_THICKNESS;
             rightLabelColumn.Color = UICommon.iconColor;
         }
+
+        // Move panel up so injected info doesn't overflow into console
+        LocalPosition = new Vector2(LocalPosition.x, LocalPosition.y - injectedHeight);
     }
 
     private void AppendInfo(string label, Func<string> info)
@@ -177,7 +182,7 @@ public class InfoPanel : CanvasPanel
         infoText.Font = UICommon.trajanBold;
         infoText.Alignment = TextAnchor.MiddleLeft;
         infoText.OnUpdate += () => infoText.Text = info();
-        
+
         // Alt implementation:
         if (DebugMod.settings.AltInfoPanel)
         {
@@ -197,11 +202,15 @@ public class InfoPanel : CanvasPanel
     {
         if (injectedInfo.Count == 0) return;
 
+        float origY = y;
+
         y += UICommon.ScaleHeight(20);  // sectionBreak
         foreach (var info in injectedInfo.OrderBy(i => i.Label))
         {
             AppendInfo(info.Label, info.Generator);
         }
+
+        injectedHeight = Mathf.Max(injectedHeight, y - origY);
     }
 
     private static string GetHeroPos()
@@ -235,7 +244,7 @@ public class InfoPanel : CanvasPanel
             // isSprinting && dashing shouldn't be possible, but we'll add an indicator for it regardless.
             return HeroController.instance.cState.dashing ? "✓✓" : "✓–";
         }
-        return HeroController.instance.cState.dashing ? "✓": "X";
+        return HeroController.instance.cState.dashing ? "✓" : "X";
     }
 
     private static string GetJumpFlags()
@@ -244,7 +253,7 @@ public class InfoPanel : CanvasPanel
         if (HeroController.instance.cState.jumping) jumpStates.Add("✓");
         if (HeroController.instance.cState.doubleJumping) jumpStates.Add("◊");
         if (HeroController.instance.isUmbrellaActive.Value) jumpStates.Add("†");
-        
+
         return jumpStates.Count == 0 ? "X" : string.Join("", jumpStates);
     }
 
@@ -258,7 +267,7 @@ public class InfoPanel : CanvasPanel
     private static string GetScaling()
     {
         if (DebugMod.lastScaling == null) return "None";
-        
+
         string[] scaleMultipliers =
         [
             $"{DebugMod.lastScaling.Level1Mult:.###}",
@@ -267,14 +276,14 @@ public class InfoPanel : CanvasPanel
             $"{DebugMod.lastScaling.Level4Mult:.###}",
             $"{DebugMod.lastScaling.Level5Mult:.###}"
         ];
-        
+
         // Level from HealthManager.ApplyDamageScaling
         int level = DebugMod.lastScaleLevel;
-        
-        if (level > 4) level = 4; 
+
+        if (level > 4) level = 4;
         if (level >= 0) // Game behaviour; sub-zero levels scale to 1f so don't highlight any multiplier
             scaleMultipliers[level] = $"({scaleMultipliers[level]})";
-        
+
         return string.Join("∶", scaleMultipliers);
     }
 
@@ -324,7 +333,7 @@ public class InfoPanel : CanvasPanel
         string m = DebugMod.IH.inputActions.QuickMap.State ? "m" : "   ";       // map
         string i = DebugMod.IH.inputActions.OpenInventory.State ? "i" : "  ";   // inventory
         string p = DebugMod.IH.inputActions.Pause.State ? "p" : "  ";           // pause
-        
+
 
         return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{t} {m}{i}{p}";
     }
