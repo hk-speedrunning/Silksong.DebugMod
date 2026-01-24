@@ -3,15 +3,31 @@ using GlobalEnums;
 using GlobalSettings;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.UI;
 
 public class InfoPanel : CanvasPanel
 {
+    internal record InjectedInfo
+    {
+        public readonly string Label;
+        public readonly Func<string> Generator;
+
+        public InjectedInfo(string label, Func<string> generator)
+        {
+            Label = label;
+            Generator = generator;
+        }
+    }
+
     public static int ListingHeight => UICommon.ScaleHeight(20);
 
     public static InfoPanel Instance { get; private set; }
+
+    internal static readonly List<InjectedInfo> LeftColumnInjects = [];
+    internal static readonly List<InjectedInfo> RightColumnInjects = [];
 
     private float x;
     private float y;
@@ -79,6 +95,8 @@ public class InfoPanel : CanvasPanel
             AppendInfo("Is Gameplay", () => HeroController.instance.isGameplayScene);
         }
 
+        AppendInfo(LeftColumnInjects);
+
         if (DebugMod.settings.AltInfoPanel)
         {
             CanvasBorder leftLabelColumn = Add(new CanvasBorder("LeftLabelColumn"));
@@ -130,7 +148,8 @@ public class InfoPanel : CanvasPanel
             // Re-add scene name omitted above
             AppendInfo("Scene Name", DebugMod.GetSceneName);
         }
-        
+
+        AppendInfo(RightColumnInjects);
 
         if (DebugMod.settings.AltInfoPanel)
         {
@@ -173,6 +192,17 @@ public class InfoPanel : CanvasPanel
 
     private void AppendInfo(string label, Func<bool> info) => AppendInfo(label, () => GetStringForBool(info()));
     private void AppendInfo<T>(string label, Func<T> info) => AppendInfo(label, () => info().ToString());
+
+    private void AppendInfo(IReadOnlyCollection<InjectedInfo> injectedInfo)
+    {
+        if (injectedInfo.Count == 0) return;
+
+        y += UICommon.ScaleHeight(20);  // sectionBreak
+        foreach (var info in injectedInfo.OrderBy(i => i.Label))
+        {
+            AppendInfo(info.Label, info.Generator);
+        }
+    }
 
     private static string GetHeroPos()
     {
