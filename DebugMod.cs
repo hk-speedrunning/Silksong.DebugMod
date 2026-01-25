@@ -29,7 +29,6 @@ public partial class DebugMod : BaseUnityPlugin
     private static GameObject _refKnight;
     private static CameraController _refCamera;
     private static Collider2D _refHeroCollider;
-    private static Collider2D _refHeroBox;
 
     internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager.SilentInstance);
     internal static InputHandler IH => _ih != null ? _ih : (_ih = GM.inputHandler);
@@ -37,7 +36,6 @@ public partial class DebugMod : BaseUnityPlugin
     internal static GameObject RefKnight => _refKnight != null ? _refKnight : (_refKnight = HC.gameObject);
     internal static CameraController RefCamera => _refCamera != null ? _refCamera : (_refCamera = GM.cameraCtrl);
     internal static Collider2D RefHeroCollider => _refHeroCollider != null ? _refHeroCollider : (_refHeroCollider = RefKnight.GetComponent<Collider2D>());
-    internal static Collider2D RefHeroBox => _refHeroBox != null ? _refHeroBox : (_refHeroBox = RefKnight.transform.Find("HeroBox").GetComponent<Collider2D>());
 
     //used to stop hazard coros
     internal static IEnumerator CurrentHazardCoro;
@@ -66,6 +64,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static bool playerInvincible;
     internal static bool noclip;
     internal static Vector3 noclipPos;
+    internal static bool heroColliderDisabled;
     internal static bool cameraFollow;
     public static bool KeyBindLock;
     internal static bool savestateFixes = true;

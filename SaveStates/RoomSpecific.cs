@@ -41,15 +41,15 @@ public static class RoomSpecific
     {
         GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
 
-        if (Utils.FindChildObject(sceneryRoot, "End Scenery").activeSelf)
+        if (sceneryRoot.FindChildObject("End Scenery").activeSelf)
         {
             return "3";
         }
-        else if (Utils.FindChildObject(sceneryRoot, "Hive Scenery").activeSelf)
+        else if (sceneryRoot.FindChildObject("Hive Scenery").activeSelf)
         {
             return "2";
         }
-        else if (Utils.FindChildObject(sceneryRoot, "Deepnest Scenery").activeSelf)
+        else if (sceneryRoot.FindChildObject("Deepnest Scenery").activeSelf)
         {
             return "1";
         }
@@ -147,7 +147,7 @@ public static class RoomSpecific
             _ => null
         };
 
-        Utils.FindChildObject(sceneryRoot, childName).SetActive(true);
+        sceneryRoot.FindChildObject(childName).SetActive(true);
 
         static void FadeOutFadeGroup(string path)
         {

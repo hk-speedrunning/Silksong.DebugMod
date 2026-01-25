@@ -223,6 +223,11 @@ public class GUIController : MonoBehaviour
             }
         }
 
+        if (DebugMod.heroColliderDisabled)
+        {
+            HeroBox.Inactive = true;
+        }
+
         if (DebugMod.cameraFollow)
         {
             DebugMod.RefCamera.isGameplayScene = false;

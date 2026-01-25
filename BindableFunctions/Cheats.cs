@@ -78,18 +78,20 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Toggle Hero Collider", category = "Cheats")]
     public static void ToggleHeroCollider()
     {
-        if (!DebugMod.RefHeroCollider.enabled)
+        if (DebugMod.heroColliderDisabled)
         {
+            DebugMod.heroColliderDisabled = false;
             DebugMod.RefHeroCollider.enabled = true;
-            DebugMod.RefHeroBox.enabled = true;
+            HeroBox.Inactive = false;
             DebugMod.LogConsole("Enabled hero collider" + (DebugMod.noclip ? " and disabled noclip" : ""));
             DebugMod.noclip = false;
             DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
         }
         else
         {
+            DebugMod.heroColliderDisabled = true;
             DebugMod.RefHeroCollider.enabled = false;
-            DebugMod.RefHeroBox.enabled = false;
+            HeroBox.Inactive = true;
             DebugMod.LogConsole("Disabled hero collider" + (DebugMod.noclip ? "" : " and enabled noclip"));
             DebugMod.noclip = true;
             DebugMod.noclipPos = DebugMod.RefKnight.transform.position;

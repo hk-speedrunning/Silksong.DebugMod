@@ -11,7 +11,7 @@ internal static class Utils
         return PlayMakerFSM.FindFsmOnGameObject(GameObject.Find(goName), fsmName);
     }
 
-    internal static GameObject FindChildObject(GameObject parent, string name)
+    internal static GameObject FindChildObject(this GameObject parent, string name)
     {
         for (int i = 0; i < parent.transform.childCount; i++)
         {
@@ -33,7 +33,7 @@ internal static class Utils
 
         for (int i = 1; i < parts.Length; i++)
         {
-            go = FindChildObject(go, parts[i]);
+            go = go.FindChildObject(parts[i]);
         }
 
         return go;

@@ -70,13 +70,7 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
         AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         AppendRow(2, 1);
-        AppendToggleControl("Toggle Hero Collider", HeroColliderToggled, BindableFunctions.ToggleHeroCollider);
-        static bool HeroColliderToggled()
-        {
-            Collider2D heroCollider = DebugMod.RefHeroCollider;
-            if (!heroCollider) return false;
-            return !heroCollider.enabled;
-        }
+        AppendToggleControl("Toggle Hero Collider", () => DebugMod.heroColliderDisabled, BindableFunctions.ToggleHeroCollider);
         AppendBasicControl("Kill All", BindableFunctions.KillAll);
 
         AppendSectionHeader("Mod UI");

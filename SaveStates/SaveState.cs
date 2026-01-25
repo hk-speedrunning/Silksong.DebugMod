@@ -432,6 +432,9 @@ public class SaveState
         HeroController.instance.FinishedEnteringScene(true, false);
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
+        // Fixes falling out of the map when loading out of some animations (i.e. bell eater entrance)
+        DebugMod.RefHeroCollider.enabled = !DebugMod.heroColliderDisabled;
+        HeroBox.Inactive = DebugMod.heroColliderDisabled;
 
         RoomSpecific.BackwardsCompat(data.saveScene, ref data.roomSpecificOptions);
 
