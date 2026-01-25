@@ -433,6 +433,8 @@ public class SaveState
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
 
+        RoomSpecific.BackwardsCompat(data.saveScene, ref data.roomSpecificOptions);
+
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
             DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);

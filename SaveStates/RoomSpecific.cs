@@ -53,12 +53,9 @@ public static class RoomSpecific
         {
             return "1";
         }
-        else if (Utils.FindChildObject(sceneryRoot, "Entry Scenery").activeSelf)
-        {
-            return "0";
-        }
 
-        return "";
+        // Assume first section
+        return "0";
     }
 
     internal static IEnumerator DoRoomSpecific(string scene, string options)
@@ -193,6 +190,23 @@ public static class RoomSpecific
         yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
         yield return new WaitForSecondsRealtime(1f);
         GameCameras.instance.hudCanvasSlideOut.SendEvent("OUT");
+    }
+    #endregion
+
+    #region backwardscompat
+    // Fill in missing roomspecifics / change format if needed and possible
+    internal static void BackwardsCompat(string scene, ref string options)
+    {
+        switch (scene)
+        {
+            case "Memory_Red":
+                // Savestate was most likely created in the first section
+                if (string.IsNullOrEmpty(options))
+                {
+                    options = "0";
+                }
+                break;
+        }
     }
     #endregion
 }
