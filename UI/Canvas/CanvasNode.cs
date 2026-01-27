@@ -11,10 +11,12 @@ public abstract class CanvasNode
     internal static readonly HashSet<CanvasNode> rootNodes = [];
     private static readonly LinkedHashSet<CanvasNode> activeNodes = [];
 
+    private static readonly List<CanvasNode> _activeNodesList = [];
     public static void UpdateAll()
     {
-        List<CanvasNode> active = [.. activeNodes];
-        foreach (var node in active) node.Update();
+        _activeNodesList.Clear();
+        _activeNodesList.AddRange(activeNodes);
+        foreach (var node in _activeNodesList) node.Update();
     }
 
     private CanvasNode parent;
