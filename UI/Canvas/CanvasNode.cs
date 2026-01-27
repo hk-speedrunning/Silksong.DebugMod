@@ -8,11 +8,17 @@ namespace DebugMod.UI.Canvas;
 public abstract class CanvasNode
 {
     internal static readonly HashSet<CanvasNode> rootNodes = [];
-    private static event Action allUpdates;
+    private static readonly HashSet<Action> _allUpdates = [];
+    private static event Action allUpdates
+    {
+        add => _allUpdates.Add(value);
+        remove => _allUpdates.Remove(value);
+    }
 
     public static void UpdateAll()
     {
-        allUpdates?.Invoke();
+        List<Action> actions = [.. _allUpdates];
+        foreach (var action in actions) action();
     }
 
     private CanvasNode parent;
