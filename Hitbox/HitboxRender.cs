@@ -11,13 +11,13 @@ public class HitboxRender : MonoBehaviour
     private struct HitboxType : IComparable<HitboxType>
     {
         public static readonly HitboxType Knight = new(Color.yellow, 0);                     // yellow
-        public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red      
+        public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red
         public static readonly HitboxType Attack = new(Color.cyan, 2);                       // cyan
         public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0), 3);     // green
         public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // lavender
         public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 5); // pink
         public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 6); // dark blue
-        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple 
+        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple
         public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 8); // orange
 
 
@@ -143,7 +143,7 @@ public class HitboxRender : MonoBehaviour
 
     private void DrawHitbox(Camera camera, Collider2D collider2D, HitboxType hitboxType, float lineWidth)
     {
-        if (collider2D == null || !collider2D.isActiveAndEnabled)
+        if (collider2D == null || !collider2D.isActiveAndEnabled || ShouldCullCollider(camera, collider2D))
         {
             return;
         }
@@ -192,6 +192,19 @@ public class HitboxRender : MonoBehaviour
 
         GUI.depth = origDepth;
     }
+
+    private bool ShouldCullCollider(Camera camera, Collider2D collider2D)
+    {
+        Bounds bounds = collider2D.bounds;
+
+        Vector3 min = camera.WorldToViewportPoint(bounds.min);
+        Vector3 max = camera.WorldToViewportPoint(bounds.max);
+
+        bool overlap = (min.x < 1 && max.x > 0 && min.y < 1 && max.y > 0);
+
+        return !overlap;
+    }
+
 
     private void DrawPointSequence(List<Vector2> points, Camera camera, Collider2D collider2D, HitboxType hitboxType, float lineWidth)
     {
