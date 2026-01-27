@@ -116,12 +116,6 @@ public class GUIController : MonoBehaviour
             BuildMenus();
         }
 
-        MainPanel.Instance?.ActiveSelf = DebugMod.settings.MainPanelVisible;
-        EnemiesPanel.Instance?.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
-        ConsolePanel.Instance?.ActiveSelf = DebugMod.settings.ConsoleVisible;
-        InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
-        SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
-
         if (ForceHideUI())
         {
             foreach (CanvasNode root in CanvasNode.rootNodes)
@@ -131,6 +125,12 @@ public class GUIController : MonoBehaviour
         }
         else
         {
+            MainPanel.Instance?.ActiveSelf = DebugMod.settings.MainPanelVisible;
+            EnemiesPanel.Instance?.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
+            ConsolePanel.Instance?.ActiveSelf = DebugMod.settings.ConsoleVisible;
+            InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
+            SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
+
             CanvasNode.UpdateAll();
         }
 
