@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DebugMod.Helpers;
 
-internal class LinkedHashSet<T> : ICollection<T>
+internal class OrderedHashSet<T> : ICollection<T>
 {
     private readonly LinkedList<T> list = [];
     private readonly Dictionary<T, LinkedListNode<T>> dict = [];
