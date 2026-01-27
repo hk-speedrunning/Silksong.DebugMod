@@ -9,7 +9,7 @@ namespace DebugMod.UI.Canvas;
 public abstract class CanvasNode
 {
     internal static readonly HashSet<CanvasNode> rootNodes = [];
-    private static readonly LinkedHashSet<CanvasNode> activeNodes = [];
+    private static readonly OrderedHashSet<CanvasNode> activeNodes = [];
 
     private static readonly List<CanvasNode> _activeNodesList = [];
     public static void UpdateAll()
