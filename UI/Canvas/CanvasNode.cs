@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DebugMod.Helpers;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,11 +9,14 @@ namespace DebugMod.UI.Canvas;
 public abstract class CanvasNode
 {
     internal static readonly HashSet<CanvasNode> rootNodes = [];
-    private static event Action allUpdates;
+    private static readonly OrderedHashSet<CanvasNode> activeNodes = [];
 
+    private static readonly List<CanvasNode> _activeNodesList = [];
     public static void UpdateAll()
     {
-        allUpdates?.Invoke();
+        _activeNodesList.Clear();
+        _activeNodesList.AddRange(activeNodes);
+        foreach (var node in _activeNodesList) node.Update();
     }
 
     private CanvasNode parent;
@@ -169,12 +173,12 @@ public abstract class CanvasNode
         bool shouldUpdate = onUpdate != null && ActiveInHierarchy;
         if (shouldUpdate && !updateHooked)
         {
-            allUpdates += Update;
+            activeNodes.Add(this);
             updateHooked = true;
         }
         else if (!shouldUpdate && updateHooked)
         {
-            allUpdates -= Update;
+            activeNodes.Remove(this);
             updateHooked = false;
         }
     }
