@@ -75,7 +75,7 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public CanvasText(string name, 
+    public CanvasText(string name,
         HorizontalWrapMode overflow = HorizontalWrapMode.Wrap) : base(name)
     {
         this.overflow = overflow;
@@ -91,12 +91,21 @@ public class CanvasText : CanvasObject
         }
     }
 
+    // Absolute position needs to be integers or the text looks blurry
     private void RoundPosition()
     {
-        // Absolute position needs to be integers or the text looks blurry
         Vector2 pos = transform.anchorMin;
-        float x = Mathf.RoundToMultipleOf(pos.x, 1f / Screen.width);
-        float y = Mathf.RoundToMultipleOf(pos.y, 1f / Screen.height);
+
+        // No idea why this check is required but it is
+        // (tested by dragging the scrollbar very slowly and watching
+        // the spacing between the text and nearby borders)
+        float x = (int)Size.x % 2 == 0
+            ? Mathf.RoundToMultipleOf(pos.x, 1f / Screen.width)
+            : (int)(pos.x * Screen.width) / (float)Screen.width;
+        float y = (int)Size.y % 2 == 0
+            ? Mathf.RoundToMultipleOf(pos.y, 1f / Screen.height)
+            : (int)(pos.y * Screen.height) / (float)Screen.height;
+
         transform.anchorMin = transform.anchorMax = new(x, y);
     }
 
