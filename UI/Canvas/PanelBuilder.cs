@@ -60,6 +60,7 @@ public class PanelBuilder : IDisposable
     public T AppendSquare<T>(T element) where T : CanvasNode => Append(element, LengthType.Square);
     public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, LengthType.Flex);
     public void AppendPadding(float length) => Append<CanvasNode>(null, LengthType.Fixed, length);
+    public void AppendFlexPadding() => Append<CanvasNode>(null, LengthType.Flex);
 
     public void Build()
     {
@@ -89,7 +90,7 @@ public class PanelBuilder : IDisposable
 
         if (Length() < totalFixedLength && flexCount != 0)
         {
-            throw new Exception("Overflow in PanelBuilder: no room for flex elements");
+            throw new Exception($"Overflow in PanelBuilder: no room for flex elements (need {totalFixedLength}, have {Length()})");
         }
 
         float flexLength = (Length() - totalFixedLength) / flexCount;

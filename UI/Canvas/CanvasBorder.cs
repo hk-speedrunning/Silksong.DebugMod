@@ -63,7 +63,15 @@ public class CanvasBorder : CanvasObject
         }
     }
 
-    public override void Build()
+    protected override void OnUpdateParent()
+    {
+        base.OnUpdateParent();
+
+        LocalPosition = Vector2.zero;
+        TruncatePosition();
+    }
+
+    private void TruncatePosition()
     {
         // Absolute coords need to be whole numbers or the border will not render correctly
         Vector2 truncated = new((int)Position.x, (int)Position.y);
@@ -71,6 +79,11 @@ public class CanvasBorder : CanvasObject
         {
             LocalPosition += truncated - Position;
         }
+    }
+
+    public override void Build()
+    {
+        TruncatePosition();
 
         if ((Size.x == 0 || Size.y == 0) && Parent != null)
         {
