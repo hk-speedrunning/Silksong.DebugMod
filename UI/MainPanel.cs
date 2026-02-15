@@ -260,6 +260,38 @@ public class MainPanel : CanvasPanel
         AppendRow(1);
         AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
 
+        AppendSectionHeader("Bellway Stations");
+        AppendRow(1);
+        AppendBasicControl("Unlock All Bellways", BindableFunctions.UnlockAllBellways);
+        AppendRow(1, 1);
+        AppendToggleControl("Deep Docks", () => PlayerData.instance.UnlockedDocksStation, BindableFunctions.ToggleBellwayDeepDocks);
+        AppendToggleControl("Far Fields", () => PlayerData.instance.UnlockedBoneforestEastStation, BindableFunctions.ToggleBellwayFarFields);
+        AppendRow(1, 1);
+        AppendToggleControl("Greymoor", () => PlayerData.instance.UnlockedGreymoorStation, BindableFunctions.ToggleBellwayGreymoor);
+        AppendToggleControl("Bellhart", () => PlayerData.instance.UnlockedBelltownStation, BindableFunctions.ToggleBellwayBellhart);
+        AppendRow(1, 1);
+        AppendToggleControl("Blasted Steps", () => PlayerData.instance.UnlockedCoralTowerStation, BindableFunctions.ToggleBellwayBlastedSteps);
+        AppendToggleControl("Grand Bellway", () => PlayerData.instance.UnlockedCityStation, BindableFunctions.ToggleBellwayGrandBellway);
+        AppendRow(1, 1);
+        AppendToggleControl("The Slab", () => PlayerData.instance.UnlockedPeakStation, BindableFunctions.ToggleBellwayTheSlab);
+        AppendToggleControl("Shellwood", () => PlayerData.instance.UnlockedShellwoodStation, BindableFunctions.ToggleBellwayShellwood);
+        AppendRow(1, 1);
+        AppendToggleControl("Bilewater", () => PlayerData.instance.UnlockedShadowStation, BindableFunctions.ToggleBellwayBilewater);
+        AppendToggleControl("Putrified Ducts", () => PlayerData.instance.UnlockedAqueductStation, BindableFunctions.ToggleBellwayPutrifiedDucts);
+
+        AppendSectionHeader("Ventrica Tubes");
+        AppendRow(1);
+        AppendBasicControl("Unlock All Ventrica", BindableFunctions.UnlockAllVentrica);
+        AppendRow(1, 1);
+        AppendToggleControl("Choral Chambers", () => PlayerData.instance.UnlockedSongTube, BindableFunctions.ToggleVentricaChoralChambers);
+        AppendToggleControl("Underworks", () => PlayerData.instance.UnlockedUnderTube, BindableFunctions.ToggleVentricaUnderworks);
+        AppendRow(1, 1);
+        AppendToggleControl("Grand Bellway", () => PlayerData.instance.UnlockedCityBellwayTube, BindableFunctions.ToggleVentricaGrandBellway);
+        AppendToggleControl("High Halls", () => PlayerData.instance.UnlockedHangTube, BindableFunctions.ToggleVentricaHighHalls);
+        AppendRow(1, 1);
+        AppendToggleControl("First Shrine", () => PlayerData.instance.UnlockedEnclaveTube, BindableFunctions.ToggleVentricaFirstShrine);
+        AppendToggleControl("Memorium", () => PlayerData.instance.UnlockedArboriumTube, BindableFunctions.ToggleVentricaMemoriam);
+
         AddTab("Keybinds");
 
         Dictionary<string, List<BindAction>> keybindData = [];
