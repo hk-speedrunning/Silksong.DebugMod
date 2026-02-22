@@ -330,15 +330,6 @@ public class SaveState
 
         string previousScene = GameManager.instance.GetSceneNameString();
 
-        GameManager.instance.entryGateName = "dreamGate";
-        GameManager.instance.startedOnThisScene = true;
-
-        // For some reason this is in the full game files, but it works so why not
-        string dummySceneName = "Demo Start";
-
-        Addressables.LoadSceneAsync($"Scenes/{dummySceneName}");
-        yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummySceneName);
-
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
         RestoreSemiPersistent(data.semiPersistentBools, SceneData.instance.persistentBools);
@@ -358,6 +349,9 @@ public class SaveState
 
         sceneData[0].LoadHook();
 
+        GameManager.instance.entryGateName = "dreamGate";
+        GameManager.instance.startedOnThisScene = true;
+
         GameManager.instance.BeginSceneTransition
         (
             new DebugModSaveStateSceneLoadInfo
@@ -366,18 +360,14 @@ public class SaveState
                 HeroLeaveDirection = GatePosition.unknown,
                 EntryGateName = "dreamGate",
                 EntryDelay = 0f,
+                PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
-                Visualization = 0,
-                AlwaysUnloadUnusedAssets = true
+                Visualization = GameManager.SceneLoadVisualizations.Default,
+                AlwaysUnloadUnusedAssets = false
             }
         );
 
         yield return new WaitUntil(() => USceneManager.GetActiveScene().name == data.saveScene);
-
-        GameManager.instance.cameraCtrl.PositionToHero(false);
-
-        GameManager.instance.cameraCtrl.isGameplayScene = true;
-        GameManager.instance.UpdateUIStateFromGameState();
 
         if (loadDuped)
         {
@@ -410,16 +400,15 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
-        FieldInfo cameraGameplayScene = typeof(CameraController).GetField("isGameplayScene", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        cameraGameplayScene.SetValue(GameManager.instance.cameraCtrl, true);
-
-        yield return null;
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
         if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         DebugMod.noclipPos = data.savePos;
+
+        GameManager.instance.cameraCtrl.PositionToHeroInstant(false);
+        GameManager.instance.cameraCtrl.isGameplayScene = true;
+        GameManager.instance.UpdateUIStateFromGameState();
 
         if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
         {
