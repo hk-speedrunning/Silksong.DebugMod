@@ -438,6 +438,8 @@ public class SaveState
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
 
+        yield return new WaitUntil(() => !GameManager.instance.isLoading);
+
         //pause fixes from homothety
         if (GameManager.instance.isPaused)
         {
