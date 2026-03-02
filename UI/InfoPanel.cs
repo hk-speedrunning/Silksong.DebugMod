@@ -259,9 +259,10 @@ public class InfoPanel : CanvasPanel
 
     private static string GetWallState() =>
           (HeroController.instance.touchingWallL ? "<" : "‒")  // Left
-        + (HeroController.instance.cState.touchingWall ? "T" : "‒") // Touch TODO: necessary with L/R indicators?
-        + (HeroController.instance.wallLocked ? "L" : "‒") // Lock TODO: look into all relevant walljump flags
+        + (HeroController.instance.cState.touchingWall ? "T" : "‒") // Touch
+        + (HeroController.instance.wallLocked ? "L" : "‒") // Lock
         + (HeroController.instance.cState.wallSliding ? "S" : "‒") // Slide
+        + (HeroController.instance.queuedWallJumpInterrupt ? "Q" : "‒") // Queued
         + (HeroController.instance.touchingWallR ? ">" : "‒"); // Right
 
     private static string GetScaling()
