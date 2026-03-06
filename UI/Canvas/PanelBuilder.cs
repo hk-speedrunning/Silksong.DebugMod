@@ -86,13 +86,15 @@ public class PanelBuilder : IDisposable
         {
             throw new Exception("Flex elements are not supported for a dynamic-length PanelBuilder");
         }
-
+        
+        float flexLength = (Length() - totalFixedLength) / flexCount;
+        
         if (Length() < totalFixedLength && flexCount != 0)
         {
-            throw new Exception("Overflow in PanelBuilder: no room for flex elements");
+            DebugMod.LogWarn($"{panel.GetQualifiedName()} has no room for flex elements, assigning 0 width");
+            flexLength = 0;
         }
-
-        float flexLength = (Length() - totalFixedLength) / flexCount;
+        
         float t = OuterPadding;
 
         foreach (Entry entry in entries)

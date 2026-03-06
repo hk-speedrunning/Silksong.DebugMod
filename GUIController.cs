@@ -5,6 +5,7 @@ using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,7 +20,10 @@ public class GUIController : MonoBehaviour
     public string respawnSceneWatch;
     private static readonly HitboxViewer hitboxes = new();
     private KeyCode keyWarning;
-    private Resolution resolution;
+    private Size resolution;
+
+    private float? lastRescale;
+    private const float RebuildDelay = 0.1f;
 
     public GameObject canvas;
     private static GUIController _instance;
@@ -97,8 +101,8 @@ public class GUIController : MonoBehaviour
             CanvasButton.BuildHoverBorder();
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
-
-            resolution = Screen.currentResolution;
+            
+            DebugMod.LogDebug("UI built");
         }
         catch (Exception e)
         {
@@ -110,9 +114,16 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
-        if (canvas && (resolution.width != Screen.currentResolution.width || resolution.height != Screen.currentResolution.height))
+        if (canvas && (resolution.Width != Screen.width || resolution.Height != Screen.height))
         {
-            resolution = Screen.currentResolution;
+            resolution = new Size(Screen.width, Screen.height);
+            lastRescale = Time.realtimeSinceStartup;
+        }
+
+        if (lastRescale != null && Time.realtimeSinceStartup > lastRescale + RebuildDelay)
+        {
+            DebugMod.LogDebug($"Resize complete, rebuilding for new resolution ({Screen.width}, {Screen.height})");
+            lastRescale = null;
             BuildMenus();
         }
 

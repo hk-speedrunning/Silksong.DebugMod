@@ -79,7 +79,8 @@ public class CanvasBorder : CanvasObject
 
         if (Size.x <= 0 || Size.y <= 0)
         {
-            throw new Exception($"Border size must be positive: {GetQualifiedName()}");
+            DebugMod.LogWarn($"Non-positive size for border {GetQualifiedName()}, clamped to 1");
+            Size = new Vector2 { x = Math.Max(Size.x, 1f), y = Math.Max(Size.y, 1f) };
         }
 
         base.Build();
