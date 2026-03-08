@@ -325,7 +325,7 @@ public class SaveState
             Object.DontDestroyOnLoad(HeroController.instance);
         }
 
-        // If another scene load operation is in progress, loading the dummy scene will hang
+        // If another scene load operation is in progress, loading the scene will hang
         yield return ScenePreloader.ForceEndPendingOperations();
 
         string previousScene = GameManager.instance.GetSceneNameString();
@@ -599,6 +599,14 @@ public class SaveState
         }
 
         return true;
+    }
+
+    // Prevent objects in the previous scene overwriting scene data when unloading
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+    [HarmonyPrefix]
+    private static bool SaveLevelState()
+    {
+        return loadingSavestate == null;
     }
     #endregion
 }
