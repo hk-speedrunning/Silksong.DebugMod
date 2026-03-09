@@ -114,6 +114,12 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Scene data changes made since entering this scene will not be saved");
     }
 
+    [BindableMethod(name = "Queue Walljump Interrupt", category = "Misc")]
+    public static void QueueWallJump()
+    {
+        HeroController.instance.queuedWallJumpInterrupt = true;
+    }
+
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
     [HarmonyPrefix]
     private static bool GameManager_SaveLevelState_Prefix()

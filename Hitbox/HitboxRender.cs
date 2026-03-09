@@ -14,11 +14,12 @@ public class HitboxRender : MonoBehaviour
         public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red
         public static readonly HitboxType Attack = new(Color.cyan, 2);                       // cyan
         public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0), 3);     // green
-        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // lavender
-        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 5); // pink
-        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 6); // dark blue
-        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple
-        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 8); // orange
+        public static readonly HitboxType NonSliderTerrain = new(new Color(0, 0.8f, 0.6f), 4); // teal
+        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 5); // lavender
+        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 6); // pink
+        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 7); // dark blue
+        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 8); // purple
+        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 9); // orange
 
 
         public readonly Color Color;
@@ -42,6 +43,7 @@ public class HitboxRender : MonoBehaviour
         {HitboxType.Enemy, new HashSet<Collider2D>()},
         {HitboxType.Attack, new HashSet<Collider2D>()},
         {HitboxType.Terrain, new HashSet<Collider2D>()},
+        {HitboxType.NonSliderTerrain, new HashSet<Collider2D>()},
         {HitboxType.Trigger, new HashSet<Collider2D>()}, // what does this category mean?
         {HitboxType.Breakable, new HashSet<Collider2D>()},
         {HitboxType.Gate, new HashSet<Collider2D>()},
@@ -89,7 +91,8 @@ public class HitboxRender : MonoBehaviour
             }
             else if (go.layer == (int)PhysLayers.TERRAIN)
             {
-                colliders[HitboxType.Terrain].Add(collider2D);
+                if (go.GetComponent<NonSlider>()) { colliders[HitboxType.NonSliderTerrain].Add(collider2D); }
+                else { colliders[HitboxType.Terrain].Add(collider2D); }
             }
             else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
             {
