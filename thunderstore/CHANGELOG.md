@@ -1,5 +1,38 @@
 ## Changelog
 
+### v0.3.6
+
+- Fixed a regression in v0.3.5 causing savestate loads to persist scene data.
+- Added `Queue Walljump Interrupt` bind. 
+- Recoloured NonSlider terrain hitboxes to teal. 
+
+### v0.3.5
+
+- Added `Q` flag to Wall States for tracking `queuedWalljumpInterrupt`, one of the flags responsible for Walljump Storage.
+- Further speedups to savestate loading & more accurate timing.
+- Improved handling of Windowed mode - UI should now rescale to an appropriate size shortly after the window is resized.
+  - Note that excessive rebuilds may cause performance issues - if you experience this, try restarting the game after resizing the window to your desired size.
+
+### v0.3.4
+
+- Fixed an issue causing poor performance on main menu (thanks @dplochcoder)
+- Massively improved performance with Hitboxes shown via culling (thanks @olvior)
+- Minor fix for Red Memory savestates created before v0.3.3
+- Fixed some instances of the hero collider incorrectly being disabled on savestate load
+
+### v0.3.3
+
+- Savestates now save semi-persistent states, meaning eg. you can now set a state after killing some bench-respawning enemies & they correctly do not respawn when loading.
+- Various minor UI adjustments; HP bars are now wider & translucent, Infinite Silk no longer causes UI flashing & Last Scaling will now overlap the second info column less often.
+- Fixed "Deactivate Visual Masks" function & adjusted several hitbox categories for use in Silksong.
+- Added support for other mods to add fields to the Info panel (#85)
+- Savestate fixes:
+  - Tools no longer remain disabled when savestating out of memories.
+  - Fixed savestates in Memory scenes - now you can practice silk heart, needolin & red memory parkour all you wish :)
+  - Fixed Hunter's crest meter not updating after savestate load.
+  - Savestates now correctly store maggot & hunter's crest evo states.
+  - Loading state while falling out of the Mist no longer hardlocks the game on Release Patch.
+
 ### v0.3.2
 
 - Savestates:
