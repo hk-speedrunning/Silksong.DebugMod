@@ -217,8 +217,9 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendBasicControl("Give All Memory Lockets", BindableFunctions.GiveMemoryLockets);
         AppendBasicControl("Give All Craftmetal", BindableFunctions.GiveCraftmetal);
-        AppendRow(1);
+        AppendRow(1, 1);
         AppendBasicControl("Give Silkeater", BindableFunctions.GiveSilkeater);
+        AppendBasicControl("Give All Keys", BindableFunctions.GiveAllKeys);
 
         AppendSectionHeader("Masks and Spools");
         AppendRow(1, 1);
