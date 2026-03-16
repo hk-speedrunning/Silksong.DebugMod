@@ -58,7 +58,7 @@ public class CanvasScrollView : CanvasNode
         {
             float y = content.LocalPosition.y + Input.mouseScrollDelta.y * ScrollSpeed;
             y = Mathf.Clamp(y, Mathf.Min(-GetScrollableHeight(), 0f), 0f);
-            content.LocalPosition = new Vector2(content.LocalPosition.x, y);
+            content.LocalPosition = new Vector2(content.LocalPosition.x, Mathf.Round(y));
         }
     }
 
