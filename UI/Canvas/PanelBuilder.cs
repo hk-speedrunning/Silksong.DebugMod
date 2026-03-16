@@ -60,6 +60,7 @@ public class PanelBuilder : IDisposable
     public T AppendSquare<T>(T element) where T : CanvasNode => Append(element, LengthType.Square);
     public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, LengthType.Flex);
     public void AppendPadding(float length) => Append<CanvasNode>(null, LengthType.Fixed, length);
+    public void AppendFlexPadding() => Append<CanvasNode>(null, LengthType.Flex);
 
     public void Build()
     {
