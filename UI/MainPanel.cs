@@ -17,7 +17,6 @@ public class MainPanel : CanvasPanel
     public static int SectionHeaderHeight => UICommon.ScaleHeight(30);
     public static int KeybindHeaderFontSize => UICommon.ScaleHeight(20);
     public static int KeybindListingHeight => UICommon.ScaleHeight(16);
-    public static int TileHeight => UICommon.ScaleWidth(175);
 
     public static MainPanel Instance { get; private set; }
 
@@ -179,53 +178,35 @@ public class MainPanel : CanvasPanel
         AppendRow(1);
         AppendBasicControl("All Skills", BindableFunctions.GiveAllSkills);
 
-        AppendTileRow(3);
-        AppendToggleTile("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep);
-        AppendToggleTile("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak);
-        AppendToggleTile("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip);
-        AppendTileRow(3);
-        AppendToggleTile("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline);
-        AppendToggleTile("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak);
-        AppendToggleTile("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar);
-        AppendTileRow(2);
-        AppendToggleTile("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin);
-        AppendToggleTile("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike);
-        AppendTileRow(2);
-        AppendToggleTile("Beastling Call", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall);
-        AppendToggleTile("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep);
-
-        /*
-        AppendRow(1, 1);
-        AppendToggleControl("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep);
-        AppendToggleControl("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar);
-        AppendRow(1, 1);
-        AppendToggleControl("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak);
-        AppendToggleControl("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike);
-        AppendRow(1, 1);
-        AppendToggleControl("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip);
-        AppendToggleControl("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin);
-        AppendRow(1, 1);
-        AppendToggleControl("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline);
-        AppendToggleControl("Beastling Call", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall);
-        AppendRow(1, 1);
-        AppendToggleControl("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak);
-        AppendToggleControl("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep);
-        */
+        AppendLabeledTileRow(5);
+        AppendToggleTile("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep, "Skill_SwiftStep");
+        AppendToggleTile("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip, "Skill_ClingGrip");
+        AppendToggleTile("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin, "Skill_Needolin");
+        AppendToggleTile("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline, "Skill_Clawline");
+        AppendToggleTile("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar, "Skill_SilkSoar");
+        
+        AppendLabeledTileRow(5);
+        AppendToggleTile("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak, "Skill_DriftersCloak");
+        AppendToggleTile("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak, "Skill_FaydownCloak");
+        AppendToggleTile("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike, "Skill_NeedleStrike");
+        AppendToggleTile("Beastling Call", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall, "Skill_BeastlingCall");
+        AppendToggleTile("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep, "Skill_Elegy");
 
         AppendSectionHeader("Upgrades");
 
-        AppendCounterTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage);
-
-        /*
-        AppendRow(1, 1);
-        AppendBasicControl("Increase Needle Damage", BindableFunctions.IncreaseNeedleDamage);
-        AppendBasicControl("Decrease Needle Damage", BindableFunctions.DecreaseNeedleDamage);
-        AppendRow(1, 1);
-        AppendIncrementControl("Tool Pouches", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches);
-        AppendIncrementControl("Crafting Kits", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits);
-        AppendRow(1);
-        AppendIncrementControl("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart);
-        */
+        AppendWideTileRow(2);
+        AppendWideIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage, "Inv_Needle");
+        AppendWideIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart, BindableFunctions.DecrementSilkHeart, "Inv_SilkHeart");
+        
+        // TODO: decrements!
+        AppendWideTileRow(2);
+        AppendWideIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.IncrementKits, "Inv_CraftingKit");
+        AppendWideIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.IncrementPouches, "Inv_ToolPouch");
+        
+        AppendWideTileRow(3);
+        AppendWideIncrementTile("Meme", () => 0, () => {}, () => {});
+        AppendWideIncrementTile("Meme1", () => 0, () => {}, () => {});
+        AppendWideIncrementTile("Meme2", () => 0, () => {}, () => {});
 
         AppendSectionHeader("Tools");
         AppendRow(1, 1);
@@ -375,10 +356,35 @@ public class MainPanel : CanvasPanel
 
         return row;
     }
+    
+    private CanvasPanel AppendLabeledTileRow(int count) => AppendTileRow(count, UICommon.ControlHeight * 2); 
 
-    private CanvasPanel AppendTileRow(int count)
+    private CanvasPanel AppendTileRow(int count, int extraHeight)
     {
-        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), TileHeight);
+        // Width parametric, maximum size as if 3 per row
+        int tileWidth = (int)(currentTab.ChildBreadth() - ScrollbarWidth - (UICommon.Margin * 2)) / Math.Max(3, count);
+        // Height parametric, leave space for square image + padding + 2line text
+        int tileHeight = tileWidth + extraHeight;
+        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), tileHeight + UICommon.Margin);
+
+        row.CollapseMode = CollapseMode.AllowNoRenaming;
+
+        currentRow = row;
+        rowPositions = rowWidths = Enumerable.Repeat(0, count).ToArray();
+        rowCounter++;
+        rowIndex = 0;
+
+        return row;
+    }
+
+    private CanvasPanel AppendWideTileRow(int count)
+    {
+        // Width parametric, maximum size as if 2 per row
+        int tileWidth = (int)(currentTab.ChildBreadth() - ScrollbarWidth - (UICommon.Margin * 2)) / Math.Max(2, count);
+        // // Horizontally we divide 1/3 to image and 2/3 to controls. Height determined based off image.
+        int tileHeight = (tileWidth - UICommon.Margin) / 3 + UICommon.Margin * 2;
+        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), tileHeight + UICommon.Margin);
+        
         row.CollapseMode = CollapseMode.AllowNoRenaming;
 
         currentRow = row;
@@ -482,25 +488,29 @@ public class MainPanel : CanvasPanel
         });
     }
 
-    private CanvasPanel AppendTile(string name)
+    private CanvasPanel AppendTile(string name, bool withLabel = true)
     {
-        CanvasPanel row = currentRow ?? AppendTileRow(1);
+        CanvasPanel row = currentRow ?? AppendLabeledTileRow(1);
 
         int count = rowPositions.Length;
-        int tileWidth = ((int)row.Size.x - UICommon.Margin * 2) / 3;
+        
+        // Width parametric, maximum size as if 3 per row
+        int tileWidth = ((int)row.Size.x - UICommon.Margin * (count - 1)) / Math.Max(4, count);
+        // Height parametric, leave space for square image + padding + 2line text
+        int tileHeight = tileWidth + (withLabel ? UICommon.ControlHeight * 2 : 0);
 
         int offset = 0;
-        if (count < 3)
+        if (count < 4)
         {
             offset = ((int)row.Size.x - tileWidth * count - UICommon.Margin * (count - 1)) / 2;
         }
 
         CanvasPanel tile = row.Add(new CanvasPanel(name));
         tile.LocalPosition = new Vector2(offset + (tileWidth + UICommon.Margin) * rowIndex, 0);
-        tile.Size = new Vector2(tileWidth, TileHeight);
+        tile.Size = new Vector2(tileWidth, tileHeight);
         tile.CollapseMode = CollapseMode.Deny;
 
-        if (count == 3 && rowIndex == count - 1)
+        if (count == 4 && rowIndex == count - 1)
         {
             tile.Size = new Vector2(row.Size.x - tile.LocalPosition.x, tile.Size.y);
         }
@@ -517,24 +527,25 @@ public class MainPanel : CanvasPanel
         return tile;
     }
 
-    private void FillTileFront(CanvasPanel panel, string name)
+    private void FillTileFront(CanvasPanel panel, string name, string image = "IconX", bool includeLabel = true)
     {
         PanelBuilder builder = new(panel);
         builder.Padding = UICommon.Margin;
 
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
-        icon.SetImage(UICommon.images["IconX"]);
+        icon.SetImage(UICommon.images[image]);
 
-        builder.AppendFlexPadding();
-
-        CanvasText label = builder.AppendFixed(new CanvasText("Label"), UICommon.ControlHeight);
-        label.Alignment = TextAnchor.MiddleCenter;
-        label.Text = name;
+        if (includeLabel)
+        {
+            CanvasText label = builder.AppendFixed(new CanvasText("Label"), UICommon.ControlHeight * 2);
+            label.Alignment = TextAnchor.MiddleCenter;
+            label.Text = name;
+        }
 
         builder.Build();
     }
 
-    private CanvasPanel AppendToggleTile(string name, Func<bool> getter, Action effect)
+    private CanvasPanel AppendToggleTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true)
     {
         CanvasPanel tile = AppendTile(name);
 
@@ -543,12 +554,12 @@ public class MainPanel : CanvasPanel
         button.OnUpdate += () => button.Toggled = getter();
         button.OnClicked += effect;
 
-        FillTileFront(tile, name);
+        FillTileFront(tile, name, image, includeLabel);
 
         return tile;
     }
 
-    private CanvasPanel AppendFlippableTile(string name)
+    private CanvasPanel AppendFlippableTile(string name, string image = "IconX")
     {
         CanvasPanel tile = AppendTile(name);
 
@@ -557,7 +568,7 @@ public class MainPanel : CanvasPanel
         CanvasPanel front = tile.Add(new CanvasPanel("Front"));
         front.Size = tile.Size;
         front.CollapseMode = CollapseMode.Deny;
-        FillTileFront(front, name);
+        FillTileFront(front, name, image);
 
         CanvasPanel back = tile.Add(new CanvasPanel("Back"));
         back.Size = tile.Size;
@@ -579,10 +590,10 @@ public class MainPanel : CanvasPanel
 
         return tile;
     }
-
-    private CanvasPanel AppendCounterTile(string name, Func<int> getter, Action add, Action remove)
+    
+    private CanvasPanel AppendFlipCounterTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
     {
-        CanvasPanel tile = AppendFlippableTile(name);
+        CanvasPanel tile = AppendFlippableTile(name, image);
         CanvasPanel back = tile.Get<CanvasPanel>("Back");
 
         PanelBuilder builder = new(back);
@@ -612,6 +623,97 @@ public class MainPanel : CanvasPanel
 
         builder.AppendFlexPadding();
         builder.Build();
+
+        return tile;
+    }
+
+    private CanvasPanel AppendWideTile(string name)
+    {
+        CanvasPanel row = currentRow ?? AppendWideTileRow(1);
+
+        int count = rowPositions.Length;
+        
+        // Width parametric, maximum size as if 2 per row
+        int tileWidth = ((int)row.Size.x - UICommon.Margin * (count - 1)) / Math.Max(2, count);
+        // Horizontally we divide 1/3 to image and 2/3 to controls. Height determined based off image.
+        int tileHeight = (tileWidth - UICommon.Margin) / 3 + UICommon.Margin * 2;
+
+        int offset = 0;
+        if (count < 2)
+        {
+            offset = ((int)row.Size.x - tileWidth * count - UICommon.Margin * (count - 1)) / 2;
+        }
+
+        CanvasPanel tile = row.Add(new CanvasPanel(name));
+        tile.LocalPosition = new Vector2(offset + (tileWidth + UICommon.Margin) * rowIndex, 0);
+        tile.Size = new Vector2(tileWidth, tileHeight);
+        tile.CollapseMode = CollapseMode.Deny;
+
+        if (count == 3 && rowIndex == count - 1)
+        {
+            tile.Size = new Vector2(row.Size.x - tile.LocalPosition.x, tile.Size.y);
+        }
+
+        rowIndex++;
+        if (rowIndex == count)
+        {
+            currentRow = null;
+            rowPositions = null;
+            rowWidths = null;
+            rowIndex = 0;
+        }
+        
+        UICommon.AddBackground(tile);
+
+        return tile;
+    }
+
+    private CanvasPanel AppendWideIncrementTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
+    {
+        CanvasPanel tile = AppendWideTile(name);
+        
+        PanelBuilder builder = new(tile)
+        {
+            Horizontal = true,
+            OuterPadding = UICommon.Margin
+        };
+
+        CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
+        icon.SetImage(UICommon.images[image]);
+
+        builder.AppendPadding(UICommon.Margin);
+        
+        PanelBuilder containerBuilder = new(builder.AppendFlex(new CanvasPanel($"Container")));
+        
+        containerBuilder.AppendFlexPadding();
+        
+        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), UICommon.ControlHeight);
+        label.Alignment = TextAnchor.MiddleCenter;
+        label.Text = name;
+        
+        
+        containerBuilder.AppendFlexPadding();
+        
+        CanvasPanel controlRow = containerBuilder.AppendFixed(new CanvasPanel("ControlRow"), UICommon.ControlHeight);
+        PanelBuilder controlBuilder = new(controlRow) { Horizontal = true, Padding = 0 };
+        
+        var decButton = controlBuilder.AppendSquare(new CanvasButton("Decrement"));
+        decButton.SetImage(UICommon.images["IconMinusMin"]);
+        decButton.RemoveText();
+        decButton.OnClicked += remove;
+        
+        var valueButton = controlBuilder.AppendFlex(new CanvasButton("Value"));
+        valueButton.OnUpdate += () => valueButton.Text.Text = getter().ToString();
+        valueButton.Text.Alignment = TextAnchor.MiddleCenter;
+        
+        var incButton = controlBuilder.AppendSquare(new CanvasButton("Increment"));
+        incButton.SetImage(UICommon.images["IconPlusMin"]);
+        incButton.RemoveText();
+        incButton.OnClicked += add;
+        
+        builder.Build();
+        containerBuilder.Build();
+        controlBuilder.Build();
 
         return tile;
     }

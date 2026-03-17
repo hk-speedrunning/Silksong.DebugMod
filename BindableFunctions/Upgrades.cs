@@ -80,18 +80,24 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Give Silk Heart", category = "Upgrades")]
+    [BindableMethod(name = "Increment Silk Hearts", category = "Upgrades")]
     public static void IncrementSilkHeart()
     {
-        if (PlayerData.instance.silkRegenMax < 3)
+        PlayerData.instance.silkRegenMax++;
+        DebugMod.LogConsole($"Incremented Silk Hearts (now {PlayerData.instance.silkRegenMax})");
+    }
+    
+    [BindableMethod(name = "Decrement Silk Hearts", category = "Upgrades")]
+    public static void DecrementSilkHeart()
+    {
+        if (PlayerData.instance.silkRegenMax > 0)
         {
-            PlayerData.instance.silkRegenMax++;
-            DebugMod.LogConsole($"Giving player Silk Heart (now {PlayerData.instance.silkRegenMax})");
+            PlayerData.instance.silkRegenMax--;
+            DebugMod.LogConsole($"Decremented Silk Hearts (now {PlayerData.instance.silkRegenMax})");
         }
         else
         {
-            PlayerData.instance.silkRegenMax = 0;
-            DebugMod.LogConsole("Taking away all Silk Hearts");
+            DebugMod.LogConsole("Can't decrement below 0 Silk Hearts!");
         }
     }
 }
