@@ -185,7 +185,14 @@ public abstract class CanvasNode
 
     private void Update()
     {
-        onUpdate?.Invoke();
+        try
+        {
+            onUpdate?.Invoke();
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error updating node {GetQualifiedName()}: {e}");
+        }
     }
 
     public virtual void Destroy()
