@@ -26,7 +26,6 @@ public class GUIController : MonoBehaviour
     private const float RebuildDelay = 0.1f;
 
     public GameObject canvas;
-    private static GUIController _instance;
 
     private readonly Array allKeyCodes = Enum.GetValues(typeof(KeyCode));
 
@@ -39,15 +38,16 @@ public class GUIController : MonoBehaviour
     {
         get
         {
-            if (_instance == null)
+            if (!field)
             {
                 DebugMod.Log("Creating new GUIController");
 
-                GameObject GUIObj = new GameObject("GUIController");
-                _instance = GUIObj.AddComponent<GUIController>();
-                DontDestroyOnLoad(GUIObj);
+                GameObject go = new("GUIController");
+                field = go.AddComponent<GUIController>();
+                DontDestroyOnLoad(go);
             }
-            return _instance;
+
+            return field;
         }
     }
 
@@ -101,7 +101,9 @@ public class GUIController : MonoBehaviour
             CanvasButton.BuildHoverBorder();
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
-            
+
+            resolution = new Size(Screen.width, Screen.height);
+
             DebugMod.LogDebug("UI built");
         }
         catch (Exception e)
@@ -114,7 +116,7 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
-        if (canvas && (resolution.Width != Screen.width || resolution.Height != Screen.height))
+        if (!resolution.IsEmpty && (resolution.Width != Screen.width || resolution.Height != Screen.height))
         {
             resolution = new Size(Screen.width, Screen.height);
             lastRescale = Time.realtimeSinceStartup;

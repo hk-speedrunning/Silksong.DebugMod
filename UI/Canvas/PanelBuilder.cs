@@ -59,6 +59,7 @@ public class PanelBuilder : IDisposable
     public T AppendFixed<T>(T element, float length) where T : CanvasNode => Append(element, LengthType.Fixed, length);
     public T AppendSquare<T>(T element) where T : CanvasNode => Append(element, LengthType.Square);
     public T AppendFlex<T>(T element) where T : CanvasNode => Append(element, LengthType.Flex);
+    public T AppendLazy<T>(T element) where T : CanvasNode => Append(element, LengthType.Lazy);
     public void AppendPadding(float length) => Append<CanvasNode>(null, LengthType.Fixed, length);
     public void AppendFlexPadding() => Append<CanvasNode>(null, LengthType.Flex);
 
@@ -80,6 +81,9 @@ public class PanelBuilder : IDisposable
                 case LengthType.Flex:
                     flexCount++;
                     break;
+                case LengthType.Lazy:
+                    totalFixedLength += Horizontal ? entry.element.Size.x : entry.element.Size.y;
+                    break;
             }
         }
 
@@ -87,15 +91,15 @@ public class PanelBuilder : IDisposable
         {
             throw new Exception("Flex elements are not supported for a dynamic-length PanelBuilder");
         }
-        
+
         float flexLength = (Length() - totalFixedLength) / flexCount;
-        
+
         if (Length() < totalFixedLength && flexCount != 0)
         {
             DebugMod.LogWarn($"{panel.GetQualifiedName()} has no room for flex elements, assigning 0 width");
             flexLength = 0;
         }
-        
+
         float t = OuterPadding;
 
         foreach (Entry entry in entries)
@@ -104,6 +108,7 @@ public class PanelBuilder : IDisposable
             {
                 LengthType.Square => ChildBreadth(),
                 LengthType.Flex => flexLength,
+                LengthType.Lazy => Horizontal ? entry.element.Size.x : entry.element.Size.y,
                 _ => entry.length
             };
 
@@ -181,5 +186,6 @@ public class PanelBuilder : IDisposable
         Fixed,
         Square,
         Flex,
+        Lazy,
     }
 }

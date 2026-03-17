@@ -16,7 +16,7 @@ public class MainPanel : CanvasPanel
     public static int SectionHeaderFontSize => UICommon.ScaleHeight(30);
     public static int SectionHeaderHeight => UICommon.ScaleHeight(30);
     public static int KeybindHeaderFontSize => UICommon.ScaleHeight(20);
-    public static int KeybindListingHeight => UICommon.ScaleHeight(16);
+    public static int ListingHeight => UICommon.ScaleHeight(16);
 
     public static MainPanel Instance { get; private set; }
 
@@ -178,14 +178,14 @@ public class MainPanel : CanvasPanel
         AppendRow(1);
         AppendBasicControl("All Skills", BindableFunctions.GiveAllSkills);
 
-        AppendLabeledTileRow(5);
+        AppendTileRow(5);
         AppendLabeledTile("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep, "Skill_SwiftStep");
         AppendLabeledTile("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip, "Skill_ClingGrip");
         AppendLabeledTile("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin, "Skill_Needolin");
         AppendLabeledTile("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline, "Skill_Clawline");
         AppendLabeledTile("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar, "Skill_SilkSoar");
 
-        AppendLabeledTileRow(5);
+        AppendTileRow(5);
         AppendLabeledTile("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak, "Skill_DriftersCloak");
         AppendLabeledTile("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak, "Skill_FaydownCloak");
         AppendLabeledTile("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike, "Skill_NeedleStrike");
@@ -194,19 +194,19 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("Upgrades");
 
-        AppendWideTileRow(2);
-        AppendWideIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage, "Inv_Needle");
-        AppendWideIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart, BindableFunctions.DecrementSilkHeart, "Inv_SilkHeart");
+        AppendTileRow(2);
+        AppendIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage, "Inv_Needle");
+        AppendIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart, BindableFunctions.DecrementSilkHeart, "Inv_SilkHeart");
 
         // TODO: decrements!
-        AppendWideTileRow(2);
-        AppendWideIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.IncrementKits, "Inv_CraftingKit");
-        AppendWideIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.IncrementPouches, "Inv_ToolPouch");
+        AppendTileRow(2);
+        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.IncrementKits, "Inv_CraftingKit");
+        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.IncrementPouches, "Inv_ToolPouch");
 
-        AppendWideTileRow(3);
-        AppendWideIncrementTile("Meme", () => 0, () => { }, () => { });
-        AppendWideIncrementTile("Meme1", () => 0, () => { }, () => { });
-        AppendWideIncrementTile("Meme2", () => 0, () => { }, () => { });
+        AppendTileRow(3);
+        AppendIncrementTile("Meme", () => 0, () => { }, () => { });
+        AppendIncrementTile("Meme1", () => 0, () => { }, () => { });
+        AppendIncrementTile("Meme2", () => 0, () => { }, () => { });
 
         AppendSectionHeader("Tools");
         AppendRow(1, 1);
@@ -267,7 +267,7 @@ public class MainPanel : CanvasPanel
 
             foreach (BindAction action in keybindData[category])
             {
-                using PanelBuilder builder = new(currentTab.AppendFixed(new CanvasPanel(action.Name), KeybindListingHeight));
+                using PanelBuilder builder = new(currentTab.AppendFixed(new CanvasPanel(action.Name), ListingHeight));
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
@@ -329,11 +329,8 @@ public class MainPanel : CanvasPanel
         return builder;
     }
 
-    private CanvasPanel AppendRow(params int[] widths)
+    private void SetupRow(CanvasPanel row, params int[] widths)
     {
-        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
-        row.CollapseMode = CollapseMode.AllowNoRenaming;
-
         int totalWidth = (int)row.Size.x;
         int widthUnits = widths.Sum();
         int singleWidth = (totalWidth - UICommon.Margin * (widthUnits - 1)) / widthUnits;
@@ -353,42 +350,24 @@ public class MainPanel : CanvasPanel
         currentRow = row;
         rowCounter++;
         rowIndex = 0;
+    }
+
+    private CanvasPanel AppendRow(params int[] widths)
+    {
+        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
+        row.CollapseMode = CollapseMode.AllowNoRenaming;
+
+        SetupRow(row, widths);
 
         return row;
     }
 
-    private CanvasPanel AppendLabeledTileRow(int count)
+    private CanvasPanel AppendTileRow(int count)
     {
-        // Width parametric, maximum size as if 3 per row
-        int tileWidth = (int)(currentTab.ChildBreadth() - ScrollbarWidth - (UICommon.Margin * 2)) / Math.Max(3, count);
-        // Height parametric, leave space for square image + padding + 2line text
-        int tileHeight = tileWidth + UICommon.ControlHeight * 2;
-        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), tileHeight);
-
+        CanvasPanel row = currentTab.AppendLazy(new CanvasPanel(rowCounter.ToString()));
         row.CollapseMode = CollapseMode.AllowNoRenaming;
 
-        currentRow = row;
-        rowPositions = rowWidths = Enumerable.Repeat(0, count).ToArray();
-        rowCounter++;
-        rowIndex = 0;
-
-        return row;
-    }
-
-    private CanvasPanel AppendWideTileRow(int count)
-    {
-        // Width parametric, maximum size as if 2 per row
-        int tileWidth = (int)(currentTab.ChildBreadth() - ScrollbarWidth - (UICommon.Margin * 2)) / Math.Max(2, count);
-        // Horizontally we divide 1/3 to image and 2/3 to controls. Height determined based off image.
-        int tileHeight = (tileWidth - UICommon.Margin) / 3 + UICommon.Margin * 2;
-        CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), tileHeight);
-
-        row.CollapseMode = CollapseMode.AllowNoRenaming;
-
-        currentRow = row;
-        rowPositions = rowWidths = Enumerable.Repeat(0, count).ToArray();
-        rowCounter++;
-        rowIndex = 0;
+        SetupRow(row, Enumerable.Repeat(1, count).ToArray());
 
         return row;
     }
@@ -406,13 +385,29 @@ public class MainPanel : CanvasPanel
         return text;
     }
 
+    private CanvasPanel AppendRowElement(string name)
+    {
+        CanvasPanel panel = currentRow.Add(new CanvasPanel(name));
+        panel.LocalPosition = new Vector2(rowPositions[rowIndex], 0);
+        panel.Size = new Vector2(rowWidths[rowIndex], currentRow.Size.y);
+
+        rowIndex++;
+        if (rowIndex == rowPositions.Length)
+        {
+            currentRow = null;
+            rowPositions = null;
+            rowWidths = null;
+            rowIndex = 0;
+        }
+
+        return panel;
+    }
+
     private CanvasPanel AppendButtonControl(string name, Action effect, Action<CanvasButton> update)
     {
-        CanvasPanel row = currentRow ?? AppendRow(1);
+        currentRow ??= AppendRow(1);
 
-        CanvasPanel controlPanel = row.Add(new CanvasPanel(name));
-        controlPanel.LocalPosition = new Vector2(rowPositions[rowIndex], 0);
-        controlPanel.Size = new Vector2(rowWidths[rowIndex], row.Size.y);
+        CanvasPanel controlPanel = AppendRowElement(name);
 
         PanelBuilder control = new(controlPanel);
         control.Horizontal = true;
@@ -444,15 +439,6 @@ public class MainPanel : CanvasPanel
 
         control.Build();
 
-        rowIndex++;
-        if (rowIndex == rowPositions.Length)
-        {
-            currentRow = null;
-            rowPositions = null;
-            rowWidths = null;
-            rowIndex = 0;
-        }
-
         return controlPanel;
     }
 
@@ -476,136 +462,68 @@ public class MainPanel : CanvasPanel
         });
     }
 
-    private CanvasPanel AppendTile(string name, bool withLabel = true)
-    {
-        CanvasPanel row = currentRow ?? AppendLabeledTileRow(1);
-
-        int count = rowPositions.Length;
-
-        // Width parametric, maximum size as if 3 per row
-        int tileWidth = ((int)row.Size.x - UICommon.Margin * (count - 1)) / Math.Max(4, count);
-        // Height parametric, leave space for square image + padding + 2line text
-        int tileHeight = tileWidth + (withLabel ? UICommon.ControlHeight * 2 : 0);
-
-        int offset = 0;
-        if (count < 4)
-        {
-            offset = ((int)row.Size.x - tileWidth * count - UICommon.Margin * (count - 1)) / 2;
-        }
-
-        CanvasPanel tile = row.Add(new CanvasPanel(name));
-        tile.LocalPosition = new Vector2(offset + (tileWidth + UICommon.Margin) * rowIndex, 0);
-        tile.Size = new Vector2(tileWidth, tileHeight);
-        tile.CollapseMode = CollapseMode.Deny;
-
-        if (count == 4 && rowIndex == count - 1)
-        {
-            tile.Size = new Vector2(row.Size.x - tile.LocalPosition.x, tile.Size.y);
-        }
-
-        rowIndex++;
-        if (rowIndex == count)
-        {
-            currentRow = null;
-            rowPositions = null;
-            rowWidths = null;
-            rowIndex = 0;
-        }
-
-        return tile;
-    }
-
     private CanvasPanel AppendLabeledTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true)
     {
-        CanvasPanel tile = AppendTile(name);
+        CanvasPanel row = currentRow ?? AppendTileRow(1);
+
+        CanvasPanel tile = AppendRowElement(name);
+        tile.CollapseMode = CollapseMode.Deny;
 
         CanvasButton button = tile.Add(new CanvasButton("Button"));
-        button.Size = tile.Size;
         button.OnUpdate += () => button.Toggled = getter();
         button.OnClicked += effect;
 
         PanelBuilder builder = new(tile);
         builder.Padding = UICommon.Margin;
+        builder.DynamicLength = true;
 
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
         icon.SetImage(UICommon.images[image]);
 
         if (includeLabel)
         {
-            CanvasText label = builder.AppendFixed(new CanvasText("Label"), UICommon.ControlHeight * 2);
+            CanvasText label = builder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
             label.Alignment = TextAnchor.MiddleCenter;
             label.Text = name;
         }
 
         builder.Build();
 
+        button.Size = tile.Size;
+        row.Size = new Vector2(row.Size.x, Mathf.Max(row.Size.y, tile.Size.y));
+
         return tile;
     }
 
-    private CanvasPanel AppendWideTile(string name)
+    private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
     {
-        CanvasPanel row = currentRow ?? AppendWideTileRow(1);
+        CanvasPanel row = currentRow ?? AppendTileRow(1);
 
-        int count = rowPositions.Length;
+        // Image gets 1/3 of the tile and determines the tile height
+        int imageWidth = rowWidths[0] / 3;
 
-        // Width parametric, maximum size as if 2 per row
-        int tileWidth = ((int)row.Size.x - UICommon.Margin * (count - 1)) / Math.Max(2, count);
-        // Horizontally we divide 1/3 to image and 2/3 to controls. Height determined based off image.
-        int tileHeight = (tileWidth - UICommon.Margin) / 3 + UICommon.Margin * 2;
-
-        int offset = 0;
-        if (count < 2)
-        {
-            offset = ((int)row.Size.x - tileWidth * count - UICommon.Margin * (count - 1)) / 2;
-        }
-
-        CanvasPanel tile = row.Add(new CanvasPanel(name));
-        tile.LocalPosition = new Vector2(offset + (tileWidth + UICommon.Margin) * rowIndex, 0);
-        tile.Size = new Vector2(tileWidth, tileHeight);
+        CanvasPanel tile = AppendRowElement(name);
         tile.CollapseMode = CollapseMode.Deny;
-
-        if (count == 3 && rowIndex == count - 1)
-        {
-            tile.Size = new Vector2(row.Size.x - tile.LocalPosition.x, tile.Size.y);
-        }
-
-        rowIndex++;
-        if (rowIndex == count)
-        {
-            currentRow = null;
-            rowPositions = null;
-            rowWidths = null;
-            rowIndex = 0;
-        }
-
         UICommon.AddBackground(tile);
 
-        return tile;
-    }
-
-    private CanvasPanel AppendWideIncrementTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
-    {
-        CanvasPanel tile = AppendWideTile(name);
+        tile.Size = new Vector2(tile.Size.x, imageWidth + UICommon.Margin * 2);
 
         PanelBuilder builder = new(tile)
         {
             Horizontal = true,
-            OuterPadding = UICommon.Margin
+            Padding = tile.ContentMargin(UICommon.Margin)
         };
 
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
         icon.SetImage(UICommon.images[image]);
 
-        builder.AppendPadding(UICommon.Margin);
-
-        PanelBuilder containerBuilder = new(builder.AppendFlex(new CanvasPanel($"Container")));
+        PanelBuilder containerBuilder = new(builder.AppendFlex(new CanvasPanel("Container")));
 
         containerBuilder.AppendFlexPadding();
 
-        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), UICommon.ControlHeight);
+        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), ListingHeight);
         label.Alignment = TextAnchor.MiddleCenter;
         label.Text = name;
-
 
         containerBuilder.AppendFlexPadding();
 
@@ -629,6 +547,8 @@ public class MainPanel : CanvasPanel
         builder.Build();
         containerBuilder.Build();
         controlBuilder.Build();
+
+        row.Size = new Vector2(row.Size.x, Mathf.Max(row.Size.y, tile.Size.y));
 
         return tile;
     }

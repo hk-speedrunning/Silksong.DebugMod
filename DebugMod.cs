@@ -476,6 +476,6 @@ public partial class DebugMod : BaseUnityPlugin
 
     public static void LogConsole(string message)
     {
-        ConsolePanel.Instance.AddLine(message);
+        ConsolePanel.Log(message);
     }
 }

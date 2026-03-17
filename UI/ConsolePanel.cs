@@ -11,6 +11,7 @@ public class ConsolePanel : CanvasPanel
 
     public static ConsolePanel Instance { get; private set; }
     private static readonly List<string> history = [];
+    private static readonly List<string> messageQueue = [];
 
     private readonly List<CanvasText> lines = [];
 
@@ -18,6 +19,18 @@ public class ConsolePanel : CanvasPanel
     {
         Instance = new ConsolePanel();
         Instance.Build();
+    }
+
+    public static void Log(string message)
+    {
+        if (Instance != null)
+        {
+            Instance.AddLine(message);
+        }
+        else
+        {
+            messageQueue.Add(message);
+        }
     }
 
     public ConsolePanel() : base(nameof(ConsolePanel))
@@ -39,6 +52,13 @@ public class ConsolePanel : CanvasPanel
             line.Size = new Vector2(Size.x - UICommon.Margin * 2, lineHeight);
             lines.Add(line);
         }
+
+        foreach (string message in messageQueue)
+        {
+            AddLine(message);
+        }
+
+        messageQueue.Clear();
     }
 
     private void UpdateText()
