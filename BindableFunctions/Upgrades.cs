@@ -50,21 +50,6 @@ public static partial class BindableFunctions
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
     }
 
-    [BindableMethod(name = "Increment Tool Pouch", category = "Upgrades")]
-    public static void IncrementPouches()
-    {
-        if (PlayerData.instance.ToolPouchUpgrades < 4)
-        {
-            PlayerData.instance.ToolPouchUpgrades++;
-            DebugMod.LogConsole($"Increasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
-        }
-        else
-        {
-            PlayerData.instance.ToolPouchUpgrades = 0;
-            DebugMod.LogConsole("Resetting tool pouch level");
-        }
-    }
-
     [BindableMethod(name = "Increment Crafting Kit", category = "Upgrades")]
     public static void IncrementKits()
     {
@@ -75,8 +60,49 @@ public static partial class BindableFunctions
         }
         else
         {
-            PlayerData.instance.ToolKitUpgrades = 0;
-            DebugMod.LogConsole("Resetting crafting kit level");
+            DebugMod.LogConsole("Crafting kit already at max level");
+        }
+    }
+
+    [BindableMethod(name = "Decrement Crafting Kit", category = "Upgrades")]
+    public static void DecrementKits()
+    {
+        if (PlayerData.instance.ToolKitUpgrades > 0)
+        {
+            PlayerData.instance.ToolKitUpgrades--;
+            DebugMod.LogConsole($"Decreasing crafting kit level (now {PlayerData.instance.ToolKitUpgrades})");
+        }
+        else
+        {
+            DebugMod.LogConsole("Crafting kit already at base level");
+        }
+    }
+
+    [BindableMethod(name = "Increment Tool Pouch", category = "Upgrades")]
+    public static void IncrementPouches()
+    {
+        if (PlayerData.instance.ToolPouchUpgrades < 4)
+        {
+            PlayerData.instance.ToolPouchUpgrades++;
+            DebugMod.LogConsole($"Increasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
+        }
+        else
+        {
+            DebugMod.LogConsole("Tool pouch already at max level");
+        }
+    }
+
+    [BindableMethod(name = "Decrement Tool Pouch", category = "Upgrades")]
+    public static void DecrementPouches()
+    {
+        if (PlayerData.instance.ToolPouchUpgrades > 0)
+        {
+            PlayerData.instance.ToolPouchUpgrades--;
+            DebugMod.LogConsole($"Decreasing tool pouch level (now {PlayerData.instance.ToolPouchUpgrades})");
+        }
+        else
+        {
+            DebugMod.LogConsole("Tool pouch already at base level");
         }
     }
 
@@ -86,7 +112,7 @@ public static partial class BindableFunctions
         PlayerData.instance.silkRegenMax++;
         DebugMod.LogConsole($"Incremented Silk Hearts (now {PlayerData.instance.silkRegenMax})");
     }
-    
+
     [BindableMethod(name = "Decrement Silk Hearts", category = "Upgrades")]
     public static void DecrementSilkHeart()
     {

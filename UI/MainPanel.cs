@@ -177,14 +177,12 @@ public class MainPanel : CanvasPanel
         AppendSectionHeader("Skills");
         AppendRow(1);
         AppendBasicControl("All Skills", BindableFunctions.GiveAllSkills);
-
         AppendTileRow(5);
         AppendLabeledTile("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep, "Skill_SwiftStep");
         AppendLabeledTile("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip, "Skill_ClingGrip");
         AppendLabeledTile("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin, "Skill_Needolin");
         AppendLabeledTile("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline, "Skill_Clawline");
         AppendLabeledTile("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar, "Skill_SilkSoar");
-
         AppendTileRow(5);
         AppendLabeledTile("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak, "Skill_DriftersCloak");
         AppendLabeledTile("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak, "Skill_FaydownCloak");
@@ -193,37 +191,63 @@ public class MainPanel : CanvasPanel
         AppendLabeledTile("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep, "Skill_Elegy");
 
         AppendSectionHeader("Upgrades");
-
         AppendTileRow(2);
         AppendIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage, "Inv_Needle");
         AppendIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart, BindableFunctions.DecrementSilkHeart, "Inv_SilkHeart");
-
-        // TODO: decrements!
         AppendTileRow(2);
-        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.IncrementKits, "Inv_CraftingKit");
-        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.IncrementPouches, "Inv_ToolPouch");
-
-        AppendTileRow(3);
-        AppendIncrementTile("Meme", () => 0, () => { }, () => { });
-        AppendIncrementTile("Meme1", () => 0, () => { }, () => { });
-        AppendIncrementTile("Meme2", () => 0, () => { }, () => { });
+        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.DecrementKits, "Inv_CraftingKit");
+        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.DecrementPouches, "Inv_ToolPouch");
 
         AppendSectionHeader("Tools");
         AppendRow(1, 1);
         AppendBasicControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
-        AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
-        AppendRow(1);
         AppendBasicControl("Craft Tools", BindableFunctions.CraftTools);
+
+        foreach (ToolItem tool in ToolItemManager.GetAllTools())
+        {
+            CanvasPanel tile = AppendLabeledTile(
+                tool.name,
+                () => tool.IsUnlockedNotHidden,
+                () =>
+                {
+                    if (tool.IsUnlockedNotHidden)
+                    {
+                        tool.Lock();
+                    }
+                    else
+                    {
+                        tool.Unlock(null, ToolItem.PopupFlags.None);
+                    }
+                }
+            );
+
+            tile.Get<CanvasText>("Label").Text = tool.GetPopupName();
+            tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
+        }
+
+        AppendSectionHeader("Crests");
+        AppendRow(1);
+        AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
 
         AppendSectionHeader("Consumables");
         AppendRow(1, 1);
         AppendBasicControl("Give Rosaries", BindableFunctions.GiveRosaries);
         AppendBasicControl("Give Shell Shards", BindableFunctions.GiveShellShards);
-        AppendRow(1, 1);
-        AppendBasicControl("Give All Memory Lockets", BindableFunctions.GiveMemoryLockets);
-        AppendBasicControl("Give All Craftmetal", BindableFunctions.GiveCraftmetal);
-        AppendRow(1);
-        AppendBasicControl("Give Silkeater", BindableFunctions.GiveSilkeater);
+
+        /*
+        // Probably useful
+        static void SetCollectable(string name, int amount)
+        {
+            if (CollectableItemManager.IsInHiddenMode())
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.AmountWhileHidden = amount);
+            }
+            else
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.Amount = amount);
+            }
+        }
+        */
 
         AppendSectionHeader("Masks and Spools");
         AppendRow(1, 1);
@@ -352,6 +376,14 @@ public class MainPanel : CanvasPanel
         rowIndex = 0;
     }
 
+    private void ResetRow()
+    {
+        currentRow = null;
+        rowPositions = null;
+        rowWidths = null;
+        rowIndex = 0;
+    }
+
     private CanvasPanel AppendRow(params int[] widths)
     {
         CanvasPanel row = currentTab.AppendFixed(new CanvasPanel(rowCounter.ToString()), UICommon.ControlHeight);
@@ -382,6 +414,8 @@ public class MainPanel : CanvasPanel
         text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
 
+        ResetRow();
+
         return text;
     }
 
@@ -394,10 +428,7 @@ public class MainPanel : CanvasPanel
         rowIndex++;
         if (rowIndex == rowPositions.Length)
         {
-            currentRow = null;
-            rowPositions = null;
-            rowWidths = null;
-            rowIndex = 0;
+            ResetRow();
         }
 
         return panel;
@@ -464,7 +495,7 @@ public class MainPanel : CanvasPanel
 
     private CanvasPanel AppendLabeledTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true)
     {
-        CanvasPanel row = currentRow ?? AppendTileRow(1);
+        CanvasPanel row = currentRow ?? AppendTileRow(5);
 
         CanvasPanel tile = AppendRowElement(name);
         tile.CollapseMode = CollapseMode.Deny;
@@ -474,7 +505,8 @@ public class MainPanel : CanvasPanel
         button.OnClicked += effect;
 
         PanelBuilder builder = new(tile);
-        builder.Padding = UICommon.Margin;
+        // Adding the divide by 2 magically makes the text line up properly
+        builder.Padding = UICommon.Margin / 2f;
         builder.DynamicLength = true;
 
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
@@ -497,7 +529,7 @@ public class MainPanel : CanvasPanel
 
     private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
     {
-        CanvasPanel row = currentRow ?? AppendTileRow(1);
+        CanvasPanel row = currentRow ?? AppendTileRow(2);
 
         // Image gets 1/3 of the tile and determines the tile height
         int imageWidth = rowWidths[0] / 3;

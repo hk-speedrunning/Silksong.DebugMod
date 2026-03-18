@@ -8,6 +8,7 @@ public class CanvasImage : CanvasObject
 {
     private Texture2D tex;
     private Rect subSprite;
+    private Sprite sprite;
     private CanvasBorder border;
 
     public CanvasBorder Border => border;
@@ -26,6 +27,21 @@ public class CanvasImage : CanvasObject
 
         this.tex = tex;
         this.subSprite = subSprite;
+        sprite = null;
+
+        if (gameObject)
+        {
+            UpdateSprite();
+        }
+    }
+
+    public void SetImage(Sprite sprite)
+    {
+        if (this.sprite == sprite) return;
+
+        this.sprite = sprite;
+        tex = null;
+        subSprite = sprite.rect;
 
         if (gameObject)
         {
@@ -80,7 +96,8 @@ public class CanvasImage : CanvasObject
     private void UpdateSprite()
     {
         Image image = gameObject.GetComponent<Image>();
-        image.sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
+
+        image.sprite = sprite ? sprite : Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height - subSprite.y, subSprite.width, subSprite.height), Vector2.zero);
         image.color = UICommon.iconColor;
     }
 
