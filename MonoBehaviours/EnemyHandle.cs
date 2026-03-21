@@ -1,11 +1,17 @@
-﻿using DebugMod.UI;
+﻿using DebugMod.Helpers;
+using DebugMod.UI;
 using DebugMod.UI.Canvas;
+using GenericVariableExtension;
 using HarmonyLib;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using System;
 using System.Linq;
 using UnityEngine;
+using Bounds = UnityEngine.Bounds;
 
 namespace DebugMod.MonoBehaviours;
+#nullable enable
 
 [HarmonyPatch]
 public class EnemyHandle : MonoBehaviour
@@ -14,11 +20,13 @@ public class EnemyHandle : MonoBehaviour
     private const int HPBAR_HEIGHT = 40;
 
     private HealthManager hm;
-    private tk2dSprite sprite;
+    private tk2dSprite? sprite;
     private BoxCollider2D collider;
-    private CanvasPanel hpBar;
-    private Texture2D barTexture;
+    private CanvasPanel? hpBar;
+    private Texture2D? barTexture;
     private int maxHP;
+
+    private PlayMakerFSM? staggerFsm;
 
     public int HP
     {
@@ -34,6 +42,8 @@ public class EnemyHandle : MonoBehaviour
         hm = GetComponent<HealthManager>();
         sprite = GetComponent<tk2dSprite>();
         collider = GetComponent<BoxCollider2D>();
+        
+        staggerFsm = gameObject.GetTemplatedFsm("stun_control");
 
         if (!EnemiesPanel.enemyPool.Contains(this))
         {
@@ -58,7 +68,7 @@ public class EnemyHandle : MonoBehaviour
             return;
         }
 
-        if (maxHP <= 0 && hm.hp > 0)
+        if (maxHP < hm.hp && hm.hp > 0)
         {
             maxHP = hm.hp;
         }
@@ -86,6 +96,15 @@ public class EnemyHandle : MonoBehaviour
                 text.FontSize = 20;
                 text.Alignment = TextAnchor.MiddleCenter;
 
+                if (staggerFsm != null)
+                {
+                    CanvasText staggerText = hpBar.Add(new CanvasText("Combo"));
+                    staggerText.Text = GetStaggerText();
+                    staggerText.FontSize = 18;
+                    staggerText.Size = hpBar.Size; // same size as hpbar, but above
+                    staggerText.Alignment = TextAnchor.LowerRight;
+                }
+
                 hpBar.Build();
 
                 // Move HP bar behind UI
@@ -103,7 +122,7 @@ public class EnemyHandle : MonoBehaviour
             Bounds bounds = sprite?.GetBounds() ?? collider?.bounds ?? new(transform.position, new Vector3(1, 1, 0));
             barPos.y += (bounds.max.y - bounds.min.y) / 2f;
 
-            barPos = Camera.main.WorldToScreenPoint(barPos);
+            if (Camera.main) barPos = Camera.main.WorldToScreenPoint(barPos);
             barPos.x -= HPBAR_WIDTH / 2f;
             barPos.y = Screen.height - barPos.y - hpBar.Size.y;
 
@@ -111,11 +130,45 @@ public class EnemyHandle : MonoBehaviour
             hpBar.Get<CanvasImage>("Background").Size = new Vector2(HPBAR_WIDTH * Mathf.Clamp01(HP / (float)MaxHP), HPBAR_HEIGHT);
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
+            if (staggerFsm != null)
+            {
+                hpBar.Get<CanvasText>("Combo").LocalPosition = new Vector2(0, -HPBAR_HEIGHT);
+                hpBar.Get<CanvasText>("Combo").Text = GetStaggerText();
+            }
         }
 
         hpBar?.ActiveSelf = EnemiesPanel.hpBars;
     }
 
+    private string GetStaggerText()
+    {
+        if (staggerFsm == null) return "Stun disabled"; // shouldn't be called
+        
+        FsmInt max = staggerFsm.FsmVariables.GetFsmInt("Stun Hit Max");
+        FsmFloat hits = staggerFsm.FsmVariables.GetFsmFloat("Hits Total");
+
+        FsmState inComboState = staggerFsm.GetState("In Combo")!;
+        FsmStateAction? comboCheckAction = inComboState.Actions[3];
+
+        if (!comboCheckAction.Active)
+        {
+            return $"{hits.Value:0.##}/{max.Value + 0.1f}";
+        }
+        
+        // Unsure if this is even used here, but it might make sense for the eventual HK port _shrug_
+        // prefixes combos as such: t.t (h.h/m)
+
+        FsmInt comboMax = staggerFsm.FsmVariables.GetFsmInt("Stun Combo");
+        FsmFloat comboHits = staggerFsm.FsmVariables.GetFsmFloat("Combo Counter");
+        FsmFloat comboTime = staggerFsm.FsmVariables.GetFsmFloat("Combo Time");
+        
+        string comboCount = staggerFsm.ActiveStateName == "In Combo" ? comboHits.Value.ToString() : "_";
+        
+        Wait waitAction = inComboState.GetFirstActionOrDefault<Wait>()!;
+        float time = comboTime.Value - waitAction.timer;
+        return $"{time:.0} ({comboCount}/{comboMax.Value}) {hits?.Value:0.##}/{max?.Value + 0.1f}";
+    }
+    
     [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Start))]
     [HarmonyPostfix]
     private static void HealthManager_Start(HealthManager __instance)

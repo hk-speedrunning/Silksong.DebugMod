@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using HutongGames.PlayMaker;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -37,5 +38,27 @@ internal static class Utils
         }
 
         return go;
+    }
+#nullable enable
+    
+    
+    internal static FsmState? GetState(this PlayMakerFSM fsm, string name)
+    {
+        return fsm.FsmStates.FirstOrDefault(state => state.Name == name);
+    }
+
+    internal static PlayMakerFSM? GetTemplatedFsm(this GameObject go, string name)
+    {
+        return go.GetComponents<PlayMakerFSM>()?.FirstOrDefault(fsm => fsm.FsmTemplate && fsm.FsmTemplate.name == name);
+    }
+
+    internal static PlayMakerFSM? GetNamedFsm(this GameObject go, string name)
+    {
+        return go.GetComponents<PlayMakerFSM>()?.FirstOrDefault(fsm => fsm.FsmTemplate && fsm.FsmTemplate.name == name);
+    }
+
+    internal static T? GetFirstActionOrDefault<T>(this FsmState state) where T : FsmStateAction
+    {
+        return state.Actions.FirstOrDefault(act => act is T) as T;
     }
 }
