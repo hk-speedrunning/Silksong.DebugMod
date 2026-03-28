@@ -49,5 +49,31 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Giving player a silkeater");
     }
 
+    private static readonly string[] _internalKeys = [
+        "Architect Key",
+        "Belltown House Key",
+        "Dock Key",
+        "Ward Key",
+        "Ward Boss Key",
+        "Slab Key"
+        ];
+
+    [BindableMethod(name = "Give All Keys", category = "Consumables")]
+    public static void GiveAllKeys()
+    {
+        foreach (string key in _internalKeys)
+        {
+            SetCollectable(key, 1);
+        }
+        SetCollectable("Simple Key", 4);
+
+        PlayerData.instance.HasSlabKeyA = true;
+        PlayerData.instance.HasSlabKeyB = true;
+        PlayerData.instance.HasSlabKeyC = true;
+        
+        DebugMod.LogConsole("Giving player all keys");
+    }
+
+
     // TODO: add bind to give all items needed for the active quest(s)
 }
