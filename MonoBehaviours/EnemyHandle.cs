@@ -152,7 +152,7 @@ public class EnemyHandle : MonoBehaviour
 
         if (!comboCheckAction.Active)
         {
-            return $"{hits.Value:0.##}/{max.Value + 0.1f}";
+            return $"{GetStunControlPrefix()} {hits.Value:0.##}/{max.Value + 0.1f}";
         }
         
         // Unsure if this is even used here, but it might make sense for the eventual HK port _shrug_
@@ -166,7 +166,14 @@ public class EnemyHandle : MonoBehaviour
         
         Wait waitAction = inComboState.GetFirstActionOrDefault<Wait>()!;
         float time = comboTime.Value - waitAction.timer;
-        return $"{time:.0} ({comboCount}/{comboMax.Value}) {hits?.Value:0.##}/{max?.Value + 0.1f}";
+        return $"{GetStunControlPrefix()} {time:.0} ({comboCount}/{comboMax.Value}) {hits?.Value:0.##}/{max?.Value + 0.1f}";
+    }
+
+    private string GetStunControlPrefix()
+    {
+        if (staggerFsm == null) return ""; // shouldn't be called
+        
+        return staggerFsm.ActiveStateName == "Stop" ? "NoStun" : "";
     }
     
     [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Start))]
