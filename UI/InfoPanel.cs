@@ -1,3 +1,4 @@
+using DebugMod.Helpers;
 using DebugMod.UI.Canvas;
 using GlobalEnums;
 using GlobalSettings;
@@ -161,6 +162,30 @@ public class InfoPanel : CanvasPanel
             rightLabelColumn.Size = new Vector2(labelWidth + lineGap + UICommon.BORDER_THICKNESS, y);
             rightLabelColumn.Thickness = UICommon.BORDER_THICKNESS;
             rightLabelColumn.Color = UICommon.iconColor;
+        }
+
+
+        if (Profiler.ENABLED)
+        {
+            // Column 3 start (usually empty)
+            x += labelWidth + infoWidth;
+            y = ContentMargin();
+
+            CanvasText profilerText = Add(new CanvasText("ProfilerInfo"));
+            profilerText.LocalPosition = new Vector2(x, y);
+            profilerText.Size = new Vector2(labelWidth + infoWidth, Size.y);
+            profilerText.OnUpdate += () =>
+            {
+                string info = "Profiler\n";
+
+                Dictionary<string, float> times = Profiler.GetTimes();
+                foreach (KeyValuePair<string, float> pair in times)
+                {
+                    info += $"{pair.Key} {pair.Value * 1000f:F2}ms\n";
+                }
+
+                profilerText.Text = info;
+            };
         }
 
         // Move panel up so injected info doesn't overflow into console

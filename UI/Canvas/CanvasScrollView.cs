@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DebugMod.Helpers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DebugMod.UI.Canvas;
@@ -56,9 +57,11 @@ public class CanvasScrollView : CanvasNode
 
         if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && IsMouseOver())
         {
+            Profiler.Begin("MouseScroll");
             float y = content.LocalPosition.y + Input.mouseScrollDelta.y * ScrollSpeed;
             y = Mathf.Clamp(y, Mathf.Min(-GetScrollableHeight(), 0f), 0f);
             content.LocalPosition = new Vector2(content.LocalPosition.x, Mathf.Round(y));
+            Profiler.End("MouseScroll");
         }
     }
 

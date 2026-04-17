@@ -1,3 +1,4 @@
+using DebugMod.Helpers;
 using DebugMod.Hitbox;
 using DebugMod.SaveStates;
 using DebugMod.UI;
@@ -115,6 +116,9 @@ public class GUIController : MonoBehaviour
     public void Update()
     {
         if (DebugMod.GM == null) return;
+
+        Profiler.NewFrame();
+        Profiler.Begin("Update");
 
         if (!resolution.IsEmpty && (resolution.Width != Screen.width || resolution.Height != Screen.height))
         {
@@ -276,6 +280,8 @@ public class GUIController : MonoBehaviour
                 hitboxes.Unload();
             }
         }
+
+        Profiler.End("Update");
     }
 
     private void HandleKeybinds()
@@ -354,6 +360,8 @@ public class GUIController : MonoBehaviour
                 }
             }
         }
+
+        Profiler.End("Update");
     }
 
     [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.SetCursorVisible))]
