@@ -165,7 +165,7 @@ public class InfoPanel : CanvasPanel
         }
 
 
-        if (Profiler.ENABLED)
+        if (Profiler.enabled)
         {
             // Column 3 start (usually empty)
             x += labelWidth + infoWidth;

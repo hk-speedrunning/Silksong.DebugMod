@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasImage : CanvasObject
+public class CanvasImage : CanvasNode
 {
     private Texture2D tex;
     private Rect subSprite;
@@ -66,13 +66,6 @@ public class CanvasImage : CanvasObject
         if (border != null) yield return border;
     }
 
-    protected override void OnUpdatePosition()
-    {
-        base.OnUpdatePosition();
-
-        UpdateScale();
-    }
-
     public override void Build()
     {
         if (IsBackground && Parent != null)
@@ -84,13 +77,12 @@ public class CanvasImage : CanvasObject
 
         if (IsBackground && !Interactable)
         {
-            gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
+            // gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
         }
 
         gameObject.AddComponent<Image>();
         UpdateSprite();
-
-        UpdateScale();
+        UpdateSizeDelta();
     }
 
     private void UpdateSprite()
@@ -101,13 +93,10 @@ public class CanvasImage : CanvasObject
         image.color = UICommon.iconColor;
     }
 
-    private void UpdateScale()
+    protected override void UpdateSizeDelta()
     {
-        if (transform)
-        {
-            transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-            transform.SetScaleX(Size.x / subSprite.width);
-            transform.SetScaleY(Size.y / subSprite.height);
-        }
+        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
+        transform.SetScaleX(Size.x / subSprite.width);
+        transform.SetScaleY(Size.y / subSprite.height);
     }
 }

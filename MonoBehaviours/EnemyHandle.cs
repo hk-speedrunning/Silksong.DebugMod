@@ -91,10 +91,7 @@ public class EnemyHandle : MonoBehaviour
                 // Move HP bar behind UI
                 foreach (CanvasNode node in hpBar.Subtree().Reverse())
                 {
-                    if (node is CanvasObject obj)
-                    {
-                        obj.GameObject.transform.SetAsFirstSibling();
-                    }
+                    node.GameObject.transform.SetAsFirstSibling();
                 }
             }
 

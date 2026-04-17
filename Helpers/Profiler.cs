@@ -5,8 +5,8 @@ namespace DebugMod.Helpers;
 
 public static class Profiler
 {
-    public const bool ENABLED = true;
     private const int INTERVAL = 20;
+    public static readonly bool enabled = true;
 
     private static readonly Dictionary<string, float> startTimes = [];
     private static readonly Dictionary<string, float> elapsedTimes = [];
@@ -15,7 +15,7 @@ public static class Profiler
 
     public static void NewFrame()
     {
-        if (!ENABLED) return;
+        if (!enabled) return;
 
         lastTimes.Add(new(elapsedTimes));
         startTimes.Clear();
@@ -48,13 +48,13 @@ public static class Profiler
 
     public static void Begin(string name)
     {
-        if (!ENABLED) return;
-        startTimes.Add(name, Time.realtimeSinceStartup);
+        if (!enabled) return;
+        startTimes[name] = Time.realtimeSinceStartup;
     }
 
     public static void End(string name)
     {
-        if (!ENABLED) return;
+        if (!enabled) return;
         float elapsed = Time.realtimeSinceStartup - startTimes[name];
         elapsedTimes.TryAdd(name, 0);
         elapsedTimes[name] += elapsed;

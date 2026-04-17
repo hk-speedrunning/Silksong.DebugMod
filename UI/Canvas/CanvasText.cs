@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasText : CanvasObject
+public class CanvasText : CanvasNode
 {
     protected Text t;
 
@@ -81,9 +81,9 @@ public class CanvasText : CanvasObject
         this.overflow = overflow;
     }
 
-    protected override void OnUpdatePosition()
+    protected override void OnUpdateLocalPosition()
     {
-        base.OnUpdatePosition();
+        base.OnUpdateLocalPosition();
 
         if (GameObject)
         {
@@ -91,22 +91,11 @@ public class CanvasText : CanvasObject
         }
     }
 
-    // Absolute position needs to be integers or the text looks blurry
+    // Relative position needs to be integers or the text looks blurry
     private void RoundPosition()
     {
-        Vector2 pos = transform.anchorMin;
-
-        // No idea why this check is required but it is
-        // (tested by dragging the scrollbar very slowly and watching
-        // the spacing between the text and nearby borders)
-        float x = (int)Size.x % 2 == 0
-            ? Mathf.RoundToMultipleOf(pos.x, 1f / Screen.width)
-            : (int)(pos.x * Screen.width) / (float)Screen.width;
-        float y = (int)Size.y % 2 == 0
-            ? Mathf.RoundToMultipleOf(pos.y, 1f / Screen.height)
-            : (int)(pos.y * Screen.height) / (float)Screen.height;
-
-        transform.anchorMin = transform.anchorMax = new(x, y);
+        Vector2 pos = transform.anchoredPosition;
+        transform.anchoredPosition = new(Mathf.Round(pos.x), Mathf.Round(pos.y));
     }
 
     public override void Build()

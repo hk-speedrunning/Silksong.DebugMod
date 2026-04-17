@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using Object = UnityEngine.Object;
 
 namespace DebugMod.UI.Canvas;
 
@@ -27,6 +29,10 @@ public abstract class CanvasNode
     private event Action onUpdate;
     private bool updateHooked;
 
+    protected GameObject gameObject;
+    protected RectTransform transform;
+    protected EventTrigger eventTrigger;
+
     public string Name { get; set; }
 
     public CanvasNode Parent
@@ -48,6 +54,7 @@ public abstract class CanvasNode
                 }
 
                 OnUpdatePosition();
+                OnUpdateSize();
                 OnUpdateActive();
                 OnUpdateParent();
             }
@@ -62,7 +69,7 @@ public abstract class CanvasNode
             if (localPosition != value)
             {
                 localPosition = value;
-                OnUpdatePosition();
+                OnUpdateLocalPosition();
             }
         }
     }
@@ -77,7 +84,7 @@ public abstract class CanvasNode
             if (size != value)
             {
                 size = value;
-                OnUpdatePosition();
+                OnUpdateSize();
             }
         }
     }
@@ -96,6 +103,10 @@ public abstract class CanvasNode
     }
 
     public bool ActiveInHierarchy => ActiveSelf && (Parent?.ActiveInHierarchy ?? true);
+
+    public GameObject GameObject => gameObject;
+
+    protected virtual bool Interactable => false;
 
     public event Action OnUpdate
     {
@@ -135,6 +146,16 @@ public abstract class CanvasNode
         }
     }
 
+    protected virtual void OnUpdateLocalPosition()
+    {
+        if (gameObject)
+        {
+            UpdateAnchoredPosition();
+        }
+
+        OnUpdatePosition();
+    }
+
     protected virtual void OnUpdatePosition()
     {
         foreach (CanvasNode child in ChildList())
@@ -143,8 +164,22 @@ public abstract class CanvasNode
         }
     }
 
+    protected virtual void OnUpdateSize()
+    {
+        if (gameObject)
+        {
+            UpdateAnchoredPosition();
+            UpdateSizeDelta();
+        }
+    }
+
     protected virtual void OnUpdateActive()
     {
+        if (gameObject)
+        {
+            gameObject.SetActive(ActiveSelf);
+        }
+
         CheckUpdateHook();
         foreach (CanvasNode child in ChildList())
         {
@@ -154,17 +189,77 @@ public abstract class CanvasNode
 
     protected virtual void OnUpdateParent()
     {
+        if (gameObject)
+        {
+            gameObject.transform.SetParent(GetParentTransform());
+            UpdateClipRect();
+        }
+
         foreach (CanvasNode child in ChildList())
         {
-            child.OnUpdateParent();
+            child.OnUpdatePosition();
         }
     }
 
     public virtual void Build()
     {
+        gameObject = new GameObject(Name);
+        gameObject.transform.SetParent(GetParentTransform());
+
+        gameObject.AddComponent<CanvasRenderer>();
+        transform = gameObject.AddComponent<RectTransform>();
+
+        transform.anchorMin = transform.anchorMax = new Vector2(0f, 1f);
+        transform.pivot = new Vector2(0f, 1f);
+
+        if (!Interactable)
+        {
+            // CanvasGroup group = gameObject.AddComponent<CanvasGroup>();
+            // group.interactable = false;
+            // group.blocksRaycasts = false;
+        }
+
+        gameObject.SetActive(ActiveSelf);
+
+        UpdateAnchoredPosition();
+        UpdateSizeDelta();
+        UpdateClipRect();
+
         foreach (CanvasNode child in ChildList())
         {
             child.Build();
+        }
+    }
+
+    private Transform GetParentTransform()
+    {
+        if (Parent != null)
+        {
+            return Parent.GameObject.transform;
+        }
+        else
+        {
+            return GUIController.Instance.canvas.transform;
+        }
+    }
+
+    private void UpdateAnchoredPosition()
+    {
+        transform.anchoredPosition = new Vector2(LocalPosition.x, -LocalPosition.y);
+    }
+
+    protected virtual void UpdateSizeDelta()
+    {
+        transform.sizeDelta = Size;
+    }
+
+    private void UpdateClipRect()
+    {
+        CanvasRenderer renderer = gameObject.GetComponent<CanvasRenderer>();
+        renderer.DisableRectClipping();
+        if (ShouldClip(out Rect clipRect))
+        {
+            renderer.EnableRectClipping(clipRect);
         }
     }
 
@@ -200,6 +295,11 @@ public abstract class CanvasNode
         foreach (CanvasNode element in ChildList())
         {
             element.Destroy();
+        }
+
+        if (gameObject)
+        {
+            Object.Destroy(gameObject);
         }
 
         if (Parent == null)
@@ -258,6 +358,28 @@ public abstract class CanvasNode
         if (yMin > yMax) (yMin, yMax) = (yMax, yMin);
         return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
     }
+
+    public void AddEventTrigger<T>(EventTriggerType type, Action<T> callback) where T : BaseEventData
+    {
+        if (!gameObject)
+        {
+            DebugMod.LogError("Cannot add event triggers before building");
+            return;
+        }
+
+        if (eventTrigger == null)
+        {
+            eventTrigger = gameObject.AddComponent<EventTrigger>();
+        }
+
+        EventTrigger.Entry entry = new();
+        entry.eventID = type;
+        entry.callback.AddListener(data => callback((T)data));
+        eventTrigger.triggers.Add(entry);
+    }
+
+    public void AddEventTrigger(EventTriggerType type, Action<PointerEventData> callback)
+        => AddEventTrigger<PointerEventData>(type, callback);
 
     internal string GetQualifiedName() => $"{Parent?.GetQualifiedName()}:{Name}";
 }

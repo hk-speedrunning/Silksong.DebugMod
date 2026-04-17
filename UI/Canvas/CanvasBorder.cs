@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasBorder : CanvasObject
+public class CanvasBorder : CanvasNode
 {
     private static readonly Dictionary<Args, Sprite> spriteCache = new();
 
@@ -52,9 +52,9 @@ public class CanvasBorder : CanvasObject
 
     public CanvasBorder(string name) : base(name) { }
 
-    protected override void OnUpdatePosition()
+    protected override void OnUpdateSize()
     {
-        base.OnUpdatePosition();
+        base.OnUpdateSize();
 
         if (args.size != Size)
         {

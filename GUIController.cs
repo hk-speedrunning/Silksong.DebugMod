@@ -91,6 +91,11 @@ public class GUIController : MonoBehaviour
             canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.AddComponent<GraphicRaycaster>();
 
+            RectTransform rt = canvas.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = Vector2.zero;
+            rt.pivot = Vector2.zero;
+            rt.sizeDelta = new Vector2(Screen.width, Screen.height);
+
             DontDestroyOnLoad(canvas);
 
             MainPanel.BuildPanel();
@@ -152,9 +157,18 @@ public class GUIController : MonoBehaviour
         }
 
         GameObject selected = EventSystem.current.currentSelectedGameObject;
-        if (selected && selected.transform.parent.gameObject == canvas && !selected.GetComponent<InputField>())
+        if (!selected.GetComponent<InputField>())
         {
-            EventSystem.current.SetSelectedGameObject(null);
+            Transform t = selected.transform;
+            while (t)
+            {
+                if (t.gameObject == canvas)
+                {
+                    EventSystem.current.SetSelectedGameObject(null);
+                    break;
+                }
+                t = t.parent;
+            }
         }
 
         if (DebugMod.GetSceneName() == "Menu_Title") return;

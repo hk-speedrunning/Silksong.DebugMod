@@ -80,14 +80,14 @@ public class CanvasButton : CanvasImage
         if (text != null) yield return text;
     }
 
-    protected override void OnUpdatePosition()
+    protected override void OnUpdateSize()
     {
         if (text != null)
         {
             text.Size = Size;
         }
 
-        base.OnUpdatePosition();
+        base.OnUpdateSize();
     }
 
     protected override void OnUpdateActive()
