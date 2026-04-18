@@ -197,6 +197,9 @@ public class MainPanel : CanvasPanel
         AppendTileRow(2);
         AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.DecrementKits, "Inv_CraftingKit");
         AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.DecrementPouches, "Inv_ToolPouch");
+        AppendRow(1, 1);
+        AppendBasicControl("All Maps", BindableFunctions.UnlockAllMaps);
+        AppendBasicControl("All Fast Travel", BindableFunctions.UnlockAllFastTravel);
 
         AppendSectionHeader("Tools");
         AppendRow(1, 1);

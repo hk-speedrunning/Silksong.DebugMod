@@ -126,4 +126,83 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("Can't decrement below 0 Silk Hearts!");
         }
     }
+
+    [BindableMethod(name = "Unlock All Maps", category = "Upgrades")]
+    public static void UnlockAllMaps()
+    {
+        PlayerData.instance.HasAbyssMap = true;
+        PlayerData.instance.HasAqueductMap = true;
+        PlayerData.instance.HasArboriumMap = true;
+        PlayerData.instance.HasBellhartMap = true;
+        PlayerData.instance.HasBoneforestMap = true;
+        PlayerData.instance.HasCitadelUnderstoreMap = true;
+        PlayerData.instance.HasCloverMap = true;
+        PlayerData.instance.HasCogMap = true;
+        PlayerData.instance.HasCoralMap = true;
+        PlayerData.instance.HasCradleMap = true;
+        PlayerData.instance.HasCrawlMap = true;
+        PlayerData.instance.HasDocksMap = true;
+        PlayerData.instance.HasDustpensMap = true;
+        PlayerData.instance.HasGreymoorMap = true;
+        PlayerData.instance.HasHallsMap = true;
+        PlayerData.instance.HasHangMap = true;
+        PlayerData.instance.HasHuntersNestMap = true;
+        PlayerData.instance.HasJudgeStepsMap = true;
+        PlayerData.instance.HasLibraryMap = true;
+        PlayerData.instance.HasMossGrottoMap = true;
+        PlayerData.instance.HasPeakMap = true;
+        PlayerData.instance.HasShellwoodMap = true;
+        PlayerData.instance.HasSlabMap = true;
+        PlayerData.instance.HasSongGateMap = true;
+        PlayerData.instance.HasSwampMap = true;
+        PlayerData.instance.HasWardMap = true;
+        PlayerData.instance.HasWeavehomeMap = true;
+        PlayerData.instance.HasWildsMap = true;
+
+        PlayerData.instance.hasQuill = true;
+
+        foreach (GameMap.ZoneInfo zone in GameManager.instance.gameMap.mapZoneInfo)
+        {
+            foreach (GameMap.ParentInfo parent in zone.Parents)
+            {
+                foreach (GameMap.ZoneInfo.MapCache cache in parent.Maps)
+                {
+                    string sceneName = cache.sceneName;
+                    if (!string.IsNullOrEmpty(sceneName))
+                    {
+                        PlayerData.instance.scenesVisited.Add(sceneName);
+                        PlayerData.instance.scenesMapped.Add(sceneName);
+                    }
+                }
+            }
+        }
+
+        GameManager.instance.gameMap.SetupMap();
+
+        DebugMod.LogConsole("Unlocked all maps");
+    }
+
+    [BindableMethod(name = "Unlock All Fast Travel", category = "Upgrades")]
+    public static void UnlockAllFastTravel()
+    {
+        PlayerData.instance.UnlockedAqueductStation = true;
+        PlayerData.instance.UnlockedBelltownStation = true;
+        PlayerData.instance.UnlockedBoneforestEastStation = true;
+        PlayerData.instance.UnlockedCityStation = true;
+        PlayerData.instance.UnlockedCoralTowerStation = true;
+        PlayerData.instance.UnlockedDocksStation = true;
+        PlayerData.instance.UnlockedGreymoorStation = true;
+        PlayerData.instance.UnlockedPeakStation = true;
+        PlayerData.instance.UnlockedShadowStation = true;
+        PlayerData.instance.UnlockedShellwoodStation = true;
+
+        PlayerData.instance.UnlockedArboriumTube = true;
+        PlayerData.instance.UnlockedCityBellwayTube = true;
+        PlayerData.instance.UnlockedEnclaveTube = true;
+        PlayerData.instance.UnlockedHangTube = true;
+        PlayerData.instance.UnlockedSongTube = true;
+        PlayerData.instance.UnlockedUnderTube = true;
+
+        DebugMod.LogConsole("Unlocked all fast travel");
+    }
 }
