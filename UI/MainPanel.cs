@@ -203,31 +203,209 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
         AppendBasicControl("Craft Tools", BindableFunctions.CraftTools);
 
+        Dictionary<string, List<ToolItem>> tools = [];
+
         foreach (ToolItem tool in ToolItemManager.GetAllTools())
         {
-            CanvasPanel tile = AppendLabeledTile(
-                tool.name,
-                () => tool.IsUnlockedNotHidden,
-                () =>
-                {
-                    if (tool.IsUnlockedNotHidden)
-                    {
-                        tool.Lock();
-                    }
-                    else
-                    {
-                        tool.Unlock(null, ToolItem.PopupFlags.None);
-                    }
-                }
-            );
+            string key = tool.name;
 
-            tile.Get<CanvasText>("Label").Text = tool.GetPopupName();
-            tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
+            if (key == "Curve Claws Upgraded")
+            {
+                key = "Curve Claws";
+            }
+
+            if (key == "WebShot Architect" || key == "WebShot Weaver")
+            {
+                key = "WebShot Forge";
+            }
+
+            if (key == "Mosscreep Tool 2")
+            {
+                key = "Mosscreep Tool 1";
+            }
+
+            if (key == "Dazzle Bind Upgraded")
+            {
+                key = "Dazzle Bind";
+            }
+
+            if (key == "Shell Satchel")
+            {
+                key = "Dead Mans Purse";
+            }
+
+            tools.TryAdd(key, []);
+            tools[key].Add(tool);
+        }
+
+        static void ToggleTool(ToolItem tool)
+        {
+            if (tool.IsUnlockedNotHidden)
+            {
+                tool.Lock();
+            }
+            else
+            {
+                tool.Unlock(null, ToolItem.PopupFlags.None);
+            }
+        }
+
+        foreach (KeyValuePair<string, List<ToolItem>> pair in tools)
+        {
+            if (pair.Value.Count == 1)
+            {
+                ToolItem tool = pair.Value[0];
+
+                CanvasPanel tile = AppendLabeledTile(
+                    tool.GetPopupName(),
+                    () => tool.IsUnlockedNotHidden,
+                    () => ToggleTool(tool)
+                );
+
+                tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
+            }
+            else
+            {
+                ToolItem firstTool = pair.Value[0];
+
+                CanvasPanel tile = null;
+                tile = AppendLabeledTile(
+                    firstTool.GetPopupName(),
+                    () =>
+                    {
+                        foreach (ToolItem tool in pair.Value)
+                        {
+                            if (tool.IsUnlockedNotHidden)
+                            {
+                                tile.Get<CanvasText>("Label").Text = tool.GetPopupName();
+                                tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
+                                return true;
+                            }
+                        }
+
+                        tile.Get<CanvasText>("Label").Text = firstTool.GetPopupName();
+                        tile.Get<CanvasImage>("Icon").SetImage(firstTool.GetPopupIcon());
+                        return false;
+                    },
+                    () =>
+                    {
+                        for (int i = 0; i < pair.Value.Count; i++)
+                        {
+                            ToolItem current = pair.Value[i];
+                            if (current.IsUnlockedNotHidden)
+                            {
+                                ToggleTool(current);
+                                if (i < pair.Value.Count - 1)
+                                {
+                                    ToggleTool(pair.Value[i + 1]);
+                                }
+                                return;
+                            }
+                        }
+
+                        ToggleTool(firstTool);
+                    }
+                );
+            }
         }
 
         AppendSectionHeader("Crests");
         AppendRow(1);
         AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
+
+        static void ToggleCrest(ToolCrest crest)
+        {
+            if (crest.IsUnlocked)
+            {
+                ToolCrestsData.Data data = crest.SaveData;
+                data.IsUnlocked = false;
+                crest.SaveData = data;
+            }
+            else
+            {
+                crest.Unlock();
+            }
+        }
+
+        List<string> hunterTiers = ["Hunter", "Hunter_v2", "Hunter_v3"];
+        ToolCrest hunterCrest = ToolItemManager.GetCrestByName(hunterTiers[0]);
+
+        CanvasPanel hunterTile = null;
+        hunterTile = AppendLabeledTile(
+            hunterCrest.DisplayName,
+            () =>
+            {
+                for (int i = hunterTiers.Count - 1; i >= 0; i--)
+                {
+                    ToolCrest crest = ToolItemManager.GetCrestByName(hunterTiers[i]);
+                    if (crest.IsUnlocked)
+                    {
+                        hunterTile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
+                        return true;
+                    }
+                }
+
+                hunterTile.Get<CanvasImage>("Icon").SetImage(hunterCrest.CrestSprite);
+                return false;
+            },
+            () =>
+            {
+                foreach (string tier in hunterTiers)
+                {
+                    ToolCrest crest = ToolItemManager.GetCrestByName(tier);
+                    if (!crest.IsUnlocked)
+                    {
+                        ToggleCrest(crest);
+                        return;
+                    }
+                }
+
+                foreach (string tier in hunterTiers)
+                {
+                    ToolCrest crest = ToolItemManager.GetCrestByName(tier);
+                    ToggleCrest(crest);
+                }
+            }
+        );
+
+        List<string> regularCrests = ["Reaper", "Wanderer", "Warrior", "Witch", "Toolmaster", "Spell"];
+
+        foreach (string name in regularCrests)
+        {
+            ToolCrest crest = ToolItemManager.GetCrestByName(name);
+
+            CanvasPanel tile = AppendLabeledTile(
+                crest.DisplayName,
+                () => crest.IsUnlocked,
+                () => ToggleCrest(crest)
+            );
+
+            tile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
+        }
+
+        AppendLabeledTile("Vesticrest Yellow", () => PlayerData.instance.UnlockedExtraYellowSlot,
+            () => PlayerData.instance.UnlockedExtraYellowSlot = !PlayerData.instance.UnlockedExtraYellowSlot);
+        AppendLabeledTile("Vesticrest Blue", () => PlayerData.instance.UnlockedExtraBlueSlot,
+            () => PlayerData.instance.UnlockedExtraBlueSlot = !PlayerData.instance.UnlockedExtraBlueSlot);
+
+        AppendRow(1, 1);
+
+        List<string> specialCrestStates = ["Cursed", "Cloakless"];
+        foreach (string name in specialCrestStates)
+        {
+            ToolCrest crest = ToolItemManager.GetCrestByName(name);
+            AppendToggleControl(
+                $"Toggle {name}",
+                () => crest.IsEquipped,
+                () =>
+                {
+                    ToggleCrest(crest);
+
+                    // TODO: Make this update the visuals instantly and work better
+                    ToolItemManager.SetEquippedCrest(crest.IsUnlocked ? crest.name : hunterCrest.name);
+                }
+            );
+        }
 
         AppendSectionHeader("Consumables");
         AppendRow(1, 1);

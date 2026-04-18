@@ -85,7 +85,9 @@ public class GUIController : MonoBehaviour
         {
             if (canvas)
             {
+                // TODO: this will break hp bars
                 Destroy(canvas);
+                CanvasNode.allNodes.Clear();
             }
 
             canvas = new GameObject("DebugModCanvas");
