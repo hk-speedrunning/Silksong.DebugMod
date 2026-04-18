@@ -1,4 +1,4 @@
-﻿using DebugMod.Helpers;
+﻿using DebugMod.MonoBehaviours;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,28 +10,19 @@ namespace DebugMod.UI.Canvas;
 // Base class for all canvas elements
 public abstract class CanvasNode
 {
-    internal static readonly HashSet<CanvasNode> rootNodes = [];
-    private static readonly OrderedHashSet<CanvasNode> activeNodes = [];
-
-    private static readonly List<CanvasNode> _activeNodesList = [];
-    public static void UpdateAll()
-    {
-        _activeNodesList.Clear();
-        _activeNodesList.AddRange(activeNodes);
-        foreach (var node in _activeNodesList) node.Update();
-    }
+    internal static readonly List<CanvasNode> allNodes = [];
 
     private CanvasNode parent;
     private Vector2 localPosition;
     private Vector2 size;
     private bool activeSelf = true;
 
-    private event Action onUpdate;
-    private bool updateHooked;
-
     protected GameObject gameObject;
     protected RectTransform transform;
     protected EventTrigger eventTrigger;
+
+    // Number of nodes in the subtree
+    internal int childCount = 1;
 
     public string Name { get; set; }
 
@@ -43,19 +34,6 @@ public abstract class CanvasNode
             if (parent != value)
             {
                 parent = value;
-
-                if (parent != null)
-                {
-                    rootNodes.Remove(this);
-                }
-                else
-                {
-                    rootNodes.Add(this);
-                }
-
-                OnUpdatePosition();
-                OnUpdateSize();
-                OnUpdateActive();
                 OnUpdateParent();
             }
         }
@@ -106,26 +84,13 @@ public abstract class CanvasNode
 
     public GameObject GameObject => gameObject;
 
-    protected virtual bool Interactable => false;
+    protected virtual bool Interactable => true;
 
-    public event Action OnUpdate
-    {
-        add
-        {
-            onUpdate += value;
-            CheckUpdateHook();
-        }
-        remove
-        {
-            onUpdate -= value;
-            CheckUpdateHook();
-        }
-    }
+    public event Action OnUpdate;
 
     protected CanvasNode(string name)
     {
         Name = name;
-        rootNodes.Add(this);
     }
 
     protected virtual IEnumerable<CanvasNode> ChildList()
@@ -152,23 +117,12 @@ public abstract class CanvasNode
         {
             UpdateAnchoredPosition();
         }
-
-        OnUpdatePosition();
-    }
-
-    protected virtual void OnUpdatePosition()
-    {
-        foreach (CanvasNode child in ChildList())
-        {
-            child.OnUpdatePosition();
-        }
     }
 
     protected virtual void OnUpdateSize()
     {
         if (gameObject)
         {
-            UpdateAnchoredPosition();
             UpdateSizeDelta();
         }
     }
@@ -179,26 +133,17 @@ public abstract class CanvasNode
         {
             gameObject.SetActive(ActiveSelf);
         }
-
-        CheckUpdateHook();
-        foreach (CanvasNode child in ChildList())
-        {
-            child.OnUpdateActive();
-        }
     }
 
     protected virtual void OnUpdateParent()
     {
         if (gameObject)
         {
-            gameObject.transform.SetParent(GetParentTransform());
+            gameObject.transform.SetParent(GetParentTransform(), false);
             UpdateClipRect();
         }
 
-        foreach (CanvasNode child in ChildList())
-        {
-            child.OnUpdatePosition();
-        }
+        OnUpdateActive();
     }
 
     public virtual void Build()
@@ -214,10 +159,13 @@ public abstract class CanvasNode
 
         if (!Interactable)
         {
-            // CanvasGroup group = gameObject.AddComponent<CanvasGroup>();
-            // group.interactable = false;
-            // group.blocksRaycasts = false;
+            CanvasGroup group = gameObject.AddComponent<CanvasGroup>();
+            group.interactable = false;
+            group.blocksRaycasts = false;
         }
+
+        NodeRef nodeRef = gameObject.AddComponent<NodeRef>();
+        nodeRef.node = this;
 
         gameObject.SetActive(ActiveSelf);
 
@@ -225,9 +173,12 @@ public abstract class CanvasNode
         UpdateSizeDelta();
         UpdateClipRect();
 
+        allNodes.Add(this);
+
         foreach (CanvasNode child in ChildList())
         {
             child.Build();
+            childCount += child.childCount;
         }
     }
 
@@ -248,7 +199,7 @@ public abstract class CanvasNode
         transform.anchoredPosition = new Vector2(LocalPosition.x, -LocalPosition.y);
     }
 
-    protected virtual void UpdateSizeDelta()
+    protected void UpdateSizeDelta()
     {
         transform.sizeDelta = Size;
     }
@@ -263,26 +214,11 @@ public abstract class CanvasNode
         }
     }
 
-    private void CheckUpdateHook()
-    {
-        bool shouldUpdate = onUpdate != null && ActiveInHierarchy;
-        if (shouldUpdate && !updateHooked)
-        {
-            activeNodes.Add(this);
-            updateHooked = true;
-        }
-        else if (!shouldUpdate && updateHooked)
-        {
-            activeNodes.Remove(this);
-            updateHooked = false;
-        }
-    }
-
-    private void Update()
+    public void Update()
     {
         try
         {
-            onUpdate?.Invoke();
+            OnUpdate?.Invoke();
         }
         catch (Exception e)
         {
@@ -300,15 +236,15 @@ public abstract class CanvasNode
         if (gameObject)
         {
             Object.Destroy(gameObject);
-        }
 
-        if (Parent == null)
-        {
-            rootNodes.Remove(this);
+            for (CanvasNode parent = Parent; parent != null; parent = parent.Parent)
+            {
+                parent.childCount -= childCount;
+            }
         }
 
         ActiveSelf = false;
-        CheckUpdateHook();
+        allNodes.Remove(this);
     }
 
     protected virtual bool GetClipRect(out Rect clipRect)

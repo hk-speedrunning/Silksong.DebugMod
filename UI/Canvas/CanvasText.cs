@@ -75,6 +75,8 @@ public class CanvasText : CanvasNode
         }
     }
 
+    protected override bool Interactable => false;
+
     public CanvasText(string name,
         HorizontalWrapMode overflow = HorizontalWrapMode.Wrap) : base(name)
     {

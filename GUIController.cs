@@ -1,5 +1,6 @@
 using DebugMod.Helpers;
 using DebugMod.Hitbox;
+using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
@@ -88,6 +89,8 @@ public class GUIController : MonoBehaviour
             }
 
             canvas = new GameObject("DebugModCanvas");
+            canvas.SetActive(false);
+
             canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.AddComponent<GraphicRaycaster>();
 
@@ -140,35 +143,37 @@ public class GUIController : MonoBehaviour
 
         if (ForceHideUI())
         {
-            foreach (CanvasNode root in CanvasNode.rootNodes)
-            {
-                root.ActiveSelf = false;
-            }
+            canvas.SetActive(false);
         }
         else
         {
+            canvas.SetActive(true);
             MainPanel.Instance?.ActiveSelf = DebugMod.settings.MainPanelVisible;
             EnemiesPanel.Instance?.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
             ConsolePanel.Instance?.ActiveSelf = DebugMod.settings.ConsoleVisible;
             InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
             SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
 
-            CanvasNode.UpdateAll();
+            // Update all nodes, skipping over disabled nodes
+            for (int i = 0; i < CanvasNode.allNodes.Count;)
+            {
+                CanvasNode node = CanvasNode.allNodes[i];
+                if (node.ActiveSelf)
+                {
+                    node.Update();
+                    i++;
+                }
+                else
+                {
+                    i += node.childCount;
+                }
+            }
         }
 
         GameObject selected = EventSystem.current.currentSelectedGameObject;
-        if (!selected.GetComponent<InputField>())
+        if (selected && selected.GetComponent<NodeRef>() && !selected.GetComponent<InputField>())
         {
-            Transform t = selected.transform;
-            while (t)
-            {
-                if (t.gameObject == canvas)
-                {
-                    EventSystem.current.SetSelectedGameObject(null);
-                    break;
-                }
-                t = t.parent;
-            }
+            EventSystem.current.SetSelectedGameObject(null);
         }
 
         if (DebugMod.GetSceneName() == "Menu_Title") return;

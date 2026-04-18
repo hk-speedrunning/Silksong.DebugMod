@@ -28,7 +28,7 @@ public class EnemiesPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.MainPanelHeight + UICommon.ScreenMargin * 2);
         Size = new Vector2(UICommon.RightSideWidth, Screen.height - UICommon.MainPanelHeight - UICommon.ScreenMargin * 3);
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         UICommon.AddBackground(this);
 
@@ -150,7 +150,7 @@ public class EnemiesPanel : CanvasPanel
         UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["Toggle HP Bars"]);
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 

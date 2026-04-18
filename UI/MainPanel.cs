@@ -56,7 +56,7 @@ public class MainPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight);
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         AddTab("Gameplay");
 
@@ -568,13 +568,16 @@ public class MainPanel : CanvasPanel
         decButton.OnClicked += remove;
 
         var valueButton = controlBuilder.AppendFlex(new CanvasButton("Value"));
+        valueButton.SetImage(UICommon.clearBG);
         valueButton.OnUpdate += () => valueButton.Text.Text = getter().ToString();
         valueButton.Text.Alignment = TextAnchor.MiddleCenter;
+        valueButton.Border.Sides &= ~BorderSides.LEFT;
 
         var incButton = controlBuilder.AppendSquare(new CanvasButton("Increment"));
         incButton.SetImage(UICommon.images["IconPlusMin"]);
         incButton.RemoveText();
         incButton.OnClicked += add;
+        incButton.Border.Sides &= ~BorderSides.LEFT;
 
         builder.Build();
         containerBuilder.Build();
@@ -609,7 +612,7 @@ public class MainPanel : CanvasPanel
         base.Build();
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         bool needsReset = true;
 

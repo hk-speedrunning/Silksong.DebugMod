@@ -16,7 +16,7 @@ public class CanvasScrollView : CanvasNode
 
     public CanvasScrollView(string name) : base(name)
     {
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
     }
 
     public T SetContent<T>(T content) where T : CanvasNode
@@ -38,7 +38,7 @@ public class CanvasScrollView : CanvasNode
         return true;
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         if (!Mathf.Approximately(content.Size.y, contentHeight))
         {

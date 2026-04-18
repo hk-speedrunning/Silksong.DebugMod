@@ -31,7 +31,7 @@ public class SaveStatesPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         CanvasImage expandedBackground = UICommon.AddBackground(this);
         OnUpdate += () => expandedBackground.ActiveSelf = ShouldBeExpanded;
@@ -241,7 +241,7 @@ public class SaveStatesPanel : CanvasPanel
         return selectStateOperation is SelectOperation.QuickslotToFile or SelectOperation.SaveToFile;
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         if (InSelectState && !CanvasTextField.AnyFieldFocused)
         {

@@ -14,6 +14,8 @@ public class CanvasImage : CanvasNode
     public CanvasBorder Border => border;
     public bool IsBackground { get; set; }
 
+    protected override bool Interactable => false;
+
     public CanvasImage(string name) : base(name) { }
 
     public void SetImage(Texture2D tex, Rect subSprite = default)
@@ -77,12 +79,11 @@ public class CanvasImage : CanvasNode
 
         if (IsBackground && !Interactable)
         {
-            // gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
+            gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
         }
 
         gameObject.AddComponent<Image>();
         UpdateSprite();
-        UpdateSizeDelta();
     }
 
     private void UpdateSprite()
@@ -91,12 +92,5 @@ public class CanvasImage : CanvasNode
 
         image.sprite = sprite ? sprite : Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height - subSprite.y, subSprite.width, subSprite.height), Vector2.zero);
         image.color = UICommon.iconColor;
-    }
-
-    protected override void UpdateSizeDelta()
-    {
-        transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-        transform.SetScaleX(Size.x / subSprite.width);
-        transform.SetScaleY(Size.y / subSprite.height);
     }
 }

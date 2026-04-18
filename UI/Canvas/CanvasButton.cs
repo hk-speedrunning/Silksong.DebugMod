@@ -7,7 +7,7 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
-    private static CanvasBorder hoverBorder;
+    internal static CanvasBorder hoverBorder;
 
     internal static void BuildHoverBorder()
     {
@@ -15,6 +15,13 @@ public class CanvasButton : CanvasImage
         hoverBorder.Size = new Vector2(1, 1);
         hoverBorder.Color = UICommon.accentColor;
         hoverBorder.ActiveSelf = false;
+        hoverBorder.OnUpdate += () =>
+        {
+            if (hoverBorder.Parent == null || !hoverBorder.Parent.ActiveInHierarchy)
+            {
+                hoverBorder.ActiveSelf = false;
+            }
+        };
         hoverBorder.Build();
     }
 
@@ -88,16 +95,6 @@ public class CanvasButton : CanvasImage
         }
 
         base.OnUpdateSize();
-    }
-
-    protected override void OnUpdateActive()
-    {
-        if (!ActiveInHierarchy && hoverBorder?.Parent == this)
-        {
-            hoverBorder.ActiveSelf = false;
-        }
-
-        base.OnUpdateActive();
     }
 
     public override void Build()
