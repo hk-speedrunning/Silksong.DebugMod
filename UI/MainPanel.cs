@@ -408,9 +408,19 @@ public class MainPanel : CanvasPanel
         }
 
         AppendSectionHeader("Consumables");
-        AppendRow(1, 1);
-        AppendBasicControl("Give Rosaries", BindableFunctions.GiveRosaries);
-        AppendBasicControl("Give Shell Shards", BindableFunctions.GiveShellShards);
+        AppendTileRow(2);
+        AppendIncrementTile(
+            "Rosaries",
+            () => PlayerData.instance.geo,
+            () => HeroController.instance.AddGeo(100),
+            () => HeroController.instance.TakeGeo(Math.Min(PlayerData.instance.geo, 100))
+        );
+        AppendIncrementTile(
+            "Shell Shards",
+            () => PlayerData.instance.ShellShards,
+            () => HeroController.instance.AddShards(100),
+            () => HeroController.instance.TakeShards(Math.Min(PlayerData.instance.ShellShards, 100))
+        );
 
         /*
         // Probably useful
@@ -428,18 +438,12 @@ public class MainPanel : CanvasPanel
         */
 
         AppendSectionHeader("Masks and Spools");
-        AppendRow(1, 1);
-        AppendBasicControl("Give Mask", BindableFunctions.GiveMask);
-        AppendBasicControl("Take Mask", BindableFunctions.TakeAwayMask);
-        AppendRow(1, 1);
-        AppendBasicControl("Give Spool", BindableFunctions.GiveSpool);
-        AppendBasicControl("Take Spool", BindableFunctions.TakeAwaySpool);
-        AppendRow(1, 1);
-        AppendBasicControl("Give Health", BindableFunctions.AddHealth);
-        AppendBasicControl("Take Health", BindableFunctions.TakeHealth);
-        AppendRow(1, 1);
-        AppendBasicControl("Give Silk", BindableFunctions.AddSilk);
-        AppendBasicControl("Take Silk", BindableFunctions.TakeSilk);
+        AppendTileRow(2);
+        AppendIncrementTile("Masks", () => PlayerData.instance.maxHealth, BindableFunctions.GiveMask, BindableFunctions.TakeAwayMask);
+        AppendIncrementTile("Spools", () => PlayerData.instance.silkMax, BindableFunctions.GiveSpool, BindableFunctions.TakeAwaySpool);
+        AppendTileRow(2);
+        AppendIncrementTile("Health", () => PlayerData.instance.health, BindableFunctions.AddHealth, BindableFunctions.TakeHealth);
+        AppendIncrementTile("Silk", () => PlayerData.instance.silk, BindableFunctions.AddSilk, BindableFunctions.TakeSilk);
         AppendRow(1);
         AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
 
