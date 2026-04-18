@@ -6,7 +6,7 @@ namespace DebugMod.Helpers;
 public static class Profiler
 {
     private const int INTERVAL = 20;
-    public static readonly bool enabled = true;
+    public static readonly bool enabled = false;
 
     private static readonly Dictionary<string, float> startTimes = [];
     private static readonly Dictionary<string, float> elapsedTimes = [];

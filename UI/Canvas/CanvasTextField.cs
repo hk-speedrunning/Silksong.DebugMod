@@ -85,6 +85,7 @@ public class CanvasTextField : CanvasText
         }
 
         Text = text;
+        inputField.text = text;
     }
 
     public bool IsFocused() => inputField && inputField.enabled;

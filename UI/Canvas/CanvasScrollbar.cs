@@ -1,5 +1,4 @@
-﻿using DebugMod.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -64,12 +63,10 @@ public class CanvasScrollbar : CanvasNode
 
         grip.AddEventTrigger(EventTriggerType.Drag, eventData =>
         {
-            Profiler.Begin("DragScrollbar");
             float y = grip.LocalPosition.y - eventData.delta.y;
             y = Mathf.Clamp(y, 0, Size.y - grip.Size.y);
             ScrollView.SetScrollPercentage(y / (Size.y - grip.Size.y));
             UpdateGripPosition(y);
-            Profiler.End("DragScrollbar");
         });
     }
 
