@@ -1,6 +1,7 @@
 using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
+using GlobalSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -330,6 +331,10 @@ public class MainPanel : CanvasPanel
             }
         }
 
+        AppendRow(1, 1);
+        AppendToggleControl("Toggle Cursed", () => Gameplay.CursedCrest.IsEquipped, BindableFunctions.ToggleCursed);
+        AppendToggleControl("Toggle Cloakless", () => Gameplay.CloaklessCrest.IsEquipped, BindableFunctions.ToggleCloakless);
+
         List<string> hunterTiers = ["Hunter", "Hunter_v2", "Hunter_v3"];
         ToolCrest hunterCrest = ToolItemManager.GetCrestByName(hunterTiers[0]);
 
@@ -390,25 +395,6 @@ public class MainPanel : CanvasPanel
             () => PlayerData.instance.UnlockedExtraYellowSlot = !PlayerData.instance.UnlockedExtraYellowSlot);
         AppendLabeledTile("Vesticrest Blue", () => PlayerData.instance.UnlockedExtraBlueSlot,
             () => PlayerData.instance.UnlockedExtraBlueSlot = !PlayerData.instance.UnlockedExtraBlueSlot);
-
-        AppendRow(1, 1);
-
-        List<string> specialCrestStates = ["Cursed", "Cloakless"];
-        foreach (string name in specialCrestStates)
-        {
-            ToolCrest crest = ToolItemManager.GetCrestByName(name);
-            AppendToggleControl(
-                $"Toggle {name}",
-                () => crest.IsEquipped,
-                () =>
-                {
-                    ToggleCrest(crest);
-
-                    // TODO: Make this update the visuals instantly and work better
-                    ToolItemManager.SetEquippedCrest(crest.IsUnlocked ? crest.name : hunterCrest.name);
-                }
-            );
-        }
 
         AppendSectionHeader("Consumables");
         AppendTileRow(2);
