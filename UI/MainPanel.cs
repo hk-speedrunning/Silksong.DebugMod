@@ -368,11 +368,15 @@ public class MainPanel : CanvasPanel
                     }
                 }
 
+                // Cycle back to base hunter crest
+
                 foreach (string tier in hunterTiers)
                 {
                     ToolCrest crest = ToolItemManager.GetCrestByName(tier);
                     ToggleCrest(crest);
                 }
+
+                ToggleCrest(hunterCrest);
             }
         );
 
@@ -391,10 +395,25 @@ public class MainPanel : CanvasPanel
             tile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
         }
 
-        AppendLabeledTile("Vesticrest Yellow", () => PlayerData.instance.UnlockedExtraYellowSlot,
-            () => PlayerData.instance.UnlockedExtraYellowSlot = !PlayerData.instance.UnlockedExtraYellowSlot);
-        AppendLabeledTile("Vesticrest Blue", () => PlayerData.instance.UnlockedExtraBlueSlot,
-            () => PlayerData.instance.UnlockedExtraBlueSlot = !PlayerData.instance.UnlockedExtraBlueSlot);
+        AppendLabeledTile("Vesticrest",
+            () => PlayerData.instance.UnlockedExtraYellowSlot,
+            () =>
+            {
+                if (!PlayerData.instance.UnlockedExtraYellowSlot)
+                {
+                    PlayerData.instance.UnlockedExtraYellowSlot = true;
+                }
+                else if (!PlayerData.instance.UnlockedExtraBlueSlot)
+                {
+                    PlayerData.instance.UnlockedExtraBlueSlot = true;
+                }
+                else
+                {
+                    PlayerData.instance.UnlockedExtraYellowSlot = false;
+                    PlayerData.instance.UnlockedExtraBlueSlot = false;
+                }
+            }
+        );
 
         AppendSectionHeader("Consumables");
         AppendTileRow(2);
