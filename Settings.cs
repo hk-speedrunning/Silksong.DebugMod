@@ -38,6 +38,8 @@ public class Settings
 
     public bool SaveStateGlitchFixes = true;
 
+    public bool SafeSaveStateLoading = false;
+
     public bool LogUnityExceptions = true;
 
     public bool AltInfoPanel = false;

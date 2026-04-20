@@ -332,6 +332,16 @@ public class SaveState
 
         string previousScene = GameManager.instance.GetSceneNameString();
 
+        GameManager.instance.entryGateName = "dreamGate";
+        GameManager.instance.startedOnThisScene = true;
+
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            string dummyScene = "Demo Start";
+            Addressables.LoadSceneAsync($"Scenes/{dummyScene}");
+            yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummyScene);
+        }
+
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
         RestoreSemiPersistent(data.semiPersistentBools, SceneData.instance.persistentBools);
@@ -351,9 +361,6 @@ public class SaveState
 
         sceneData[0].LoadHook();
 
-        GameManager.instance.entryGateName = "dreamGate";
-        GameManager.instance.startedOnThisScene = true;
-
         GameManager.instance.BeginSceneTransition
         (
             new DebugModSaveStateSceneLoadInfo
@@ -365,7 +372,7 @@ public class SaveState
                 PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
                 Visualization = GameManager.SceneLoadVisualizations.Default,
-                AlwaysUnloadUnusedAssets = false
+                AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
             }
         );
 
@@ -402,6 +409,11 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            // Probably just being paranoid?
+            yield return null;
+        }
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
