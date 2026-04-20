@@ -43,7 +43,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static IEnumerator CurrentInvulnCoro;
 
 
-    internal static DebugMod instance;
+    public static DebugMod instance;
 
     public static Settings settings { get; set; } = new Settings();
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
@@ -57,25 +57,25 @@ public partial class DebugMod : BaseUnityPlugin
     [CanBeNull] internal static HealthManager.DamageScalingConfig lastScaling;
     internal static int lastScaleLevel;
 
-    internal static bool stateOnDeath;
-    internal static bool infiniteHP;
-    internal static bool infiniteSilk;
-    internal static bool infiniteTools;
-    internal static bool playerInvincible;
-    internal static bool noclip;
+    public static bool stateOnDeath;
+    public static bool infiniteHP;
+    public static bool infiniteSilk;
+    public static bool infiniteTools;
+    public static bool playerInvincible;
+    public static bool noclip;
     internal static Vector3 noclipPos;
-    internal static bool heroColliderDisabled;
-    internal static bool cameraFollow;
+    public static bool heroColliderDisabled;
+    public static bool cameraFollow;
     public static bool KeyBindLock;
-    internal static bool savestateFixes = true;
+    public static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
-    internal static int extraNailDamage;
-    internal static bool forcePaused;
+    public static int extraNailDamage;
+    public static bool forcePaused;
 
-    internal static readonly Dictionary<string, BindAction> bindActions = new();
+    public static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
-    internal static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
-    internal static event Action<string, KeyCode?> bindUpdated;
+    public static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
+    public static event Action<string, KeyCode?> bindUpdated;
 
     public void Awake()
     {
@@ -231,14 +231,14 @@ public partial class DebugMod : BaseUnityPlugin
     //save coros so they can be forcibly stopped
     [HarmonyPatch(typeof(HeroController), nameof(HeroController.HazardRespawn))]
     [HarmonyPostfix]
-    public static void OnHazardRespawn(HeroController __instance, IEnumerator __result)
+    private static void OnHazardRespawn(HeroController __instance, IEnumerator __result)
     {
         CurrentHazardCoro = __result;
     }
 
     [HarmonyPatch(typeof(HeroController), nameof(HeroController.Invulnerable))]
     [HarmonyPostfix]
-    public static void OnInvulnerable(HeroController __instance, IEnumerator __result)
+    private static void OnInvulnerable(HeroController __instance, IEnumerator __result)
     {
         CurrentInvulnCoro = __result;
     }
@@ -413,7 +413,9 @@ public partial class DebugMod : BaseUnityPlugin
             if (method.GetCustomAttribute<BindableMethod>(false) is BindableMethod attr)
             {
                 Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
-                bindActions.Add(attr.name, new BindAction(attr, method));
+                BindAction action = new(attr, method);
+                bindActions.Add(attr.name, action);
+                bindsByMethod.Add(method, action);
             }
         }
     }
@@ -434,7 +436,9 @@ public partial class DebugMod : BaseUnityPlugin
     public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
     {
         Log($"Received Action: {name}");
-        bindActions.Add(name, new BindAction(name, category, allowLock, method));
+        BindAction action = new(name, category, allowLock, method);
+        bindActions.Add(name, action);
+        bindsByMethod.Add(method.Method, action);
     }
 
     [PublicAPI]

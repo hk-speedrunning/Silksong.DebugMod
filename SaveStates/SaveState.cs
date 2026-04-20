@@ -28,6 +28,8 @@ public class SaveState
     //used to stop double loads
     public static SaveState loadingSavestate { get; private set; }
 
+    public static bool LoadDuped { get; set; }
+
     [Serializable]
     public class SaveStateData
     {
@@ -182,7 +184,7 @@ public class SaveState
 
     #region loading
     //loadDuped is used by external mods
-    public IEnumerator Load(bool loadDuped = false)
+    public IEnumerator Load()
     {
         if (!IsSet())
         {
@@ -203,7 +205,7 @@ public class SaveState
 
         loadingSavestate = this;
 
-        IEnumerator enumerator = LoadImpl(loadDuped);
+        IEnumerator enumerator = LoadImpl();
         while (true)
         {
             try
@@ -262,7 +264,7 @@ public class SaveState
         }
     }
 
-    private IEnumerator LoadImpl(bool loadDuped)
+    private IEnumerator LoadImpl()
     {
         bool stateondeath = DebugMod.stateOnDeath;
         DebugMod.stateOnDeath = false;
@@ -369,7 +371,7 @@ public class SaveState
 
         yield return new WaitUntil(() => USceneManager.GetActiveScene().name == data.saveScene);
 
-        if (loadDuped)
+        if (LoadDuped)
         {
             yield return new WaitUntil(() => GameManager.instance.IsInSceneTransition == false);
             for (int i = 1; i < sceneData.Length; i++)
@@ -410,7 +412,7 @@ public class SaveState
         GameManager.instance.cameraCtrl.isGameplayScene = true;
         GameManager.instance.UpdateUIStateFromGameState();
 
-        if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
+        if (LoadDuped && DebugMod.settings.ShowHitBoxes > 0)
         {
             int cs = DebugMod.settings.ShowHitBoxes;
             DebugMod.settings.ShowHitBoxes = 0;
