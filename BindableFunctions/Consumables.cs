@@ -16,5 +16,22 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Giving player 100 shell shards");
     }
 
-    // TODO: add bind to give all items needed for the active quest(s)
+    [BindableMethod(name = "Give Quest Items", category = "Consumables")]
+    public static void GiveQuestItems()
+    {
+        foreach (FullQuestBase quest in QuestManager.GetActiveQuests())
+        {
+            foreach (FullQuestBase.QuestTarget target in quest.Targets)
+            {
+                if (target.Counter is CollectableItem item)
+                {
+                    int amountToGive = target.Count - item.CollectedAmount;
+                    if (amountToGive > 0)
+                    {
+                        item.Collect(amountToGive);
+                    }
+                }
+            }
+        }
+    }
 }

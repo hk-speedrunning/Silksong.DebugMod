@@ -473,12 +473,21 @@ public class MainPanel : CanvasPanel
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
-        AppendLabeledTile("Key of Indolent", () => PlayerData.instance.HasSlabKeyA,
-            () => PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA);
-        AppendLabeledTile("Key of Heretic", () => PlayerData.instance.HasSlabKeyB,
-            () => PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB);
-        AppendLabeledTile("Key of Apostate", () => PlayerData.instance.HasSlabKeyC,
-            () => PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC);
+        AppendLabeledTile("Key of Indolent", () => PlayerData.instance.HasSlabKeyA, () =>
+        {
+            PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA;
+            CollectableItemManager.IncrementVersion();
+        });
+        AppendLabeledTile("Key of Heretic", () => PlayerData.instance.HasSlabKeyB, () =>
+        {
+            PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB;
+            CollectableItemManager.IncrementVersion();
+        });
+        AppendLabeledTile("Key of Apostate", () => PlayerData.instance.HasSlabKeyC, () =>
+        {
+            PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC;
+            CollectableItemManager.IncrementVersion();
+        });
 
         items =
         [
@@ -486,9 +495,6 @@ public class MainPanel : CanvasPanel
             "Belltown House Key",
             "Dock Key",
             "Craw Summons",
-            "Farsight",
-            "Courier Supplies",
-            "Courier Supplies Gourmand"
         ];
 
         foreach (string name in items)
@@ -501,6 +507,9 @@ public class MainPanel : CanvasPanel
             );
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
+
+        AppendLabeledTile("Farsight", () => PlayerData.instance.ConstructedFarsight,
+            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight);
 
         AppendSectionHeader("Consumables");
         AppendTileRow(2);
@@ -547,8 +556,8 @@ public class MainPanel : CanvasPanel
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
-        // quest items button
-        // give courier delivery button
+        AppendRow(1);
+        AppendBasicControl("Give Quest Items", BindableFunctions.GiveQuestItems);
 
         AppendSectionHeader("Masks and Spools");
         AppendTileRow(2);
