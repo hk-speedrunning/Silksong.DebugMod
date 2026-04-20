@@ -2,7 +2,6 @@
 using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
@@ -94,11 +93,8 @@ public class EnemyHandle : MonoBehaviour
 
                 hpBar.Build();
 
-                // Move HP bar behind UI
-                foreach (CanvasNode node in hpBar.Subtree().Reverse())
-                {
-                    node.GameObject.transform.SetAsFirstSibling();
-                }
+                // Move hp bar behind the rest of the UI
+                hpBar.GameObject.transform.SetAsFirstSibling();
             }
 
             Vector2 barPos = transform.position;
