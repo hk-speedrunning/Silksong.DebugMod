@@ -85,7 +85,11 @@ public class GUIController : MonoBehaviour
         {
             if (canvas)
             {
-                // TODO: this will break hp bars
+                foreach (EnemyHandle handle in EnemiesPanel.enemyPool)
+                {
+                    handle.DestroyUI();
+                }
+
                 Destroy(canvas);
                 CanvasNode.allNodes.Clear();
             }
