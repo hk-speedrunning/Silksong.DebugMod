@@ -415,6 +415,93 @@ public class MainPanel : CanvasPanel
             }
         );
 
+        AppendSectionHeader("Items");
+
+        static void ToggleItem(CollectableItem item)
+        {
+            if (item.CollectedAmount == 0)
+            {
+                item.Collect(1, false);
+            }
+            else
+            {
+                item.Take(1, false);
+            }
+        }
+
+        static void SetCollectableAmount(string name, Func<int, int> affector)
+        {
+            if (CollectableItemManager.IsInHiddenMode())
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.AmountWhileHidden = affector(data.AmountWhileHidden));
+            }
+            else
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.Amount = affector(data.Amount));
+            }
+        }
+
+        static void IncrementCollectable(string name) => SetCollectableAmount(name, x => x + 1);
+        static void DecrementCollectable(string name) => SetCollectableAmount(name, x => Math.Max(x - 1, 0));
+
+        AppendLabeledTile("Architect's Melody", () => PlayerData.instance.HasMelodyArchitect,
+            () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect);
+        AppendLabeledTile("Vaultkeeper's Melody", () => PlayerData.instance.HasMelodyLibrarian,
+            () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian);
+        AppendLabeledTile("Conductor's Melody", () => PlayerData.instance.HasMelodyConductor,
+            () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor);
+
+        List<string> items =
+        [
+            "Coral Heart",
+            "Flower Heart",
+            "Hunter Heart",
+            "Clover Heart",
+            "White Flower",
+            "Ward Key",
+            "Ward Boss Key"
+        ];
+
+        foreach (string name in items)
+        {
+            CollectableItem item = CollectableItemManager.GetItemByName(name);
+            CanvasPanel tile = AppendLabeledTile(
+                item.GetPopupName(),
+                () => item.IsVisible,
+                () => ToggleItem(item)
+            );
+            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
+        }
+
+        AppendLabeledTile("Key of Indolent", () => PlayerData.instance.HasSlabKeyA,
+            () => PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA);
+        AppendLabeledTile("Key of Heretic", () => PlayerData.instance.HasSlabKeyB,
+            () => PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB);
+        AppendLabeledTile("Key of Apostate", () => PlayerData.instance.HasSlabKeyC,
+            () => PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC);
+
+        items =
+        [
+            "Architect Key",
+            "Belltown House Key",
+            "Dock Key",
+            "Craw Summons",
+            "Farsight",
+            "Courier Supplies",
+            "Courier Supplies Gourmand"
+        ];
+
+        foreach (string name in items)
+        {
+            CollectableItem item = CollectableItemManager.GetItemByName(name);
+            CanvasPanel tile = AppendLabeledTile(
+                item.GetPopupName(),
+                () => item.IsVisible,
+                () => ToggleItem(item)
+            );
+            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
+        }
+
         AppendSectionHeader("Consumables");
         AppendTileRow(2);
         AppendIncrementTile(
@@ -430,20 +517,38 @@ public class MainPanel : CanvasPanel
             () => HeroController.instance.TakeShards(Math.Min(PlayerData.instance.ShellShards, 100))
         );
 
-        /*
-        // Probably useful
-        static void SetCollectable(string name, int amount)
+        List<string> consumables =
+        [
+            "Rosary_Set_Frayed",
+            "Fixer Idol",
+            "Rosary_Set_Small",
+            "Shard Pouch",
+            "Rosary_Set_Medium",
+            "Great Shard",
+            "Rosary_Set_Large",
+            "Pristine Core",
+            "Rosary_Set_Huge_White",
+            "Silk Grub",
+            "Simple Key",
+            "Crest Socket Unlocker",
+            "Tool Metal",
+            "Pale_Oil"
+        ];
+
+        foreach (string name in consumables)
         {
-            if (CollectableItemManager.IsInHiddenMode())
-            {
-                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.AmountWhileHidden = amount);
-            }
-            else
-            {
-                CollectableItemManager.Instance.AffectItemData(name, (ref CollectableItemsData.Data data) => data.Amount = amount);
-            }
+            CollectableItem item = CollectableItemManager.GetItemByName(name);
+            CanvasPanel tile = AppendIncrementTile(
+                item.GetPopupName(),
+                () => item.CollectedAmount,
+                () => IncrementCollectable(name),
+                () => DecrementCollectable(name)
+            );
+            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
-        */
+
+        // quest items button
+        // give courier delivery button
 
         AppendSectionHeader("Masks and Spools");
         AppendTileRow(2);

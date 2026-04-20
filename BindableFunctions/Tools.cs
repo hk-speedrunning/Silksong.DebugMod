@@ -1,4 +1,5 @@
 ﻿using GlobalSettings;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DebugMod;
@@ -8,7 +9,28 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Unlock All Tools", category = "Tools")]
     public static void UnlockAllTools()
     {
-        ToolItemManager.UnlockAllTools();
+        HashSet<string> upgrades =
+        [
+            "Curve Claws Upgraded",
+            "WebShot Architect",
+            "WebShot Weaver",
+            "Mosscreep Tool 2",
+            "Dazzle Bind Upgraded",
+            "Shell Satchel"
+        ];
+
+        foreach (ToolItem tool in ToolItemManager.GetAllTools())
+        {
+            if (!upgrades.Contains(tool.name))
+            {
+                tool.Unlock(null, ToolItem.PopupFlags.None);
+            }
+            else
+            {
+                tool.Lock();
+            }
+        }
+
         DebugMod.LogConsole("Unlocked all tools");
     }
 
