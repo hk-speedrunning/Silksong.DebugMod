@@ -30,6 +30,10 @@ public class SaveState
 
     public static bool LoadDuped { get; set; }
 
+    public static event Action<SaveState> OnSave;
+    public static event Action<SaveState> BeforeLoad;
+    public static event Action<SaveState> AfterLoad;
+
     [Serializable]
     public class SaveStateData
     {
@@ -48,7 +52,7 @@ public class SaveState
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
-
+        public Dictionary<string, object> customData;
 
         internal SaveStateData() { }
 
@@ -101,6 +105,11 @@ public class SaveState
                     loadedSceneActiveScenes[i] = loadedScenes[i];
                 }
             }
+
+            if (_data.customData != null)
+            {
+                customData = new Dictionary<string, object>(_data.customData);
+            }
         }
 
         public SaveStateData DeepCopy()
@@ -150,6 +159,12 @@ public class SaveState
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
         data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
+
+        if (OnSave != null)
+        {
+            data.customData = [];
+            OnSave.Invoke(this);
+        }
 
         DebugMod.LogConsole("Saved temp state");
         return true;
@@ -294,6 +309,8 @@ public class SaveState
         }
 
         if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
+
+        BeforeLoad?.Invoke(this);
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");
@@ -451,6 +468,8 @@ public class SaveState
 
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
+
+        AfterLoad?.Invoke(this);
 
         yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
