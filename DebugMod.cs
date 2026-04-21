@@ -80,6 +80,7 @@ public partial class DebugMod : BaseUnityPlugin
     public void Awake()
     {
         LoadSettings();
+        settings.InitMenu(Config);
 
         if (settings.LogUnityExceptions
             // If there's an existing unity log source, then messages are logged already

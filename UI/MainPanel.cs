@@ -451,9 +451,6 @@ public class MainPanel : CanvasPanel
             }
         }
 
-        static void IncrementCollectable(string name) => SetCollectableAmount(name, x => x + 1);
-        static void DecrementCollectable(string name) => SetCollectableAmount(name, x => Math.Max(x - 1, 0));
-
         AppendLabeledTile("Architect's Melody", () => PlayerData.instance.HasMelodyArchitect,
             () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect);
         AppendLabeledTile("Vaultkeeper's Melody", () => PlayerData.instance.HasMelodyLibrarian,
