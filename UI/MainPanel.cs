@@ -193,11 +193,21 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("Upgrades");
         AppendTileRow(2);
-        AppendIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, BindableFunctions.IncreaseNeedleDamage, BindableFunctions.DecreaseNeedleDamage, "Inv_Needle");
-        AppendIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax, BindableFunctions.IncrementSilkHeart, BindableFunctions.DecrementSilkHeart, "Inv_SilkHeart");
+        AppendIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, SetNailDamage, "Inv_Needle",
+            customAdd: BindableFunctions.IncreaseNeedleDamage, customRemove: BindableFunctions.DecreaseNeedleDamage);
+        static void SetNailDamage(int value)
+        {
+            int nailUpgrades = Math.Clamp((value - 5) / 4, 0, 4);
+            PlayerData.instance.nailUpgrades = nailUpgrades;
+            DebugMod.extraNailDamage = value - (nailUpgrades * 4 + 5);
+        }
+        AppendIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax,
+            value => PlayerData.instance.silkRegenMax = value, "Inv_SilkHeart", max: 3, wrap: true);
         AppendTileRow(2);
-        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades, BindableFunctions.IncrementKits, BindableFunctions.DecrementKits, "Inv_CraftingKit");
-        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades, BindableFunctions.IncrementPouches, BindableFunctions.DecrementPouches, "Inv_ToolPouch");
+        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades,
+            value => PlayerData.instance.ToolKitUpgrades = value, "Inv_CraftingKit", max: 4, wrap: true);
+        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades,
+            value => PlayerData.instance.ToolPouchUpgrades = value, "Inv_ToolPouch", max: 4, wrap: true);
         AppendRow(1, 1);
         AppendBasicControl("All Maps", BindableFunctions.UnlockAllMaps);
         AppendBasicControl("All Fast Travel", BindableFunctions.UnlockAllFastTravel);
@@ -516,14 +526,14 @@ public class MainPanel : CanvasPanel
         AppendIncrementTile(
             "Rosaries",
             () => PlayerData.instance.geo,
-            () => HeroController.instance.AddGeo(100),
-            () => HeroController.instance.TakeGeo(Math.Min(PlayerData.instance.geo, 100))
+            value => HeroController.instance.AddGeo(value - PlayerData.instance.geo),
+            step: 100
         );
         AppendIncrementTile(
             "Shell Shards",
             () => PlayerData.instance.ShellShards,
-            () => HeroController.instance.AddShards(100),
-            () => HeroController.instance.TakeShards(Math.Min(PlayerData.instance.ShellShards, 100))
+            value => HeroController.instance.AddShards(value - PlayerData.instance.ShellShards),
+            step: 100
         );
 
         List<string> consumables =
@@ -550,8 +560,7 @@ public class MainPanel : CanvasPanel
             CanvasPanel tile = AppendIncrementTile(
                 item.GetPopupName(),
                 () => item.CollectedAmount,
-                () => IncrementCollectable(name),
-                () => DecrementCollectable(name)
+                value => SetCollectableAmount(name, _ => value)
             );
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
@@ -561,11 +570,56 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("Masks and Spools");
         AppendTileRow(2);
-        AppendIncrementTile("Masks", () => PlayerData.instance.maxHealth, BindableFunctions.GiveMask, BindableFunctions.TakeAwayMask);
-        AppendIncrementTile("Spools", () => PlayerData.instance.silkMax, BindableFunctions.GiveSpool, BindableFunctions.TakeAwaySpool);
+        AppendIncrementTile("Masks", () => PlayerData.instance.maxHealth, SetMaxHealth, min: 1, max: 10);
+        static void SetMaxHealth(int value)
+        {
+            bool increase = value > PlayerData.instance.maxHealth;
+            PlayerData.instance.maxHealth = value;
+            PlayerData.instance.maxHealthBase = value;
+            if (increase)
+            {
+                HeroController.instance.MaxHealth();
+            }
+            else
+            {
+                PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
+            }
+            HudHelper.RefreshMasks();
+        }
+        AppendIncrementTile("Spools", () => PlayerData.instance.silkMax, SetMaxSilk, min: 9, max: 18);
+        static void SetMaxSilk(int value)
+        {
+            PlayerData.instance.silkMax = value;
+            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+            HudHelper.RefreshSpool();
+            if (PlayerData.instance.IsSilkSpoolBroken && value > 9)
+            {
+                PlayerData.instance.IsSilkSpoolBroken = false;
+                EventRegister.SendEvent("SPOOL UNBROKEN");
+            }
+        }
         AppendTileRow(2);
-        AppendIncrementTile("Health", () => PlayerData.instance.health, BindableFunctions.AddHealth, BindableFunctions.TakeHealth);
-        AppendIncrementTile("Silk", () => PlayerData.instance.silk, BindableFunctions.AddSilk, BindableFunctions.TakeSilk);
+        AppendIncrementTile("Health", () => PlayerData.instance.health, SetHealth, min: 1, max: 10);
+        static void SetHealth(int value)
+        {
+            if (!HeroController.instance.cState.dead && GameManager.instance.IsGameplayScene())
+            {
+                HeroController.instance.AddHealth(value - PlayerData.instance.health);
+                HudHelper.RefreshMasks();
+            }
+        }
+        AppendIncrementTile("Silk", () => PlayerData.instance.silk, SetSilk);
+        static void SetSilk(int value)
+        {
+            if (value > PlayerData.instance.silk)
+            {
+                HeroController.instance.AddSilk(value - PlayerData.instance.silk, true);
+            }
+            else if (value < PlayerData.instance.silk)
+            {
+                HeroController.instance.TakeSilk(PlayerData.instance.silk - value);
+            }
+        }
         AppendRow(1);
         AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
 
@@ -831,7 +885,8 @@ public class MainPanel : CanvasPanel
         return tile;
     }
 
-    private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action add, Action remove, string image = "IconX")
+    private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action<int> setter, string image = "IconX",
+        Action customAdd = null, Action customRemove = null, int step = 1, int min = 0, int max = int.MaxValue, bool wrap = false)
     {
         CanvasPanel row = currentRow ?? AppendTileRow(2);
 
@@ -844,11 +899,10 @@ public class MainPanel : CanvasPanel
 
         tile.Size = new Vector2(tile.Size.x, imageWidth + UICommon.Margin * 2);
 
-        PanelBuilder builder = new(tile)
-        {
-            Horizontal = true,
-            Padding = tile.ContentMargin(UICommon.Margin)
-        };
+        PanelBuilder builder = new(tile);
+        builder.Horizontal = true;
+        builder.InnerPadding = UICommon.Margin;
+        builder.OuterPadding = tile.ContentMargin(UICommon.Margin);
 
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
         icon.SetImage(UICommon.images[image]);
@@ -857,30 +911,60 @@ public class MainPanel : CanvasPanel
 
         containerBuilder.AppendFlexPadding();
 
-        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), ListingHeight);
+        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
         label.Alignment = TextAnchor.MiddleCenter;
         label.Text = name;
 
         containerBuilder.AppendFlexPadding();
+        containerBuilder.AppendPadding(UICommon.Margin); // Evens spacing between tile border and control row border
 
         CanvasPanel controlRow = containerBuilder.AppendFixed(new CanvasPanel("ControlRow"), UICommon.ControlHeight);
         PanelBuilder controlBuilder = new(controlRow) { Horizontal = true, InnerPadding = -UICommon.BORDER_THICKNESS };
 
+        void ValueUpdate(int value)
+        {
+            if (value < min)
+            {
+                value = wrap ? max : min;
+            }
+
+            if (value > max)
+            {
+                value = wrap ? min : max;
+            }
+
+            setter(value);
+        }
+
         var decButton = controlBuilder.AppendSquare(new CanvasButton("Decrement"));
         decButton.SetImage(UICommon.images["IconMinusMin"]);
         decButton.RemoveText();
-        decButton.OnClicked += remove;
+        decButton.OnClicked += customRemove ?? (() => ValueUpdate(getter() - step));
 
         var valueButton = controlBuilder.AppendFlex(new CanvasButton("Value"));
         valueButton.SetImage(UICommon.clearBG);
-        valueButton.OnUpdate += () => valueButton.Text.Text = getter().ToString();
-        valueButton.Text.Alignment = TextAnchor.MiddleCenter;
         valueButton.Border.Sides &= ~BorderSides.LEFT;
+
+        var textField = valueButton.SetTextField();
+        textField.OnUpdate += () => textField.UpdateDefaultText(getter().ToString());
+        textField.OnSubmit += text =>
+        {
+            if (!int.TryParse(text, out int value))
+            {
+                return;
+            }
+
+            // Always clamp text input instead of wrapping
+            if (value < min) value = min;
+            if (value > max) value = max;
+
+            setter(value);
+        };
 
         var incButton = controlBuilder.AppendSquare(new CanvasButton("Increment"));
         incButton.SetImage(UICommon.images["IconPlusMin"]);
         incButton.RemoveText();
-        incButton.OnClicked += add;
+        incButton.OnClicked += customAdd ?? (() => ValueUpdate(getter() + step));
         incButton.Border.Sides &= ~BorderSides.LEFT;
 
         builder.Build();

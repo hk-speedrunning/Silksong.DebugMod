@@ -58,6 +58,15 @@ public class CanvasButton : CanvasImage
         text.Alignment = TextAnchor.MiddleCenter;
     }
 
+    public CanvasTextField SetTextField()
+    {
+        CanvasTextField textField = new("ButtonTextField");
+        textField.Parent = this;
+        textField.Alignment = TextAnchor.MiddleCenter;
+        text = textField;
+        return textField;
+    }
+
     public void RemoveText()
     {
         text = null;

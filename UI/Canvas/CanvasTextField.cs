@@ -48,6 +48,8 @@ public class CanvasTextField : CanvasText
         {
             if (!IsFocused())
             {
+                // For some reason clicking the input field doesn't clear the selection,
+                // but I actually prefer it that way
                 Activate();
             }
         });
