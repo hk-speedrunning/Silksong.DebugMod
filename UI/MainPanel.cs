@@ -273,7 +273,8 @@ public class MainPanel : CanvasPanel
                 CanvasPanel tile = AppendLabeledTile(
                     tool.GetPopupName(),
                     () => tool.IsUnlockedNotHidden,
-                    () => ToggleTool(tool)
+                    () => ToggleTool(tool),
+                    includeLabel: false
                 );
 
                 tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
@@ -291,13 +292,11 @@ public class MainPanel : CanvasPanel
                         {
                             if (tool.IsUnlockedNotHidden)
                             {
-                                tile.Get<CanvasText>("Label").Text = tool.GetPopupName();
                                 tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
                                 return true;
                             }
                         }
 
-                        tile.Get<CanvasText>("Label").Text = firstTool.GetPopupName();
                         tile.Get<CanvasImage>("Icon").SetImage(firstTool.GetPopupIcon());
                         return false;
                     },
@@ -318,7 +317,8 @@ public class MainPanel : CanvasPanel
                         }
 
                         ToggleTool(firstTool);
-                    }
+                    },
+                    includeLabel: false
                 );
             }
         }
