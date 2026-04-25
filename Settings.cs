@@ -13,7 +13,6 @@ public class Settings
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
-    private static ConfigEntry<bool> logUnityExceptions;
 
     private static ConfigEntry<int> maxSavestatePages;
     private static ConfigEntry<bool> numpadForSavestates;
@@ -32,7 +31,17 @@ public class Settings
             "Press this key to toggle DebugMod's UI."
         );
         toggleAllUI.Value = binds.GetValueOrDefault("Toggle All UI", KeyCode.None);
-        toggleAllUI.SettingChanged += (_, _) => binds["Toggle All UI"] = toggleAllUI.Value;
+        toggleAllUI.SettingChanged += (_, _) =>
+        {
+            if (toggleAllUI.Value == KeyCode.None)
+            {
+                DebugMod.UpdateBind("Toggle All UI", null);
+            }
+            else
+            {
+                DebugMod.UpdateBind("Toggle All UI", toggleAllUI.Value);
+            }
+        };
         DebugMod.bindUpdated += (name, key) =>
         {
             if (name == "Toggle All UI")
@@ -83,15 +92,6 @@ public class Settings
                 InfoPanel.BuildPanel();
             }
         };
-
-        logUnityExceptions = config.Bind(
-            "General",
-            "Log Unity Exceptions",
-            true,
-            "Copy Unity exceptions to the BepInEx log for convenience. Takes effect on restart."
-        );
-        logUnityExceptions.Value = LogUnityExceptions;
-        logUnityExceptions.SettingChanged += (_, _) => LogUnityExceptions = logUnityExceptions.Value;
 
         maxSavestatePages = config.Bind(
             "Savestates",
