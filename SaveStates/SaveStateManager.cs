@@ -47,6 +47,20 @@ public static class SaveStateManager
             }
         }
 
+        // Cleanup empty directories in case the page count was decreased
+        foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
+        {
+            string name = Path.GetFileName(path);
+            if (!int.TryParse(name, out int i) || i < 0 || i >= NumPages)
+            {
+                try
+                {
+                    Directory.Delete(path);
+                }
+                catch { }
+            }
+        }
+
         LoadFileStates();
     }
 

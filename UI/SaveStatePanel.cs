@@ -111,7 +111,7 @@ public class SaveStatesPanel : CanvasPanel
             using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
             pageControl.Horizontal = true;
 
-            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(75));
+            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(85));
             pageText.Alignment = TextAnchor.MiddleLeft;
             pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
 
