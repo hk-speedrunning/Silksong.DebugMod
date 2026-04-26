@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class GUIController : MonoBehaviour
     private static readonly HitboxViewer hitboxes = new();
     private KeyCode keyWarning;
     private Size resolution;
+    internal LanguageCode language;
 
     private float? lastRescale;
     private const float RebuildDelay = 0.1f;
@@ -118,6 +120,7 @@ public class GUIController : MonoBehaviour
             ConfirmDialog.BuildPanel();
 
             resolution = new Size(Screen.width, Screen.height);
+            language = Language.CurrentLanguage();
 
             DebugMod.LogDebug("UI built");
         }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -248,6 +249,15 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void LoadCharacter(SaveGameData saveGameData)
     {
+        // Wait for load since there is no confirm option when switching language
+        // and rebuiling every time is very slow
+        // TODO: use Silksong.I18N language override instead, once that gets implemented
+        if (GUIController.Instance.language != Language.CurrentLanguage())
+        {
+            LogDebug($"Detected language change from {GUIController.Instance.language} to {Language.CurrentLanguage()}, rebuilding UI");
+            GUIController.Instance.BuildMenus();
+        }
+
         ConsolePanel.Instance?.Reset();
 
         playerInvincible = false;
