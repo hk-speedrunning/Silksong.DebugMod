@@ -46,6 +46,7 @@ public class MainPanel : CanvasPanel
     private int[] rowPositions;
     private int[] rowWidths;
     private int rowIndex;
+    private int lastRowCount;
 
     public static void BuildPanel()
     {
@@ -266,6 +267,7 @@ public class MainPanel : CanvasPanel
 
         foreach (KeyValuePair<string, List<ToolItem>> pair in tools)
         {
+            currentRow ??= AppendTileRow(6);
             if (pair.Value.Count == 1)
             {
                 ToolItem tool = pair.Value[0];
@@ -714,29 +716,59 @@ public class MainPanel : CanvasPanel
         int widthUnits = widths.Sum();
         int singleWidth = (totalWidth - UICommon.Margin * (widthUnits - 1)) / widthUnits;
 
-        int x = 0;
-        rowPositions = new int[widths.Length];
-        rowWidths = new int[widths.Length];
-        for (int i = 0; i < widths.Length; i++)
+        if (widthUnits != lastRowCount || rowIndex != widths.Length)
         {
-            rowPositions[i] = x;
-            rowWidths[i] = singleWidth * widths[i] + UICommon.Margin * (widths[i] - 1);
-            x += rowWidths[i] + UICommon.Margin;
-        }
+            int[] lastPositions = rowPositions;
+            int[] lastWidths = rowWidths;
 
-        rowWidths[widths.Length - 1] = totalWidth - rowPositions[widths.Length - 1];
+            int x = 0;
+            rowPositions = new int[widths.Length];
+            rowWidths = new int[widths.Length];
+            for (int i = 0; i < widths.Length; i++)
+            {
+                rowPositions[i] = x;
+                rowWidths[i] = singleWidth * widths[i] + UICommon.Margin * (widths[i] - 1);
+                x += rowWidths[i] + UICommon.Margin;
+            }
+
+            rowWidths[widths.Length - 1] = totalWidth - rowPositions[widths.Length - 1];
+
+            if (lastRowCount > 1 && widthUnits > lastRowCount && widthUnits % lastRowCount == 0)
+            {
+                // Make sure this row's margins line up properly with the previous row's margins
+                // (This is a horrible way to do this lmao)
+
+                int factor = widthUnits / lastRowCount;
+
+                for (int i = 0; i < lastRowCount; i++)
+                {
+                    int j = (i + 1) * factor - 1;
+                    int lastX = lastPositions[i] + lastWidths[i];
+                    int curX = rowPositions[j] + rowWidths[j];
+
+                    if (lastX != curX)
+                    {
+                        rowWidths[j] += lastX - curX;
+                        for (int k = j + 1; k < widths.Length; k++)
+                        {
+                            rowPositions[k] += lastX - curX;
+                        }
+                    }
+                }
+
+                rowWidths[widths.Length - 1] = totalWidth - rowPositions[widths.Length - 1];
+            }
+        }
 
         currentRow = row;
         rowCounter++;
         rowIndex = 0;
+        lastRowCount = widthUnits;
     }
 
     private void ResetRow()
     {
         currentRow = null;
-        rowPositions = null;
-        rowWidths = null;
-        rowIndex = 0;
     }
 
     private CanvasPanel AppendRow(params int[] widths)
@@ -864,7 +896,8 @@ public class MainPanel : CanvasPanel
         builder.Padding = UICommon.Margin / 2f;
         builder.DynamicLength = true;
 
-        CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
+        // Effectively AppendSquare() but ensures the last tile in a row isn't longer than the others
+        CanvasImage icon = builder.AppendFixed(new CanvasImage("Icon"), rowWidths[0] - builder.OuterPadding * 2);
         icon.SetImage(UICommon.images[image]);
 
         if (includeLabel)

@@ -59,6 +59,8 @@ public class ConsolePanel : CanvasPanel
         }
 
         messageQueue.Clear();
+
+        UpdateText();
     }
 
     private void UpdateText()
