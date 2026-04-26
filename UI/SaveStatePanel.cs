@@ -1,4 +1,5 @@
-﻿using DebugMod.SaveStates;
+﻿using DebugMod.Helpers;
+using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
@@ -51,10 +52,11 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasText quickslotLabel = quickslot.AppendFlex(new CanvasText("Label"));
             quickslotLabel.Alignment = TextAnchor.MiddleLeft;
-            quickslotLabel.OnUpdate += () => quickslotLabel.Text = $"Quickslot: {SaveStateManager.GetQuickState()}";
+            quickslotLabel.OnUpdate += () => quickslotLabel.Text = string.Format(
+                Utils.Localize("SAVESTATEPANEL_QUICKSLOTFORMAT"), SaveStateManager.GetQuickState());
 
             CanvasButton load = quickslot.AppendFixed(new CanvasButton("Load"), QuickSlotButtonWidth - UICommon.ControlHeight);
-            load.Text.Text = "Load";
+            load.Text.Text = Utils.Localize("SAVESTATEPANEL_QUICKSLOTLOAD");
             load.OnClicked += () =>
             {
                 CancelSelectState(true);
@@ -66,7 +68,7 @@ public class SaveStatesPanel : CanvasPanel
             quickslot.AppendPadding(UICommon.Margin);
 
             CanvasButton save = quickslot.AppendFixed(new CanvasButton("Save"), QuickSlotButtonWidth - UICommon.ControlHeight);
-            save.Text.Text = "Save";
+            save.Text.Text = Utils.Localize("SAVESTATEPANEL_QUICKSLOTSAVE");
             save.OnClicked += () =>
             {
                 CancelSelectState(true);
@@ -113,7 +115,8 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(85));
             pageText.Alignment = TextAnchor.MiddleLeft;
-            pageText.OnUpdate += () => pageText.Text = $"Page {currentPage + 1}/{SaveStateManager.NumPages}";
+            pageText.OnUpdate += () => pageText.Text = string.Format(
+                Utils.Localize("SAVESTATEPANEL_PAGEFORMAT"), currentPage + 1, SaveStateManager.NumPages);
 
             CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
             prevPage.ImageOnly(UICommon.images["IconMinus"]);
@@ -163,7 +166,7 @@ public class SaveStatesPanel : CanvasPanel
             fileSlot.AppendPadding(UICommon.Margin);
 
             CanvasButton read = fileSlot.AppendFixed(new CanvasButton("Read"), FileSlotButtonWidth);
-            read.Text.Text = "Read";
+            read.Text.Text = Utils.Localize("SAVESTATEPANEL_FILESLOTREAD");
             read.OnUpdate += () => read.Border.Color = IsReadOperation() ? UICommon.highlightColor : UICommon.borderColor;
             read.OnClicked += () =>
             {
@@ -184,7 +187,7 @@ public class SaveStatesPanel : CanvasPanel
             fileSlot.AppendPadding(UICommon.Margin);
 
             CanvasButton write = fileSlot.AppendFixed(new CanvasButton("Write"), FileSlotButtonWidth);
-            write.Text.Text = "Write";
+            write.Text.Text = Utils.Localize("SAVESTATEPANEL_FILESLOTWRITE");
             write.OnUpdate += () => write.Border.Color = IsWriteOperation() ? UICommon.highlightColor : UICommon.borderColor;
             write.OnClicked += () =>
             {
@@ -206,7 +209,7 @@ public class SaveStatesPanel : CanvasPanel
 
                 if (SaveStateManager.GetFileState(currentPage, index).IsSet())
                 {
-                    ConfirmDialog.Instance.Toggle(write, "Overwrite file slot?", action, () => CancelSelectState(true));
+                    ConfirmDialog.Instance.Toggle(write, Utils.Localize("SAVESTATEPANEL_OVERWRITEPROMPT"), action, () => CancelSelectState(true));
                 }
                 else
                 {
@@ -223,10 +226,10 @@ public class SaveStatesPanel : CanvasPanel
     {
         return operation switch
         {
-            SelectOperation.QuickslotToFile => "Writing quickslot to file slot",
-            SelectOperation.FileToQuickslot => "Reading file slot to quickslot",
-            SelectOperation.SaveToFile => "Saving directly to file slot",
-            SelectOperation.LoadFromFile => "Loading directly from file slot",
+            SelectOperation.QuickslotToFile => Utils.Localize("SAVESTATEPANEL_OPERATION_QUICKSLOTTOFILE"),
+            SelectOperation.FileToQuickslot => Utils.Localize("SAVESTATEPANEL_OPERATION_FILETOQUICKSLOT"),
+            SelectOperation.SaveToFile => Utils.Localize("SAVESTATEPANEL_OPERATION_SAVETOFILE"),
+            SelectOperation.LoadFromFile => Utils.Localize("SAVESTATEPANEL_OPERATION_LOADFROMFILE"),
             _ => null
         };
     }

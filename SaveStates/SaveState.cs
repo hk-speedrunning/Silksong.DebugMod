@@ -616,7 +616,7 @@ public class SaveState
     #region helper functionality
     public bool IsSet() => !string.IsNullOrEmpty(data.saveStateIdentifier);
 
-    public override string ToString() => IsSet() ? data.saveStateIdentifier : "Empty";
+    public override string ToString() => IsSet() ? data.saveStateIdentifier : Utils.Localize("SAVESTATEPANEL_EMPTY");
     #endregion
 
     #region patches

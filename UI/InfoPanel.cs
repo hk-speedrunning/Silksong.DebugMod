@@ -64,38 +64,38 @@ public class InfoPanel : CanvasPanel
 
         int sectionBreak = UICommon.ScaleHeight(20);
 
-        AppendInfo("Position", GetHeroPos);
-        AppendInfo("Velocity", () => HeroController.instance.current_velocity);
-        AppendInfo("Inputs", GetInputs);
-        AppendInfo("Hero State", () => HeroController.instance.hero_state);
-        AppendInfo("Damage State", () => HeroController.instance.damageMode);
+        AppendInfo("INFOPANEL_POSITION", GetHeroPos);
+        AppendInfo("INFOPANEL_VELOCITY", () => HeroController.instance.current_velocity);
+        AppendInfo("INFOPANEL_INPUTS", GetInputs);
+        AppendInfo("INFOPANEL_HEROSTATE", () => HeroController.instance.hero_state);
+        AppendInfo("INFOPANEL_DAMAGESTATE", () => HeroController.instance.damageMode);
 
         y += sectionBreak;
 
-        AppendInfo("Needle Base", () => $"{PlayerData.instance.nailDamage} (n{PlayerData.instance.nailUpgrades})");
-        AppendInfo("Last Damage", () => DebugMod.lastHit != null ?
-            $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : "None");
-        AppendInfo("Last Type", () => DebugMod.lastHit?.AttackType.ToString() ?? "None");
-        AppendInfo("Last Scaling", GetScaling);
+        AppendInfo("INFOPANEL_NEEDLEBASE", () => $"{PlayerData.instance.nailDamage} (n{PlayerData.instance.nailUpgrades})");
+        AppendInfo("INFOPANEL_LASTDAMAGEAMOUNT", () => DebugMod.lastHit != null ?
+            $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : Utils.Localize("INFOPANEL_NONE"));
+        AppendInfo("INFOPANEL_LASTDAMAGETYPE", () => DebugMod.lastHit?.AttackType.ToString() ?? Utils.Localize("INFOPANEL_NONE"));
+        AppendInfo("INFOPANEL_LASTDAMAGESCALING", GetScaling);
 
         y += sectionBreak;
 
-        AppendInfo("Health", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
-        AppendInfo("Silk", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
-        AppendInfo("Completion", () => $"{PlayerData.instance.completionPercentage}%");
-        AppendInfo("Fleas", () => $"{Gameplay.FleasCollectedCount} / 30");
-        AppendInfo("Quest Points", GetQuestPoints);
+        AppendInfo("INFOPANEL_HEALTH", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
+        AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
+        AppendInfo("INFOPANEL_COMPLETION", () => $"{PlayerData.instance.completionPercentage}%");
+        AppendInfo("INFOPANEL_FLEAS", () => $"{Gameplay.FleasCollectedCount} / 30");
+        AppendInfo("INFOPANEL_QUESTPOINTS", GetQuestPoints);
 
         if (DebugMod.settings.ExpandedInfoPanel)
         {
             y += sectionBreak;
 
-            AppendInfo("Scene Name", DebugMod.GetSceneName);
-            AppendInfo("Trans State", GetTransitionStates);
-            AppendInfo("Game State", () => GameManager.instance.GameState);
-            AppendInfo("UI State", () => HeroController.instance.ui.uiState);
-            AppendInfo("Transition", () => HeroController.instance.cState.transitioning);
-            AppendInfo("Is Gameplay", () => HeroController.instance.isGameplayScene);
+            AppendInfo("INFOPANEL_SCENENAME", DebugMod.GetSceneName);
+            AppendInfo("INFOPANEL_TRANSITIONSTATE", GetTransitionStates);
+            AppendInfo("INFOPANEL_GAMESTATE", () => GameManager.instance.GameState);
+            AppendInfo("INFOPANEL_UISTATE", () => HeroController.instance.ui.uiState);
+            AppendInfo("INFOPANEL_TRANSITIONING", () => HeroController.instance.cState.transitioning);
+            AppendInfo("INFOPANEL_ISGAMEPLAY", () => HeroController.instance.isGameplayScene);
         }
 
         AppendInfo(LeftColumnInjects);
@@ -114,42 +114,42 @@ public class InfoPanel : CanvasPanel
         x += labelWidth + infoWidth;
         y = ContentMargin();
 
-        AppendInfo("Attacking", () => HeroController.instance.cState.attacking);
-        AppendInfo("Sprinting", GetSprintFlags);
-        AppendInfo("Jumping", GetJumpFlags);
-        AppendInfo("Falling", () => HeroController.instance.cState.falling);
-        AppendInfo("Hardland", () => HeroController.instance.cState.willHardLand);  // Could combine into above to make room if needed
-        AppendInfo("Swimming", () => HeroController.instance.cState.swimming);
-        AppendInfo("Recoiling", () => HeroController.instance.cState.recoiling);
-        AppendInfo("Soaring", () => HeroController.instance.cState.superDashing);
+        AppendInfo("INFOPANEL_ATTACKING", () => HeroController.instance.cState.attacking);
+        AppendInfo("INFOPANEL_SPRINTING", GetSprintFlags);
+        AppendInfo("INFOPANEL_JUMPING", GetJumpFlags);
+        AppendInfo("INFOPANEL_FALLING", () => HeroController.instance.cState.falling);
+        AppendInfo("INFOPANEL_HARDLAND", () => HeroController.instance.cState.willHardLand);  // Could combine into above to make room if needed
+        AppendInfo("INFOPANEL_SWIMMING", () => HeroController.instance.cState.swimming);
+        AppendInfo("INFOPANEL_RECOILING", () => HeroController.instance.cState.recoiling);
+        AppendInfo("INFOPANEL_SOARING", () => HeroController.instance.cState.superDashing);
 
         y += sectionBreak;
 
-        AppendInfo("Wall States", GetWallState);
-        AppendInfo("Can Cast", () => HeroController.instance.CanCast());
-        AppendInfo("Can Soar", () => HeroController.instance.CanSuperJump());
-        AppendInfo("Can Quickmap", () => HeroController.instance.CanQuickMap());
-        AppendInfo("Can Inventory", () => HeroController.instance.CanOpenInventory());
+        AppendInfo("INFOPANEL_WALLSTATES", GetWallState);
+        AppendInfo("INFOPANEL_CANCAST", () => HeroController.instance.CanCast());
+        AppendInfo("INFOPANEL_CANSOAR", () => HeroController.instance.CanSuperJump());
+        AppendInfo("INFOPANEL_CANQUICKMAP", () => HeroController.instance.CanQuickMap());
+        AppendInfo("INFOPANEL_CANINVENTORY", () => HeroController.instance.CanOpenInventory());
 
         y += sectionBreak;
 
         if (DebugMod.settings.ExpandedInfoPanel)
         {
-            AppendInfo("Accept Input", () => HeroController.instance.acceptingInput);
-            AppendInfo("Relinquished", () => HeroController.instance.controlReqlinquished);
-            AppendInfo("Hero Paused", () => HeroController.instance.IsPaused());
-            AppendInfo("At Bench", () => PlayerData.instance.atBench);
-            AppendInfo("Invulnerable", () => HeroController.instance.cState.Invulnerable);
-            AppendInfo("Invincible", () => PlayerData.instance.isInvincible);
+            AppendInfo("INFOPANEL_ACCEPTINPUT", () => HeroController.instance.acceptingInput);
+            AppendInfo("INFOPANEL_CONTROLRELINQUISHED", () => HeroController.instance.controlReqlinquished);
+            AppendInfo("INFOPANEL_HEROPAUSED", () => HeroController.instance.IsPaused());
+            AppendInfo("INFOPANEL_ATBENCH", () => PlayerData.instance.atBench);
+            AppendInfo("INFOPANEL_INVULNERABLE", () => HeroController.instance.cState.Invulnerable);
+            AppendInfo("INFOPANEL_INVINCIBLE", () => PlayerData.instance.isInvincible);
 
             y += sectionBreak;
 
-            AppendInfo("Camera Mode", GetCameraModes);
+            AppendInfo("INFOPANEL_CAMERAMODE", GetCameraModes);
         }
         else
         {
             // Re-add scene name omitted above
-            AppendInfo("Scene Name", DebugMod.GetSceneName);
+            AppendInfo("INFOPANEL_SCENENAME", DebugMod.GetSceneName);
         }
 
         AppendInfo(RightColumnInjects);
@@ -176,7 +176,7 @@ public class InfoPanel : CanvasPanel
             profilerText.Size = new Vector2(labelWidth + infoWidth, Size.y);
             profilerText.OnUpdate += () =>
             {
-                string info = "Profiler\n";
+                string info = Utils.Localize("INFOPANEL_PROFILER") + "\n";
 
                 Dictionary<string, float> times = Profiler.GetTimes();
                 foreach (KeyValuePair<string, float> pair in times)
@@ -198,7 +198,7 @@ public class InfoPanel : CanvasPanel
         labelText.LocalPosition = new Vector2(x, y);
         labelText.Size = new Vector2(labelWidth, ListingHeight);
         labelText.Alignment = TextAnchor.MiddleLeft;
-        labelText.Text = label;
+        labelText.Text = Utils.Localize(label);
 
         // Info text is offset slightly downward so the different fonts (approximately) line up
         CanvasText infoText = Add(new CanvasText($"Info{counter}", overflow: HorizontalWrapMode.Overflow));
@@ -292,7 +292,7 @@ public class InfoPanel : CanvasPanel
 
     private static string GetScaling()
     {
-        if (DebugMod.lastScaling == null) return "None";
+        if (DebugMod.lastScaling == null) return Utils.Localize("INFOPANEL_NONE");
 
         string[] scaleMultipliers =
         [
@@ -317,12 +317,13 @@ public class InfoPanel : CanvasPanel
     {
         return HeroController.instance.transitionState switch
         {
-            HeroTransitionState.WAITING_TO_TRANSITION => $"Done ({DebugMod.GetLoadTime()}s)",
-            HeroTransitionState.EXITING_SCENE => "Exiting",
-            HeroTransitionState.WAITING_TO_ENTER_LEVEL => "Wait Enter",
-            HeroTransitionState.ENTERING_SCENE => "Entering",
-            HeroTransitionState.DROPPING_DOWN => "Dropping down",
-            _ => "UNKNOWN"
+            HeroTransitionState.WAITING_TO_TRANSITION => string.Format(
+                Utils.Localize("INFOPANEL_TRANSITIONSTATE_DONEFORMAT"), DebugMod.GetLoadTime()),
+            HeroTransitionState.EXITING_SCENE => Utils.Localize("INFOPANEL_TRANSITIONSTATE_EXITING"),
+            HeroTransitionState.WAITING_TO_ENTER_LEVEL => Utils.Localize("INFOPANEL_TRANSITIONSTATE_WAITINGTOENTER"),
+            HeroTransitionState.ENTERING_SCENE => Utils.Localize("INFOPANEL_TRANSITIONSTATE_ENTERING"),
+            HeroTransitionState.DROPPING_DOWN => Utils.Localize("INFOPANEL_TRANSITIONSTATE_DROPPINGDOWN"),
+            _ => Utils.Localize("INFOPANEL_UNKNOWN")
         };
     }
 
@@ -330,14 +331,14 @@ public class InfoPanel : CanvasPanel
     {
         return DebugMod.RefCamera.mode switch
         {
-            CameraController.CameraMode.FROZEN => "Frz",
-            CameraController.CameraMode.FOLLOWING => "Fol",
-            CameraController.CameraMode.LOCKED => "Lck",
-            CameraController.CameraMode.PANNING => "Pan",
-            CameraController.CameraMode.FADEOUT => "Out",
-            CameraController.CameraMode.FADEIN => "In",
-            CameraController.CameraMode.PREVIOUS => "Prv",
-            _ => "UNKNOWN"
+            CameraController.CameraMode.FROZEN => Utils.Localize("INFOPANEL_CAMERAMODE_FROZEN"),
+            CameraController.CameraMode.FOLLOWING => Utils.Localize("INFOPANEL_CAMERAMODE_FOLLOWING"),
+            CameraController.CameraMode.LOCKED => Utils.Localize("INFOPANEL_CAMERAMODE_LOCKED"),
+            CameraController.CameraMode.PANNING => Utils.Localize("INFOPANEL_CAMERAMODE_PANNING"),
+            CameraController.CameraMode.FADEOUT => Utils.Localize("INFOPANEL_CAMERAMODE_FADEOUT"),
+            CameraController.CameraMode.FADEIN => Utils.Localize("INFOPANEL_CAMERAMODE_FADEIN"),
+            CameraController.CameraMode.PREVIOUS => Utils.Localize("INFOPANEL_CAMERAMODE_PREVIOUS"),
+            _ => Utils.Localize("INFOPANEL_UNKNOWN")
         };
     }
 
