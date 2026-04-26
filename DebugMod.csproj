@@ -29,6 +29,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/hk-speedrunning/Silksong.DebugMod</RepositoryUrl>
+
+    <NeutralLanguage>EN</NeutralLanguage>
     
   </PropertyGroup>
 
@@ -65,6 +67,7 @@
     <ItemGroup>
       <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/" />
       <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/" />
+      <Binaries Include="$(ProjectDir)/languages/*.json" LocalDir="languages" PackDir="plugins/languages" />
     </ItemGroup>
     <PropertyGroup>
       <ThunderstoreDir>$(ProjectDir)/thunderstore</ThunderstoreDir>
@@ -79,7 +82,7 @@
     
   <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
       <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
-      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
+      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)/%(Binaries.LocalDir)" />
 
       <PropertyGroup>
         <ModlistVersion>0.2.0</ModlistVersion>

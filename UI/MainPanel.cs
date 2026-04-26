@@ -60,53 +60,53 @@ public class MainPanel : CanvasPanel
         Size = new Vector2(UICommon.RightSideWidth, UICommon.MainPanelHeight);
         OnUpdate += DoUpdate;
 
-        AddTab("Gameplay");
+        AddTab("MAINPANEL_TAB_GAMEPLAY");
 
-        AppendSectionHeader("Cheats");
+        AppendSectionHeader("GAMEPLAY_SECTION_CHEATS");
         AppendRow(1, 1, 1);
-        AppendToggleControl("Noclip", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
-        AppendToggleControl("Invincibility", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
-        AppendToggleControl("Infinite Jump", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
+        AppendToggleControl("GAMEPLAY_CHEATS_NOCLIP", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
+        AppendToggleControl("GAMEPLAY_CHEATS_INVINCIBILITY", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
+        AppendToggleControl("GAMEPLAY_CHEATS_INFINITEJUMP", () => PlayerData.instance.infiniteAirJump, BindableFunctions.ToggleInfiniteJump);
         AppendRow(1, 1, 1);
-        AppendToggleControl("Infinite HP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
-        AppendToggleControl("Infinite Silk", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
-        AppendToggleControl("Infinite Tools", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
+        AppendToggleControl("GAMEPLAY_CHEATS_INFINITEHP", () => DebugMod.infiniteHP, BindableFunctions.ToggleInfiniteHP);
+        AppendToggleControl("GAMEPLAY_CHEATS_INFINITESILK", () => DebugMod.infiniteSilk, BindableFunctions.ToggleInfiniteSilk);
+        AppendToggleControl("GAMEPLAY_CHEATS_INFINITETOOLS", () => DebugMod.infiniteTools, BindableFunctions.ToggleInfiniteTools);
         AppendRow(2, 1);
-        AppendToggleControl("Toggle Hero Collider", () => DebugMod.heroColliderDisabled, BindableFunctions.ToggleHeroCollider);
-        AppendBasicControl("Kill All", BindableFunctions.KillAll);
+        AppendToggleControl("GAMEPLAY_CHEATS_TOGGLEHEROCOLLIDER", () => DebugMod.heroColliderDisabled, BindableFunctions.ToggleHeroCollider);
+        AppendBasicControl("GAMEPLAY_CHEATS_KILLALL", BindableFunctions.KillAll);
 
-        AppendSectionHeader("Mod UI");
+        AppendSectionHeader("GAMEPLAY_SECTION_MODUI");
         AppendRow(1, 1);
-        AppendToggleControl("Toggle All UI", () => true, BindableFunctions.ToggleAllPanels);
-        AppendToggleControl("Toggle Main Panel", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLEALLUI", () => true, BindableFunctions.ToggleAllPanels);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLEMAINPANEL", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Enemies Panel", () => DebugMod.settings.EnemiesPanelVisible, BindableFunctions.ToggleEnemiesPanel);
-        AppendToggleControl("Toggle Console Panel", () => DebugMod.settings.ConsoleVisible, BindableFunctions.ToggleConsolePanel);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLEENEMIESPANEL", () => DebugMod.settings.EnemiesPanelVisible, BindableFunctions.ToggleEnemiesPanel);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLECONSOLEPANEL", () => DebugMod.settings.ConsoleVisible, BindableFunctions.ToggleConsolePanel);
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Savestates Panel", () => DebugMod.settings.SaveStatePanelVisible, BindableFunctions.ToggleSaveStatePanel);
-        AppendToggleControl("Expand/Collapse Savestates", () => DebugMod.settings.SaveStatePanelExpanded, BindableFunctions.ToggleExpandedSaveStatePanel);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLESAVESTATESPANEL", () => DebugMod.settings.SaveStatePanelVisible, BindableFunctions.ToggleSaveStatePanel);
+        AppendToggleControl("GAMEPLAY_MODUI_EXPANDCOLLAPSESAVESTATES", () => DebugMod.settings.SaveStatePanelExpanded, BindableFunctions.ToggleExpandedSaveStatePanel);
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Info Panel", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
-        AppendToggleControl("Always Show Cursor", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
+        AppendToggleControl("GAMEPLAY_MODUI_TOGGLEINFOPANEL", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
+        AppendToggleControl("GAMEPLAY_MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
-        AppendSectionHeader("Time");
+        AppendSectionHeader("GAMEPLAY_SECTION_TIME");
         AppendRow(1, 1);
-        AppendBasicControl("Increase Timescale", BindableFunctions.TimescaleUp);
-        AppendBasicControl("Decrease Timescale", BindableFunctions.TimescaleDown);
+        AppendBasicControl("GAMEPLAY_TIME_INCREASETIMESCALE", BindableFunctions.TimescaleUp);
+        AppendBasicControl("GAMEPLAY_TIME_DECREASETIMESCALE", BindableFunctions.TimescaleDown);
         AppendRow(1, 1);
-        AppendToggleControl("Freeze Game", () => TimeScale.Frozen, BindableFunctions.PauseGameNoUI);
-        AppendBasicControl("Advance Frame", BindableFunctions.AdvanceFrame);
+        AppendToggleControl("GAMEPLAY_TIME_FREEZEGAME", () => TimeScale.Frozen, BindableFunctions.PauseGameNoUI);
+        AppendBasicControl("GAMEPLAY_TIME_ADVANCEFRAME", BindableFunctions.AdvanceFrame);
         AppendRow(1, 1);
-        AppendToggleControl("Force Pause", () =>
+        AppendToggleControl("GAMEPLAY_TIME_FORCEPAUSE", () =>
             DebugMod.forcePaused && GameManager.instance.isPaused, BindableFunctions.ForcePause);
-        AppendBasicControl("Reset Frame Counter", BindableFunctions.ResetFrameCounter);
+        AppendBasicControl("GAMEPLAY_TIME_RESETFRAMECOUNTER", BindableFunctions.ResetFrameCounter);
 
-        AppendSectionHeader("Visual");
+        AppendSectionHeader("GAMEPLAY_SECTION_VISUAL");
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Hitboxes", () => DebugMod.settings.ShowHitBoxes != 0, BindableFunctions.ShowHitboxes);
-        AppendToggleControl("Force Camera Follow", () => DebugMod.cameraFollow, BindableFunctions.ForceCameraFollow);
+        AppendToggleControl("GAMEPLAY_VISUAL_TOGGLEHITBOXES", () => DebugMod.settings.ShowHitBoxes != 0, BindableFunctions.ShowHitboxes);
+        AppendToggleControl("GAMEPLAY_VISUAL_FORCECAMERAFOLLOW", () => DebugMod.cameraFollow, BindableFunctions.ForceCameraFollow);
         AppendRow(1, 1);
-        AppendToggleControl("Preview Cocoon Position", CocoonPreviewToggled, BindableFunctions.PreviewCocoonPosition);
+        AppendToggleControl("GAMEPLAY_VISUAL_PREVIEWCOCOONPOSITION", CocoonPreviewToggled, BindableFunctions.PreviewCocoonPosition);
         static bool CocoonPreviewToggled()
         {
             CocoonPreviewer previewer = GameManager.instance.GetComponent<CocoonPreviewer>();
@@ -114,7 +114,7 @@ public class MainPanel : CanvasPanel
             return previewer.previewEnabled;
         }
 
-        AppendToggleControl("Toggle Hero Light", HeroLightToggled, BindableFunctions.ToggleHeroLight);
+        AppendToggleControl("GAMEPLAY_VISUAL_TOGGLEHEROLIGHT", HeroLightToggled, BindableFunctions.ToggleHeroLight);
         static bool HeroLightToggled()
         {
             // Null propagation doesn't work on Unity objects
@@ -127,15 +127,15 @@ public class MainPanel : CanvasPanel
             return Math.Abs(renderer.color.a) == 0;
         }
         AppendRow(1, 1, 1);
-        AppendToggleControl("Toggle HUD", HUDToggled, BindableFunctions.ToggleHUD);
+        AppendToggleControl("GAMEPLAY_VISUAL_TOGGLEHUD", HUDToggled, BindableFunctions.ToggleHUD);
         static bool HUDToggled()
         {
             PlayMakerFSM hud = GameCameras.instance.hudCanvasSlideOut;
             if (!hud) return false;
             return !hud.gameObject.activeInHierarchy;
         }
-        AppendToggleControl("Toggle Vignette", () => VisualMaskHelper.vignetteDisabled, BindableFunctions.ToggleVignette);
-        AppendToggleControl("Hide Hero", HideHeroToggled, BindableFunctions.HideHero);
+        AppendToggleControl("GAMEPLAY_VISUAL_TOGGLEVIGNETTE", () => VisualMaskHelper.vignetteDisabled, BindableFunctions.ToggleVignette);
+        AppendToggleControl("GAMEPLAY_VISUAL_HIDEHERO", HideHeroToggled, BindableFunctions.HideHero);
         static bool HideHeroToggled()
         {
             GameObject hero = DebugMod.RefKnight;
@@ -145,56 +145,56 @@ public class MainPanel : CanvasPanel
             return Math.Abs(sprite.color.a) == 0;
         }
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Camera Shake", CameraShakeToggled, BindableFunctions.ToggleCameraShake);
+        AppendToggleControl("GAMEPLAY_VISUAL_TOGGLECAMERASHAKE", CameraShakeToggled, BindableFunctions.ToggleCameraShake);
         static bool CameraShakeToggled()
         {
             PlayMakerFSM cameraShake = GameCameras.instance.cameraShakeFSM;
             if (!cameraShake) return false;
             return !cameraShake.enabled;
         }
-        AppendToggleControl("Deactivate Visual Masks", () => VisualMaskHelper.masksDisabled, BindableFunctions.DoDeactivateVisualMasks);
+        AppendToggleControl("GAMEPLAY_VISUAL_DEACTIVATEVISUALMASKS", () => VisualMaskHelper.masksDisabled, BindableFunctions.DoDeactivateVisualMasks);
         AppendRow(1, 1, 1);
-        AppendBasicControl("Zoom In", BindableFunctions.ZoomIn);
-        AppendBasicControl("Zoom Out", BindableFunctions.ZoomOut);
-        AppendBasicControl("Reset Zoom", BindableFunctions.ResetZoom);
+        AppendBasicControl("GAMEPLAY_VISUAL_ZOOMIN", BindableFunctions.ZoomIn);
+        AppendBasicControl("GAMEPLAY_VISUAL_ZOOMOUT", BindableFunctions.ZoomOut);
+        AppendBasicControl("GAMEPLAY_VISUAL_RESETZOOM", BindableFunctions.ResetZoom);
 
-        AppendSectionHeader("Misc");
+        AppendSectionHeader("GAMEPLAY_SECTION_MISC");
         AppendRow(1, 1);
-        AppendBasicControl("Set Hazard Respawn", BindableFunctions.SetHazardRespawn);
-        AppendBasicControl("Hazard Respawn", BindableFunctions.Respawn);
+        AppendBasicControl("GAMEPLAY_MISC_SETHAZARDRESPAWN", BindableFunctions.SetHazardRespawn);
+        AppendBasicControl("GAMEPLAY_MISC_HAZARDRESPAWN", BindableFunctions.Respawn);
         AppendRow(1, 1, 1);
-        AppendBasicControl("Damage Self", BindableFunctions.SelfDamage);
-        AppendBasicControl("Kill Self", BindableFunctions.KillSelf);
-        AppendBasicControl("Break Cocoon", BindableFunctions.BreakCocoon);
+        AppendBasicControl("GAMEPLAY_MISC_DAMAGESELF", BindableFunctions.SelfDamage);
+        AppendBasicControl("GAMEPLAY_MISC_KILLSELF", BindableFunctions.KillSelf);
+        AppendBasicControl("GAMEPLAY_MISC_BREAKCOCOON", BindableFunctions.BreakCocoon);
         AppendRow(1, 1);
-        AppendBasicControl("Reset Current Scene Data", BindableFunctions.ResetCurrentScene);
-        AppendBasicControl("Block Scene Data Changes", BindableFunctions.BlockCurrentSceneChanges);
+        AppendBasicControl("GAMEPLAY_MISC_RESETCURRENTSCENEDATA", BindableFunctions.ResetCurrentScene);
+        AppendBasicControl("GAMEPLAY_MISC_BLOCKSCENEDATACHANGES", BindableFunctions.BlockCurrentSceneChanges);
         AppendRow(1, 1, 1);
-        AppendToggleControl("Toggle Act 3", () => PlayerData.instance.blackThreadWorld, BindableFunctions.ToggleAct3);
-        AppendToggleControl("Lock Keybinds", () => DebugMod.KeyBindLock, BindableFunctions.ToggleLockKeyBinds);
-        AppendBasicControl("Reset All", BindableFunctions.Reset);
+        AppendToggleControl("GAMEPLAY_MISC_TOGGLEACT3", () => PlayerData.instance.blackThreadWorld, BindableFunctions.ToggleAct3);
+        AppendToggleControl("GAMEPLAY_MISC_LOCKKEYBINDS", () => DebugMod.KeyBindLock, BindableFunctions.ToggleLockKeyBinds);
+        AppendBasicControl("GAMEPLAY_MISC_RESETALL", BindableFunctions.Reset);
 
-        AddTab("Items");
+        AddTab("MAINPANEL_TAB_ITEMS");
 
-        AppendSectionHeader("Skills");
+        AppendSectionHeader("ITEMS_SECTION_SKILLS");
         AppendRow(1);
-        AppendBasicControl("All Skills", BindableFunctions.GiveAllSkills);
+        AppendBasicControl("ITEMS_SKILLS_ALLSKILLS", BindableFunctions.GiveAllSkills);
         AppendTileRow(5);
-        AppendLabeledTile("Swift Step", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep, "Skill_SwiftStep");
-        AppendLabeledTile("Cling Grip", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip, "Skill_ClingGrip");
-        AppendLabeledTile("Needolin", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin, "Skill_Needolin");
-        AppendLabeledTile("Clawline", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline, "Skill_Clawline");
-        AppendLabeledTile("Silk Soar", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar, "Skill_SilkSoar");
+        AppendLabeledTile("ITEMS_SKILLS_SWIFTSTEP", () => PlayerData.instance.hasDash, BindableFunctions.ToggleSwiftStep, "Skill_SwiftStep");
+        AppendLabeledTile("ITEMS_SKILLS_CLINGGRIP", () => PlayerData.instance.hasWalljump, BindableFunctions.ToggleClingGrip, "Skill_ClingGrip");
+        AppendLabeledTile("ITEMS_SKILLS_NEEDOLIN", () => PlayerData.instance.hasNeedolin, BindableFunctions.ToggleNeedolin, "Skill_Needolin");
+        AppendLabeledTile("ITEMS_SKILLS_CLAWLINE", () => PlayerData.instance.hasHarpoonDash, BindableFunctions.ToggleClawline, "Skill_Clawline");
+        AppendLabeledTile("ITEMS_SKILLS_SILKSOAR", () => PlayerData.instance.hasSuperJump, BindableFunctions.ToggleSilkSoar, "Skill_SilkSoar");
         AppendTileRow(5);
-        AppendLabeledTile("Drifter's Cloak", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak, "Skill_DriftersCloak");
-        AppendLabeledTile("Faydown Cloak", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak, "Skill_FaydownCloak");
-        AppendLabeledTile("Needle Strike", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike, "Skill_NeedleStrike");
-        AppendLabeledTile("Beastling Call", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall, "Skill_BeastlingCall");
-        AppendLabeledTile("Elegy of the Deep", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep, "Skill_Elegy");
+        AppendLabeledTile("ITEMS_SKILLS_DRIFTERSCLOAK", () => PlayerData.instance.hasBrolly, BindableFunctions.ToggleDriftersCloak, "Skill_DriftersCloak");
+        AppendLabeledTile("ITEMS_SKILLS_FAYDOWNCLOAK", () => PlayerData.instance.hasDoubleJump, BindableFunctions.ToggleFaydownCloak, "Skill_FaydownCloak");
+        AppendLabeledTile("ITEMS_SKILLS_NEEDLESTRIKE", () => PlayerData.instance.hasChargeSlash, BindableFunctions.ToggleNeedleStrike, "Skill_NeedleStrike");
+        AppendLabeledTile("ITEMS_SKILLS_BEASTLINGCALL", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall, "Skill_BeastlingCall");
+        AppendLabeledTile("ITEMS_SKILLS_ELEGYOFTHEDEEP", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep, "Skill_Elegy");
 
-        AppendSectionHeader("Upgrades");
+        AppendSectionHeader("ITEMS_SECTION_UPGRADES");
         AppendTileRow(2);
-        AppendIncrementTile("Needle Damage", () => PlayerData.instance.nailDamage, SetNailDamage, "Inv_Needle",
+        AppendIncrementTile("ITEMS_UPGRADES_NEEDLEDAMAGE", () => PlayerData.instance.nailDamage, SetNailDamage, "Inv_Needle",
             customAdd: BindableFunctions.IncreaseNeedleDamage, customRemove: BindableFunctions.DecreaseNeedleDamage);
         static void SetNailDamage(int value)
         {
@@ -202,21 +202,21 @@ public class MainPanel : CanvasPanel
             PlayerData.instance.nailUpgrades = nailUpgrades;
             DebugMod.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
-        AppendIncrementTile("Silk Hearts", () => PlayerData.instance.silkRegenMax,
+        AppendIncrementTile("ITEMS_UPGRADES_SILKHEARTS", () => PlayerData.instance.silkRegenMax,
             value => PlayerData.instance.silkRegenMax = value, "Inv_SilkHeart", max: 3, wrap: true);
         AppendTileRow(2);
-        AppendIncrementTile("Crafting Kit", () => PlayerData.instance.ToolKitUpgrades,
+        AppendIncrementTile("ITEMS_UPGRADES_CRAFTINGKIT", () => PlayerData.instance.ToolKitUpgrades,
             value => PlayerData.instance.ToolKitUpgrades = value, "Inv_CraftingKit", max: 4, wrap: true);
-        AppendIncrementTile("Tool Pouch", () => PlayerData.instance.ToolPouchUpgrades,
+        AppendIncrementTile("ITEMS_UPGRADES_TOOLPOUCH", () => PlayerData.instance.ToolPouchUpgrades,
             value => PlayerData.instance.ToolPouchUpgrades = value, "Inv_ToolPouch", max: 4, wrap: true);
         AppendRow(1, 1);
-        AppendBasicControl("All Maps", BindableFunctions.UnlockAllMaps);
-        AppendBasicControl("All Fast Travel", BindableFunctions.UnlockAllFastTravel);
+        AppendBasicControl("ITEMS_UPGRADES_ALLMAPS", BindableFunctions.UnlockAllMaps);
+        AppendBasicControl("ITEMS_UPGRADES_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
 
-        AppendSectionHeader("Tools");
+        AppendSectionHeader("ITEMS_SECTION_TOOLS");
         AppendRow(1, 1);
-        AppendBasicControl("Unlock All Tools", BindableFunctions.UnlockAllTools);
-        AppendBasicControl("Craft Tools", BindableFunctions.CraftTools);
+        AppendBasicControl("ITEMS_TOOLS_UNLOCKALLTOOLS", BindableFunctions.UnlockAllTools);
+        AppendBasicControl("ITEMS_TOOLS_CRAFTTOOLS", BindableFunctions.CraftTools);
 
         Dictionary<string, List<ToolItem>> tools = [];
 
@@ -273,7 +273,7 @@ public class MainPanel : CanvasPanel
                 ToolItem tool = pair.Value[0];
 
                 CanvasPanel tile = AppendLabeledTile(
-                    tool.GetPopupName(),
+                    tool.name,
                     () => tool.IsUnlockedNotHidden,
                     () => ToggleTool(tool),
                     includeLabel: false
@@ -287,7 +287,7 @@ public class MainPanel : CanvasPanel
 
                 CanvasPanel tile = null;
                 tile = AppendLabeledTile(
-                    firstTool.GetPopupName(),
+                    firstTool.name,
                     () =>
                     {
                         foreach (ToolItem tool in pair.Value)
@@ -325,9 +325,9 @@ public class MainPanel : CanvasPanel
             }
         }
 
-        AppendSectionHeader("Crests");
+        AppendSectionHeader("ITEMS_SECTION_CRESTS");
         AppendRow(1);
-        AppendBasicControl("Unlock All Crests", BindableFunctions.UnlockAllCrests);
+        AppendBasicControl("ITEMS_CRESTS_UNLOCKALLCRESTS", BindableFunctions.UnlockAllCrests);
 
         static void ToggleCrest(ToolCrest crest)
         {
@@ -344,15 +344,15 @@ public class MainPanel : CanvasPanel
         }
 
         AppendRow(1, 1);
-        AppendToggleControl("Toggle Cursed", () => Gameplay.CursedCrest.IsEquipped, BindableFunctions.ToggleCursed);
-        AppendToggleControl("Toggle Cloakless", () => Gameplay.CloaklessCrest.IsEquipped, BindableFunctions.ToggleCloakless);
+        AppendToggleControl("ITEMS_CRESTS_TOGGLECURSED", () => Gameplay.CursedCrest.IsEquipped, BindableFunctions.ToggleCursed);
+        AppendToggleControl("ITEMS_CRESTS_TOGGLECLOAKLESS", () => Gameplay.CloaklessCrest.IsEquipped, BindableFunctions.ToggleCloakless);
 
         List<string> hunterTiers = ["Hunter", "Hunter_v2", "Hunter_v3"];
         ToolCrest hunterCrest = ToolItemManager.GetCrestByName(hunterTiers[0]);
 
         CanvasPanel hunterTile = null;
         hunterTile = AppendLabeledTile(
-            hunterCrest.DisplayName,
+            "ITEMS_CRESTS_HUNTER",
             () =>
             {
                 for (int i = hunterTiers.Count - 1; i >= 0; i--)
@@ -392,14 +392,21 @@ public class MainPanel : CanvasPanel
             }
         );
 
-        List<string> regularCrests = ["Reaper", "Wanderer", "Warrior", "Witch", "Toolmaster", "Spell"];
+        List<(string, string)> regularCrests = [
+            ("Reaper", "ITEMS_CRESTS_REAPER"),
+            ("Wanderer", "ITEMS_CRESTS_WANDERER"),
+            ("Warrior", "ITEMS_CRESTS_BEAST"),
+            ("Witch", "ITEMS_CRESTS_WITCH"),
+            ("Toolmaster", "ITEMS_CRESTS_ARCHITECT"),
+            ("Spell", "ITEMS_CRESTS_SHAMAN")
+        ];
 
-        foreach (string name in regularCrests)
+        foreach ((string name, string displayName) in regularCrests)
         {
             ToolCrest crest = ToolItemManager.GetCrestByName(name);
 
             CanvasPanel tile = AppendLabeledTile(
-                crest.DisplayName,
+                displayName,
                 () => crest.IsUnlocked,
                 () => ToggleCrest(crest)
             );
@@ -407,7 +414,7 @@ public class MainPanel : CanvasPanel
             tile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
         }
 
-        AppendLabeledTile("Vesticrest",
+        AppendLabeledTile("ITEMS_CRESTS_VESTICREST",
             () => PlayerData.instance.UnlockedExtraYellowSlot,
             () =>
             {
@@ -427,7 +434,7 @@ public class MainPanel : CanvasPanel
             }
         );
 
-        AppendSectionHeader("Items");
+        AppendSectionHeader("ITEMS_SECTION_ITEMS");
 
         static void ToggleItem(CollectableItem item)
         {
@@ -453,46 +460,46 @@ public class MainPanel : CanvasPanel
             }
         }
 
-        AppendLabeledTile("Architect's Melody", () => PlayerData.instance.HasMelodyArchitect,
+        AppendLabeledTile("ITEMS_ITEMS_ARCHITECTSMELODY", () => PlayerData.instance.HasMelodyArchitect,
             () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect);
-        AppendLabeledTile("Vaultkeeper's Melody", () => PlayerData.instance.HasMelodyLibrarian,
+        AppendLabeledTile("ITEMS_ITEMS_VAULTKEEPERSMELODY", () => PlayerData.instance.HasMelodyLibrarian,
             () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian);
-        AppendLabeledTile("Conductor's Melody", () => PlayerData.instance.HasMelodyConductor,
+        AppendLabeledTile("ITEMS_ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
             () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor);
 
-        List<string> items =
+        List<(string, string)> items =
         [
-            "Coral Heart",
-            "Flower Heart",
-            "Hunter Heart",
-            "Clover Heart",
-            "White Flower",
-            "Ward Key",
-            "Ward Boss Key"
+            ("Coral Heart", "ITEMS_ITEMS_HEARTOFMIGHT"),
+            ("Flower Heart", "ITEMS_ITEMS_HEARTOFTHEWOODS"),
+            ("Hunter Heart", "ITEMS_ITEMS_HEARTOFTHEWILD"),
+            ("Clover Heart", "ITEMS_ITEMS_CONJOINEDHEART"),
+            ("White Flower", "ITEMS_ITEMS_EVERBLOOM"),
+            ("Ward Key", "ITEMS_ITEMS_WHITEKEY"),
+            ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY")
         ];
 
-        foreach (string name in items)
+        foreach ((string name, string displayName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendLabeledTile(
-                item.GetPopupName(),
+                displayName,
                 () => item.IsVisible,
                 () => ToggleItem(item)
             );
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
-        AppendLabeledTile("Key of Indolent", () => PlayerData.instance.HasSlabKeyA, () =>
+        AppendLabeledTile("ITEMS_ITEMS_KEYOFINDOLENT", () => PlayerData.instance.HasSlabKeyA, () =>
         {
             PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA;
             CollectableItemManager.IncrementVersion();
         });
-        AppendLabeledTile("Key of Heretic", () => PlayerData.instance.HasSlabKeyB, () =>
+        AppendLabeledTile("ITEMS_ITEMS_KEYOFHERETIC", () => PlayerData.instance.HasSlabKeyB, () =>
         {
             PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB;
             CollectableItemManager.IncrementVersion();
         });
-        AppendLabeledTile("Key of Apostate", () => PlayerData.instance.HasSlabKeyC, () =>
+        AppendLabeledTile("ITEMS_ITEMS_KEYOFAPOSTATE", () => PlayerData.instance.HasSlabKeyC, () =>
         {
             PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC;
             CollectableItemManager.IncrementVersion();
@@ -500,27 +507,27 @@ public class MainPanel : CanvasPanel
 
         items =
         [
-            "Architect Key",
-            "Belltown House Key",
-            "Dock Key",
-            "Craw Summons",
+            ("Architect Key", "ITEMS_ITEMS_ARCHITECTSKEY"),
+            ("Belltown House Key", "ITEMS_ITEMS_BELLHOMEKEY"),
+            ("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY"),
+            ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS")
         ];
 
-        foreach (string name in items)
+        foreach ((string name, string displayName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendLabeledTile(
-                item.GetPopupName(),
+                displayName,
                 () => item.IsVisible,
                 () => ToggleItem(item)
             );
             tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
-        AppendLabeledTile("Farsight", () => PlayerData.instance.ConstructedFarsight,
+        AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
             () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight);
 
-        AppendSectionHeader("Consumables");
+        AppendSectionHeader("ITEMS_SECTION_CONSUMABLES");
         AppendTileRow(2);
         AppendIncrementTile(
             "Rosaries",
@@ -535,29 +542,29 @@ public class MainPanel : CanvasPanel
             step: 100
         );
 
-        List<string> consumables =
+        List<(string, string)> consumables =
         [
-            "Rosary_Set_Frayed",
-            "Fixer Idol",
-            "Rosary_Set_Small",
-            "Shard Pouch",
-            "Rosary_Set_Medium",
-            "Great Shard",
-            "Rosary_Set_Large",
-            "Pristine Core",
-            "Rosary_Set_Huge_White",
-            "Silk Grub",
-            "Simple Key",
-            "Crest Socket Unlocker",
-            "Tool Metal",
-            "Pale_Oil"
+            ("Rosary_Set_Frayed", "ITEMS_CONSUMABLES_FRAYEDROSARYSTRING"),
+            ("Fixer Idol", "ITEMS_CONSUMABLES_HORNETSTATUETTE"),
+            ("Rosary_Set_Small", "ITEMS_CONSUMABLES_ROSARYSTRING"),
+            ("Shard Pouch", "ITEMS_CONSUMABLES_SHARDBUNDLE"),
+            ("Rosary_Set_Medium", "ITEMS_CONSUMABLES_ROSARYNECKLACE"),
+            ("Great Shard", "ITEMS_CONSUMABLES_BEASTSHARD"),
+            ("Rosary_Set_Large", "ITEMS_CONSUMABLES_HEAVYROSARYNECKLACE"),
+            ("Pristine Core", "ITEMS_CONSUMABLES_PRISTINECORE"),
+            ("Rosary_Set_Huge_White", "ITEMS_CONSUMABLES_PALEROSARYNECKLACE"),
+            ("Silk Grub", "ITEMS_CONSUMABLES_SILKEATER"),
+            ("Simple Key", "ITEMS_CONSUMABLES_SIMPLEKEY"),
+            ("Crest Socket Unlocker", "ITEMS_CONSUMABLES_MEMORYLOCKET"),
+            ("Tool Metal", "ITEMS_CONSUMABLES_CRAFTMETAL"),
+            ("Pale_Oil", "ITEMS_CONSUMABLES_PALEOIL")
         ];
 
-        foreach (string name in consumables)
+        foreach ((string name, string displayName) in consumables)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendIncrementTile(
-                item.GetPopupName(),
+                displayName,
                 () => item.CollectedAmount,
                 value => SetCollectableAmount(name, _ => value)
             );
@@ -565,11 +572,11 @@ public class MainPanel : CanvasPanel
         }
 
         AppendRow(1);
-        AppendBasicControl("Give Quest Items", BindableFunctions.GiveQuestItems);
+        AppendBasicControl("ITEMS_CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
 
-        AppendSectionHeader("Masks and Spools");
+        AppendSectionHeader("ITEMS_SECTION_MASKSANDSPOOLS");
         AppendTileRow(2);
-        AppendIncrementTile("Masks", () => PlayerData.instance.maxHealth, SetMaxHealth, min: 1, max: 10);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_MASKS", () => PlayerData.instance.maxHealth, SetMaxHealth, min: 1, max: 10);
         static void SetMaxHealth(int value)
         {
             bool increase = value > PlayerData.instance.maxHealth;
@@ -585,7 +592,7 @@ public class MainPanel : CanvasPanel
             }
             HudHelper.RefreshMasks();
         }
-        AppendIncrementTile("Spools", () => PlayerData.instance.silkMax, SetMaxSilk, min: 9, max: 18);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SPOOLS", () => PlayerData.instance.silkMax, SetMaxSilk, min: 9, max: 18);
         static void SetMaxSilk(int value)
         {
             PlayerData.instance.silkMax = value;
@@ -598,7 +605,7 @@ public class MainPanel : CanvasPanel
             }
         }
         AppendTileRow(2);
-        AppendIncrementTile("Health", () => PlayerData.instance.health, SetHealth, min: 1, max: 10);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, min: 1, max: 10);
         static void SetHealth(int value)
         {
             if (!HeroController.instance.cState.dead && GameManager.instance.IsGameplayScene())
@@ -607,7 +614,7 @@ public class MainPanel : CanvasPanel
                 HudHelper.RefreshMasks();
             }
         }
-        AppendIncrementTile("Silk", () => PlayerData.instance.silk, SetSilk);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SILK", () => PlayerData.instance.silk, SetSilk);
         static void SetSilk(int value)
         {
             if (value > PlayerData.instance.silk)
@@ -620,9 +627,9 @@ public class MainPanel : CanvasPanel
             }
         }
         AppendRow(1);
-        AppendBasicControl("Add Lifeblood", BindableFunctions.Lifeblood);
+        AppendBasicControl("ITEMS_MASKSANDSPOOLS_ADDLIFEBLOOD", BindableFunctions.Lifeblood);
 
-        AddTab("Keybinds");
+        AddTab("MAINPANEL_TAB_KEYBINDS");
 
         Dictionary<string, List<BindAction>> keybindData = [];
         foreach (string category in keybindCategoryOrder)
@@ -796,7 +803,7 @@ public class MainPanel : CanvasPanel
         currentTab.AppendPadding(SectionEndPadding);
 
         CanvasText text = currentTab.AppendFixed(new CanvasText(name), SectionHeaderHeight);
-        text.Text = name;
+        text.Text = Utils.Localize(name);
         text.Font = UICommon.trajanBold;
         text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
@@ -831,7 +838,7 @@ public class MainPanel : CanvasPanel
         control.Horizontal = true;
 
         CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
-        button.Text.Text = name;
+        button.Text.Text = Utils.Localize(name);
 
         button.OnClicked += () =>
         {
@@ -904,7 +911,7 @@ public class MainPanel : CanvasPanel
         {
             CanvasText label = builder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
             label.Alignment = TextAnchor.MiddleCenter;
-            label.Text = name;
+            label.Text = Utils.Localize(name);
         }
 
         builder.Build();
@@ -943,7 +950,7 @@ public class MainPanel : CanvasPanel
 
         CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
         label.Alignment = TextAnchor.MiddleCenter;
-        label.Text = name;
+        label.Text = Utils.Localize(name);
 
         containerBuilder.AppendFlexPadding();
         containerBuilder.AppendPadding(UICommon.Margin); // Evens spacing between tile border and control row border
@@ -1020,7 +1027,7 @@ public class MainPanel : CanvasPanel
             button.LocalPosition = new Vector2(tabX, 0);
             button.Size = new Vector2(tabButtonWidth, TabButtonHeight);
             button.SetImage(UICommon.panelBG);
-            button.Text.Text = tab.Name;
+            button.Text.Text = Utils.Localize(tab.Name);
             button.OnClicked += () => DebugMod.settings.MainPanelCurrentTab = tab.Name;
             button.OnUpdate += () => button.Toggled = DebugMod.settings.MainPanelCurrentTab == tab.Name;
 

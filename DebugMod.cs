@@ -19,7 +19,7 @@ using UnityEngine.SceneManagement;
 namespace DebugMod;
 
 [BepInAutoPlugin("io.github.hk-speedrunning.debugmod")]
-[BepInDependency(DependencyGUID: "org.silksong-modding.modlist", MinimumDependencyVersion: "0.2.0")]
+[BepInDependency("org.silksong-modding.modlist", "0.2.0")]
 [HarmonyPatch]
 public partial class DebugMod : BaseUnityPlugin
 {
@@ -457,6 +457,25 @@ public partial class DebugMod : BaseUnityPlugin
     {
         var list = column == InfoPanelColumn.LEFT ? InfoPanel.LeftColumnInjects : InfoPanel.RightColumnInjects;
         list.Add(new(label, dataGenerator));
+    }
+
+    /// <summary>
+    /// Replace the sheet used when localizing text in the UI. Useful for adding to existing menus.
+    /// </summary>
+    /// <param name="sheet">The name of the sheet, such as Mods.YourModId</param>
+    [PublicAPI]
+    public static void OverrideTranslationSheet(string sheet)
+    {
+        Utils.translationSheet = sheet;
+    }
+
+    /// <summary>
+    /// Reset the translation sheet to the one provided by DebugMod.
+    /// </summary>
+    [PublicAPI]
+    public static void ResetTranslationSheet()
+    {
+        Utils.translationSheet = Utils.defaultTranslationSheet;
     }
 
     public static void LogDebug(string message)
