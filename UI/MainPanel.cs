@@ -218,7 +218,7 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendBasicControl("ITEMS_UPGRADES_ALLMAPS", BindableFunctions.UnlockAllMaps);
         AppendBasicControl("ITEMS_UPGRADES_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
-        
+
         AppendSectionHeader("ITEMS_SECTION_MASKSANDSPOOLS");
         AppendTileRow(2);
         AppendIncrementTile("ITEMS_MASKSANDSPOOLS_MASKS", () => PlayerData.instance.maxHealth, SetMaxHealth, image: "Inv_Mask", min: 1, max: 10);
@@ -273,7 +273,7 @@ public class MainPanel : CanvasPanel
         }
 
         AppendIncrementTile("ITEMS_MASKSANDSPOOLS_LIFEBLOOD", () => PlayerData.instance.healthBlue, (int x) => { }, image: "Inv_Lifeblood", customAdd: BindableFunctions.Lifeblood, min: 0);
-        
+
         AppendSectionHeader("ITEMS_SECTION_CRESTS");
         AppendRow(1);
         AppendBasicControl("ITEMS_CRESTS_UNLOCKALLCRESTS", BindableFunctions.UnlockAllCrests);
@@ -285,6 +285,12 @@ public class MainPanel : CanvasPanel
                 ToolCrestsData.Data data = crest.SaveData;
                 data.IsUnlocked = false;
                 crest.SaveData = data;
+
+                if (PlayerData.instance.CurrentCrestID == crest.name)
+                {
+                    // Choose an unlocked crest and equip it
+                    ToolItemManager.AutoEquip(null, false, false);
+                }
             }
             else
             {
@@ -319,25 +325,39 @@ public class MainPanel : CanvasPanel
             },
             () =>
             {
+                ToolCrest next = null;
+                bool cycleToFirst = true;
+
                 foreach (string tier in hunterTiers)
                 {
                     ToolCrest crest = ToolItemManager.GetCrestByName(tier);
                     if (!crest.IsUnlocked)
                     {
                         ToggleCrest(crest);
-                        return;
+                        next = crest;
+                        cycleToFirst = false;
+                        break;
                     }
                 }
 
-                // Cycle back to base hunter crest
-
-                foreach (string tier in hunterTiers)
+                if (cycleToFirst)
                 {
-                    ToolCrest crest = ToolItemManager.GetCrestByName(tier);
-                    ToggleCrest(crest);
+                    // Cycle back to base hunter crest
+
+                    foreach (string tier in hunterTiers)
+                    {
+                        ToolCrest crest = ToolItemManager.GetCrestByName(tier);
+                        ToggleCrest(crest);
+                    }
+
+                    ToggleCrest(hunterCrest);
+                    next = hunterCrest;
                 }
 
-                ToggleCrest(hunterCrest);
+                if (PlayerData.instance.CurrentCrestID.StartsWith("Hunter"))
+                {
+                    ToolItemManager.AutoEquip(next, false, false);
+                }
             },
             includeLabel: false,
             defaultRowWidth: 4
@@ -467,6 +487,7 @@ public class MainPanel : CanvasPanel
             {"Wisp Lantern", [new ToolDef("Tool_WispfireLantern", ToolItemManager.GetToolByName("Wisp Lantern"))]},
             {"Flea Charm", [new ToolDef("Tool_EggOfFlealia", ToolItemManager.GetToolByName("Flea Charm"))]},
             {"Pinstress Tool", [new ToolDef("Tool_PinBadge", ToolItemManager.GetToolByName("Pinstress Tool"))]},
+            // Yellow
             {"Compass", [new ToolDef("Tool_Compass", ToolItemManager.GetToolByName("Compass"))]},
             {"Bone Necklace", [new ToolDef("Tool_ShardPendant", ToolItemManager.GetToolByName("Bone Necklace"))]},
             {"Rosary Magnet", [new ToolDef("Tool_MagnetiteBrooch", ToolItemManager.GetToolByName("Rosary Magnet"))]},
@@ -498,17 +519,17 @@ public class MainPanel : CanvasPanel
 
         void AppendToolTile(string key, List<ToolDef> toolDefs, int width)
         {
-            currentRow ??= AppendTileRow(width);
             if (toolDefs.Count == 1)
             {
                 ToolDef tool = toolDefs[0];
 
-                CanvasPanel tile = AppendLabeledTile(
+                AppendLabeledTile(
                     key,
                     () => tool.Item.IsUnlockedNotHidden,
                     () => ToggleTool(tool.Item),
                     image: tool.IconKey,
-                    includeLabel: false
+                    includeLabel: false,
+                    defaultRowWidth: width
                 );
             }
             else
@@ -572,18 +593,6 @@ public class MainPanel : CanvasPanel
             else
             {
                 item.Take(1, false);
-            }
-        }
-
-        static void SetCollectableAmount(string name, Func<int, int> affector)
-        {
-            if (CollectableItemManager.IsInHiddenMode())
-            {
-                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.AmountWhileHidden = affector(data.AmountWhileHidden));
-            }
-            else
-            {
-                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.Amount = affector(data.Amount));
             }
         }
 
@@ -671,6 +680,19 @@ public class MainPanel : CanvasPanel
             image: "Inv_ShellShards",
             step: 100
         );
+
+
+        static void SetCollectableAmount(string name, Func<int, int> affector)
+        {
+            if (CollectableItemManager.IsInHiddenMode())
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.AmountWhileHidden = affector(data.AmountWhileHidden));
+            }
+            else
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.Amount = affector(data.Amount));
+            }
+        }
 
         List<(string, string, string)> consumables =
         [

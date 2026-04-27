@@ -71,7 +71,7 @@ public static partial class BindableFunctions
         {
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
-            ToolItemManager.AutoEquip(null, false, true);
+            ToolItemManager.AutoEquip(null, false, false);
         }
         else
         {
@@ -88,7 +88,7 @@ public static partial class BindableFunctions
         {
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
-            ToolItemManager.AutoEquip(null, false, true);
+            ToolItemManager.AutoEquip(null, false, false);
         }
         else
         {
