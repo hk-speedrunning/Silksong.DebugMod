@@ -3,6 +3,7 @@ using InControl;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
@@ -42,6 +43,16 @@ public class CanvasTextField : CanvasText
             AnyFieldFocused = false;
             InputManager.enabled = true;
         });
+
+        AddEventTrigger(EventTriggerType.PointerDown, _ =>
+        {
+            if (!IsFocused())
+            {
+                // For some reason clicking the input field doesn't clear the selection,
+                // but I actually prefer it that way
+                Activate();
+            }
+        });
     }
 
     public void Activate()
@@ -70,13 +81,16 @@ public class CanvasTextField : CanvasText
 
     public void UpdateDefaultText(string text)
     {
-        if (inputField && inputField.isFocused)
+        if (IsFocused())
         {
             return;
         }
 
         Text = text;
+        inputField.text = text;
     }
+
+    public bool IsFocused() => inputField && inputField.enabled;
 
     [HarmonyPatch(typeof(HollowKnightInputModule), nameof(HollowKnightInputModule.ProcessMove))]
     [HarmonyPrefix]

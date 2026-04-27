@@ -1,4 +1,5 @@
-﻿using DebugMod.UI.Canvas;
+﻿using DebugMod.Helpers;
+using DebugMod.UI.Canvas;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -53,11 +54,11 @@ public class KeybindDialog : CanvasDialog
     {
         if (DebugMod.settings.binds.TryGetValue(action, out KeyCode keycode))
         {
-            return keycode == KeyCode.None ? "Press a key..." : keycode.ToString();
+            return keycode == KeyCode.None ? Utils.Localize("KEYBIND_REBINDPROMPT") : keycode.ToString();
         }
         else
         {
-            return "Unbound";
+            return Utils.Localize("KEYBIND_UNBOUND");
         }
     }
 

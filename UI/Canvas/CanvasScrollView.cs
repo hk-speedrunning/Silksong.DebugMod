@@ -15,7 +15,7 @@ public class CanvasScrollView : CanvasNode
 
     public CanvasScrollView(string name) : base(name)
     {
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
     }
 
     public T SetContent<T>(T content) where T : CanvasNode
@@ -37,7 +37,7 @@ public class CanvasScrollView : CanvasNode
         return true;
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         if (!Mathf.Approximately(content.Size.y, contentHeight))
         {
@@ -58,7 +58,7 @@ public class CanvasScrollView : CanvasNode
         {
             float y = content.LocalPosition.y + Input.mouseScrollDelta.y * ScrollSpeed;
             y = Mathf.Clamp(y, Mathf.Min(-GetScrollableHeight(), 0f), 0f);
-            content.LocalPosition = new Vector2(content.LocalPosition.x, y);
+            content.LocalPosition = new Vector2(content.LocalPosition.x, Mathf.Round(y));
         }
     }
 

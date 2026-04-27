@@ -4,14 +4,17 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasImage : CanvasObject
+public class CanvasImage : CanvasNode
 {
     private Texture2D tex;
     private Rect subSprite;
+    private Sprite sprite;
     private CanvasBorder border;
 
     public CanvasBorder Border => border;
     public bool IsBackground { get; set; }
+
+    protected override bool Interactable => false;
 
     public CanvasImage(string name) : base(name) { }
 
@@ -26,6 +29,21 @@ public class CanvasImage : CanvasObject
 
         this.tex = tex;
         this.subSprite = subSprite;
+        sprite = null;
+
+        if (gameObject)
+        {
+            UpdateSprite();
+        }
+    }
+
+    public void SetImage(Sprite sprite)
+    {
+        if (this.sprite == sprite) return;
+
+        this.sprite = sprite;
+        tex = null;
+        subSprite = sprite.rect;
 
         if (gameObject)
         {
@@ -50,13 +68,6 @@ public class CanvasImage : CanvasObject
         if (border != null) yield return border;
     }
 
-    protected override void OnUpdatePosition()
-    {
-        base.OnUpdatePosition();
-
-        UpdateScale();
-    }
-
     public override void Build()
     {
         if (IsBackground && Parent != null)
@@ -73,24 +84,13 @@ public class CanvasImage : CanvasObject
 
         gameObject.AddComponent<Image>();
         UpdateSprite();
-
-        UpdateScale();
     }
 
     private void UpdateSprite()
     {
         Image image = gameObject.GetComponent<Image>();
-        image.sprite = Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height, subSprite.width, subSprite.height), Vector2.zero);
-        image.color = UICommon.iconColor;
-    }
 
-    private void UpdateScale()
-    {
-        if (transform)
-        {
-            transform.sizeDelta = new Vector2(subSprite.width, subSprite.height);
-            transform.SetScaleX(Size.x / subSprite.width);
-            transform.SetScaleY(Size.y / subSprite.height);
-        }
+        image.sprite = sprite ? sprite : Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height - subSprite.y, subSprite.width, subSprite.height), Vector2.zero);
+        image.color = UICommon.iconColor;
     }
 }

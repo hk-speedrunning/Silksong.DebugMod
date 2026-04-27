@@ -11,7 +11,7 @@ public static class SaveStateManager
 {
     public const int STATES_PER_PAGE = 10;
 
-    public static int NumPages => DebugMod.settings.MaxSavePages;
+    public static int NumPages { get; private set; }
 
     private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
 
@@ -20,6 +20,8 @@ public static class SaveStateManager
 
     internal static void Initialize()
     {
+        NumPages = DebugMod.settings.MaxSavePages;
+
         quickState = new SaveState();
 
         for (int i = 0; i < NumPages; i++)
@@ -42,6 +44,20 @@ public static class SaveStateManager
             else
             {
                 Directory.CreateDirectory(saveStatesBaseDirectory);
+            }
+        }
+
+        // Cleanup empty directories in case the page count was decreased
+        foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
+        {
+            string name = Path.GetFileName(path);
+            if (!int.TryParse(name, out int i) || i < 0 || i >= NumPages)
+            {
+                try
+                {
+                    Directory.Delete(path);
+                }
+                catch { }
             }
         }
 

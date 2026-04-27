@@ -1,7 +1,6 @@
 ﻿using DebugMod.Helpers;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
-using GenericVariableExtension;
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
@@ -16,8 +15,8 @@ namespace DebugMod.MonoBehaviours;
 [HarmonyPatch]
 public class EnemyHandle : MonoBehaviour
 {
-    private const int HPBAR_WIDTH = 150;
-    private const int HPBAR_HEIGHT = 40;
+    private static int BarWidth => UICommon.ScaleWidth(150);
+    private static int BarHeight => UICommon.ScaleHeight(40);
 
     private HealthManager hm;
     private tk2dSprite? sprite;
@@ -54,11 +53,17 @@ public class EnemyHandle : MonoBehaviour
     public void OnDestroy()
     {
         EnemiesPanel.enemyPool.Remove(this);
-        hpBar?.Destroy();
+        DestroyUI();
     }
 
     public void OnEnable() => Awake();
     public void OnDisable() => OnDestroy();
+
+    public void DestroyUI()
+    {
+        hpBar?.Destroy();
+        hpBar = null;
+    }
 
     public void Update()
     {
@@ -77,14 +82,14 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar == null)
             {
-                barTexture = new Texture2D(HPBAR_WIDTH, 1);
-                Color[] colors = new Color[HPBAR_WIDTH];
+                barTexture = new Texture2D(BarWidth, 1);
+                Color[] colors = new Color[BarWidth];
                 Array.Fill(colors, Color.red.SetAlpha(0.5f));
                 barTexture.SetPixels(colors);
                 barTexture.Apply();
 
                 hpBar = new CanvasPanel($"{gameObject.name} HP Bar");
-                hpBar.Size = new Vector2(HPBAR_WIDTH, HPBAR_HEIGHT);
+                hpBar.Size = new Vector2(BarWidth, BarHeight);
 
                 CanvasImage background = UICommon.AddBackground(hpBar);
                 background.SetImage(barTexture);
@@ -93,7 +98,7 @@ public class EnemyHandle : MonoBehaviour
 
                 CanvasText text = hpBar.Add(new CanvasText("HP"));
                 text.Size = hpBar.Size;
-                text.FontSize = 20;
+                text.FontSize = UICommon.ScaleHeight(20);
                 text.Alignment = TextAnchor.MiddleCenter;
 
                 if (staggerFsm != null)
@@ -110,9 +115,9 @@ public class EnemyHandle : MonoBehaviour
                 // Move HP bar behind UI
                 foreach (CanvasNode node in hpBar.Subtree().Reverse())
                 {
-                    if (node is CanvasObject obj)
+                    if (node != null)
                     {
-                        obj.GameObject.transform.SetAsFirstSibling();
+                        node.GameObject.transform.SetAsFirstSibling();
                     }
                 }
             }
@@ -123,16 +128,16 @@ public class EnemyHandle : MonoBehaviour
             barPos.y += (bounds.max.y - bounds.min.y) / 2f;
 
             if (Camera.main) barPos = Camera.main.WorldToScreenPoint(barPos);
-            barPos.x -= HPBAR_WIDTH / 2f;
+            barPos.x -= BarWidth / 2f;
             barPos.y = Screen.height - barPos.y - hpBar.Size.y;
 
             hpBar.LocalPosition = barPos;
-            hpBar.Get<CanvasImage>("Background").Size = new Vector2(HPBAR_WIDTH * Mathf.Clamp01(HP / (float)MaxHP), HPBAR_HEIGHT);
+            hpBar.Get<CanvasImage>("Background").Size = new Vector2(BarWidth * Mathf.Clamp01(HP / (float)MaxHP), BarHeight);
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
             if (staggerFsm != null)
             {
-                hpBar.Get<CanvasText>("Combo").LocalPosition = new Vector2(0, -HPBAR_HEIGHT);
+                hpBar.Get<CanvasText>("Combo").LocalPosition = new Vector2(0, -BarHeight);
                 hpBar.Get<CanvasText>("Combo").Text = GetStaggerText();
             }
         }

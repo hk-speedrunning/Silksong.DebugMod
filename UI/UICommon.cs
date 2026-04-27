@@ -41,6 +41,7 @@ public static class UICommon
     public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
     public static readonly Texture2D panelStrongBG = SolidColor(strongColor, 220);
     public static readonly Texture2D dialogBG = SolidColor(baseColor);
+    public static readonly Texture2D clearBG = SolidColor(baseColor, 0);
 
     public static Font trajanBold;
     public static Font trajanNormal;

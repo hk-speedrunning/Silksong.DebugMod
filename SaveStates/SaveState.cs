@@ -28,6 +28,12 @@ public class SaveState
     //used to stop double loads
     public static SaveState loadingSavestate { get; private set; }
 
+    public static bool LoadDuped { get; set; }
+
+    public static event Action<SaveState> OnSave;
+    public static event Action<SaveState> BeforeLoad;
+    public static event Action<SaveState> AfterLoad;
+
     [Serializable]
     public class SaveStateData
     {
@@ -46,7 +52,7 @@ public class SaveState
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
-
+        public Dictionary<string, object> customData;
 
         internal SaveStateData() { }
 
@@ -99,6 +105,11 @@ public class SaveState
                     loadedSceneActiveScenes[i] = loadedScenes[i];
                 }
             }
+
+            if (_data.customData != null)
+            {
+                customData = new Dictionary<string, object>(_data.customData);
+            }
         }
 
         public SaveStateData DeepCopy()
@@ -149,6 +160,12 @@ public class SaveState
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
         data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
 
+        if (OnSave != null)
+        {
+            data.customData = [];
+            OnSave.Invoke(this);
+        }
+
         DebugMod.LogConsole("Saved temp state");
         return true;
     }
@@ -182,7 +199,7 @@ public class SaveState
 
     #region loading
     //loadDuped is used by external mods
-    public IEnumerator Load(bool loadDuped = false)
+    public IEnumerator Load()
     {
         if (!IsSet())
         {
@@ -203,7 +220,7 @@ public class SaveState
 
         loadingSavestate = this;
 
-        IEnumerator enumerator = LoadImpl(loadDuped);
+        IEnumerator enumerator = LoadImpl();
         while (true)
         {
             try
@@ -262,7 +279,7 @@ public class SaveState
         }
     }
 
-    private IEnumerator LoadImpl(bool loadDuped)
+    private IEnumerator LoadImpl()
     {
         bool stateondeath = DebugMod.stateOnDeath;
         DebugMod.stateOnDeath = false;
@@ -292,6 +309,8 @@ public class SaveState
         }
 
         if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
+
+        BeforeLoad?.Invoke(this);
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");
@@ -330,6 +349,16 @@ public class SaveState
 
         string previousScene = GameManager.instance.GetSceneNameString();
 
+        GameManager.instance.entryGateName = "dreamGate";
+        GameManager.instance.startedOnThisScene = true;
+
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            string dummyScene = "Demo Start";
+            Addressables.LoadSceneAsync($"Scenes/{dummyScene}");
+            yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummyScene);
+        }
+
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
         RestoreSemiPersistent(data.semiPersistentBools, SceneData.instance.persistentBools);
@@ -349,9 +378,6 @@ public class SaveState
 
         sceneData[0].LoadHook();
 
-        GameManager.instance.entryGateName = "dreamGate";
-        GameManager.instance.startedOnThisScene = true;
-
         GameManager.instance.BeginSceneTransition
         (
             new DebugModSaveStateSceneLoadInfo
@@ -363,13 +389,13 @@ public class SaveState
                 PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
                 Visualization = GameManager.SceneLoadVisualizations.Default,
-                AlwaysUnloadUnusedAssets = false
+                AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
             }
         );
 
         yield return new WaitUntil(() => USceneManager.GetActiveScene().name == data.saveScene);
 
-        if (loadDuped)
+        if (LoadDuped)
         {
             yield return new WaitUntil(() => GameManager.instance.IsInSceneTransition == false);
             for (int i = 1; i < sceneData.Length; i++)
@@ -400,6 +426,11 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
 
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            // Probably just being paranoid?
+            yield return null;
+        }
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
@@ -410,7 +441,7 @@ public class SaveState
         GameManager.instance.cameraCtrl.isGameplayScene = true;
         GameManager.instance.UpdateUIStateFromGameState();
 
-        if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
+        if (LoadDuped && DebugMod.settings.ShowHitBoxes > 0)
         {
             int cs = DebugMod.settings.ShowHitBoxes;
             DebugMod.settings.ShowHitBoxes = 0;
@@ -437,6 +468,8 @@ public class SaveState
 
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
+
+        AfterLoad?.Invoke(this);
 
         yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
@@ -583,7 +616,7 @@ public class SaveState
     #region helper functionality
     public bool IsSet() => !string.IsNullOrEmpty(data.saveStateIdentifier);
 
-    public override string ToString() => IsSet() ? data.saveStateIdentifier : "Empty";
+    public override string ToString() => IsSet() ? data.saveStateIdentifier : Utils.Localize("SAVESTATEPANEL_EMPTY");
     #endregion
 
     #region patches

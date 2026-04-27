@@ -12,13 +12,13 @@ public class CanvasDialog : CanvasPanel
     public CanvasDialog(string name) : base(name)
     {
         ActiveSelf = false;
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         UICommon.AddBackground(this);
         Get<CanvasImage>("Background").SetImage(UICommon.dialogBG);
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         if (initialClickEnded && !IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
         {

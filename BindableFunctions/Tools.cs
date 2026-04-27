@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using GlobalSettings;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DebugMod;
 
@@ -7,7 +9,28 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Unlock All Tools", category = "Tools")]
     public static void UnlockAllTools()
     {
-        ToolItemManager.UnlockAllTools();
+        HashSet<string> upgrades =
+        [
+            "Curve Claws Upgraded",
+            "WebShot Architect",
+            "WebShot Weaver",
+            "Mosscreep Tool 2",
+            "Dazzle Bind Upgraded",
+            "Shell Satchel"
+        ];
+
+        foreach (ToolItem tool in ToolItemManager.GetAllTools())
+        {
+            if (!upgrades.Contains(tool.name))
+            {
+                tool.Unlock(null, ToolItem.PopupFlags.None);
+            }
+            else
+            {
+                tool.Lock();
+            }
+        }
+
         DebugMod.LogConsole("Unlocked all tools");
     }
 
@@ -39,5 +62,48 @@ public static partial class BindableFunctions
     {
         ToolItemManager.TryReplenishTools(true, ToolItemManager.ReplenishMethod.Bench);
         DebugMod.LogConsole("Crafted new tools");
+    }
+
+    [BindableMethod(name = "Toggle Cursed", category = "Tools")]
+    public static void ToggleCursed()
+    {
+        if (Gameplay.CursedCrest.IsEquipped)
+        {
+            ToolItemManager.ResetPreviousCrest();
+            PlayerData.instance.PreviousCrestID = "";
+            ToolItemManager.AutoEquip(null, false, false);
+        }
+        else
+        {
+            ToolItemManager.AutoEquip(Gameplay.CursedCrest, false, true);
+        }
+
+        HeroController.instance.UpdateSilkCursed();
+    }
+
+    [BindableMethod(name = "Toggle Cloakless", category = "Tools")]
+    public static void ToggleCloakless()
+    {
+        if (Gameplay.CloaklessCrest.IsEquipped)
+        {
+            ToolItemManager.ResetPreviousCrest();
+            PlayerData.instance.PreviousCrestID = "";
+            ToolItemManager.AutoEquip(null, false, false);
+        }
+        else
+        {
+            ToolItemManager.AutoEquip(Gameplay.CloaklessCrest, false, true);
+        }
+
+        // In case the player was cursed before this
+        if (PlayerData.instance.PreviousCrestID == "Cursed")
+        {
+            HeroController.instance.UpdateSilkCursed();
+        }
+
+        // Forces animations to update immediately instead of the next time the animation clip changes
+        HeroController.instance.ResetAllCrestState();
+        HeroController.instance.animCtrl.PlayFromFrame(HeroController.instance.animCtrl.animator.CurrentClip.name,
+            HeroController.instance.animCtrl.animator.CurrentFrame, true);
     }
 }
