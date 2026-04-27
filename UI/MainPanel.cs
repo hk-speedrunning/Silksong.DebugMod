@@ -9,6 +9,12 @@ using UnityEngine;
 
 namespace DebugMod.UI;
 
+public record struct ToolDef(string IconKey, ToolItem Item)
+{
+    public string IconKey = IconKey;
+    public ToolItem Item = Item;
+}
+
 public class MainPanel : CanvasPanel
 {
     public static int TabButtonHeight => UICommon.ScaleHeight(20);
@@ -212,119 +218,62 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendBasicControl("ITEMS_UPGRADES_ALLMAPS", BindableFunctions.UnlockAllMaps);
         AppendBasicControl("ITEMS_UPGRADES_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
-
-        AppendSectionHeader("ITEMS_SECTION_TOOLS");
-        AppendRow(1, 1);
-        AppendBasicControl("ITEMS_TOOLS_UNLOCKALLTOOLS", BindableFunctions.UnlockAllTools);
-        AppendBasicControl("ITEMS_TOOLS_CRAFTTOOLS", BindableFunctions.CraftTools);
-
-        Dictionary<string, List<ToolItem>> tools = [];
-
-        foreach (ToolItem tool in ToolItemManager.GetAllTools())
+        
+        AppendSectionHeader("ITEMS_SECTION_MASKSANDSPOOLS");
+        AppendTileRow(2);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_MASKS", () => PlayerData.instance.maxHealth, SetMaxHealth, image: "Inv_Mask", min: 1, max: 10);
+        static void SetMaxHealth(int value)
         {
-            string key = tool.name;
-
-            if (key == "Curve Claws Upgraded")
+            bool increase = value > PlayerData.instance.maxHealth;
+            PlayerData.instance.maxHealth = value;
+            PlayerData.instance.maxHealthBase = value;
+            if (increase)
             {
-                key = "Curve Claws";
-            }
-
-            if (key == "WebShot Architect" || key == "WebShot Weaver")
-            {
-                key = "WebShot Forge";
-            }
-
-            if (key == "Mosscreep Tool 2")
-            {
-                key = "Mosscreep Tool 1";
-            }
-
-            if (key == "Dazzle Bind Upgraded")
-            {
-                key = "Dazzle Bind";
-            }
-
-            if (key == "Shell Satchel")
-            {
-                key = "Dead Mans Purse";
-            }
-
-            tools.TryAdd(key, []);
-            tools[key].Add(tool);
-        }
-
-        static void ToggleTool(ToolItem tool)
-        {
-            if (tool.IsUnlockedNotHidden)
-            {
-                tool.Lock();
+                HeroController.instance.MaxHealth();
             }
             else
             {
-                tool.Unlock(null, ToolItem.PopupFlags.None);
+                PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
             }
+            HudHelper.RefreshMasks();
         }
-
-        foreach (KeyValuePair<string, List<ToolItem>> pair in tools)
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SPOOLS", () => PlayerData.instance.silkMax, SetMaxSilk, image: "Inv_Spool", min: 9, max: 18);
+        static void SetMaxSilk(int value)
         {
-            currentRow ??= AppendTileRow(6);
-            if (pair.Value.Count == 1)
+            PlayerData.instance.silkMax = value;
+            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+            HudHelper.RefreshSpool();
+            if (PlayerData.instance.IsSilkSpoolBroken && value > 9)
             {
-                ToolItem tool = pair.Value[0];
-
-                CanvasPanel tile = AppendLabeledTile(
-                    tool.name,
-                    () => tool.IsUnlockedNotHidden,
-                    () => ToggleTool(tool),
-                    includeLabel: false
-                );
-
-                tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
+                PlayerData.instance.IsSilkSpoolBroken = false;
+                EventRegister.SendEvent("SPOOL UNBROKEN");
             }
-            else
+        }
+        AppendTileRow(3);
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, image: "Inv_Health", min: 1, max: 10);
+        static void SetHealth(int value)
+        {
+            if (!HeroController.instance.cState.dead && GameManager.instance.IsGameplayScene())
             {
-                ToolItem firstTool = pair.Value[0];
-
-                CanvasPanel tile = null;
-                tile = AppendLabeledTile(
-                    firstTool.name,
-                    () =>
-                    {
-                        foreach (ToolItem tool in pair.Value)
-                        {
-                            if (tool.IsUnlockedNotHidden)
-                            {
-                                tile.Get<CanvasImage>("Icon").SetImage(tool.GetPopupIcon());
-                                return true;
-                            }
-                        }
-
-                        tile.Get<CanvasImage>("Icon").SetImage(firstTool.GetPopupIcon());
-                        return false;
-                    },
-                    () =>
-                    {
-                        for (int i = 0; i < pair.Value.Count; i++)
-                        {
-                            ToolItem current = pair.Value[i];
-                            if (current.IsUnlockedNotHidden)
-                            {
-                                ToggleTool(current);
-                                if (i < pair.Value.Count - 1)
-                                {
-                                    ToggleTool(pair.Value[i + 1]);
-                                }
-                                return;
-                            }
-                        }
-
-                        ToggleTool(firstTool);
-                    },
-                    includeLabel: false
-                );
+                HeroController.instance.AddHealth(value - PlayerData.instance.health);
+                HudHelper.RefreshMasks();
+            }
+        }
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SILK", () => PlayerData.instance.silk, SetSilk, image: "Inv_Silk");
+        static void SetSilk(int value)
+        {
+            if (value > PlayerData.instance.silk)
+            {
+                HeroController.instance.AddSilk(value - PlayerData.instance.silk, true);
+            }
+            else if (value < PlayerData.instance.silk)
+            {
+                HeroController.instance.TakeSilk(PlayerData.instance.silk - value);
             }
         }
 
+        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_LIFEBLOOD", () => PlayerData.instance.healthBlue, (int x) => { }, image: "Inv_Lifeblood", customAdd: BindableFunctions.Lifeblood, min: 0);
+        
         AppendSectionHeader("ITEMS_SECTION_CRESTS");
         AppendRow(1);
         AppendBasicControl("ITEMS_CRESTS_UNLOCKALLCRESTS", BindableFunctions.UnlockAllCrests);
@@ -360,12 +309,12 @@ public class MainPanel : CanvasPanel
                     ToolCrest crest = ToolItemManager.GetCrestByName(hunterTiers[i]);
                     if (crest.IsUnlocked)
                     {
-                        hunterTile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
+                        hunterTile.Get<CanvasImage>("Icon").SetImage(UICommon.images[$"Crest_{hunterTiers[i]}"]);
                         return true;
                     }
                 }
 
-                hunterTile.Get<CanvasImage>("Icon").SetImage(hunterCrest.CrestSprite);
+                hunterTile.Get<CanvasImage>("Icon").SetImage(UICommon.images["Crest_Hunter"]);
                 return false;
             },
             () =>
@@ -389,7 +338,9 @@ public class MainPanel : CanvasPanel
                 }
 
                 ToggleCrest(hunterCrest);
-            }
+            },
+            includeLabel: false,
+            defaultRowWidth: 4
         );
 
         List<(string, string)> regularCrests = [
@@ -408,14 +359,23 @@ public class MainPanel : CanvasPanel
             CanvasPanel tile = AppendLabeledTile(
                 displayName,
                 () => crest.IsUnlocked,
-                () => ToggleCrest(crest)
+                () => ToggleCrest(crest),
+                includeLabel: false,
+                defaultRowWidth: 4
             );
 
-            tile.Get<CanvasImage>("Icon").SetImage(crest.CrestSprite);
+            tile.Get<CanvasImage>("Icon").SetImage(UICommon.images[$"Crest_{name}"]);
         }
 
-        AppendLabeledTile("ITEMS_CRESTS_VESTICREST",
-            () => PlayerData.instance.UnlockedExtraYellowSlot,
+        CanvasPanel vesticrestTile = null;
+        vesticrestTile = AppendLabeledTile("ITEMS_CRESTS_VESTICREST",
+            () =>
+            {
+                vesticrestTile.Get<CanvasImage>("Icon")?.SetImage(PlayerData.instance.UnlockedExtraBlueSlot
+                    ? UICommon.images["Inv_Vesticrest2"]
+                    : UICommon.images["Inv_Vesticrest"]);
+                return PlayerData.instance.UnlockedExtraYellowSlot;
+            },
             () =>
             {
                 if (!PlayerData.instance.UnlockedExtraYellowSlot)
@@ -431,8 +391,175 @@ public class MainPanel : CanvasPanel
                     PlayerData.instance.UnlockedExtraYellowSlot = false;
                     PlayerData.instance.UnlockedExtraBlueSlot = false;
                 }
-            }
+            },
+            includeLabel: false,
+            defaultRowWidth: 4,
+            image: "Inv_Vesticrest"
         );
+
+        AppendSectionHeader("ITEMS_SECTION_TOOLS");
+        AppendRow(1, 1);
+        AppendBasicControl("ITEMS_TOOLS_UNLOCKALLTOOLS", BindableFunctions.UnlockAllTools);
+        AppendBasicControl("ITEMS_TOOLS_CRAFTTOOLS", BindableFunctions.CraftTools);
+
+        Dictionary<string, List<ToolDef>> tools = new()
+        {
+            // Spells
+            {"Silk Spear", [new ToolDef("Spell_SilkSpear", ToolItemManager.GetToolByName("Silk Spear"))]},
+            {"Thread Sphere", [new ToolDef("Spell_ThreadStorm", ToolItemManager.GetToolByName("Thread Sphere"))]},
+            {"Parry", [new ToolDef("Spell_CrossStitch", ToolItemManager.GetToolByName("Parry"))]},
+            {"Silk Charge", [new ToolDef("Spell_Sharpdart", ToolItemManager.GetToolByName("Silk Charge"))]},
+            {"Silk Bomb", [new ToolDef("Spell_RuneRage", ToolItemManager.GetToolByName("Silk Bomb"))]},
+            {"Silk Boss Needle", [new ToolDef("Spell_PaleNails", ToolItemManager.GetToolByName("Silk Boss Needle"))]},
+            // Red
+            {"Straight Pin", [new ToolDef("Tool_StraightPin", ToolItemManager.GetToolByName("Straight Pin"))]},
+            {"Tri Pin", [new ToolDef("Tool_ThreefoldPin", ToolItemManager.GetToolByName("Tri Pin"))]},
+            {"Sting Shard", [new ToolDef("Tool_StingShard", ToolItemManager.GetToolByName("Sting Shard"))]},
+            {"Tack", [new ToolDef("Tool_Tacks", ToolItemManager.GetToolByName("Tack"))]},
+            {"Harpoon", [new ToolDef("Tool_Longpin", ToolItemManager.GetToolByName("Harpoon"))]},
+            {"Curve Claws", [
+                new ToolDef("Tool_Curveclaw", ToolItemManager.GetToolByName("Curve Claws")),
+                new ToolDef("Tool_Curveclaw2", ToolItemManager.GetToolByName("Curve Claws Upgraded"))
+            ]},
+            {"Shakra Ring", [new ToolDef("Tool_ThrowingRing", ToolItemManager.GetToolByName("Shakra Ring"))]},
+            {"Pimpilo", [new ToolDef("Tool_Pimpillo", ToolItemManager.GetToolByName("Pimpilo"))]},
+            {"Conch Drill", [new ToolDef("Tool_Conchcutter", ToolItemManager.GetToolByName("Conch Drill"))]},
+            {"WebShot", [
+                new ToolDef("Tool_Silkshot_Forge", ToolItemManager.GetToolByName("WebShot Forge")),
+                new ToolDef("Tool_Silkshot_Architect", ToolItemManager.GetToolByName("WebShot Architect")),
+                new ToolDef("Tool_Silkshot_Weaver", ToolItemManager.GetToolByName("WebShot Weaver"))
+            ]},
+            {"Screw Attack", [new ToolDef("Tool_DelversDrill", ToolItemManager.GetToolByName("Screw Attack"))]},
+            {"Cogwork Saw", [new ToolDef("Tool_CogworkWheel", ToolItemManager.GetToolByName("Cogwork Saw"))]},
+            {"Cogwork Flier", [new ToolDef("Tool_Cogfly", ToolItemManager.GetToolByName("Cogwork Flier"))]},
+            {"Rosary Cannon", [new ToolDef("Tool_RosaryCannon", ToolItemManager.GetToolByName("Rosary Cannon"))]},
+            {"Lightning Rod", [new ToolDef("Tool_Voltvessels", ToolItemManager.GetToolByName("Lightning Rod"))]},
+            {"Flintstone", [new ToolDef("Tool_Flintslate", ToolItemManager.GetToolByName("Flintstone"))]},
+            {"Silk Snare", [new ToolDef("Tool_SnareSetter", ToolItemManager.GetToolByName("Silk Snare"))]},
+            {"Flea Brew", [new ToolDef("Tool_FleaBrew", ToolItemManager.GetToolByName("Flea Brew"))]},
+            {"Lifeblood Syringe", [new ToolDef("Tool_PlasmiumPhial", ToolItemManager.GetToolByName("Lifeblood Syringe"))]},
+            {"Extractor", [new ToolDef("Tool_NeedlePhial", ToolItemManager.GetToolByName("Extractor"))]},
+            // Blue
+            {"Mosscreep Tool", [
+                new ToolDef("Tool_DruidsEye", ToolItemManager.GetToolByName("Mosscreep Tool 1")),
+                new ToolDef("Tool_DruidsEye2", ToolItemManager.GetToolByName("Mosscreep Tool 2"))
+            ]},
+            {"Lava Charm", [new ToolDef("Tool_MagmaBell", ToolItemManager.GetToolByName("Lava Charm"))]},
+            {"Bell Bind", [new ToolDef("Tool_WardingBell", ToolItemManager.GetToolByName("Bell Bind"))]},
+            {"Poison Pouch", [new ToolDef("Tool_PollipPouch", ToolItemManager.GetToolByName("Poison Pouch"))]},
+            {"Fractured Mask", [new ToolDef("Tool_FracturedMask", ToolItemManager.GetToolByName("Fractured Mask"))]},
+            {"Multibind", [new ToolDef("Tool_Multibinder", ToolItemManager.GetToolByName("Multibind"))]},
+            {"White Ring", [new ToolDef("Tool_Weavelight", ToolItemManager.GetToolByName("White Ring"))]},
+            {"Brolly Spike", [new ToolDef("Tool_SawtoothCirclet", ToolItemManager.GetToolByName("Brolly Spike"))]},
+            {"Quickbind", [new ToolDef("Tool_InjectorBand", ToolItemManager.GetToolByName("Quickbind"))]},
+            {"Spool Extender", [new ToolDef("Tool_SpoolExtender", ToolItemManager.GetToolByName("Spool Extender"))]},
+            {"Reserve Bind", [new ToolDef("Tool_ReserveBind", ToolItemManager.GetToolByName("Reserve Bind"))]},
+            {"Dazzle Bind", [
+                new ToolDef("Tool_ClawMirror", ToolItemManager.GetToolByName("Dazzle Bind")),
+                new ToolDef("Tool_ClawMirror2", ToolItemManager.GetToolByName("Dazzle Bind Upgraded"))
+            ] },
+            {"Revenge Crystal", [new ToolDef("Tool_MemoryCrystal", ToolItemManager.GetToolByName("Revenge Crystal"))]},
+            {"Thief Claw", [new ToolDef("Tool_SnitchPick", ToolItemManager.GetToolByName("Thief Claw"))]},
+            {"Zap Imbuement", [new ToolDef("Tool_VoltFilament", ToolItemManager.GetToolByName("Zap Imbuement"))]},
+            {"Quick Sling", [new ToolDef("Tool_QuickSling", ToolItemManager.GetToolByName("Quick Sling"))]},
+            {"Maggot Charm", [new ToolDef("Tool_WreathOfPurity", ToolItemManager.GetToolByName("Maggot Charm"))]},
+            {"Longneedle", [new ToolDef("Tool_Longclaw", ToolItemManager.GetToolByName("Longneedle"))]},
+            {"Wisp Lantern", [new ToolDef("Tool_WispfireLantern", ToolItemManager.GetToolByName("Wisp Lantern"))]},
+            {"Flea Charm", [new ToolDef("Tool_EggOfFlealia", ToolItemManager.GetToolByName("Flea Charm"))]},
+            {"Pinstress Tool", [new ToolDef("Tool_PinBadge", ToolItemManager.GetToolByName("Pinstress Tool"))]},
+            {"Compass", [new ToolDef("Tool_Compass", ToolItemManager.GetToolByName("Compass"))]},
+            {"Bone Necklace", [new ToolDef("Tool_ShardPendant", ToolItemManager.GetToolByName("Bone Necklace"))]},
+            {"Rosary Magnet", [new ToolDef("Tool_MagnetiteBrooch", ToolItemManager.GetToolByName("Rosary Magnet"))]},
+            {"Weighted Anklet", [new ToolDef("Tool_WeightedBelt", ToolItemManager.GetToolByName("Weighted Anklet"))]},
+            {"Barbed Wire", [new ToolDef("Tool_BarbedBracelet", ToolItemManager.GetToolByName("Barbed Wire"))]},
+            {"Dead Mans Purse", [
+                new ToolDef("Tool_DeadBugsPurse", ToolItemManager.GetToolByName("Dead Mans Purse")),
+                new ToolDef("Tool_ShellSatchel", ToolItemManager.GetToolByName("Shell Satchel"))
+            ]},
+            {"Magnetite Dice", [new ToolDef("Tool_MagnetiteDice", ToolItemManager.GetToolByName("Magnetite Dice"))]},
+            {"Scuttlebrace", [new ToolDef("Tool_Scuttlebrace", ToolItemManager.GetToolByName("Scuttlebrace"))]},
+            {"Wallcling", [new ToolDef("Tool_AscendantsGrip", ToolItemManager.GetToolByName("Wallcling"))]},
+            {"Musician Charm", [new ToolDef("Tool_SpiderStrings", ToolItemManager.GetToolByName("Musician Charm"))]},
+            {"Sprintmaster", [new ToolDef("Tool_SilkspeedAnklets", ToolItemManager.GetToolByName("Sprintmaster"))]},
+            {"Thief Charm", [new ToolDef("Tool_ThiefsMark", ToolItemManager.GetToolByName("Thief Charm"))]},
+        };
+
+        static void ToggleTool(ToolItem tool)
+        {
+            if (tool.IsUnlockedNotHidden)
+            {
+                tool.Lock();
+            }
+            else
+            {
+                tool.Unlock(null, ToolItem.PopupFlags.None);
+            }
+        }
+
+        void AppendToolTile(string key, List<ToolDef> toolDefs, int width)
+        {
+            currentRow ??= AppendTileRow(width);
+            if (toolDefs.Count == 1)
+            {
+                ToolDef tool = toolDefs[0];
+
+                CanvasPanel tile = AppendLabeledTile(
+                    key,
+                    () => tool.Item.IsUnlockedNotHidden,
+                    () => ToggleTool(tool.Item),
+                    image: tool.IconKey,
+                    includeLabel: false
+                );
+            }
+            else
+            {
+                ToolDef firstTool = toolDefs[0];
+
+                CanvasPanel tile = null;
+                tile = AppendLabeledTile(
+                    key,
+                    () =>
+                    {
+                        foreach (ToolDef tool in toolDefs)
+                        {
+                            if (tool.Item.IsUnlockedNotHidden)
+                            {
+                                tile.Get<CanvasImage>("Icon").SetImage(UICommon.images[tool.IconKey]);
+                                return true;
+                            }
+                        }
+
+                        tile.Get<CanvasImage>("Icon").SetImage(UICommon.images[firstTool.IconKey]);
+                        return false;
+                    },
+                    () =>
+                    {
+                        for (int i = 0; i < toolDefs.Count; i++)
+                        {
+                            ToolItem current = toolDefs[i].Item;
+                            if (current.IsUnlockedNotHidden)
+                            {
+                                ToggleTool(current);
+                                if (i < toolDefs.Count - 1)
+                                {
+                                    ToggleTool(toolDefs[i + 1].Item);
+                                }
+                                return;
+                            }
+                        }
+
+                        ToggleTool(firstTool.Item);
+                    },
+                    includeLabel: false,
+                    defaultRowWidth: width
+                );
+            }
+        }
+
+        foreach (var (ToolKey, ToolDefs) in tools)
+        {
+            AppendToolTile(ToolKey, ToolDefs, 6);
+        }
 
         AppendSectionHeader("ITEMS_SECTION_ITEMS");
 
@@ -461,71 +588,72 @@ public class MainPanel : CanvasPanel
         }
 
         AppendLabeledTile("ITEMS_ITEMS_ARCHITECTSMELODY", () => PlayerData.instance.HasMelodyArchitect,
-            () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect);
+            () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect, image: "Inv_MelodyArchitect");
         AppendLabeledTile("ITEMS_ITEMS_VAULTKEEPERSMELODY", () => PlayerData.instance.HasMelodyLibrarian,
-            () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian);
+            () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian, image: "Inv_MelodyVaultkeeper");
         AppendLabeledTile("ITEMS_ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
-            () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor);
+            () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor, image: "Inv_MelodyConductor");
 
-        List<(string, string)> items =
+        List<(string, string, string)> items =
         [
-            ("Coral Heart", "ITEMS_ITEMS_HEARTOFMIGHT"),
-            ("Flower Heart", "ITEMS_ITEMS_HEARTOFTHEWOODS"),
-            ("Hunter Heart", "ITEMS_ITEMS_HEARTOFTHEWILD"),
-            ("Clover Heart", "ITEMS_ITEMS_CONJOINEDHEART"),
-            ("White Flower", "ITEMS_ITEMS_EVERBLOOM"),
-            ("Ward Key", "ITEMS_ITEMS_WHITEKEY"),
-            ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY")
+            ("Coral Heart", "ITEMS_ITEMS_HEARTOFMIGHT", "Inv_HeartCoral"),
+            ("Flower Heart", "ITEMS_ITEMS_HEARTOFTHEWOODS", "Inv_HeartFlower"),
+            ("Hunter Heart", "ITEMS_ITEMS_HEARTOFTHEWILD", "Inv_HeartAnt"),
+            ("Clover Heart", "ITEMS_ITEMS_CONJOINEDHEART", "Inv_HeartJoined"),
+            ("White Flower", "ITEMS_ITEMS_EVERBLOOM", "Inv_Everbloom"),
+            ("Ward Key", "ITEMS_ITEMS_WHITEKEY", "Inv_WhiteKey"),
+            ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY", "Inv_SurgeonsKey")
         ];
 
-        foreach ((string name, string displayName) in items)
+        foreach ((string name, string displayName, string iconName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendLabeledTile(
                 displayName,
                 () => item.IsVisible,
-                () => ToggleItem(item)
+                () => ToggleItem(item),
+                image: iconName
             );
-            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
         AppendLabeledTile("ITEMS_ITEMS_KEYOFINDOLENT", () => PlayerData.instance.HasSlabKeyA, () =>
         {
             PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA;
             CollectableItemManager.IncrementVersion();
-        });
+        }, image: "Inv_KeyIndolent");
         AppendLabeledTile("ITEMS_ITEMS_KEYOFHERETIC", () => PlayerData.instance.HasSlabKeyB, () =>
         {
             PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB;
             CollectableItemManager.IncrementVersion();
-        });
+        }, image: "Inv_KeyHeretic");
         AppendLabeledTile("ITEMS_ITEMS_KEYOFAPOSTATE", () => PlayerData.instance.HasSlabKeyC, () =>
         {
             PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC;
             CollectableItemManager.IncrementVersion();
-        });
+        }, image: "Inv_KeyApostate");
 
         items =
         [
-            ("Architect Key", "ITEMS_ITEMS_ARCHITECTSKEY"),
-            ("Belltown House Key", "ITEMS_ITEMS_BELLHOMEKEY"),
-            ("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY"),
-            ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS")
+            ("Architect Key", "ITEMS_ITEMS_ARCHITECTSKEY", "Inv_ArchitectKey"),
+            ("Belltown House Key", "ITEMS_ITEMS_BELLHOMEKEY", "Inv_BellhomeKey"),
+            ("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey"),
+            ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
         ];
 
-        foreach ((string name, string displayName) in items)
+        foreach ((string name, string displayName, string iconName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendLabeledTile(
                 displayName,
                 () => item.IsVisible,
-                () => ToggleItem(item)
+                () => ToggleItem(item),
+                image: iconName
             );
-            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
         AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
-            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight);
+            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
+            image: "Inv_Farsight");
 
         AppendSectionHeader("ITEMS_SECTION_CONSUMABLES");
         AppendTileRow(2);
@@ -533,101 +661,48 @@ public class MainPanel : CanvasPanel
             "Rosaries",
             () => PlayerData.instance.geo,
             value => HeroController.instance.AddGeo(value - PlayerData.instance.geo),
+            image: "Inv_Rosaries",
             step: 100
         );
         AppendIncrementTile(
             "Shell Shards",
             () => PlayerData.instance.ShellShards,
             value => HeroController.instance.AddShards(value - PlayerData.instance.ShellShards),
+            image: "Inv_ShellShards",
             step: 100
         );
 
-        List<(string, string)> consumables =
+        List<(string, string, string)> consumables =
         [
-            ("Rosary_Set_Frayed", "ITEMS_CONSUMABLES_FRAYEDROSARYSTRING"),
-            ("Fixer Idol", "ITEMS_CONSUMABLES_HORNETSTATUETTE"),
-            ("Rosary_Set_Small", "ITEMS_CONSUMABLES_ROSARYSTRING"),
-            ("Shard Pouch", "ITEMS_CONSUMABLES_SHARDBUNDLE"),
-            ("Rosary_Set_Medium", "ITEMS_CONSUMABLES_ROSARYNECKLACE"),
-            ("Great Shard", "ITEMS_CONSUMABLES_BEASTSHARD"),
-            ("Rosary_Set_Large", "ITEMS_CONSUMABLES_HEAVYROSARYNECKLACE"),
-            ("Pristine Core", "ITEMS_CONSUMABLES_PRISTINECORE"),
-            ("Rosary_Set_Huge_White", "ITEMS_CONSUMABLES_PALEROSARYNECKLACE"),
-            ("Silk Grub", "ITEMS_CONSUMABLES_SILKEATER"),
-            ("Simple Key", "ITEMS_CONSUMABLES_SIMPLEKEY"),
-            ("Crest Socket Unlocker", "ITEMS_CONSUMABLES_MEMORYLOCKET"),
-            ("Tool Metal", "ITEMS_CONSUMABLES_CRAFTMETAL"),
-            ("Pale_Oil", "ITEMS_CONSUMABLES_PALEOIL")
+            ("Rosary_Set_Frayed", "ITEMS_CONSUMABLES_FRAYEDROSARYSTRING", "Inv_RosaryString1"),
+            ("Fixer Idol", "ITEMS_CONSUMABLES_HORNETSTATUETTE", "Inv_ShardStatue"),
+            ("Rosary_Set_Small", "ITEMS_CONSUMABLES_ROSARYSTRING", "Inv_RosaryString2"),
+            ("Shard Pouch", "ITEMS_CONSUMABLES_SHARDBUNDLE", "Inv_ShardBundle"),
+            ("Rosary_Set_Medium", "ITEMS_CONSUMABLES_ROSARYNECKLACE", "Inv_RosaryString3"),
+            ("Great Shard", "ITEMS_CONSUMABLES_BEASTSHARD", "Inv_ShardBeast"),
+            ("Rosary_Set_Large", "ITEMS_CONSUMABLES_HEAVYROSARYNECKLACE", "Inv_RosaryString4"),
+            ("Pristine Core", "ITEMS_CONSUMABLES_PRISTINECORE", "Inv_ShardCore"),
+            ("Rosary_Set_Huge_White", "ITEMS_CONSUMABLES_PALEROSARYNECKLACE", "Inv_RosaryString5"),
+            ("Silk Grub", "ITEMS_CONSUMABLES_SILKEATER", "Inv_Silkeater"),
+            ("Simple Key", "ITEMS_CONSUMABLES_SIMPLEKEY", "Inv_SimpleKey"),
+            ("Crest Socket Unlocker", "ITEMS_CONSUMABLES_MEMORYLOCKET", "Inv_MemoryLocket"),
+            ("Tool Metal", "ITEMS_CONSUMABLES_CRAFTMETAL", "Inv_Craftmetal"),
+            ("Pale_Oil", "ITEMS_CONSUMABLES_PALEOIL", "Inv_PaleOil")
         ];
 
-        foreach ((string name, string displayName) in consumables)
+        foreach ((string name, string displayName, string iconName) in consumables)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
             CanvasPanel tile = AppendIncrementTile(
                 displayName,
                 () => item.CollectedAmount,
-                value => SetCollectableAmount(name, _ => value)
+                value => SetCollectableAmount(name, _ => value),
+                image: iconName
             );
-            tile.Get<CanvasImage>("Icon").SetImage(item.GetPopupIcon());
         }
 
         AppendRow(1);
         AppendBasicControl("ITEMS_CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
-
-        AppendSectionHeader("ITEMS_SECTION_MASKSANDSPOOLS");
-        AppendTileRow(2);
-        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_MASKS", () => PlayerData.instance.maxHealth, SetMaxHealth, min: 1, max: 10);
-        static void SetMaxHealth(int value)
-        {
-            bool increase = value > PlayerData.instance.maxHealth;
-            PlayerData.instance.maxHealth = value;
-            PlayerData.instance.maxHealthBase = value;
-            if (increase)
-            {
-                HeroController.instance.MaxHealth();
-            }
-            else
-            {
-                PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
-            }
-            HudHelper.RefreshMasks();
-        }
-        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SPOOLS", () => PlayerData.instance.silkMax, SetMaxSilk, min: 9, max: 18);
-        static void SetMaxSilk(int value)
-        {
-            PlayerData.instance.silkMax = value;
-            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
-            HudHelper.RefreshSpool();
-            if (PlayerData.instance.IsSilkSpoolBroken && value > 9)
-            {
-                PlayerData.instance.IsSilkSpoolBroken = false;
-                EventRegister.SendEvent("SPOOL UNBROKEN");
-            }
-        }
-        AppendTileRow(2);
-        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, min: 1, max: 10);
-        static void SetHealth(int value)
-        {
-            if (!HeroController.instance.cState.dead && GameManager.instance.IsGameplayScene())
-            {
-                HeroController.instance.AddHealth(value - PlayerData.instance.health);
-                HudHelper.RefreshMasks();
-            }
-        }
-        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_SILK", () => PlayerData.instance.silk, SetSilk);
-        static void SetSilk(int value)
-        {
-            if (value > PlayerData.instance.silk)
-            {
-                HeroController.instance.AddSilk(value - PlayerData.instance.silk, true);
-            }
-            else if (value < PlayerData.instance.silk)
-            {
-                HeroController.instance.TakeSilk(PlayerData.instance.silk - value);
-            }
-        }
-        AppendRow(1);
-        AppendBasicControl("ITEMS_MASKSANDSPOOLS_ADDLIFEBLOOD", BindableFunctions.Lifeblood);
 
         AddTab("MAINPANEL_TAB_KEYBINDS");
 
@@ -887,9 +962,9 @@ public class MainPanel : CanvasPanel
         });
     }
 
-    private CanvasPanel AppendLabeledTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true)
+    private CanvasPanel AppendLabeledTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true, int defaultRowWidth = 5)
     {
-        CanvasPanel row = currentRow ?? AppendTileRow(5);
+        CanvasPanel row = currentRow ?? AppendTileRow(defaultRowWidth);
 
         CanvasPanel tile = AppendRowElement(name);
         tile.CollapseMode = CollapseMode.Deny;
@@ -948,7 +1023,9 @@ public class MainPanel : CanvasPanel
 
         containerBuilder.AppendFlexPadding();
 
-        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
+        var labelHeight = rowWidths.Length > 2 ? ListingHeight : ListingHeight * 2;
+
+        CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), labelHeight);
         label.Alignment = TextAnchor.MiddleCenter;
         label.Text = Utils.Localize(name);
 
