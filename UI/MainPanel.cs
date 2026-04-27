@@ -452,9 +452,9 @@ public class MainPanel : CanvasPanel
             {"Pimpilo", [new ToolDef("Tool_Pimpillo", ToolItemManager.GetToolByName("Pimpilo"))]},
             {"Conch Drill", [new ToolDef("Tool_Conchcutter", ToolItemManager.GetToolByName("Conch Drill"))]},
             {"WebShot", [
+                new ToolDef("Tool_Silkshot_Weaver", ToolItemManager.GetToolByName("WebShot Weaver")),
                 new ToolDef("Tool_Silkshot_Forge", ToolItemManager.GetToolByName("WebShot Forge")),
                 new ToolDef("Tool_Silkshot_Architect", ToolItemManager.GetToolByName("WebShot Architect")),
-                new ToolDef("Tool_Silkshot_Weaver", ToolItemManager.GetToolByName("WebShot Weaver"))
             ]},
             {"Screw Attack", [new ToolDef("Tool_DelversDrill", ToolItemManager.GetToolByName("Screw Attack"))]},
             {"Cogwork Saw", [new ToolDef("Tool_CogworkWheel", ToolItemManager.GetToolByName("Cogwork Saw"))]},
@@ -603,34 +603,40 @@ public class MainPanel : CanvasPanel
             }
         }
 
+        void AddItemsLabeledTiles(List<(string, string, string)> items)
+        {
+            foreach ((string name, string displayName, string iconName) in items)
+            {
+                CollectableItem item = CollectableItemManager.GetItemByName(name);
+                AppendLabeledTile(
+                    displayName,
+                    () => item.IsVisible,
+                    () => ToggleItem(item),
+                    image: iconName
+                );
+            }
+        }
+
         AppendLabeledTile("ITEMS_ITEMS_ARCHITECTSMELODY", () => PlayerData.instance.HasMelodyArchitect,
             () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect, image: "Inv_MelodyArchitect");
         AppendLabeledTile("ITEMS_ITEMS_VAULTKEEPERSMELODY", () => PlayerData.instance.HasMelodyLibrarian,
             () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian, image: "Inv_MelodyVaultkeeper");
         AppendLabeledTile("ITEMS_ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
             () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor, image: "Inv_MelodyConductor");
+        
+        AddItemsLabeledTiles([("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey")]);
+        
+        AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
+            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
+            image: "Inv_Farsight");
 
-        List<(string, string, string)> items =
-        [
+        AddItemsLabeledTiles([
             ("Coral Heart", "ITEMS_ITEMS_HEARTOFMIGHT", "Inv_HeartCoral"),
             ("Flower Heart", "ITEMS_ITEMS_HEARTOFTHEWOODS", "Inv_HeartFlower"),
             ("Hunter Heart", "ITEMS_ITEMS_HEARTOFTHEWILD", "Inv_HeartAnt"),
             ("Clover Heart", "ITEMS_ITEMS_CONJOINEDHEART", "Inv_HeartJoined"),
-            ("White Flower", "ITEMS_ITEMS_EVERBLOOM", "Inv_Everbloom"),
-            ("Ward Key", "ITEMS_ITEMS_WHITEKEY", "Inv_WhiteKey"),
-            ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY", "Inv_SurgeonsKey")
-        ];
-
-        foreach ((string name, string displayName, string iconName) in items)
-        {
-            CollectableItem item = CollectableItemManager.GetItemByName(name);
-            AppendLabeledTile(
-                displayName,
-                () => item.IsVisible,
-                () => ToggleItem(item),
-                image: iconName
-            );
-        }
+            ("White Flower", "ITEMS_ITEMS_EVERBLOOM", "Inv_Everbloom")
+        ]);
 
         AppendLabeledTile("ITEMS_ITEMS_KEYOFINDOLENT", () => PlayerData.instance.HasSlabKeyA, () =>
         {
@@ -648,30 +654,17 @@ public class MainPanel : CanvasPanel
             CollectableItemManager.IncrementVersion();
         }, image: "Inv_KeyApostate");
 
-        items =
-        [
+        AddItemsLabeledTiles([
+            ("Ward Key", "ITEMS_ITEMS_WHITEKEY", "Inv_WhiteKey"),
+            ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY", "Inv_SurgeonsKey"),
             ("Architect Key", "ITEMS_ITEMS_ARCHITECTSKEY", "Inv_ArchitectKey"),
             ("Belltown House Key", "ITEMS_ITEMS_BELLHOMEKEY", "Inv_BellhomeKey"),
-            ("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey"),
             ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
-        ];
-
-        foreach ((string name, string displayName, string iconName) in items)
-        {
-            CollectableItem item = CollectableItemManager.GetItemByName(name);
-            AppendLabeledTile(
-                displayName,
-                () => item.IsVisible,
-                () => ToggleItem(item),
-                image: iconName
-            );
-        }
-
-        AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
-            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
-            image: "Inv_Farsight");
+        ]);
 
         AppendSectionHeader("ITEMS_SECTION_CONSUMABLES");
+        AppendRow(1);
+        AppendBasicControl("ITEMS_CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
         AppendTileRow(2);
         AppendIncrementTile(
             "Rosaries",
@@ -703,20 +696,20 @@ public class MainPanel : CanvasPanel
 
         List<(string, string, string)> consumables =
         [
-            ("Rosary_Set_Frayed", "ITEMS_CONSUMABLES_FRAYEDROSARYSTRING", "Inv_RosaryString1"),
-            ("Fixer Idol", "ITEMS_CONSUMABLES_HORNETSTATUETTE", "Inv_ShardStatue"),
-            ("Rosary_Set_Small", "ITEMS_CONSUMABLES_ROSARYSTRING", "Inv_RosaryString2"),
-            ("Shard Pouch", "ITEMS_CONSUMABLES_SHARDBUNDLE", "Inv_ShardBundle"),
-            ("Rosary_Set_Medium", "ITEMS_CONSUMABLES_ROSARYNECKLACE", "Inv_RosaryString3"),
-            ("Great Shard", "ITEMS_CONSUMABLES_BEASTSHARD", "Inv_ShardBeast"),
-            ("Rosary_Set_Large", "ITEMS_CONSUMABLES_HEAVYROSARYNECKLACE", "Inv_RosaryString4"),
-            ("Pristine Core", "ITEMS_CONSUMABLES_PRISTINECORE", "Inv_ShardCore"),
-            ("Rosary_Set_Huge_White", "ITEMS_CONSUMABLES_PALEROSARYNECKLACE", "Inv_RosaryString5"),
-            ("Silk Grub", "ITEMS_CONSUMABLES_SILKEATER", "Inv_Silkeater"),
             ("Simple Key", "ITEMS_CONSUMABLES_SIMPLEKEY", "Inv_SimpleKey"),
             ("Crest Socket Unlocker", "ITEMS_CONSUMABLES_MEMORYLOCKET", "Inv_MemoryLocket"),
             ("Tool Metal", "ITEMS_CONSUMABLES_CRAFTMETAL", "Inv_Craftmetal"),
-            ("Pale_Oil", "ITEMS_CONSUMABLES_PALEOIL", "Inv_PaleOil")
+            ("Pale_Oil", "ITEMS_CONSUMABLES_PALEOIL", "Inv_PaleOil"),
+            ("Rosary_Set_Frayed", "ITEMS_CONSUMABLES_FRAYEDROSARYSTRING", "Inv_RosaryString1"),
+            ("Silk Grub", "ITEMS_CONSUMABLES_SILKEATER", "Inv_Silkeater"),
+            ("Rosary_Set_Small", "ITEMS_CONSUMABLES_ROSARYSTRING", "Inv_RosaryString2"),
+            ("Fixer Idol", "ITEMS_CONSUMABLES_HORNETSTATUETTE", "Inv_ShardStatue"),
+            ("Rosary_Set_Medium", "ITEMS_CONSUMABLES_ROSARYNECKLACE", "Inv_RosaryString3"),
+            ("Shard Pouch", "ITEMS_CONSUMABLES_SHARDBUNDLE", "Inv_ShardBundle"),
+            ("Rosary_Set_Large", "ITEMS_CONSUMABLES_HEAVYROSARYNECKLACE", "Inv_RosaryString4"),
+            ("Great Shard", "ITEMS_CONSUMABLES_BEASTSHARD", "Inv_ShardBeast"),
+            ("Rosary_Set_Huge_White", "ITEMS_CONSUMABLES_PALEROSARYNECKLACE", "Inv_RosaryString5"),
+            ("Pristine Core", "ITEMS_CONSUMABLES_PRISTINECORE", "Inv_ShardCore"),
         ];
 
         foreach ((string name, string displayName, string iconName) in consumables)
@@ -729,9 +722,6 @@ public class MainPanel : CanvasPanel
                 image: iconName
             );
         }
-
-        AppendRow(1);
-        AppendBasicControl("ITEMS_CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
 
         AddTab("MAINPANEL_TAB_KEYBINDS");
 
