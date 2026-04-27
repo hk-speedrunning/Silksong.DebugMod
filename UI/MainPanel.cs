@@ -272,7 +272,14 @@ public class MainPanel : CanvasPanel
             }
         }
 
-        AppendIncrementTile("ITEMS_MASKSANDSPOOLS_LIFEBLOOD", () => PlayerData.instance.healthBlue, (int x) => { }, image: "Inv_Lifeblood", customAdd: BindableFunctions.Lifeblood, min: 0);
+        AppendWideTile("ITEMS_MASKSANDSPOOLS_LIFEBLOOD", BuildLifebloodTile, image: "Inv_Lifeblood");
+        static void BuildLifebloodTile(CanvasPanel controlRow)
+        {
+            CanvasButton button = controlRow.Add(new CanvasButton("Button"));
+            button.Size = controlRow.Size;
+            button.Text.Text = Utils.Localize("ITEMS_ADD");
+            button.OnClicked += BindableFunctions.Lifeblood;
+        }
 
         AppendSectionHeader("ITEMS_SECTION_CRESTS");
         AppendRow(1);
@@ -1019,8 +1026,7 @@ public class MainPanel : CanvasPanel
         return tile;
     }
 
-    private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action<int> setter, string image = "IconX",
-        Action customAdd = null, Action customRemove = null, int step = 1, int min = 0, int max = int.MaxValue, bool wrap = false)
+    private CanvasPanel AppendWideTile(string name, Action<CanvasPanel> controlBuilder, string image = "IconX")
     {
         CanvasPanel row = currentRow ?? AppendTileRow(2);
 
@@ -1054,62 +1060,76 @@ public class MainPanel : CanvasPanel
         containerBuilder.AppendFlexPadding();
         containerBuilder.AppendPadding(UICommon.Margin); // Evens spacing between tile border and control row border
 
-        CanvasPanel controlRow = containerBuilder.AppendFixed(new CanvasPanel("ControlRow"), UICommon.ControlHeight);
-        PanelBuilder controlBuilder = new(controlRow) { Horizontal = true, InnerPadding = -UICommon.BORDER_THICKNESS };
+        var controlHeight = rowWidths.Length > 2 ? UICommon.ScaleHeight(20) : UICommon.ControlHeight;
 
-        void ValueUpdate(int value)
-        {
-            if (value < min)
-            {
-                value = wrap ? max : min;
-            }
-
-            if (value > max)
-            {
-                value = wrap ? min : max;
-            }
-
-            setter(value);
-        }
-
-        var decButton = controlBuilder.AppendSquare(new CanvasButton("Decrement"));
-        decButton.SetImage(UICommon.images["IconMinusMin"]);
-        decButton.RemoveText();
-        decButton.OnClicked += customRemove ?? (() => ValueUpdate(getter() - step));
-
-        var valueButton = controlBuilder.AppendFlex(new CanvasButton("Value"));
-        valueButton.SetImage(UICommon.clearBG);
-        valueButton.Border.Sides &= ~BorderSides.LEFT;
-
-        var textField = valueButton.SetTextField();
-        textField.OnUpdate += () => textField.UpdateDefaultText(getter().ToString());
-        textField.OnSubmit += text =>
-        {
-            if (!int.TryParse(text, out int value))
-            {
-                return;
-            }
-
-            // Always clamp text input instead of wrapping
-            if (value < min) value = min;
-            if (value > max) value = max;
-
-            setter(value);
-        };
-
-        var incButton = controlBuilder.AppendSquare(new CanvasButton("Increment"));
-        incButton.SetImage(UICommon.images["IconPlusMin"]);
-        incButton.RemoveText();
-        incButton.OnClicked += customAdd ?? (() => ValueUpdate(getter() + step));
-        incButton.Border.Sides &= ~BorderSides.LEFT;
+        CanvasPanel controlRow = containerBuilder.AppendFixed(new CanvasPanel("ControlRow"), controlHeight);
 
         builder.Build();
         containerBuilder.Build();
-        controlBuilder.Build();
+        controlBuilder(controlRow);
 
         row.Size = new Vector2(row.Size.x, Mathf.Max(row.Size.y, tile.Size.y));
 
         return tile;
+    }
+
+    private CanvasPanel AppendIncrementTile(string name, Func<int> getter, Action<int> setter, string image = "IconX",
+        Action customAdd = null, Action customRemove = null, int step = 1, int min = 0, int max = int.MaxValue, bool wrap = false)
+    {
+        void Builder(CanvasPanel controlRow)
+        {
+            PanelBuilder controlBuilder = new(controlRow) { Horizontal = true, InnerPadding = -UICommon.BORDER_THICKNESS };
+
+            void ValueUpdate(int value)
+            {
+                if (value < min)
+                {
+                    value = wrap ? max : min;
+                }
+
+                if (value > max)
+                {
+                    value = wrap ? min : max;
+                }
+
+                setter(value);
+            }
+
+            var decButton = controlBuilder.AppendSquare(new CanvasButton("Decrement"));
+            decButton.SetImage(UICommon.images["IconMinusMin"]);
+            decButton.RemoveText();
+            decButton.OnClicked += customRemove ?? (() => ValueUpdate(getter() - step));
+
+            var valueButton = controlBuilder.AppendFlex(new CanvasButton("Value"));
+            valueButton.SetImage(UICommon.clearBG);
+            valueButton.Border.Sides &= ~BorderSides.LEFT;
+
+            var textField = valueButton.SetTextField();
+            textField.OnUpdate += () => textField.UpdateDefaultText(getter().ToString());
+            textField.OnSubmit += text =>
+            {
+                if (!int.TryParse(text, out int value))
+                {
+                    return;
+                }
+
+                // Always clamp text input instead of wrapping
+                if (value < min) value = min;
+                if (value > max) value = max;
+
+                setter(value);
+            };
+
+            var incButton = controlBuilder.AppendSquare(new CanvasButton("Increment"));
+            incButton.SetImage(UICommon.images["IconPlusMin"]);
+            incButton.RemoveText();
+            incButton.OnClicked += customAdd ?? (() => ValueUpdate(getter() + step));
+            incButton.Border.Sides &= ~BorderSides.LEFT;
+
+            controlBuilder.Build();
+        }
+
+        return AppendWideTile(name, Builder, image);
     }
 
     public override void Build()
