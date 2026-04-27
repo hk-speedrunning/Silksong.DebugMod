@@ -84,7 +84,7 @@ internal static class Utils
 
         if (result == "" || result.StartsWith("#!#"))
         {
-            return LanguageSheetFallback(key);
+            result = LanguageSheetFallback(key);
         }
 
         return result;

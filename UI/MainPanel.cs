@@ -624,7 +624,7 @@ public class MainPanel : CanvasPanel
         foreach ((string name, string displayName, string iconName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
-            CanvasPanel tile = AppendLabeledTile(
+            AppendLabeledTile(
                 displayName,
                 () => item.IsVisible,
                 () => ToggleItem(item),
@@ -659,7 +659,7 @@ public class MainPanel : CanvasPanel
         foreach ((string name, string displayName, string iconName) in items)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
-            CanvasPanel tile = AppendLabeledTile(
+            AppendLabeledTile(
                 displayName,
                 () => item.IsVisible,
                 () => ToggleItem(item),
@@ -722,7 +722,7 @@ public class MainPanel : CanvasPanel
         foreach ((string name, string displayName, string iconName) in consumables)
         {
             CollectableItem item = CollectableItemManager.GetItemByName(name);
-            CanvasPanel tile = AppendIncrementTile(
+            AppendIncrementTile(
                 displayName,
                 () => item.CollectedAmount,
                 value => SetCollectableAmount(name, _ => value),
@@ -768,7 +768,14 @@ public class MainPanel : CanvasPanel
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
                 keycode.Alignment = TextAnchor.MiddleLeft;
-                keycode.OnUpdate += () => keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
+                keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
+                DebugMod.bindUpdated += (name, _) =>
+                {
+                    if (name == action.Name)
+                    {
+                        keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
+                    }
+                };
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
                 edit.ImageOnly(UICommon.images["IconDotCircled"]);

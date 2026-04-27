@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DebugMod.Helpers;
 
-public static class Profiler
+internal static class Profiler
 {
     private const int INTERVAL = 20;
     public static readonly bool enabled = false;
