@@ -99,7 +99,8 @@ public class HitboxRender : MonoBehaviour
             }
             else if (go.layer == (int)PhysLayers.TERRAIN)
             {
-                if (go.GetComponent<NonSlider>()) { colliders[HitboxType.NonSliderTerrain].Add(collider2D); }
+                NonSlider nonSlider = go.GetComponent<NonSlider>();
+                if (nonSlider && nonSlider.IsActive) { colliders[HitboxType.NonSliderTerrain].Add(collider2D); }
                 else { colliders[HitboxType.Terrain].Add(collider2D); }
             }
             else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
@@ -136,7 +137,8 @@ public class HitboxRender : MonoBehaviour
             }
             else if (HitboxViewer.State == 2)
             {
-                if (go.GetComponent<NoClamberRegion>()) { colliders[HitboxType.NonMantleRegion].Add(collider2D); }
+                var noClamber = go.GetComponent<NoClamberRegion>();
+                if (noClamber && noClamber.enabled) { colliders[HitboxType.NonMantleRegion].Add(collider2D); }
                 else if (go.GetComponent<AlertRange>()) { colliders[HitboxType.AlertRegion].Add(collider2D); }
                 else colliders[HitboxType.Other].Add(collider2D);
             }
