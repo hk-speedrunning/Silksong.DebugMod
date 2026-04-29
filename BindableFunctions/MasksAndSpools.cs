@@ -142,7 +142,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Add Lifeblood", category = "Masks & Spools")]
     public static void Lifeblood()
     {
+        bool wasInLifebloodState = HeroController.instance.IsInLifebloodState;
+
         EventRegister.SendEvent("ADD BLUE HEALTH");
+
+        if (!wasInLifebloodState && HeroController.instance.IsInLifebloodState)
+        {
+            HeroController.instance.HitMaxBlueHealthBurst();
+        }
 
         DebugMod.LogConsole("Attempting to add lifeblood");
     }
