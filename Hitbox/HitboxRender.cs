@@ -1,4 +1,5 @@
-﻿using GlobalEnums;
+﻿using DebugMod.Helpers;
+using GlobalEnums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,12 +15,15 @@ public class HitboxRender : MonoBehaviour
         public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red
         public static readonly HitboxType Attack = new(Color.cyan, 2);                       // cyan
         public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0), 3);     // green
-        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 4); // lavender
-        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 5); // pink
-        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 6); // dark blue
-        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 7); // purple
-        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 8); // orange
-
+        public static readonly HitboxType NonSliderTerrain = new(new Color(0, 0.8f, 0.6f), 4); // teal
+        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 5); // lavender
+        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 6); // pink
+        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 7); // dark blue
+        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 8); // purple
+        public static readonly HitboxType NonMantleRegion = new(new Color(1f, 0.4f,  0.5f), 9); // pink
+        public static readonly HitboxType AlertRegion = new(new Color(0.7f, 0.7f, 0.7f), 10); // gray
+        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 11); // orange
+        
 
         public readonly Color Color;
         public readonly int Depth;
@@ -42,10 +46,13 @@ public class HitboxRender : MonoBehaviour
         {HitboxType.Enemy, new HashSet<Collider2D>()},
         {HitboxType.Attack, new HashSet<Collider2D>()},
         {HitboxType.Terrain, new HashSet<Collider2D>()},
+        {HitboxType.NonSliderTerrain, new HashSet<Collider2D>()},
         {HitboxType.Trigger, new HashSet<Collider2D>()}, // what does this category mean?
         {HitboxType.Breakable, new HashSet<Collider2D>()},
         {HitboxType.Gate, new HashSet<Collider2D>()},
         {HitboxType.HazardRespawn, new HashSet<Collider2D>()},
+        {HitboxType.NonMantleRegion, new HashSet<Collider2D>()},
+        {HitboxType.AlertRegion, new HashSet<Collider2D>()},
         {HitboxType.Other, new HashSet<Collider2D>()},
     };
 
@@ -83,13 +90,18 @@ public class HitboxRender : MonoBehaviour
         if (collider2D is BoxCollider2D or PolygonCollider2D or EdgeCollider2D or CircleCollider2D)
         {
             GameObject go = collider2D.gameObject;
-            if (collider2D.GetComponent<DamageHero>() || collider2D.gameObject.LocateMyFSM("damages_hero"))
+            if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder")
+                || collider2D.GetComponent<CogMultiHitter>() 
+                || (collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>())
+                )
             {
                 colliders[HitboxType.Enemy].Add(collider2D);
             }
             else if (go.layer == (int)PhysLayers.TERRAIN)
             {
-                colliders[HitboxType.Terrain].Add(collider2D);
+                NonSlider nonSlider = go.GetComponent<NonSlider>();
+                if (nonSlider && nonSlider.IsActive) { colliders[HitboxType.NonSliderTerrain].Add(collider2D); }
+                else { colliders[HitboxType.Terrain].Add(collider2D); }
             }
             else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
             {
@@ -107,17 +119,28 @@ public class HitboxRender : MonoBehaviour
             {
                 colliders[HitboxType.Gate].Add(collider2D);
             }
-            else if (collider2D.GetComponent<Breakable>())
+            else if (collider2D.GetComponent<Breakable>() || collider2D.gameObject.layer == LayerMask.NameToLayer("Interactive Object"))
             {
-                colliders[HitboxType.Breakable].Add(collider2D);
+                if (collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>())
+                {
+                    colliders[HitboxType.Trigger].Add(collider2D);
+                }
+                else if (!collider2D.GetComponent<NonBouncer>() || HitboxViewer.State == 2)
+                {
+                    colliders[HitboxType.Breakable].Add(collider2D);
+                }
             }
-            else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<NonBouncer>())
+            else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>()
+                    || collider2D.tag == "Geo")
             {
                 colliders[HitboxType.Trigger].Add(collider2D);
             }
             else if (HitboxViewer.State == 2)
             {
-                colliders[HitboxType.Other].Add(collider2D);
+                var noClamber = go.GetComponent<NoClamberRegion>();
+                if (noClamber && noClamber.enabled) { colliders[HitboxType.NonMantleRegion].Add(collider2D); }
+                else if (go.GetComponent<AlertRange>()) { colliders[HitboxType.AlertRegion].Add(collider2D); }
+                else colliders[HitboxType.Other].Add(collider2D);
             }
         }
     }

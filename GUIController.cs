@@ -1,11 +1,15 @@
+using DebugMod.Helpers;
 using DebugMod.Hitbox;
+using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -19,10 +23,13 @@ public class GUIController : MonoBehaviour
     public string respawnSceneWatch;
     private static readonly HitboxViewer hitboxes = new();
     private KeyCode keyWarning;
-    private Resolution resolution;
+    private Size resolution;
+    internal LanguageCode language;
+
+    private float? lastRescale;
+    private const float RebuildDelay = 0.1f;
 
     public GameObject canvas;
-    private static GUIController _instance;
 
     private readonly Array allKeyCodes = Enum.GetValues(typeof(KeyCode));
 
@@ -35,15 +42,16 @@ public class GUIController : MonoBehaviour
     {
         get
         {
-            if (_instance == null)
+            if (!field)
             {
                 DebugMod.Log("Creating new GUIController");
 
-                GameObject GUIObj = new GameObject("GUIController");
-                _instance = GUIObj.AddComponent<GUIController>();
-                DontDestroyOnLoad(GUIObj);
+                GameObject go = new("GUIController");
+                field = go.AddComponent<GUIController>();
+                DontDestroyOnLoad(go);
             }
-            return _instance;
+
+            return field;
         }
     }
 
@@ -79,12 +87,25 @@ public class GUIController : MonoBehaviour
         {
             if (canvas)
             {
+                foreach (EnemyHandle handle in EnemiesPanel.enemyPool)
+                {
+                    handle.DestroyUI();
+                }
+
                 Destroy(canvas);
+                CanvasNode.allNodes.Clear();
             }
 
             canvas = new GameObject("DebugModCanvas");
+            canvas.SetActive(false);
+
             canvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.AddComponent<GraphicRaycaster>();
+
+            RectTransform rt = canvas.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = Vector2.zero;
+            rt.pivot = Vector2.zero;
+            rt.sizeDelta = new Vector2(Screen.width, Screen.height);
 
             DontDestroyOnLoad(canvas);
 
@@ -98,7 +119,10 @@ public class GUIController : MonoBehaviour
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
 
-            resolution = Screen.currentResolution;
+            resolution = new Size(Screen.width, Screen.height);
+            language = Language.CurrentLanguage();
+
+            DebugMod.LogDebug("UI built");
         }
         catch (Exception e)
         {
@@ -110,32 +134,52 @@ public class GUIController : MonoBehaviour
     {
         if (DebugMod.GM == null) return;
 
-        if (canvas && (resolution.width != Screen.currentResolution.width || resolution.height != Screen.currentResolution.height))
+        Profiler.NewFrame();
+
+        if (!resolution.IsEmpty && (resolution.Width != Screen.width || resolution.Height != Screen.height))
         {
-            resolution = Screen.currentResolution;
+            resolution = new Size(Screen.width, Screen.height);
+            lastRescale = Time.realtimeSinceStartup;
+        }
+
+        if (lastRescale != null && Time.realtimeSinceStartup > lastRescale + RebuildDelay)
+        {
+            DebugMod.LogDebug($"Resize complete, rebuilding for new resolution ({Screen.width}, {Screen.height})");
+            lastRescale = null;
             BuildMenus();
         }
 
         if (ForceHideUI())
         {
-            foreach (CanvasNode root in CanvasNode.rootNodes)
-            {
-                root.ActiveSelf = false;
-            }
+            canvas.SetActive(false);
         }
         else
         {
+            canvas.SetActive(true);
             MainPanel.Instance?.ActiveSelf = DebugMod.settings.MainPanelVisible;
             EnemiesPanel.Instance?.ActiveSelf = DebugMod.settings.EnemiesPanelVisible;
             ConsolePanel.Instance?.ActiveSelf = DebugMod.settings.ConsoleVisible;
             InfoPanel.Instance?.ActiveSelf = DebugMod.settings.InfoPanelVisible;
             SaveStatesPanel.Instance?.ActiveSelf = SaveStatesPanel.ShouldBeVisible;
 
-            CanvasNode.UpdateAll();
+            // Update all nodes, skipping over disabled nodes
+            for (int i = 0; i < CanvasNode.allNodes.Count;)
+            {
+                CanvasNode node = CanvasNode.allNodes[i];
+                if (node.ActiveSelf)
+                {
+                    node.Update();
+                    i++;
+                }
+                else
+                {
+                    i += node.childCount;
+                }
+            }
         }
 
         GameObject selected = EventSystem.current.currentSelectedGameObject;
-        if (selected && selected.transform.parent.gameObject == canvas && !selected.GetComponent<InputField>())
+        if (selected && selected.GetComponent<NodeRef>() && !selected.GetComponent<InputField>())
         {
             EventSystem.current.SetSelectedGameObject(null);
         }

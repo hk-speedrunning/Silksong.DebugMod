@@ -17,7 +17,7 @@ public class CanvasScrollbar : CanvasNode
 
     public CanvasScrollbar(string name) : base(name)
     {
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         grip = new CanvasButton("Grip");
         grip.Parent = this;
@@ -70,7 +70,7 @@ public class CanvasScrollbar : CanvasNode
         });
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         float percentage = -ScrollView.Content.LocalPosition.y / ScrollView.GetScrollableHeight();
         percentage = Mathf.Clamp01(percentage);

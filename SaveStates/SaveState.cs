@@ -28,6 +28,12 @@ public class SaveState
     //used to stop double loads
     public static SaveState loadingSavestate { get; private set; }
 
+    public static bool LoadDuped { get; set; }
+
+    public static event Action<SaveState> OnSave;
+    public static event Action<SaveState> BeforeLoad;
+    public static event Action<SaveState> AfterLoad;
+
     [Serializable]
     public class SaveStateData
     {
@@ -46,7 +52,7 @@ public class SaveState
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
-
+        public Dictionary<string, object> customData;
 
         internal SaveStateData() { }
 
@@ -99,6 +105,11 @@ public class SaveState
                     loadedSceneActiveScenes[i] = loadedScenes[i];
                 }
             }
+
+            if (_data.customData != null)
+            {
+                customData = new Dictionary<string, object>(_data.customData);
+            }
         }
 
         public SaveStateData DeepCopy()
@@ -149,6 +160,12 @@ public class SaveState
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
         data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
 
+        if (OnSave != null)
+        {
+            data.customData = [];
+            OnSave.Invoke(this);
+        }
+
         DebugMod.LogConsole("Saved temp state");
         return true;
     }
@@ -181,8 +198,7 @@ public class SaveState
     #endregion
 
     #region loading
-    //loadDuped is used by external mods
-    public IEnumerator Load(bool loadDuped = false)
+    public IEnumerator Load()
     {
         if (!IsSet())
         {
@@ -203,7 +219,7 @@ public class SaveState
 
         loadingSavestate = this;
 
-        IEnumerator enumerator = LoadImpl(loadDuped);
+        IEnumerator enumerator = LoadImpl();
         while (true)
         {
             try
@@ -262,7 +278,7 @@ public class SaveState
         }
     }
 
-    private IEnumerator LoadImpl(bool loadDuped)
+    private IEnumerator LoadImpl()
     {
         bool stateondeath = DebugMod.stateOnDeath;
         DebugMod.stateOnDeath = false;
@@ -292,6 +308,8 @@ public class SaveState
         }
 
         if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
+
+        BeforeLoad?.Invoke(this);
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");
@@ -325,7 +343,7 @@ public class SaveState
             Object.DontDestroyOnLoad(HeroController.instance);
         }
 
-        // If another scene load operation is in progress, loading the dummy scene will hang
+        // If another scene load operation is in progress, loading the scene will hang
         yield return ScenePreloader.ForceEndPendingOperations();
 
         string previousScene = GameManager.instance.GetSceneNameString();
@@ -333,11 +351,12 @@ public class SaveState
         GameManager.instance.entryGateName = "dreamGate";
         GameManager.instance.startedOnThisScene = true;
 
-        // For some reason this is in the full game files, but it works so why not
-        string dummySceneName = "Demo Start";
-
-        Addressables.LoadSceneAsync($"Scenes/{dummySceneName}");
-        yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummySceneName);
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            string dummyScene = "Demo Start";
+            Addressables.LoadSceneAsync($"Scenes/{dummyScene}");
+            yield return new WaitUntil(() => USceneManager.GetActiveScene().name == dummyScene);
+        }
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedSd), SceneData.instance);
         GameManager.instance.ResetSemiPersistentItems();
@@ -350,6 +369,11 @@ public class SaveState
         yield return null;
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
+
+        // JsonUtility doesn't serialize null fields, so they won't get reset to null when loading.
+        // But we don't want to reset every PlayerData field since then savestates lose forwards compatibility.
+        // This problem is rare enough to just handle it manually.
+        PlayerData.instance.toolAmountsOverride = data.savedPd.toolAmountsOverride;
 
         SceneWatcher.LoadedSceneInfo[] sceneData = data
             .loadedScenes
@@ -366,20 +390,16 @@ public class SaveState
                 HeroLeaveDirection = GatePosition.unknown,
                 EntryGateName = "dreamGate",
                 EntryDelay = 0f,
+                PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
-                Visualization = 0,
-                AlwaysUnloadUnusedAssets = true
+                Visualization = GameManager.SceneLoadVisualizations.Default,
+                AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
             }
         );
 
         yield return new WaitUntil(() => USceneManager.GetActiveScene().name == data.saveScene);
 
-        GameManager.instance.cameraCtrl.PositionToHero(false);
-
-        GameManager.instance.cameraCtrl.isGameplayScene = true;
-        GameManager.instance.UpdateUIStateFromGameState();
-
-        if (loadDuped)
+        if (LoadDuped)
         {
             yield return new WaitUntil(() => GameManager.instance.IsInSceneTransition == false);
             for (int i = 1; i < sceneData.Length; i++)
@@ -409,19 +429,24 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+        EventRegister.SendEvent("END FOLLOWERS INSTANT");
 
-        FieldInfo cameraGameplayScene = typeof(CameraController).GetField("isGameplayScene", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        cameraGameplayScene.SetValue(GameManager.instance.cameraCtrl, true);
-
-        yield return null;
+        if (DebugMod.settings.SafeSaveStateLoading)
+        {
+            // Probably just being paranoid?
+            yield return null;
+        }
 
         HeroController.instance.gameObject.transform.position = data.savePos;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
         if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         DebugMod.noclipPos = data.savePos;
 
-        if (loadDuped && DebugMod.settings.ShowHitBoxes > 0)
+        GameManager.instance.cameraCtrl.PositionToHeroInstant(false);
+        GameManager.instance.cameraCtrl.isGameplayScene = true;
+        GameManager.instance.UpdateUIStateFromGameState();
+
+        if (LoadDuped && DebugMod.settings.ShowHitBoxes > 0)
         {
             int cs = DebugMod.settings.ShowHitBoxes;
             DebugMod.settings.ShowHitBoxes = 0;
@@ -448,6 +473,10 @@ public class SaveState
 
         //removes things like bench storage no clip float etc
         if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
+
+        AfterLoad?.Invoke(this);
+
+        yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
         //pause fixes from homothety
         if (GameManager.instance.isPaused)
@@ -566,6 +595,7 @@ public class SaveState
         }
         HeroController.instance.hunterUpgState = data.evoState;
 
+        // TODO: this is broken
         int healthBlue = data.savedPd.healthBlue;
         for (int i = 0; i < healthBlue; i++)
         {
@@ -592,7 +622,7 @@ public class SaveState
     #region helper functionality
     public bool IsSet() => !string.IsNullOrEmpty(data.saveStateIdentifier);
 
-    public override string ToString() => IsSet() ? data.saveStateIdentifier : "Empty";
+    public override string ToString() => IsSet() ? data.saveStateIdentifier : Utils.Localize("SAVESTATEPANEL_EMPTY");
     #endregion
 
     #region patches
@@ -608,6 +638,14 @@ public class SaveState
         }
 
         return true;
+    }
+
+    // Prevent objects in the previous scene overwriting scene data when unloading
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
+    [HarmonyPrefix]
+    private static bool SaveLevelState()
+    {
+        return loadingSavestate == null;
     }
     #endregion
 }

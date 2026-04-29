@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace DebugMod.UI.Canvas;
 
-public class CanvasText : CanvasObject
+public class CanvasText : CanvasNode
 {
     protected Text t;
 
@@ -75,15 +75,17 @@ public class CanvasText : CanvasObject
         }
     }
 
-    public CanvasText(string name, 
+    protected override bool Interactable => false;
+
+    public CanvasText(string name,
         HorizontalWrapMode overflow = HorizontalWrapMode.Wrap) : base(name)
     {
         this.overflow = overflow;
     }
 
-    protected override void OnUpdatePosition()
+    protected override void OnUpdateLocalPosition()
     {
-        base.OnUpdatePosition();
+        base.OnUpdateLocalPosition();
 
         if (GameObject)
         {
@@ -91,13 +93,11 @@ public class CanvasText : CanvasObject
         }
     }
 
+    // Relative position needs to be integers or the text looks blurry
     private void RoundPosition()
     {
-        // Absolute position needs to be integers or the text looks blurry
-        Vector2 pos = transform.anchorMin;
-        float x = Mathf.RoundToMultipleOf(pos.x, 1f / Screen.width);
-        float y = Mathf.RoundToMultipleOf(pos.y, 1f / Screen.height);
-        transform.anchorMin = transform.anchorMax = new(x, y);
+        Vector2 pos = transform.anchoredPosition;
+        transform.anchoredPosition = new(Mathf.Round(pos.x), Mathf.Round(pos.y));
     }
 
     public override void Build()

@@ -1,3 +1,4 @@
+using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ public class EnemiesPanel : CanvasPanel
     {
         LocalPosition = new Vector2(Screen.width - UICommon.ScreenMargin - UICommon.RightSideWidth, UICommon.MainPanelHeight + UICommon.ScreenMargin * 2);
         Size = new Vector2(UICommon.RightSideWidth, Screen.height - UICommon.MainPanelHeight - UICommon.ScreenMargin * 3);
-        OnUpdate += Update;
+        OnUpdate += DoUpdate;
 
         UICommon.AddBackground(this);
 
@@ -130,11 +131,12 @@ public class EnemiesPanel : CanvasPanel
         {
             if (enemyPool.Count == 0)
             {
-                overflow.Text = "No enemies detected";
+                overflow.Text = Utils.Localize("ENEMIESPANEL_NOENEMIES");
             }
             else if (enemyPool.Count > listings.Count)
             {
-                overflow.Text = $"... and {enemyPool.Count - listings.Count} more";
+                overflow.Text = string.Format(Utils.Localize("ENEMIESPANEL_OVERFLOWFORMAT"),
+                    enemyPool.Count - listings.Count);
             }
             else
             {
@@ -143,14 +145,14 @@ public class EnemiesPanel : CanvasPanel
         };
 
         CanvasButton hpBarsButton = footerBuilder.AppendFixed(new CanvasButton("HPBars"), UICommon.ScaleWidth(100));
-        hpBarsButton.Text.Text = "HP Bars";
+        hpBarsButton.Text.Text = Utils.Localize("ENEMIESPANEL_HPBARS");
         hpBarsButton.OnUpdate += () => hpBarsButton.Toggled = hpBars;
         hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
 
         UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["Toggle HP Bars"]);
     }
 
-    private void Update()
+    private void DoUpdate()
     {
         enemyPool.RemoveAll(handle => !handle && !handle.gameObject.activeSelf);
 

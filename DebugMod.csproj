@@ -25,8 +25,12 @@
     
     <!--Shortens and anonymizes paths in debug symbols relative to the project directory. Breakpoints will not work, however.-->
     <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/</PathMap>
+    <PackageId>Silksong.$(AssemblyTitle)</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/hk-speedrunning/Silksong.DebugMod</RepositoryUrl>
+
+    <NeutralLanguage>EN</NeutralLanguage>
     
   </PropertyGroup>
 
@@ -42,7 +46,7 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="HarmonyX" Version="2.9.0" />
-    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.26.0" PrivateAssets="all" />
     <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
     <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
@@ -63,6 +67,7 @@
     <ItemGroup>
       <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/" />
       <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/" />
+      <Binaries Include="$(ProjectDir)/languages/*.json" LocalDir="languages" PackDir="plugins/languages" />
     </ItemGroup>
     <PropertyGroup>
       <ThunderstoreDir>$(ProjectDir)/thunderstore</ThunderstoreDir>
@@ -77,7 +82,7 @@
     
   <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
       <RemoveDir Directories="$(IntermediateOutputPath)/archive" />
-      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)" />
+      <Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)/%(Binaries.LocalDir)" />
 
       <PropertyGroup>
         <ModlistVersion>0.2.0</ModlistVersion>

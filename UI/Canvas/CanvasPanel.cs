@@ -4,24 +4,30 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasPanel : CanvasNode
 {
-    protected readonly Dictionary<string, CanvasNode> elements = new();
+    protected readonly List<CanvasNode> elements = [];
+    protected readonly Dictionary<string, CanvasNode> byName = [];
 
     public CollapseMode CollapseMode { get; set; }
 
     public CanvasPanel(string name) : base(name) { }
 
-    protected override IEnumerable<CanvasNode> ChildList() => elements.Values;
+    protected override IEnumerable<CanvasNode> ChildList() => elements;
 
     public T Add<T>(T element) where T : CanvasNode
     {
         element.Parent = this;
-        elements.Add(element.Name, element);
+        elements.Add(element);
+        byName.Add(element.Name, element);
         return element;
     }
 
-    public T Get<T>(string name) where T : CanvasNode => elements.GetValueOrDefault(name) as T;
+    public T Get<T>(string name) where T : CanvasNode => byName.GetValueOrDefault(name) as T;
 
-    public void Remove(string name) => elements.Remove(name);
+    public void Remove(string name)
+    {
+        elements.RemoveAll(node => node.Name == name);
+        byName.Remove(name);
+    }
 
     public int ContentMargin(int baseMargin = 0)
     {
@@ -44,7 +50,7 @@ public class CanvasPanel : CanvasNode
     {
         List<CanvasPanel> panelsToCollapse = [];
 
-        foreach (CanvasNode element in elements.Values)
+        foreach (CanvasNode element in elements)
         {
             if (element is CanvasPanel panel && panel.CollapseMode != CollapseMode.Deny)
             {
@@ -56,7 +62,7 @@ public class CanvasPanel : CanvasNode
         {
             panel.Collapse();
 
-            foreach (CanvasNode child in panel.elements.Values)
+            foreach (CanvasNode child in panel.elements)
             {
                 if (panel.CollapseMode == CollapseMode.Allow)
                 {
@@ -68,6 +74,7 @@ public class CanvasPanel : CanvasNode
             }
 
             panel.elements.Clear();
+            panel.byName.Clear();
             Remove(panel.Name);
         }
     }
