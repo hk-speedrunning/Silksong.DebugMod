@@ -198,7 +198,6 @@ public class SaveState
     #endregion
 
     #region loading
-    //loadDuped is used by external mods
     public IEnumerator Load()
     {
         if (!IsSet())
@@ -371,6 +370,11 @@ public class SaveState
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
 
+        // JsonUtility doesn't serialize null fields, so they won't get reset to null when loading.
+        // But we don't want to reset every PlayerData field since then savestates lose forwards compatibility.
+        // This problem is rare enough to just handle it manually.
+        PlayerData.instance.toolAmountsOverride = data.savedPd.toolAmountsOverride;
+
         SceneWatcher.LoadedSceneInfo[] sceneData = data
             .loadedScenes
             .Zip(data.loadedSceneActiveScenes, (name, gameplay) => new SceneWatcher.LoadedSceneInfo(name, gameplay))
@@ -425,6 +429,7 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+        EventRegister.SendEvent("END FOLLOWERS INSTANT");
 
         if (DebugMod.settings.SafeSaveStateLoading)
         {
@@ -590,6 +595,7 @@ public class SaveState
         }
         HeroController.instance.hunterUpgState = data.evoState;
 
+        // TODO: this is broken
         int healthBlue = data.savedPd.healthBlue;
         for (int i = 0; i < healthBlue; i++)
         {
