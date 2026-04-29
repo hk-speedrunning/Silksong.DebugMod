@@ -1,8 +1,8 @@
+using HutongGames.PlayMaker;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using HutongGames.PlayMaker;
 using System.Linq;
 using System.Reflection;
 using TeamCherry.Localization;
@@ -56,7 +56,8 @@ internal static class Utils
         {
             try
             {
-                DebugMod.LogWarn("I18N seems to not be installed, manually loading English translations...");
+                DebugMod.LogWarn("Entry not found in language sheet, manually loading English translations...");
+                DebugMod.LogWarn("(This can happen if Silksong.I18N is not installed.)");
 
                 string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
                 Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(path));
@@ -76,7 +77,13 @@ internal static class Utils
             }
         }
 
-        return fallbackSheet.GetValueOrDefault(key, key);
+        if (fallbackSheet.TryGetValue(key, out string value))
+        {
+            return value;
+        }
+
+        DebugMod.LogError($"'{key}' is not a valid key in the language sheet.");
+        return key;
     }
 
     internal static string Localize(string key)
@@ -91,8 +98,8 @@ internal static class Utils
         return result;
     }
 #nullable enable
-    
-    
+
+
     internal static FsmState? GetState(this PlayMakerFSM fsm, string name)
     {
         return fsm.FsmStates.FirstOrDefault(state => state.Name == name);

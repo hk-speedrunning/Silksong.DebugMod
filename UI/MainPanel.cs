@@ -27,20 +27,20 @@ public class MainPanel : CanvasPanel
 
     public static MainPanel Instance { get; private set; }
 
-    private static readonly List<string> keybindCategoryOrder =
+    private static readonly List<(string, string)> keybindCategoryOrder =
     [
-        "Cheats",
-        "Savestates",
-        "Mod UI",
-        "Time",
-        "Enemies",
-        "Skills",
-        "Upgrades",
-        "Tools",
-        "Consumables",
-        "Masks & Spools",
-        "Visual",
-        "Misc",
+        ("Cheats", "CATEGORY_CHEATS"),
+        ("Savestates", "CATEGORY_SAVESTATES"),
+        ("Mod UI", "CATEGORY_MODUI"),
+        ("Time", "CATEGORY_TIME"),
+        ("Enemies", "CATEGORY_ENEMIES"),
+        ("Skills", "CATEGORY_SKILLS"),
+        ("Upgrades", "CATEGORY_UPGRADES"),
+        ("Tools", "CATEGORY_TOOLS"),
+        ("Consumables", "CATEGORY_CONSUMABLES"),
+        ("Masks & Spools", "CATEGORY_MASKSANDSPOOLS"),
+        ("Visual", "CATEGORY_VISUAL"),
+        ("Misc", "CATEGORY_MISC")
     ];
 
     private readonly List<CanvasPanel> tabs = [];
@@ -68,7 +68,7 @@ public class MainPanel : CanvasPanel
 
         AddTab("MAINPANEL_TAB_GAMEPLAY");
 
-        AppendSectionHeader("GAMEPLAY_SECTION_CHEATS");
+        AppendSectionHeader("CATEGORY_CHEATS");
         AppendRow(1, 1, 1);
         AppendToggleControl("GAMEPLAY_CHEATS_NOCLIP", () => DebugMod.noclip, BindableFunctions.ToggleNoclip);
         AppendToggleControl("GAMEPLAY_CHEATS_INVINCIBILITY", () => DebugMod.playerInvincible, BindableFunctions.ToggleInvincibility);
@@ -81,7 +81,7 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("GAMEPLAY_CHEATS_TOGGLEHEROCOLLIDER", () => DebugMod.heroColliderDisabled, BindableFunctions.ToggleHeroCollider);
         AppendBasicControl("GAMEPLAY_CHEATS_KILLALL", BindableFunctions.KillAll);
 
-        AppendSectionHeader("GAMEPLAY_SECTION_MODUI");
+        AppendSectionHeader("CATEGORY_MODUI");
         AppendRow(1, 1);
         AppendToggleControl("GAMEPLAY_MODUI_TOGGLEALLUI", () => true, BindableFunctions.ToggleAllPanels);
         AppendToggleControl("GAMEPLAY_MODUI_TOGGLEMAINPANEL", () => DebugMod.settings.MainPanelVisible, BindableFunctions.ToggleMainPanel);
@@ -95,7 +95,7 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("GAMEPLAY_MODUI_TOGGLEINFOPANEL", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
         AppendToggleControl("GAMEPLAY_MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
-        AppendSectionHeader("GAMEPLAY_SECTION_TIME");
+        AppendSectionHeader("CATEGORY_TIME");
         AppendRow(1, 1);
         AppendBasicControl("GAMEPLAY_TIME_INCREASETIMESCALE", BindableFunctions.TimescaleUp);
         AppendBasicControl("GAMEPLAY_TIME_DECREASETIMESCALE", BindableFunctions.TimescaleDown);
@@ -107,7 +107,7 @@ public class MainPanel : CanvasPanel
             DebugMod.forcePaused && GameManager.instance.isPaused, BindableFunctions.ForcePause);
         AppendBasicControl("GAMEPLAY_TIME_RESETFRAMECOUNTER", BindableFunctions.ResetFrameCounter);
 
-        AppendSectionHeader("GAMEPLAY_SECTION_VISUAL");
+        AppendSectionHeader("CATEGORY_VISUAL");
         AppendRow(1, 1);
         AppendToggleControl("GAMEPLAY_VISUAL_TOGGLEHITBOXES", () => DebugMod.settings.ShowHitBoxes != 0, BindableFunctions.ShowHitboxes);
         AppendToggleControl("GAMEPLAY_VISUAL_FORCECAMERAFOLLOW", () => DebugMod.cameraFollow, BindableFunctions.ForceCameraFollow);
@@ -164,7 +164,7 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("GAMEPLAY_VISUAL_ZOOMOUT", BindableFunctions.ZoomOut);
         AppendBasicControl("GAMEPLAY_VISUAL_RESETZOOM", BindableFunctions.ResetZoom);
 
-        AppendSectionHeader("GAMEPLAY_SECTION_MISC");
+        AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);
         AppendBasicControl("GAMEPLAY_MISC_SETHAZARDRESPAWN", BindableFunctions.SetHazardRespawn);
         AppendBasicControl("GAMEPLAY_MISC_HAZARDRESPAWN", BindableFunctions.Respawn);
@@ -182,7 +182,7 @@ public class MainPanel : CanvasPanel
 
         AddTab("MAINPANEL_TAB_ITEMS");
 
-        AppendSectionHeader("ITEMS_SECTION_SKILLS");
+        AppendSectionHeader("CATEGORY_SKILLS");
         AppendRow(1);
         AppendBasicControl("ITEMS_SKILLS_ALLSKILLS", BindableFunctions.GiveAllSkills);
         AppendTileRow(5);
@@ -198,7 +198,7 @@ public class MainPanel : CanvasPanel
         AppendLabeledTile("ITEMS_SKILLS_BEASTLINGCALL", () => PlayerData.instance.UnlockedFastTravelTeleport, BindableFunctions.ToggleBeastlingCall, "Skill_BeastlingCall");
         AppendLabeledTile("ITEMS_SKILLS_ELEGYOFTHEDEEP", () => PlayerData.instance.hasNeedolinMemoryPowerup, BindableFunctions.ToggleElegyOfTheDeep, "Skill_Elegy");
 
-        AppendSectionHeader("ITEMS_SECTION_UPGRADES");
+        AppendSectionHeader("CATEGORY_UPGRADES");
         AppendTileRow(2);
         AppendIncrementTile("ITEMS_UPGRADES_NEEDLEDAMAGE", () => PlayerData.instance.nailDamage, SetNailDamage, "Inv_Needle",
             customAdd: BindableFunctions.IncreaseNeedleDamage, customRemove: BindableFunctions.DecreaseNeedleDamage);
@@ -219,7 +219,7 @@ public class MainPanel : CanvasPanel
         AppendBasicControl("ITEMS_UPGRADES_ALLMAPS", BindableFunctions.UnlockAllMaps);
         AppendBasicControl("ITEMS_UPGRADES_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
 
-        AppendSectionHeader("ITEMS_SECTION_MASKSANDSPOOLS");
+        AppendSectionHeader("CATEGORY_MASKSANDSPOOLS");
         AppendTileRow(2);
         AppendIncrementTile("ITEMS_MASKSANDSPOOLS_MASKS", () => PlayerData.instance.maxHealth, SetMaxHealth, image: "Inv_Mask", min: 1, max: 10);
         static void SetMaxHealth(int value)
@@ -281,7 +281,7 @@ public class MainPanel : CanvasPanel
             button.OnClicked += BindableFunctions.Lifeblood;
         }
 
-        AppendSectionHeader("ITEMS_SECTION_CRESTS");
+        AppendSectionHeader("CATEGORY_CRESTS");
         AppendRow(1);
         AppendBasicControl("ITEMS_CRESTS_UNLOCKALLCRESTS", BindableFunctions.UnlockAllCrests);
 
@@ -424,7 +424,7 @@ public class MainPanel : CanvasPanel
             image: "Inv_Vesticrest"
         );
 
-        AppendSectionHeader("ITEMS_SECTION_TOOLS");
+        AppendSectionHeader("CATEGORY_TOOLS");
         AppendRow(1, 1);
         AppendBasicControl("ITEMS_TOOLS_UNLOCKALLTOOLS", BindableFunctions.UnlockAllTools);
         AppendBasicControl("ITEMS_TOOLS_CRAFTTOOLS", BindableFunctions.CraftTools);
@@ -589,7 +589,7 @@ public class MainPanel : CanvasPanel
             AppendToolTile(ToolKey, ToolDefs, 6);
         }
 
-        AppendSectionHeader("ITEMS_SECTION_ITEMS");
+        AppendSectionHeader("CATEGORY_ITEMS");
 
         static void ToggleItem(CollectableItem item)
         {
@@ -623,9 +623,9 @@ public class MainPanel : CanvasPanel
             () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian, image: "Inv_MelodyVaultkeeper");
         AppendLabeledTile("ITEMS_ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
             () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor, image: "Inv_MelodyConductor");
-        
+
         AddItemsLabeledTiles([("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey")]);
-        
+
         AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
             () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
             image: "Inv_Farsight");
@@ -662,19 +662,19 @@ public class MainPanel : CanvasPanel
             ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
         ]);
 
-        AppendSectionHeader("ITEMS_SECTION_CONSUMABLES");
+        AppendSectionHeader("CATEGORY_CONSUMABLES");
         AppendRow(1);
         AppendBasicControl("ITEMS_CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
         AppendTileRow(2);
         AppendIncrementTile(
-            "Rosaries",
+            "ITEMS_CONSUMABLES_ROSARIES",
             () => PlayerData.instance.geo,
             value => HeroController.instance.AddGeo(value - PlayerData.instance.geo),
             image: "Inv_Rosaries",
             step: 100
         );
         AppendIncrementTile(
-            "Shell Shards",
+            "ITEMS_CONSUMABLES_SHELLSHARDS",
             () => PlayerData.instance.ShellShards,
             value => HeroController.instance.AddShards(value - PlayerData.instance.ShellShards),
             image: "Inv_ShellShards",
@@ -726,7 +726,7 @@ public class MainPanel : CanvasPanel
         AddTab("MAINPANEL_TAB_KEYBINDS");
 
         Dictionary<string, List<BindAction>> keybindData = [];
-        foreach (string category in keybindCategoryOrder)
+        foreach ((string category, _) in keybindCategoryOrder)
         {
             keybindData.Add(category, []);
         }
@@ -735,15 +735,16 @@ public class MainPanel : CanvasPanel
         {
             if (!keybindData.ContainsKey(action.Category))
             {
-                keybindCategoryOrder.Add(action.Category);
+                // TODO: localization of custom categories
+                keybindCategoryOrder.Add((action.Category, action.Category));
                 keybindData.Add(action.Category, []);
             }
             keybindData[action.Category].Add(action);
         }
 
-        foreach (string category in keybindCategoryOrder)
+        foreach ((string category, string displayName) in keybindCategoryOrder)
         {
-            CanvasText header = AppendSectionHeader(category);
+            CanvasText header = AppendSectionHeader(displayName);
             header.FontSize = KeybindHeaderFontSize;
             header.Alignment = TextAnchor.MiddleLeft;
 
@@ -753,7 +754,7 @@ public class MainPanel : CanvasPanel
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
-                keybindName.Text = action.Name;
+                keybindName.Text = Utils.Localize(displayName);
                 keybindName.Alignment = TextAnchor.MiddleLeft;
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
