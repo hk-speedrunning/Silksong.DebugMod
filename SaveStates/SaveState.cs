@@ -595,6 +595,10 @@ public class SaveState
         }
         HeroController.instance.hunterUpgState = data.evoState;
 
+        // Reset timers
+        HeroController.instance.gameObject.LocateMyFSM("Sprint Silk Usage").SetState("Reset Timer");
+        HeroController.instance.SetFrostAmount(0f);
+
         // TODO: this is broken
         int healthBlue = data.savedPd.healthBlue;
         for (int i = 0; i < healthBlue; i++)
