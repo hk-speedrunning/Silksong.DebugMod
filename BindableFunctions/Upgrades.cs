@@ -130,6 +130,43 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Unlock All Maps", category = "Upgrades")]
     public static void UnlockAllMaps()
     {
+        if (PlayerData.instance.HasAllMaps)
+        {
+            PlayerData.instance.HasAbyssMap = false;
+            PlayerData.instance.HasAqueductMap = false;
+            PlayerData.instance.HasArboriumMap = false;
+            PlayerData.instance.HasBellhartMap = false;
+            PlayerData.instance.HasBoneforestMap = false;
+            PlayerData.instance.HasCitadelUnderstoreMap = false;
+            PlayerData.instance.HasCloverMap = false;
+            PlayerData.instance.HasCogMap = false;
+            PlayerData.instance.HasCoralMap = false;
+            PlayerData.instance.HasCradleMap = false;
+            PlayerData.instance.HasCrawlMap = false;
+            PlayerData.instance.HasDocksMap = false;
+            PlayerData.instance.HasDustpensMap = false;
+            PlayerData.instance.HasGreymoorMap = false;
+            PlayerData.instance.HasHallsMap = false;
+            PlayerData.instance.HasHangMap = false;
+            PlayerData.instance.HasHuntersNestMap = false;
+            PlayerData.instance.HasJudgeStepsMap = false;
+            PlayerData.instance.HasLibraryMap = false;
+            PlayerData.instance.HasMossGrottoMap = false;
+            PlayerData.instance.HasPeakMap = false;
+            PlayerData.instance.HasShellwoodMap = false;
+            PlayerData.instance.HasSlabMap = false;
+            PlayerData.instance.HasSongGateMap = false;
+            PlayerData.instance.HasSwampMap = false;
+            PlayerData.instance.HasWardMap = false;
+            PlayerData.instance.HasWeavehomeMap = false;
+            PlayerData.instance.HasWildsMap = false;
+
+            PlayerData.instance.hasQuill = false;
+
+            DebugMod.LogConsole("Removed all maps");
+            return;
+        }
+
         PlayerData.instance.HasAbyssMap = true;
         PlayerData.instance.HasAqueductMap = true;
         PlayerData.instance.HasArboriumMap = true;
@@ -185,6 +222,45 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Unlock All Fast Travel", category = "Upgrades")]
     public static void UnlockAllFastTravel()
     {
+        if (PlayerData.instance.UnlockedAqueductStation
+            && PlayerData.instance.UnlockedBelltownStation
+            && PlayerData.instance.UnlockedBoneforestEastStation
+            && PlayerData.instance.UnlockedCityStation
+            && PlayerData.instance.UnlockedCoralTowerStation
+            && PlayerData.instance.UnlockedDocksStation
+            && PlayerData.instance.UnlockedGreymoorStation
+            && PlayerData.instance.UnlockedPeakStation
+            && PlayerData.instance.UnlockedShadowStation
+            && PlayerData.instance.UnlockedShellwoodStation
+            && PlayerData.instance.UnlockedArboriumTube
+            && PlayerData.instance.UnlockedCityBellwayTube
+            && PlayerData.instance.UnlockedEnclaveTube
+            && PlayerData.instance.UnlockedHangTube
+            && PlayerData.instance.UnlockedSongTube
+            && PlayerData.instance.UnlockedUnderTube)
+        {
+            PlayerData.instance.UnlockedAqueductStation = false;
+            PlayerData.instance.UnlockedBelltownStation = false;
+            PlayerData.instance.UnlockedBoneforestEastStation = false;
+            PlayerData.instance.UnlockedCityStation = false;
+            PlayerData.instance.UnlockedCoralTowerStation = false;
+            PlayerData.instance.UnlockedDocksStation = false;
+            PlayerData.instance.UnlockedGreymoorStation = false;
+            PlayerData.instance.UnlockedPeakStation = false;
+            PlayerData.instance.UnlockedShadowStation = false;
+            PlayerData.instance.UnlockedShellwoodStation = false;
+
+            PlayerData.instance.UnlockedArboriumTube = false;
+            PlayerData.instance.UnlockedCityBellwayTube = false;
+            PlayerData.instance.UnlockedEnclaveTube = false;
+            PlayerData.instance.UnlockedHangTube = false;
+            PlayerData.instance.UnlockedSongTube = false;
+            PlayerData.instance.UnlockedUnderTube = false;
+
+            DebugMod.LogConsole("Removed all fast travel");
+            return;
+        }
+
         PlayerData.instance.UnlockedAqueductStation = true;
         PlayerData.instance.UnlockedBelltownStation = true;
         PlayerData.instance.UnlockedBoneforestEastStation = true;
