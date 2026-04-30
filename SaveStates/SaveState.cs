@@ -583,7 +583,7 @@ public class SaveState
 
         PlayerData.instance.health = data.savedPd.health;
 
-        // Resets maggots, lifeblood, buff tools, etc.
+        // Resets maggots, lifeblood overdose, buff tools, etc.
         HeroController.instance.ClearEffects();
 
         // Need to be done after ClearEffects()
@@ -602,12 +602,9 @@ public class SaveState
         }
         HeroController.instance.SetFrostAmount(0f);
 
-        // TODO: this is broken
-        int healthBlue = data.savedPd.healthBlue;
-        for (int i = 0; i < healthBlue; i++)
-        {
-            EventRegister.SendEvent("ADD BLUE HEALTH");
-        }
+        // TODO: restore blue health instead of clearing it
+        PlayerData.instance.healthBlue = 0;
+        EventRegister.SendEvent("HEALTH UPDATE");
 
         HudHelper.RefreshMasks();
         HudHelper.RefreshSpool();
