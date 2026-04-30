@@ -177,7 +177,7 @@ jobs:
         name: manual-bundle
         path: thunderstore/manual
     - name: Release
-      uses: softprops/action-gh-release@v2.5.0
+      uses: softprops/action-gh-release@v3.0.0
       with:
         draft: false
         generate_release_notes: true
