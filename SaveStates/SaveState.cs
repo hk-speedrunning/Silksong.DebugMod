@@ -345,6 +345,11 @@ public class SaveState
 
         // If another scene load operation is in progress, loading the scene will hang
         yield return ScenePreloader.ForceEndPendingOperations();
+        foreach (ScenePreloader.SceneLoadOp op in ScenePreloader._forceEndedOperations)
+        {
+            yield return Addressables.UnloadSceneAsync(op.Operation);
+        }
+        ScenePreloader._forceEndedOperations.Clear();
 
         string previousScene = GameManager.instance.GetSceneNameString();
 
