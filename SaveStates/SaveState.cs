@@ -447,9 +447,13 @@ public class SaveState
         if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
         DebugMod.noclipPos = data.savePos;
 
-        GameManager.instance.cameraCtrl.PositionToHeroInstant(false);
-        GameManager.instance.cameraCtrl.isGameplayScene = true;
-        GameManager.instance.UpdateUIStateFromGameState();
+        try
+        {
+            GameManager.instance.cameraCtrl.PositionToHeroInstant(false);
+            GameManager.instance.cameraCtrl.isGameplayScene = true;
+            GameManager.instance.UpdateUIStateFromGameState();
+        }
+        catch (NullReferenceException) { } // This can fail for mysterious reasons if loading out of a cutscene, but it isn't crucial
 
         if (LoadDuped && DebugMod.settings.ShowHitBoxes > 0)
         {
