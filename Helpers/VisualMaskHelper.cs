@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace DebugMod.Helpers;
 
+[HarmonyPatch]
 public static class VisualMaskHelper
 {
     internal static bool masksDisabled = false;
@@ -33,7 +35,7 @@ public static class VisualMaskHelper
 
     public static void ToggleVignette()
     {
-        vignetteDisabled = !vignetteDisabled;
+        vignetteDisabled = DebugMod.HC.vignette.enabled;
         if (vignetteDisabled)
         {
             DisableVignette(false);
@@ -74,6 +76,16 @@ public static class VisualMaskHelper
             {
                 r.enabled = true;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.HazardRespawn))]
+    [HarmonyPostfix]
+    private static void GameManager_HazardRespawn()
+    {
+        if (vignetteDisabled)
+        {
+            DelayInvoke(3, () => DisableVignette(false));
         }
     }
 
