@@ -454,6 +454,7 @@ public class SaveState
             DebugMod.settings.ShowHitBoxes = cs;
         }
 
+        HeroController.instance.SetLockStates(HeroLockStates.None); // not cleared automatically by transition
         HeroController.instance.FinishedEnteringScene(true, false);
         // Fixes invisible player when loading out of certain boss attacks
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
