@@ -2,6 +2,7 @@
 using GlobalEnums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod.Hitbox;
@@ -9,52 +10,35 @@ namespace DebugMod.Hitbox;
 public class HitboxRender : MonoBehaviour
 {
     // ReSharper disable once StructCanBeMadeReadOnly
-    private struct HitboxType : IComparable<HitboxType>
+    private class HitboxType
     {
-        public static readonly HitboxType Knight = new(Color.yellow, 0);                     // yellow
-        public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0), 1);       // red
-        public static readonly HitboxType Attack = new(Color.cyan, 2);                       // cyan
-        public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0), 3);     // green
-        public static readonly HitboxType NonSliderTerrain = new(new Color(0, 0.8f, 0.6f), 4); // teal
-        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f), 5); // lavender
-        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f), 6); // pink
-        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f), 7); // dark blue
-        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f), 8); // purple
-        public static readonly HitboxType NonMantleRegion = new(new Color(1f, 0.4f,  0.5f), 9); // pink
-        public static readonly HitboxType AlertRegion = new(new Color(0.7f, 0.7f, 0.7f), 10); // gray
-        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f), 11); // orange
-        
+        public static int count = 0;
+
+        public static readonly HitboxType Knight = new(Color.yellow);                        // yellow
+        public static readonly HitboxType Enemy = new(new Color(0.8f, 0, 0));                // red
+        public static readonly HitboxType Attack = new(Color.cyan);                          // cyan
+        public static readonly HitboxType Terrain = new(new Color(0, 0.8f, 0));              // green
+        public static readonly HitboxType NonSliderTerrain = new(new Color(0, 0.8f, 0.6f));  // teal
+        public static readonly HitboxType Trigger = new(new Color(0.5f, 0.5f, 1f));          // lavender
+        public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f));       // pink
+        public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f));           // dark blue
+        public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f));  // purple
+        public static readonly HitboxType NonMantleRegion = new(new Color(1f, 0.4f, 0.5f));  // salmon
+        public static readonly HitboxType AlertRegion = new(new Color(0.7f, 0.7f, 0.7f));    // gray
+        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f));          // orange
+
 
         public readonly Color Color;
         public readonly int Depth;
 
-        private HitboxType(Color color, int depth)
+        private HitboxType(Color color)
         {
             Color = color;
-            Depth = depth;
-        }
-
-        public int CompareTo(HitboxType other)
-        {
-            return other.Depth.CompareTo(Depth);
+            Depth = count++;
         }
     }
 
-    private readonly SortedDictionary<HitboxType, HashSet<Collider2D>> colliders = new()
-    {
-        {HitboxType.Knight, new HashSet<Collider2D>()},
-        {HitboxType.Enemy, new HashSet<Collider2D>()},
-        {HitboxType.Attack, new HashSet<Collider2D>()},
-        {HitboxType.Terrain, new HashSet<Collider2D>()},
-        {HitboxType.NonSliderTerrain, new HashSet<Collider2D>()},
-        {HitboxType.Trigger, new HashSet<Collider2D>()}, // what does this category mean?
-        {HitboxType.Breakable, new HashSet<Collider2D>()},
-        {HitboxType.Gate, new HashSet<Collider2D>()},
-        {HitboxType.HazardRespawn, new HashSet<Collider2D>()},
-        {HitboxType.NonMantleRegion, new HashSet<Collider2D>()},
-        {HitboxType.AlertRegion, new HashSet<Collider2D>()},
-        {HitboxType.Other, new HashSet<Collider2D>()},
-    };
+    private readonly Dictionary<Collider2D, HitboxType> colliders = [];
 
     public static float LineWidth => Math.Max(0.7f, Screen.width / 960f * GameCameras.instance.tk2dCam.ZoomFactor);
 
@@ -89,60 +73,71 @@ public class HitboxRender : MonoBehaviour
 
         if (collider2D is BoxCollider2D or PolygonCollider2D or EdgeCollider2D or CircleCollider2D)
         {
-            GameObject go = collider2D.gameObject;
-            if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder")
-                || collider2D.GetComponent<CogMultiHitter>() 
-                || (collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>())
-                )
+            HitboxType type = CategorizeHitbox(collider2D);
+            if (type != null)
             {
-                colliders[HitboxType.Enemy].Add(collider2D);
-            }
-            else if (go.layer == (int)PhysLayers.TERRAIN)
-            {
-                NonSlider nonSlider = go.GetComponent<NonSlider>();
-                if (nonSlider && nonSlider.IsActive) { colliders[HitboxType.NonSliderTerrain].Add(collider2D); }
-                else { colliders[HitboxType.Terrain].Add(collider2D); }
-            }
-            else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
-            {
-                colliders[HitboxType.Knight].Add(collider2D);
-            }
-            else if (go.GetComponent<DamageEnemies>() || go.LocateMyFSM("damages_enemy") || go.name == "Damager" && go.LocateMyFSM("Damage"))
-            {
-                colliders[HitboxType.Attack].Add(collider2D);
-            }
-            else if (collider2D.isTrigger && collider2D.GetComponent<HazardRespawnTrigger>())
-            {
-                colliders[HitboxType.HazardRespawn].Add(collider2D);
-            }
-            else if (collider2D.isTrigger && collider2D.GetComponent<TransitionPoint>())
-            {
-                colliders[HitboxType.Gate].Add(collider2D);
-            }
-            else if (collider2D.GetComponent<Breakable>() || collider2D.gameObject.layer == LayerMask.NameToLayer("Interactive Object"))
-            {
-                if (collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>())
-                {
-                    colliders[HitboxType.Trigger].Add(collider2D);
-                }
-                else if (!collider2D.GetComponent<NonBouncer>() || HitboxViewer.State == 2)
-                {
-                    colliders[HitboxType.Breakable].Add(collider2D);
-                }
-            }
-            else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>()
-                    || collider2D.tag == "Geo")
-            {
-                colliders[HitboxType.Trigger].Add(collider2D);
-            }
-            else if (HitboxViewer.State == 2)
-            {
-                var noClamber = go.GetComponent<NoClamberRegion>();
-                if (noClamber && noClamber.enabled) { colliders[HitboxType.NonMantleRegion].Add(collider2D); }
-                else if (go.GetComponent<AlertRange>()) { colliders[HitboxType.AlertRegion].Add(collider2D); }
-                else colliders[HitboxType.Other].Add(collider2D);
+                colliders.Add(collider2D, type);
             }
         }
+    }
+
+    private HitboxType CategorizeHitbox(Collider2D collider2D)
+    {
+        GameObject go = collider2D.gameObject;
+        if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder")
+            || collider2D.GetComponent<CogMultiHitter>()
+            || (collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>())
+            )
+        {
+            return HitboxType.Enemy;
+        }
+        else if (go.layer == (int)PhysLayers.TERRAIN)
+        {
+            NonSlider nonSlider = go.GetComponent<NonSlider>();
+            if (nonSlider && nonSlider.IsActive) return HitboxType.NonSliderTerrain;
+            else return HitboxType.Terrain;
+        }
+        else if (go == HeroController.instance?.gameObject && !collider2D.isTrigger)
+        {
+            return HitboxType.Knight;
+        }
+        else if (go.GetComponent<DamageEnemies>() || go.LocateMyFSM("damages_enemy") || go.name == "Damager" && go.LocateMyFSM("Damage"))
+        {
+            return HitboxType.Attack;
+        }
+        else if (collider2D.isTrigger && collider2D.GetComponent<HazardRespawnTrigger>())
+        {
+            return HitboxType.HazardRespawn;
+        }
+        else if (collider2D.isTrigger && collider2D.GetComponent<TransitionPoint>())
+        {
+            return HitboxType.Gate;
+        }
+        else if (collider2D.GetComponent<Breakable>() || collider2D.gameObject.layer == LayerMask.NameToLayer("Interactive Object"))
+        {
+            if (collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>())
+            {
+                return HitboxType.Trigger;
+            }
+            else if (!collider2D.GetComponent<NonBouncer>() || HitboxViewer.State == 2)
+            {
+                return HitboxType.Breakable;
+            }
+        }
+        else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>()
+                || collider2D.tag == "Geo")
+        {
+            return HitboxType.Trigger;
+        }
+        else if (HitboxViewer.State == 2)
+        {
+            var noClamber = go.GetComponent<NoClamberRegion>();
+            if (noClamber && noClamber.enabled) { return HitboxType.NonMantleRegion; }
+            else if (go.GetComponent<AlertRange>()) { return HitboxType.AlertRegion; }
+            else return HitboxType.Other;
+        }
+
+        return null;
     }
 
     private void OnGUI()
@@ -155,13 +150,63 @@ public class HitboxRender : MonoBehaviour
         GUI.depth = int.MaxValue;
         Camera camera = Camera.main;
         float lineWidth = LineWidth;
-        foreach (var pair in colliders)
+
+        // Update hitbox type for applicable colliders
+        var keys = colliders.Keys.ToArray();
+        foreach (Collider2D key in keys)
         {
-            foreach (Collider2D collider2D in pair.Value)
+            HitboxType value = colliders[key];
+            if (value == HitboxType.Terrain || value == HitboxType.NonSliderTerrain)
             {
-                DrawHitbox(camera, collider2D, pair.Key, lineWidth);
+                GameObject go = key.gameObject;
+                NonSlider nonSlider = go.GetComponent<NonSlider>();
+                if (nonSlider && nonSlider.IsActive)
+                {
+                    colliders[key] = HitboxType.NonSliderTerrain;
+                }
+                else
+                {
+                    colliders[key] = HitboxType.Terrain;
+                }
             }
         }
+
+        KeyValuePair<Collider2D, HitboxType>[] array = colliders.ToArray();
+        array = Sort(array);
+
+        for (int i = array.Length - 1; i >= 0; i--)
+        {
+            var pair = array[i];
+            DrawHitbox(camera, pair.Key, pair.Value, lineWidth);
+        }
+    }
+
+    // O(n) sorting algorithm :3
+    private KeyValuePair<Collider2D, HitboxType>[] Sort(KeyValuePair<Collider2D, HitboxType>[] a)
+    {
+        int n = a.Length;
+        int k = HitboxType.count;
+
+        int[] c = new int[k];
+
+        for (int i = 0; i < n; i++)
+        {
+            c[a[i].Value.Depth]++;
+        }
+
+        for (int i = 1; i < k; i++)
+        {
+            c[i] += c[i - 1];
+        }
+
+        KeyValuePair<Collider2D, HitboxType>[] b = new KeyValuePair<Collider2D, HitboxType>[n];
+
+        for (int i = n - 1; i >= 0; i--)
+        {
+            b[--c[a[i].Value.Depth]] = a[i];
+        }
+
+        return b;
     }
 
     private void DrawHitbox(Camera camera, Collider2D collider2D, HitboxType hitboxType, float lineWidth)
