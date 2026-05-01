@@ -280,11 +280,10 @@ public class SaveState
 
     private IEnumerator LoadImpl()
     {
-        bool stateondeath = DebugMod.stateOnDeath;
-        DebugMod.stateOnDeath = false;
-
         //prevents silly things from happening
         TimeScale.Frozen = true;
+
+        BeforeLoad?.Invoke(this);
 
         //called here because this needs to be done here
         if (DebugMod.savestateFixes)
@@ -295,8 +294,11 @@ public class SaveState
                 HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
             if (DebugMod.CurrentInvulnCoro != null)
                 HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
+            if (HeroController.instance.hazardRespawnRoutine != null)
+                HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
             DebugMod.CurrentHazardCoro = null;
             DebugMod.CurrentInvulnCoro = null;
+            HeroController.instance.hazardRespawnRoutine = null;
             HeroController.instance.hazardInvulnRoutine = null;
 
             //fixes knockback storage
@@ -305,11 +307,10 @@ public class SaveState
             //ends hazard respawn animation
             var invPulse = HeroController.instance.GetComponent<InvulnerablePulse>();
             invPulse.StopInvulnerablePulse();
+
+            // Reset problematic cstates
+            HeroController.instance.cState.hazardDeath = false;
         }
-
-        if (data.savedPd == null || string.IsNullOrEmpty(data.saveScene)) yield break;
-
-        BeforeLoad?.Invoke(this);
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");
@@ -463,13 +464,13 @@ public class SaveState
             DebugMod.settings.ShowHitBoxes = cs;
         }
 
-        HeroController.instance.SetLockStates(HeroLockStates.None); // not cleared automatically by transition
-        HeroController.instance.FinishedEnteringScene(true, false);
-        // Fixes invisible player when loading out of certain boss attacks
+        // Reset various things that could be out of place depending on when the load started
+        HeroController.instance.SetLockStates(HeroLockStates.None);
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
-        // Fixes falling out of the map when loading out of some animations (i.e. bell eater entrance)
         DebugMod.RefHeroCollider.enabled = !DebugMod.heroColliderDisabled;
         HeroBox.Inactive = DebugMod.heroColliderDisabled;
+        HeroController.instance.gameObject.layer = (int)PhysLayers.PLAYER;
+        HeroController.instance.FinishedEnteringScene();
 
         RoomSpecific.BackwardsCompat(data.saveScene, ref data.roomSpecificOptions);
 
@@ -505,7 +506,6 @@ public class SaveState
 
         //set timescale back
         TimeScale.Frozen = false;
-        DebugMod.stateOnDeath = stateondeath;
     }
 
     private static void RestoreSemiPersistent<TValue, TContainer>(TContainer[] list, SceneData.PersistentItemDataCollection<TValue, TContainer> collection)

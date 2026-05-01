@@ -221,7 +221,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
 
         int damage = infiniteHP ? 0 : damageAmount;
-        if (stateOnDeath && (PlayerData.instance.health - damage <= 0))
+        if (stateOnDeath && SaveState.loadingSavestate == null && (PlayerData.instance.health - damage <= 0))
         {
             SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             LogConsole("Lethal damage prevented, savestate loading");
