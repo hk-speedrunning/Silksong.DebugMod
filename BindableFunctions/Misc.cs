@@ -1,8 +1,8 @@
-﻿using DebugMod.MonoBehaviours;
+﻿using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
 using DebugMod.UI;
 using HarmonyLib;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace DebugMod;
 
@@ -180,7 +180,8 @@ public static partial class BindableFunctions
         //rest all is self explanatory
         TimeScale.Reset();
         GC.tk2dCam.ZoomFactor = 1f;
-        HC.vignette.enabled = false;
+        VisualMaskHelper.vignetteDisabled = false;
+        DebugMod.HC.vignette.enabled = true;
         EnemiesPanel.hpBars = false;
         pd.infiniteAirJump = false;
         DebugMod.infiniteSilk = false;
