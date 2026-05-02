@@ -155,6 +155,8 @@ public class HitboxRender : MonoBehaviour
         var keys = colliders.Keys.ToArray();
         foreach (Collider2D key in keys)
         {
+            if (!key) continue;
+
             HitboxType value = colliders[key];
             if (value == HitboxType.Terrain || value == HitboxType.NonSliderTerrain)
             {
