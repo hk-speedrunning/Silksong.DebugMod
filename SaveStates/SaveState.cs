@@ -276,6 +276,13 @@ public class SaveState
                 break;
             }
         }
+
+        // EVEN MORE redundancy (Bone_East_08 is evil)
+        if (DebugMod.GetSceneName().StartsWith("Bone_East_08"))
+        {
+            HeroController.instance.transform.position = data.savePos;
+            DebugMod.noclipPos = HeroController.instance.transform.position;
+        }
     }
 
     private IEnumerator LoadImpl()
@@ -443,10 +450,10 @@ public class SaveState
             yield return null;
         }
 
-        HeroController.instance.gameObject.transform.position = data.savePos;
+        HeroController.instance.transform.position = data.savePos;
+        DebugMod.noclipPos = HeroController.instance.transform.position;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
         if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
-        DebugMod.noclipPos = data.savePos;
 
         try
         {
@@ -488,6 +495,10 @@ public class SaveState
         AfterLoad?.Invoke(this);
 
         yield return new WaitUntil(() => !GameManager.instance.isLoading);
+
+        // For redundancy
+        HeroController.instance.transform.position = data.savePos;
+        DebugMod.noclipPos = HeroController.instance.transform.position;
 
         //pause fixes from homothety
         if (GameManager.instance.isPaused)
