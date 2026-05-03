@@ -1045,6 +1045,7 @@ public class MainPanel : CanvasPanel
 
         int connecterLength = UICommon.ScaleWidth(70);
 
+        control.AppendPadding(-control.InnerPadding * 2);
         CanvasPanel connectorPanel = control.AppendFixed(new CanvasPanel("Connector1"), connecterLength);
         connectorPanel.CollapseMode = CollapseMode.Deny;
         CanvasBorder connector = connectorPanel.Add(new CanvasBorder("Border"));
@@ -1076,6 +1077,7 @@ public class MainPanel : CanvasPanel
         incButton.OnClicked += increase;
         incButton.Border.Sides &= ~BorderSides.LEFT;
 
+        control.AppendPadding(-control.InnerPadding * 2);
         connectorPanel = control.AppendFixed(new CanvasPanel("Connector2"), connecterLength);
         connectorPanel.CollapseMode = CollapseMode.Deny;
         connector = connectorPanel.Add(new CanvasBorder("Border"));
@@ -1088,7 +1090,7 @@ public class MainPanel : CanvasPanel
 
         CanvasButton resetButton = resetContainer.Add(new CanvasButton("Button"));
         resetButton.Size = resetContainer.Size;
-        resetButton.SetImage(UICommon.images["IconX"]);
+        resetButton.SetImage(UICommon.images["IconReset"]);
         resetButton.RemoveText();
         resetButton.OnClicked += reset;
 
