@@ -1,5 +1,7 @@
 ﻿using DebugMod.Helpers;
 using HarmonyLib;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -14,6 +16,16 @@ public static class RoomSpecific
     #region roomspecifics
     internal static string SaveRoomSpecific(string scene)
     {
+        if (scene == "Memory_Ant_Queen")
+        {
+            return SaveKarmelita();
+        }
+
+        if (scene == "Memory_Red")
+        {
+            return SaveRedMemory();
+        }
+
         foreach (BattleScene battleScene in Object.FindObjectsByType<BattleScene>(FindObjectsSortMode.None))
         {
             if (battleScene.started)
@@ -22,18 +34,19 @@ public static class RoomSpecific
             }
         }
 
-        if (scene == "Memory_Red")
-        {
-            return SaveRedMemory();
-        }
-
         return "";
     }
 
-    // Allow loading into the middle of an arena battle
-    internal static string SaveBattleScene(BattleScene battleScene)
+    internal static string SaveKarmelita()
     {
-        return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
+        BattleScene battleScene = Object.FindAnyObjectByType<BattleScene>();
+
+        if (battleScene.completed)
+        {
+            return "SkipArena";
+        }
+
+        return "";
     }
 
     // Red memory has four parts which each get activated when you reach the preceeding cutscene
@@ -58,20 +71,32 @@ public static class RoomSpecific
         return "0";
     }
 
+    // Allow loading into the middle of an arena battle
+    internal static string SaveBattleScene(BattleScene battleScene)
+    {
+        return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
+    }
+
     internal static IEnumerator DoRoomSpecific(string scene, string options)
     {
-        string[] parts = options.Split('|');
-        switch (parts[0])
+        if (scene == "Memory_Ant_Queen")
         {
-            case "BattleScene":
-                DoBattleScene(scene, parts[1], int.Parse(parts[2]));
-                yield break;
+            DoKarmelita();
+            yield break;
         }
 
         if (scene == "Memory_Red")
         {
             DoRedMemory(options);
             yield break;
+        }
+
+        string[] parts = options.Split('|');
+        switch (parts[0])
+        {
+            case "BattleScene":
+                DoBattleScene(scene, parts[1], int.Parse(parts[2]));
+                yield break;
         }
 
         if (options == scene)
@@ -81,6 +106,65 @@ public static class RoomSpecific
         }
 
         DebugMod.LogConsole($"Invalid room-specific options for {scene}: {options}");
+    }
+
+    internal static void DoKarmelita()
+    {
+        // Based off randomscorp's Skip Karmelita Arena mod
+
+        static IEnumerator Routine()
+        {
+            // Needed if the scene was already active before loading the savestate, not sure why
+            yield return new WaitUntil(() => !GameManager.instance.isLoading);
+
+            PlayMakerFSM fsm = Utils.FindFSM("Hunter Queen Boss", "Control");
+            FsmState state = fsm.GetState("Battle Dance");
+
+            foreach (FsmStateAction action in state.Actions)
+            {
+                if (action is SendMessage || action is Wait)
+                {
+                    action.Enabled = false;
+                }
+            }
+
+            foreach (FsmTransition transition in state.Transitions)
+            {
+                if (transition.EventName == "BATTLE END")
+                {
+                    transition.FsmEvent = FsmEvent.Finished;
+                }
+            }
+        }
+
+        DebugMod.instance.StartCoroutine(Routine());
+    }
+
+    internal static void DoRedMemory(string options)
+    {
+        int stage = int.Parse(options);
+
+        GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
+
+        string childName = stage switch
+        {
+            0 => "Entry Scenery",
+            1 => "Deepnest Scenery",
+            2 => "Hive Scenery",
+            3 => "End Scenery",
+            _ => null
+        };
+
+        sceneryRoot.FindChildObject(childName).SetActive(true);
+
+        static void FadeOutFadeGroup(string path)
+        {
+            Utils.FindGameObjectByPath(path).GetComponent<NestedFadeGroup>().FadeTo(0f, 0f);
+        }
+
+        FadeOutFadeGroup("Memory Control/Weaver_Memory_Lighting");
+        FadeOutFadeGroup("Memory Control/Beast_Memory_Lighting");
+        FadeOutFadeGroup("Memory Control/Hive_Memory_Lighting");
     }
 
     internal static void DoBattleScene(string scene, string objectName, int wave)
@@ -130,33 +214,6 @@ public static class RoomSpecific
             new CodeInstruction(OpCodes.Ldfld, typeof(BattleScene).GetField(nameof(BattleScene.currentWave))));
 
         return matcher.InstructionEnumeration();
-    }
-
-    internal static void DoRedMemory(string options)
-    {
-        int stage = int.Parse(options);
-
-        GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
-
-        string childName = stage switch
-        {
-            0 => "Entry Scenery",
-            1 => "Deepnest Scenery",
-            2 => "Hive Scenery",
-            3 => "End Scenery",
-            _ => null
-        };
-
-        sceneryRoot.FindChildObject(childName).SetActive(true);
-
-        static void FadeOutFadeGroup(string path)
-        {
-            Utils.FindGameObjectByPath(path).GetComponent<NestedFadeGroup>().FadeTo(0f, 0f);
-        }
-
-        FadeOutFadeGroup("Memory Control/Weaver_Memory_Lighting");
-        FadeOutFadeGroup("Memory Control/Beast_Memory_Lighting");
-        FadeOutFadeGroup("Memory Control/Hive_Memory_Lighting");
     }
     #endregion
 
