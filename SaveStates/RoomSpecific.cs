@@ -2,11 +2,15 @@
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 using TeamCherry.NestedFadeGroup;
 using UnityEngine;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace DebugMod.SaveStates;
 
@@ -16,6 +20,11 @@ public static class RoomSpecific
     #region roomspecifics
     internal static string SaveRoomSpecific(string scene)
     {
+        if (scene == "Cog_Dancers")
+        {
+            return SaveCogworkDancers();
+        }
+
         if (scene == "Memory_Ant_Queen")
         {
             return SaveKarmelita();
@@ -37,6 +46,21 @@ public static class RoomSpecific
         return "";
     }
 
+    // Allow skipping phases
+    internal static string SaveCogworkDancers()
+    {
+        PlayMakerFSM fsm = Utils.FindFSM("Dancer Control", "Control");
+
+        int phase = fsm.FsmVariables.FindFsmInt("Phase").Value;
+        if (phase > 1)
+        {
+            return phase.ToString();
+        }
+
+        return "";
+    }
+
+    // Allow skipping the arena
     internal static string SaveKarmelita()
     {
         BattleScene battleScene = Object.FindAnyObjectByType<BattleScene>();
@@ -79,6 +103,12 @@ public static class RoomSpecific
 
     internal static IEnumerator DoRoomSpecific(string scene, string options)
     {
+        if (scene == "Cog_Dancers")
+        {
+            DoCogworkDancers(int.Parse(options));
+            yield break;
+        }
+
         if (scene == "Memory_Ant_Queen")
         {
             DoKarmelita();
@@ -108,16 +138,82 @@ public static class RoomSpecific
         DebugMod.LogConsole($"Invalid room-specific options for {scene}: {options}");
     }
 
-    internal static void DoKarmelita()
+    private static void ModifyFSM(string goName, string fsmName, Action<PlayMakerFSM> action)
     {
-        // Based off randomscorp's Skip Karmelita Arena mod
-
-        static IEnumerator Routine()
+        IEnumerator Routine()
         {
             // Needed if the scene was already active before loading the savestate, not sure why
             yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
-            PlayMakerFSM fsm = Utils.FindFSM("Hunter Queen Boss", "Control");
+            PlayMakerFSM fsm = Utils.FindFSM(goName, fsmName);
+            action(fsm);
+        }
+
+        DebugMod.instance.StartCoroutine(Routine());
+    }
+
+    internal static void DoCogworkDancers(int phase)
+    {
+        ModifyFSM("Dancer Control", "Control", fsm =>
+        {
+            FsmState state = fsm.GetState("Beat Start");
+            FsmTransition transition = state.GetTransition(0);
+
+            string target = phase switch
+            {
+                2 => "Set Phase 2",
+                3 => "Set Phase 3",
+                4 => "Dancer Death",
+                _ => transition.ToState
+            };
+
+            transition.ToState = target;
+            transition.ToFsmState = fsm.GetState(transition.ToState);
+
+            if (phase == 4)
+            {
+                // Dancers will swap their places during the phase, so the surviving dancer
+                // could end up on either side even if you always target the same dancer at the start
+                string dancerToKill = Random.value < 0.5f ? "Dancer A" : "Dancer B";
+                fsm.FsmVariables.GetFsmGameObject("Stunned Dancer").Value = GameObject.Find(dancerToKill);
+            }
+        });
+
+        ModifyFSM("Dancer Control", "Music Control", fsm =>
+        {
+            FsmState phase1 = fsm.GetState("P1 Music");
+            List<FsmStateAction> initActions = phase1.Actions.ToList().GetRange(0, 2);
+
+            string stateName = phase switch
+            {
+                2 => "P2 Music",
+                3 => "P3 Music",
+                4 => "P4 Music",
+                _ => ""
+            };
+
+            FsmState state = fsm.GetState(stateName);
+            List<FsmStateAction> actions = state.Actions.ToList();
+            actions.InsertRange(0, initActions);
+            state.Actions = actions.ToArray();
+        });
+
+        void ModifyDancer(PlayMakerFSM fsm)
+        {
+            fsm.FsmVariables.GetFsmBool("Did First Windup").Value = true;
+            fsm.FsmVariables.GetFsmBool("Did Roar").Value = true;
+        }
+
+        ModifyFSM("Dancer A", "Control", ModifyDancer);
+        ModifyFSM("Dancer B", "Control", ModifyDancer);
+    }
+
+    internal static void DoKarmelita()
+    {
+        // Based off randomscorp's Skip Karmelita Arena mod
+
+        ModifyFSM("Hunter Queen Boss", "Control", fsm =>
+        {
             FsmState state = fsm.GetState("Battle Dance");
 
             foreach (FsmStateAction action in state.Actions)
@@ -135,9 +231,7 @@ public static class RoomSpecific
                     transition.FsmEvent = FsmEvent.Finished;
                 }
             }
-        }
-
-        DebugMod.instance.StartCoroutine(Routine());
+        });
     }
 
     internal static void DoRedMemory(string options)
