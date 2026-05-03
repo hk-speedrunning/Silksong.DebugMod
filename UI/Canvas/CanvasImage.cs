@@ -68,6 +68,16 @@ public class CanvasImage : CanvasNode
         if (border != null) yield return border;
     }
 
+    protected override void OnUpdateSize()
+    {
+        base.OnUpdateSize();
+
+        if (border != null)
+        {
+            border.Size = Size;
+        }
+    }
+
     public override void Build()
     {
         if (IsBackground && Parent != null)

@@ -4,6 +4,7 @@ using DebugMod.UI.Canvas;
 using GlobalSettings;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -96,9 +97,21 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("GAMEPLAY_MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
         AppendSectionHeader("CATEGORY_TIME");
-        AppendRow(1, 1);
-        AppendBasicControl("GAMEPLAY_TIME_INCREASETIMESCALE", BindableFunctions.TimescaleUp);
-        AppendBasicControl("GAMEPLAY_TIME_DECREASETIMESCALE", BindableFunctions.TimescaleDown);
+        AppendRow(1);
+        AppendNumericControl(
+            "GAMEPLAY_TIME_TIMESCALE",
+            () => TimeScale.CustomTimeScale,
+            f =>
+            {
+                if (f >= 0f)
+                {
+                    TimeScale.CustomTimeScale = f;
+                }
+            },
+            BindableFunctions.TimescaleUp,
+            BindableFunctions.TimescaleDown,
+            () => TimeScale.CustomTimeScale = 1f
+        );
         AppendRow(1, 1);
         AppendToggleControl("GAMEPLAY_TIME_FREEZEGAME", () => TimeScale.Frozen, BindableFunctions.PauseGameNoUI);
         AppendBasicControl("GAMEPLAY_TIME_ADVANCEFRAME", BindableFunctions.AdvanceFrame);
@@ -159,10 +172,21 @@ public class MainPanel : CanvasPanel
             return !cameraShake.enabled;
         }
         AppendToggleControl("GAMEPLAY_VISUAL_DEACTIVATEVISUALMASKS", () => VisualMaskHelper.masksDisabled, BindableFunctions.DoDeactivateVisualMasks);
-        AppendRow(1, 1, 1);
-        AppendBasicControl("GAMEPLAY_VISUAL_ZOOMIN", BindableFunctions.ZoomIn);
-        AppendBasicControl("GAMEPLAY_VISUAL_ZOOMOUT", BindableFunctions.ZoomOut);
-        AppendBasicControl("GAMEPLAY_VISUAL_RESETZOOM", BindableFunctions.ResetZoom);
+        AppendRow(1);
+        AppendNumericControl(
+            "GAMEPLAY_VISUAL_ZOOM",
+            () => GameCameras.instance.tk2dCam.zoomFactor,
+            f =>
+            {
+                if (f > 0f)
+                {
+                    GameCameras.instance.tk2dCam.zoomFactor = f;
+                }
+            },
+            BindableFunctions.ZoomIn,
+            BindableFunctions.ZoomOut,
+            BindableFunctions.ResetZoom
+        );
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);
@@ -980,13 +1004,96 @@ public class MainPanel : CanvasPanel
         });
     }
 
-    // TODO: replace this with a slider or increment/decrement buttons
-    private CanvasPanel AppendIncrementControl(string name, Func<int> getter, Action effect)
+    private CanvasPanel AppendNumericControl(string name, Func<float> getter, Action<float> setter, Action increase,
+        Action decrease, Action reset)
     {
-        return AppendButtonControl(name, effect, button =>
+        currentRow ??= AppendRow(1);
+
+        CanvasPanel controlPanel = AppendRowElement(name);
+
+        PanelBuilder control = new(controlPanel);
+        control.Horizontal = true;
+        control.InnerPadding = -UICommon.BORDER_THICKNESS;
+
+        CanvasButton label = control.AppendFlex(new CanvasButton("Label"));
+        label.Text.Text = Utils.Localize(name);
+        label.RemoveHoverBorder();
+
+        List<BindAction> actions = [];
+        BindAction action;
+
+        if (DebugMod.bindsByMethod.TryGetValue(increase.Method, out action))
         {
-            button.Text.Text = $"{name}: {getter()}";
-        });
+            actions.Add(action);
+        }
+
+        if (DebugMod.bindsByMethod.TryGetValue(decrease.Method, out action))
+        {
+            actions.Add(action);
+        }
+
+        if (DebugMod.bindsByMethod.TryGetValue(reset.Method, out action))
+        {
+            actions.Add(action);
+        }
+
+        if (actions.Count > 0)
+        {
+            control.AppendPadding(-control.InnerPadding * 2);
+            UICommon.AppendKeybindButton(control, actions.ToArray());
+        }
+
+        int connecterLength = UICommon.ScaleWidth(70);
+
+        CanvasPanel connectorPanel = control.AppendFixed(new CanvasPanel("Connector1"), connecterLength);
+        connectorPanel.CollapseMode = CollapseMode.Deny;
+        CanvasBorder connector = connectorPanel.Add(new CanvasBorder("Border"));
+        connector.LocalPosition = new Vector2(0f, (int)(control.ChildBreadth() / 2f));
+        connector.Sides = BorderSides.TOP;
+
+        CanvasButton decButton = control.AppendSquare(new CanvasButton("Decrease"));
+        decButton.SetImage(UICommon.images["IconMinusMin"]);
+        decButton.RemoveText();
+        decButton.OnClicked += decrease;
+
+        CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
+        button.SetImage(UICommon.clearBG);
+        button.Border.Sides &= ~BorderSides.LEFT;
+
+        CanvasTextField textField = button.SetTextField();
+        textField.OnUpdate += () => textField.UpdateDefaultText(getter().ToString(CultureInfo.CurrentCulture));
+        textField.OnSubmit += text =>
+        {
+            if (float.TryParse(text, out float f))
+            {
+                setter(f);
+            }
+        };
+
+        CanvasButton incButton = control.AppendSquare(new CanvasButton("Increase"));
+        incButton.SetImage(UICommon.images["IconPlusMin"]);
+        incButton.RemoveText();
+        incButton.OnClicked += increase;
+        incButton.Border.Sides &= ~BorderSides.LEFT;
+
+        connectorPanel = control.AppendFixed(new CanvasPanel("Connector2"), connecterLength);
+        connectorPanel.CollapseMode = CollapseMode.Deny;
+        connector = connectorPanel.Add(new CanvasBorder("Border"));
+        connector.LocalPosition = new Vector2(0f, (int)(control.ChildBreadth() / 2f));
+        connector.Sides = BorderSides.TOP;
+
+        CanvasPanel resetContainer = control.AppendSquare(new CanvasPanel("Reset"));
+        resetContainer.CollapseMode = CollapseMode.Deny;
+        UICommon.AddBackground(resetContainer);
+
+        CanvasButton resetButton = resetContainer.Add(new CanvasButton("Button"));
+        resetButton.Size = resetContainer.Size;
+        resetButton.SetImage(UICommon.images["IconX"]);
+        resetButton.RemoveText();
+        resetButton.OnClicked += reset;
+
+        control.Build();
+        return controlPanel;
     }
 
     private CanvasPanel AppendLabeledTile(string name, Func<bool> getter, Action effect, string image = "IconX", bool includeLabel = true, int defaultRowWidth = 5)

@@ -80,43 +80,35 @@ public static class UICommon
         return background;
     }
 
-    public static CanvasButton AppendKeybindButton(PanelBuilder builder, BindAction action)
+    public static CanvasButton AppendKeybindButton(PanelBuilder builder, params BindAction[] actions)
     {
-        CanvasPanel keybindBackground = builder.AppendFixed(new CanvasPanel($"{action.Name} Keybind"), builder.ChildBreadth() - BORDER_THICKNESS);
+        CanvasPanel keybindBackground = builder.AppendFixed(new CanvasPanel($"{actions[0].Name} Keybind"), builder.ChildBreadth() - BORDER_THICKNESS);
         keybindBackground.CollapseMode = CollapseMode.Deny; // Would cause background to incorrectly resize
         AddBackground(keybindBackground).RemoveBorder();
 
         CanvasButton keybindButton = keybindBackground.Add(new CanvasButton("Button"));
         keybindButton.LocalPosition = new Vector2(-BORDER_THICKNESS, 0);
         keybindButton.Size = keybindBackground.Size - keybindButton.LocalPosition;
-
-        if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
-        {
-            keybindButton.SetImage(images["IconDot"]);
-        }
-        else
-        {
-            keybindButton.SetImage(images["IconDotOutline"]);
-        }
-
         keybindButton.RemoveText();
         keybindButton.Border.Sides &= ~BorderSides.LEFT;
-        keybindButton.OnClicked += () => KeybindDialog.Instance.Toggle(keybindButton, action.Name);
+        keybindButton.OnClicked += () => KeybindDialog.Instance.Toggle(keybindButton, actions);
 
-        DebugMod.bindUpdated += (name, key) =>
+        void UpdateImage()
         {
-            if (name == action.Name)
+            foreach (BindAction action in actions)
             {
-                if (!key.HasValue)
+                if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
                 {
-                    keybindButton.SetImage(images["IconDotOutline"]);
+                    keybindButton.SetImage(UICommon.images["IconDot"]);
+                    return;
                 }
-                else if (key != KeyCode.None)
-                {
-                    keybindButton.SetImage(images["IconDot"]);
-                }
+
+                keybindButton.SetImage(UICommon.images["IconDotOutline"]);
             }
-        };
+        }
+
+        UpdateImage();
+        DebugMod.bindUpdated += (_, _) => UpdateImage();
 
         return keybindButton;
     }
