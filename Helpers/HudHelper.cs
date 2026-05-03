@@ -38,6 +38,7 @@ public static class HudHelper
                 }
 
                 fsm.FsmVariables.FindFsmBool("Initialised").Value = true;
+                fsm.FsmVariables.FindFsmBool("Skip HUD Frame Wait").Value = true;
                 fsm.SetState("Check Max HP");
             }
         }
