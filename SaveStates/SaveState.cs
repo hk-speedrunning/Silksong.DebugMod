@@ -46,6 +46,8 @@ public class SaveState
         public Vector3 savePos;
         public FieldInfo cameraLockArea;
         public object lockArea;
+        public bool facingLeft; // for backwards compatibility
+        public bool facingRight;
         public bool isKinematized;
         public HeroController.HunterUpgCrestStateInfo evoState;
         public bool isMaggoted;
@@ -66,6 +68,8 @@ public class SaveState
             savedSd = _data.savedSd;
             savePos = _data.savePos;
             lockArea = _data.lockArea;
+            facingLeft = _data.facingLeft;
+            facingRight = _data.facingRight;
             isKinematized = _data.isKinematized;
             evoState = _data.evoState;
             isMaggoted = _data.isMaggoted;
@@ -152,6 +156,8 @@ public class SaveState
         data.savePos = HeroController.instance.gameObject.transform.position;
         data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
         data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
+        data.facingLeft = !HeroController.instance.cState.facingRight;
+        data.facingRight = HeroController.instance.cState.facingRight;
         data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
         data.evoState = HeroController.instance.hunterUpgState;
         data.isMaggoted = HeroController.instance.cState.isMaggoted;
@@ -454,6 +460,8 @@ public class SaveState
         DebugMod.noclipPos = HeroController.instance.transform.position;
         HeroController.instance.transitionState = HeroTransitionState.WAITING_TO_TRANSITION;
         if (data.isKinematized) HeroController.instance.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+        if (data.facingLeft) HeroController.instance.FaceLeft();
+        else if (data.facingRight) HeroController.instance.FaceRight();
 
         try
         {
