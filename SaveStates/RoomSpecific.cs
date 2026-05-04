@@ -321,6 +321,14 @@ public static class RoomSpecific
                 // Wait for lava platforms to load in so we don't fall through them
                 yield return new WaitUntil(() => !GameManager.instance.isLoading);
                 break;
+            case "Hang_04":
+            case "Hang_06":
+                // Hornet always turns towards this object when the roar plays, but for HHA its position
+                // depends on previous roars done in other rooms. By default it will be at x=0 (face left),
+                // but in practice Hornet will always face right when playing casually or in a speedrun.
+                // TODO: if this can happen in other places, consider tracking it in savestates
+                GameCameras.instance.gameObject.FindChildObject("Roar Wave Emitter").transform.SetPositionX(100f);
+                break;
             case "Memory_Silk_Heart_BellBeast":
             case "Memory_Silk_Heart_LaceTower":
             case "Memory_Silk_Heart_WardBoss":
