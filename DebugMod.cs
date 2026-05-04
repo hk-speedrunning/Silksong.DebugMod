@@ -30,6 +30,7 @@ public partial class DebugMod : BaseUnityPlugin
     private static GameObject _refKnight;
     private static CameraController _refCamera;
     private static Collider2D _refHeroCollider;
+    private static LightBlurredBackground _lbb;
 
     internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager.SilentInstance);
     internal static InputHandler IH => _ih != null ? _ih : (_ih = GM.inputHandler);
@@ -37,6 +38,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static GameObject RefKnight => _refKnight != null ? _refKnight : (_refKnight = HC.gameObject);
     internal static CameraController RefCamera => _refCamera != null ? _refCamera : (_refCamera = GM.cameraCtrl);
     internal static Collider2D RefHeroCollider => _refHeroCollider != null ? _refHeroCollider : (_refHeroCollider = RefKnight.GetComponent<Collider2D>());
+    internal static LightBlurredBackground LBB => _lbb != null ? _lbb : (_lbb = GameObject.FindFirstObjectByType<LightBlurredBackground>());
 
     //used to stop hazard coros
     internal static IEnumerator CurrentHazardCoro;
