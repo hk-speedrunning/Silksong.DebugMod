@@ -116,16 +116,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Zoom In", category = "Visual")]
     public static void ZoomIn()
     {
-        float zoomFactor = GameCameras.instance.tk2dCam.ZoomFactor;
-        GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor + zoomFactor * 0.05f;
+        GameCameras.instance.tk2dCam.ZoomFactor *= 1.1f;
         DebugMod.LogConsole("Zoom level increased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
     }
 
     [BindableMethod(name = "Zoom Out", category = "Visual")]
     public static void ZoomOut()
     {
-        float zoomFactor2 = GameCameras.instance.tk2dCam.ZoomFactor;
-        GameCameras.instance.tk2dCam.ZoomFactor = zoomFactor2 - zoomFactor2 * 0.05f;
+        GameCameras.instance.tk2dCam.ZoomFactor *= 0.9f;
         DebugMod.LogConsole("Zoom level decreased to: " + GameCameras.instance.tk2dCam.ZoomFactor);
     }
 

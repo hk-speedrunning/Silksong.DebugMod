@@ -110,7 +110,7 @@ public class MainPanel : CanvasPanel
             },
             BindableFunctions.TimescaleUp,
             BindableFunctions.TimescaleDown,
-            () => TimeScale.CustomTimeScale = 1f
+            BindableFunctions.TimescaleReset
         );
         AppendRow(1, 1);
         AppendToggleControl("GAMEPLAY_TIME_FREEZEGAME", () => TimeScale.Frozen, BindableFunctions.PauseGameNoUI);

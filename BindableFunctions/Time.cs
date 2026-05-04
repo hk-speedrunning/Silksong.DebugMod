@@ -15,6 +15,9 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Decrease Timescale", category = "Time")]
     public static void TimescaleDown() => TimeScale.CustomTimeScale = Mathf.Round(TimeScale.CustomTimeScale * 10 - 1f) / 10f;
 
+    [BindableMethod(name = "Reset Timescale", category = "Time")]
+    public static void TimescaleReset() => TimeScale.CustomTimeScale = 1f;
+
     [BindableMethod(name = "Freeze Game", category = "Time")]
     public static void PauseGameNoUI()
     {
