@@ -650,7 +650,50 @@ public class MainPanel : CanvasPanel
         AppendLabeledTile("ITEMS_ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
             () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor, image: "Inv_MelodyConductor");
 
-        AddItemsLabeledTiles([("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey")]);
+        CanvasPanel quillTile = AppendLabeledTile(
+            "ITEMS_ITEMS_QUILL",
+            () => PlayerData.instance.hasQuill,
+            () =>
+            {
+                if (!PlayerData.instance.hasQuill)
+                {
+                    PlayerData.instance.hasQuill = true;
+                    PlayerData.instance.QuillState = 1;
+                }
+                else if (PlayerData.instance.QuillState >= 3)
+                {
+                    PlayerData.instance.hasQuill = false;
+                }
+                else
+                {
+                    PlayerData.instance.QuillState++;
+                }
+
+                CollectableItemManager.IncrementVersion();
+            }
+        );
+        quillTile.OnUpdate += () =>
+        {
+            string image;
+
+            if (PlayerData.instance.hasQuill && PlayerData.instance.QuillState > 1)
+            {
+                if (PlayerData.instance.QuillState == 2)
+                {
+                    image = "Inv_RedQuill";
+                }
+                else
+                {
+                    image = "Inv_PurpleQuill";
+                }
+            }
+            else
+            {
+                image = "Inv_Quill";
+            }
+
+            quillTile.Get<CanvasImage>("Icon").SetImage(UICommon.images[image]);
+        };
 
         AppendLabeledTile("ITEMS_ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
             () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
@@ -684,6 +727,7 @@ public class MainPanel : CanvasPanel
             ("Ward Key", "ITEMS_ITEMS_WHITEKEY", "Inv_WhiteKey"),
             ("Ward Boss Key", "ITEMS_ITEMS_SURGEONSKEY", "Inv_SurgeonsKey"),
             ("Architect Key", "ITEMS_ITEMS_ARCHITECTSKEY", "Inv_ArchitectKey"),
+            ("Dock Key", "ITEMS_ITEMS_DIVINGBELLKEY", "Inv_DockKey"),
             ("Belltown House Key", "ITEMS_ITEMS_BELLHOMEKEY", "Inv_BellhomeKey"),
             ("Craw Summons", "ITEMS_ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
         ]);

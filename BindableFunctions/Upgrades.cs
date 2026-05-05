@@ -162,6 +162,7 @@ public static partial class BindableFunctions
             PlayerData.instance.HasWildsMap = false;
 
             PlayerData.instance.hasQuill = false;
+            CollectableItemManager.IncrementVersion();
 
             DebugMod.LogConsole("Removed all maps");
             return;
@@ -197,6 +198,8 @@ public static partial class BindableFunctions
         PlayerData.instance.HasWildsMap = true;
 
         PlayerData.instance.hasQuill = true;
+        PlayerData.instance.QuillState = 1;
+        CollectableItemManager.IncrementVersion();
 
         foreach (GameMap.ZoneInfo zone in GameManager.instance.gameMap.mapZoneInfo)
         {
