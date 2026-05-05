@@ -23,6 +23,8 @@ public class KeybindDialog : CanvasDialog
 
     public KeybindDialog() : base(nameof(KeybindDialog))
     {
+        Get<CanvasImage>("Background").RemoveBorder();
+
         float y = 0f;
 
         for (int i = 0; i < 3; i++)

@@ -101,6 +101,7 @@ public class MainPanel : CanvasPanel
         AppendNumericControl(
             "GAMEPLAY_TIME_TIMESCALE",
             () => TimeScale.CustomTimeScale,
+            1f,
             f =>
             {
                 if (f >= 0f)
@@ -176,6 +177,7 @@ public class MainPanel : CanvasPanel
         AppendNumericControl(
             "GAMEPLAY_VISUAL_ZOOM",
             () => GameCameras.instance.tk2dCam.zoomFactor,
+            1f,
             f =>
             {
                 if (f > 0f)
@@ -1004,7 +1006,7 @@ public class MainPanel : CanvasPanel
         });
     }
 
-    private CanvasPanel AppendNumericControl(string name, Func<float> getter, Action<float> setter, Action increase,
+    private CanvasPanel AppendNumericControl(string name, Func<float> getter, float defaultValue, Action<float> setter, Action increase,
         Action decrease, Action reset)
     {
         currentRow ??= AppendRow(1);
@@ -1018,6 +1020,7 @@ public class MainPanel : CanvasPanel
         CanvasButton label = control.AppendFlex(new CanvasButton("Label"));
         label.Text.Text = Utils.Localize(name);
         label.RemoveHoverBorder();
+        label.OnUpdate += () => label.SetImage(Mathf.Approximately(getter(), defaultValue) ? UICommon.panelBG : UICommon.panelStrongBG);
 
         List<BindAction> actions = [];
         BindAction action;
