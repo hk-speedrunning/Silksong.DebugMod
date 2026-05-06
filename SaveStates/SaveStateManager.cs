@@ -33,34 +33,6 @@ public static class SaveStateManager
             }
         }
 
-        if (!Directory.Exists(saveStatesBaseDirectory))
-        {
-            string legacyPath = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
-            if (Directory.Exists(legacyPath))
-            {
-                DebugMod.LogWarn("Legacy savestates directory detected. Renaming...");
-                Directory.Move(legacyPath, saveStatesBaseDirectory);
-            }
-            else
-            {
-                Directory.CreateDirectory(saveStatesBaseDirectory);
-            }
-        }
-
-        // Cleanup empty directories in case the page count was decreased
-        foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
-        {
-            string name = Path.GetFileName(path);
-            if (!int.TryParse(name, out int i) || i < 0 || i >= NumPages)
-            {
-                try
-                {
-                    Directory.Delete(path);
-                }
-                catch { }
-            }
-        }
-
         LoadFileStates();
     }
 
@@ -190,10 +162,39 @@ public static class SaveStateManager
         return true;
     }
 
-    private static void LoadFileStates()
+    public static void LoadFileStates()
     {
         try
         {
+            if (!Directory.Exists(saveStatesBaseDirectory))
+            {
+                string legacyPath = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
+                if (Directory.Exists(legacyPath))
+                {
+                    DebugMod.LogWarn("Legacy savestates directory detected. Renaming...");
+                    Directory.Move(legacyPath, saveStatesBaseDirectory);
+                }
+                else
+                {
+                    Directory.CreateDirectory(saveStatesBaseDirectory);
+                }
+            }
+
+            // Cleanup empty directories in case the page count was decreased
+            foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
+            {
+                string name = Path.GetFileName(path);
+                if (!int.TryParse(name, out int i) || i < 0 || i >= NumPages)
+                {
+                    try
+                    {
+                        // Will throw an exception if the directory is not empty
+                        Directory.Delete(path);
+                    }
+                    catch { }
+                }
+            }
+
             for (int page = 0; page < NumPages; page++)
             {
                 string pageDirectory = Path.Combine(saveStatesBaseDirectory, page.ToString());
@@ -217,14 +218,14 @@ public static class SaveStateManager
                     }
                     catch (Exception ex)
                     {
-                        DebugMod.LogError(ex.Message);
+                        DebugMod.LogError(ex.ToString());
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            DebugMod.LogError(ex.Message);
+            DebugMod.LogError(ex.ToString());
             throw;
         }
     }

@@ -55,6 +55,13 @@ public static partial class BindableFunctions
         SaveStatesPanel.Instance.PrevPage();
     }
 
+    [BindableMethod(name = "Refresh File Slots", category = "Savestates")]
+    public static void RefreshFileSlots()
+    {
+        SaveStateManager.LoadFileStates();
+        DebugMod.LogConsole("Reread file slots from disk");
+    }
+
     [BindableMethod(name = "Load Quickslot On Death", category = "Savestates")]
     public static void LoadStateOnDeath()
     {
