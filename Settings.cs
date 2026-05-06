@@ -110,7 +110,7 @@ public class Settings
 
         numpadForSavestates = config.Bind(
             "Savestates",
-            "Numpad Hotkeys",
+            "Savestate Numpad Hotkeys",
             false,
             "Use the numpad keys instead of the regular number keys to select file states in the savestate panel. Takes effect on restart."
         );

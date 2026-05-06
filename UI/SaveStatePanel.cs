@@ -1,4 +1,5 @@
-﻿using DebugMod.Helpers;
+﻿using BepInEx.Bootstrap;
+using DebugMod.Helpers;
 using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
 using System;
@@ -12,6 +13,7 @@ public class SaveStatesPanel : CanvasPanel
     public static int QuickSlotButtonWidth => UICommon.ScaleWidth(90);
     public static int FileSlotButtonWidth => UICommon.ScaleWidth(60);
     public static int IconPadding => UICommon.ScaleHeight(4);
+    public static int BenchwarpShiftDistance => UICommon.ScaleHeight(50);
 
     public static SaveStatesPanel Instance { get; private set; }
 
@@ -21,6 +23,8 @@ public class SaveStatesPanel : CanvasPanel
 
     private SelectOperation selectStateOperation;
     private int currentPage;
+
+    private bool shiftedDown;
 
     public static void BuildPanel()
     {
@@ -33,6 +37,12 @@ public class SaveStatesPanel : CanvasPanel
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
         OnUpdate += DoUpdate;
+
+        // Move out of the way of benchwarp if it's installed
+        if (Chainloader.PluginInfos.ContainsKey("io.github.homothetyhk.benchwarp"))
+        {
+            OnUpdate += BenchwarpShift;
+        }
 
         CanvasImage expandedBackground = UICommon.AddBackground(this);
         OnUpdate += () => expandedBackground.ActiveSelf = ShouldBeExpanded;
@@ -338,6 +348,25 @@ public class SaveStatesPanel : CanvasPanel
         }
 
         selectStateOperation = SelectOperation.None;
+    }
+
+    public void BenchwarpShift()
+    {
+        // Could also check if the benchwarp GUI object is active, but there is no easy and fast way to find the object
+        bool benchwarpActive = GameManager.instance.IsGamePaused() && !GameManager.instance.IsNonGameplayScene();
+
+        if (benchwarpActive != shiftedDown)
+        {
+            shiftedDown = benchwarpActive;
+            if (shiftedDown)
+            {
+                LocalPosition += new Vector2(0f, BenchwarpShiftDistance);
+            }
+            else
+            {
+                LocalPosition -= new Vector2(0f, BenchwarpShiftDistance);
+            }
+        }
     }
 }
 
