@@ -1,3 +1,4 @@
+using BepInEx.Bootstrap;
 using DebugMod.Helpers;
 using DebugMod.Hitbox;
 using DebugMod.MonoBehaviours;
@@ -25,6 +26,7 @@ public class GUIController : MonoBehaviour
     private KeyCode keyWarning;
     private Size resolution;
     internal LanguageCode language;
+    private bool benchwarpShifted;
 
     private float? lastRescale;
     private const float RebuildDelay = 0.1f;
@@ -147,6 +149,30 @@ public class GUIController : MonoBehaviour
             DebugMod.LogDebug($"Resize complete, rebuilding for new resolution ({Screen.width}, {Screen.height})");
             lastRescale = null;
             BuildMenus();
+        }
+
+        // Move out of the way of benchwarp if it's installed
+        if (Chainloader.PluginInfos.ContainsKey("io.github.homothetyhk.benchwarp"))
+        {
+            // Could also check if the benchwarp GUI object is active, but there is no easy and fast way to find the object
+            bool benchwarpActive = GameManager.instance.IsGamePaused() && !GameManager.instance.IsNonGameplayScene();
+
+            if (benchwarpActive != benchwarpShifted)
+            {
+                benchwarpShifted = benchwarpActive;
+                int shiftDistance = UICommon.ScaleHeight(50);
+
+                if (benchwarpShifted)
+                {
+                    MainPanel.Instance.LayoutTabsSide(shiftDistance);
+                    SaveStatesPanel.Instance.LocalPosition += new Vector2(0f, shiftDistance);
+                }
+                else
+                {
+                    MainPanel.Instance.LayoutTabsNormal();
+                    SaveStatesPanel.Instance.LocalPosition -= new Vector2(0f, shiftDistance);
+                }
+            }
         }
 
         if (ForceHideUI())

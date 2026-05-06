@@ -45,6 +45,7 @@ public class MainPanel : CanvasPanel
     ];
 
     private readonly List<CanvasPanel> tabs = [];
+    private readonly List<CanvasButton> tabButtons = [];
 
     // Convenience fields for building
     private PanelBuilder currentTab;
@@ -1291,23 +1292,44 @@ public class MainPanel : CanvasPanel
         currentTab?.Build();
 
         float tabButtonWidth = (Size.x - UICommon.Margin * (tabs.Count - 1)) / tabs.Count;
-        float tabX = 0;
 
         foreach (CanvasPanel tab in tabs)
         {
             // Created after the tabs themselves so they get input priority over offscreen controls
             CanvasButton button = Add(new CanvasButton($"{tab.Name}TabButton"));
-            button.LocalPosition = new Vector2(tabX, 0);
             button.Size = new Vector2(tabButtonWidth, TabButtonHeight);
             button.SetImage(UICommon.panelBG);
             button.Text.Text = Utils.Localize(tab.Name);
             button.OnClicked += () => DebugMod.settings.MainPanelCurrentTab = tab.Name;
             button.OnUpdate += () => button.Toggled = DebugMod.settings.MainPanelCurrentTab == tab.Name;
-
-            tabX += tabButtonWidth + UICommon.Margin;
+            tabButtons.Add(button);
         }
 
+        LayoutTabsNormal();
+
         base.Build();
+    }
+
+    internal void LayoutTabsNormal()
+    {
+        float tabX = 0;
+
+        foreach (CanvasButton button in tabButtons)
+        {
+            button.LocalPosition = new Vector2(tabX, 0);
+            tabX += button.Size.x + UICommon.Margin;
+        }
+    }
+
+    internal void LayoutTabsSide(float offset)
+    {
+        float tabY = offset;
+
+        foreach (CanvasButton button in tabButtons)
+        {
+            button.LocalPosition = new Vector2(-button.Size.x + UICommon.BORDER_THICKNESS, tabY);
+            tabY += button.Size.y + UICommon.Margin;
+        }
     }
 
     private void DoUpdate()
