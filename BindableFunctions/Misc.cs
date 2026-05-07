@@ -13,7 +13,8 @@ public static partial class BindableFunctions
     public static void ToggleAct3()
     {
         PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
-        DebugMod.LogConsole("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled"));
+        DebugMod.LogConsole("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled")
+            + ", reload the scene to apply changes");
     }
 
     [BindableMethod(name = "Set Hazard Respawn", category = "Misc")]
@@ -34,7 +35,7 @@ public static partial class BindableFunctions
             {
                 InputHandler.Instance.StartCoroutine(GameManager.instance.PauseGameToggle(false));
                 GameManager.instance.HazardRespawn();
-                DebugMod.LogConsole("Closing Pause Menu and respawning...");
+                DebugMod.LogConsole("Closing pause menu and respawning...");
                 return;
             }
 
@@ -47,7 +48,7 @@ public static partial class BindableFunctions
                 return;
             }
 
-            DebugMod.LogConsole("Respawn requested in some weird conditions, abort, ABORT");
+            DebugMod.LogConsole("How are you seeing this??? (please create a bug report)");
         }
     }
 
@@ -104,7 +105,7 @@ public static partial class BindableFunctions
     public static void ResetCurrentScene()
     {
         saveLevelStateAction = GameManager.instance.GetSceneNameString();
-        DebugMod.LogConsole("Clearing scene data from this scene, re-enter scene or warp to apply changes");
+        DebugMod.LogConsole("Clearing scene data from this scene, reload the scene to apply changes");
     }
 
     [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
@@ -177,6 +178,10 @@ public static partial class BindableFunctions
         color = component.color; color.a = 1f;
         component.color = color;
 
+        // noclip
+        DebugMod.noclip = false;
+        DebugMod.RefKnight.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
+
         //rest all is self explanatory
         TimeScale.Reset();
         GC.tk2dCam.ZoomFactor = 1f;
@@ -187,6 +192,7 @@ public static partial class BindableFunctions
         DebugMod.infiniteSilk = false;
         DebugMod.infiniteHP = false;
         pd.isInvincible = false;
-        DebugMod.noclip = false;
+
+        DebugMod.LogConsole("Reset all gameplay toggles");
     }
 }

@@ -150,8 +150,6 @@ public partial class DebugMod : BaseUnityPlugin
             UICommon.LoadResources();
             GUIController.Instance.BuildMenus();
             SceneWatcher.Init();
-
-            LogConsole("New session started " + DateTime.Now);
         };
 
         KeyBindLock = false;
@@ -282,10 +280,13 @@ public partial class DebugMod : BaseUnityPlugin
 
         if (_loadingChar)
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(PlayerData.instance.playTime);
-            string text = string.Format("{0:00}.{1:00}", Math.Floor(timeSpan.TotalHours), timeSpan.Minutes);
-            int profileID = PlayerData.instance.profileID;
-            LogConsole("New savegame loaded. Profile playtime " + text + " Completion: " + PlayerData.instance.completionPercentage + " Save slot: " + profileID + " Game Version: " + PlayerData.instance.version);
+            string playtime = TimeSpan.FromSeconds(PlayerData.instance.playTime).ToString(@"hh\:mm\:ss");
+            LogConsole($"DebugMod {Version} on Silksong {PlayerData.instance.version}");
+            LogConsole($"\tSave slot: {PlayerData.instance.profileID}");
+            LogConsole($"\tProfile playtime: {playtime}");
+            LogConsole($"\tCompletion: {PlayerData.instance.completionPercentage}%");
+
+            GUIController.Instance.respawnSceneWatch = PlayerData.instance.respawnScene;
             _loadingChar = false;
         }
 
@@ -425,7 +426,7 @@ public partial class DebugMod : BaseUnityPlugin
         {
             if (method.GetCustomAttribute<BindableMethod>(false) is BindableMethod attr)
             {
-                Log($"Recieved Action: {attr.name} (from {BindableFunctionsClass.Name})");
+                Log($"Adding new keybind: {attr.name} (from {BindableFunctionsClass.Name})");
                 BindAction action = new(attr, method);
                 bindActions.Add(attr.name, action);
                 bindsByMethod.Add(method, action);
@@ -448,7 +449,7 @@ public partial class DebugMod : BaseUnityPlugin
     [PublicAPI]
     public static void AddActionToKeyBindList(Action method, string name, string category, bool allowLock)
     {
-        Log($"Received Action: {name}");
+        Log($"Adding new keybind: {name}");
         BindAction action = new(name, category, allowLock, method);
         bindActions.Add(name, action);
         bindsByMethod.Add(method.Method, action);

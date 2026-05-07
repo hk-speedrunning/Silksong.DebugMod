@@ -59,7 +59,7 @@ public static partial class BindableFunctions
     public static void RefreshFileSlots()
     {
         SaveStateManager.LoadFileStates();
-        DebugMod.LogConsole("Reread file slots from disk");
+        DebugMod.LogConsole("Reimporting file slots from disk");
     }
 
     [BindableMethod(name = "Load Quickslot On Death", category = "Savestates")]
@@ -73,6 +73,6 @@ public static partial class BindableFunctions
     public static void OverrideLoadLockout()
     {
         DebugMod.overrideLoadLockout = !DebugMod.overrideLoadLockout;
-        DebugMod.LogConsole("Savestate lockout override set to " + DebugMod.overrideLoadLockout);
+        DebugMod.LogConsole("Savestate lockout override set to " + DebugMod.overrideLoadLockout.ToString().ToUpper());
     }
 }

@@ -14,7 +14,7 @@ public static partial class BindableFunctions
             HeroController.instance.AddToMaxHealth(1);
             HudHelper.RefreshMasks();
 
-            DebugMod.LogConsole("Added Mask");
+            DebugMod.LogConsole("Added mask");
         }
         else
         {
@@ -30,7 +30,7 @@ public static partial class BindableFunctions
             HeroController.instance.AddToMaxSilk(1);
             HudHelper.RefreshSpool();
 
-            DebugMod.LogConsole("Added Spool");
+            DebugMod.LogConsole("Added spool");
         }
         else
         {
@@ -51,7 +51,7 @@ public static partial class BindableFunctions
             PlayerData.instance.health = Math.Min(PlayerData.instance.health, PlayerData.instance.maxHealth);
             HudHelper.RefreshMasks();
 
-            DebugMod.LogConsole("Took Away Mask");
+            DebugMod.LogConsole("Removed mask");
         }
         else
         {
@@ -68,7 +68,7 @@ public static partial class BindableFunctions
             PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
             HudHelper.RefreshSpool();
 
-            DebugMod.LogConsole("Removed Spool");
+            DebugMod.LogConsole("Removed spool");
         }
         else
         {
@@ -80,7 +80,7 @@ public static partial class BindableFunctions
     {
         if (health <= 0)
         {
-            DebugMod.LogConsole("Cannot add/take health: health is too low");
+            DebugMod.LogConsole("Cannot add/take health: health <= 0");
             return false;
         }
 
@@ -107,7 +107,7 @@ public static partial class BindableFunctions
             HeroController.instance.AddHealth(1);
             HudHelper.RefreshMasks();
 
-            DebugMod.LogConsole("Added Health");
+            DebugMod.LogConsole("Added health");
         }
     }
 
@@ -128,7 +128,7 @@ public static partial class BindableFunctions
     {
         HeroController.instance.AddSilk(1, true);
 
-        DebugMod.LogConsole("Added Silk");
+        DebugMod.LogConsole("Added silk");
     }
 
     [BindableMethod(name = "Take Silk", category = "Masks & Spools")]

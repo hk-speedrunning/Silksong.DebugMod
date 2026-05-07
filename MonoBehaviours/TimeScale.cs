@@ -29,10 +29,10 @@ public static class TimeScale
             float prevValue = CustomTimeScale;
             if (value == prevValue || value < 0f)
                 return; // unchanged
-            
+
             tScale.TimeScale = value;
             string adjustmentText = value > prevValue ? "increased" : "decreased";
-            DebugMod.LogConsole($"Timescale {adjustmentText}: {CustomTimeScale:0.0} (was {prevValue:0.0})");
+            DebugMod.LogConsole($"Timescale {adjustmentText} to {CustomTimeScale:0.0}");
             CheckHookRequirement();
         }
     }
@@ -92,13 +92,17 @@ public static class TimeScale
     // in order for it to allow timescales > 1
     static bool overrideIsCheatsEnabled = false;
 
-    [HarmonyPrefix] [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
     public static void UpdateTimeScalePrefix() => overrideIsCheatsEnabled = IsUsingSpedUpTime;
 
-    [HarmonyPostfix] [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
     public static void UpdateTimeScalePostfix() => overrideIsCheatsEnabled = false;
 
-    [HarmonyPostfix] [HarmonyPatch(typeof(CheatManager), "IsCheatsEnabled")] [HarmonyPatch(MethodType.Getter)]
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(CheatManager), "IsCheatsEnabled")]
+    [HarmonyPatch(MethodType.Getter)]
     public static void IsCheatsEnabledPostfix(ref bool __result)
     {
         if (overrideIsCheatsEnabled)

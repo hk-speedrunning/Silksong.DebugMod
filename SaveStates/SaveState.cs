@@ -172,7 +172,7 @@ public class SaveState
             OnSave.Invoke(this);
         }
 
-        DebugMod.LogConsole("Saved temp state");
+        DebugMod.LogConsole("Created savestate");
         return true;
     }
 
@@ -491,7 +491,7 @@ public class SaveState
 
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
         {
-            DebugMod.LogConsole("Performing Room Specific Option " + data.roomSpecificOptions);
+            DebugMod.LogConsole("Performing room specific option " + data.roomSpecificOptions);
             yield return RoomSpecific.DoRoomSpecific(data.saveScene, data.roomSpecificOptions);
         }
 

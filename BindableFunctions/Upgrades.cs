@@ -38,7 +38,7 @@ public static partial class BindableFunctions
             }
             else
             {
-                DebugMod.LogConsole("Reducing nail damage by 4");
+                DebugMod.LogConsole("Reducing needle damage by 4");
             }
         }
         else
@@ -110,7 +110,7 @@ public static partial class BindableFunctions
     public static void IncrementSilkHeart()
     {
         PlayerData.instance.silkRegenMax++;
-        DebugMod.LogConsole($"Incremented Silk Hearts (now {PlayerData.instance.silkRegenMax})");
+        DebugMod.LogConsole($"Incremented silk hearts (now {PlayerData.instance.silkRegenMax})");
     }
 
     [BindableMethod(name = "Decrement Silk Hearts", category = "Upgrades")]
@@ -119,11 +119,11 @@ public static partial class BindableFunctions
         if (PlayerData.instance.silkRegenMax > 0)
         {
             PlayerData.instance.silkRegenMax--;
-            DebugMod.LogConsole($"Decremented Silk Hearts (now {PlayerData.instance.silkRegenMax})");
+            DebugMod.LogConsole($"Decremented silk hearts (now {PlayerData.instance.silkRegenMax})");
         }
         else
         {
-            DebugMod.LogConsole("Can't decrement below 0 Silk Hearts!");
+            DebugMod.LogConsole("Already at 0 silk hearts");
         }
     }
 

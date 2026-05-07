@@ -307,20 +307,15 @@ public class GUIController : MonoBehaviour
         if (PlayerData.instance.hazardRespawnLocation != hazardLocation)
         {
             hazardLocation = PlayerData.instance.hazardRespawnLocation;
-            DebugMod.LogConsole("Hazard Respawn location updated: " + hazardLocation.ToString());
+            DebugMod.LogConsole($"Hazard respawn location updated: {hazardLocation}");
         }
-        if (!string.IsNullOrEmpty(respawnSceneWatch) && respawnSceneWatch != PlayerData.instance.respawnScene)
+        if (respawnSceneWatch != PlayerData.instance.respawnScene)
         {
             respawnSceneWatch = PlayerData.instance.respawnScene;
-            DebugMod.LogConsole(string.Concat(new string[]
-            {
-                "Save Respawn updated, new scene: ",
-                PlayerData.instance.respawnScene.ToString(),
-                ", Map Zone: ",
-                GameManager.instance.GetCurrentMapZone(),
-                ", Respawn Marker: ",
-                PlayerData.instance.respawnMarkerName.ToString()
-            }));
+            DebugMod.LogConsole("Save respawn updated:");
+            DebugMod.LogConsole($"\tNew Scene: {PlayerData.instance.respawnScene}");
+            DebugMod.LogConsole($"\tMap zone: {GameManager.instance.GetCurrentMapZone()}");
+            DebugMod.LogConsole($"\tRespawn marker: {PlayerData.instance.respawnMarkerName}");
         }
         if (HitboxViewer.State != DebugMod.settings.ShowHitBoxes)
         {

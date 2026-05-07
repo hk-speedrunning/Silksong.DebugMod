@@ -1,6 +1,5 @@
 ﻿using GlobalSettings;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DebugMod;
 
@@ -39,20 +38,23 @@ public static partial class BindableFunctions
     {
         ToolItemManager.UnlockAllCrests();
 
-        if (ToolItemManager.Instance && ToolItemManager.Instance.crestList)
-        {
-            foreach (ToolCrest crest in ToolItemManager.Instance.crestList)
-            {
-                crest.slots = crest.slots.Select(slotInfo => slotInfo with { IsLocked = false }).ToArray();
+        // Would unlock all slots on crests, but this cannot be undone easily
+        // and the same effect can be achieved by giving memory lockets instead.
 
-                ToolCrestsData.Data crestData = crest.SaveData;
-                if (crestData.Slots != null)
-                {
-                    crestData.Slots = crestData.Slots.Select(slot => slot with { IsUnlocked = true }).ToList();
-                }
-                crest.SaveData = crestData;
-            }
-        }
+        // if (ToolItemManager.Instance && ToolItemManager.Instance.crestList)
+        // {
+        //     foreach (ToolCrest crest in ToolItemManager.Instance.crestList)
+        //     {
+        //         crest.slots = crest.slots.Select(slotInfo => slotInfo with { IsLocked = false }).ToArray();
+        //
+        //         ToolCrestsData.Data crestData = crest.SaveData;
+        //         if (crestData.Slots != null)
+        //         {
+        //             crestData.Slots = crestData.Slots.Select(slot => slot with { IsUnlocked = true }).ToList();
+        //         }
+        //         crest.SaveData = crestData;
+        //     }
+        // }
 
         DebugMod.LogConsole("Unlocked all crests");
     }
@@ -72,10 +74,12 @@ public static partial class BindableFunctions
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
             ToolItemManager.AutoEquip(null, false, false);
+            DebugMod.LogConsole("Disabled cursed state");
         }
         else
         {
             ToolItemManager.AutoEquip(Gameplay.CursedCrest, false, true);
+            DebugMod.LogConsole("Enabled cursed state");
         }
 
         HeroController.instance.UpdateSilkCursed();
@@ -89,10 +93,12 @@ public static partial class BindableFunctions
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
             ToolItemManager.AutoEquip(null, false, false);
+            DebugMod.LogConsole("Disabled cloakless state");
         }
         else
         {
             ToolItemManager.AutoEquip(Gameplay.CloaklessCrest, false, true);
+            DebugMod.LogConsole("Enabled cloakless state");
         }
 
         // In case the player was cursed before this

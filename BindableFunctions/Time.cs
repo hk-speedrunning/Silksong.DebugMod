@@ -26,11 +26,11 @@ public static partial class BindableFunctions
         if (TimeScale.Frozen)
         {
             frameCounter = 0;
-            DebugMod.LogConsole("Game Frozen");
+            DebugMod.LogConsole("Game frozen");
         }
         else
         {
-            DebugMod.LogConsole("Game Unfrozen");
+            DebugMod.LogConsole("Game unfrozen");
         }
     }
 
@@ -47,11 +47,11 @@ public static partial class BindableFunctions
                 UIManager.instance.ignoreUnpause = false;
                 PlayerData.instance.disablePause = false;
                 UIManager.instance.TogglePauseGame();
-                DebugMod.LogConsole("Forcing Pause Menu because pause is disabled");
+                DebugMod.LogConsole("Forcing pause menu because pause is disabled");
             }
             else
             {
-                DebugMod.LogConsole("Game does not report that Pause is disabled, requesting it normally.");
+                DebugMod.LogConsole("Pausing game");
                 UIManager.instance.TogglePauseGame();
             }
 
@@ -59,7 +59,7 @@ public static partial class BindableFunctions
         }
         catch (Exception e)
         {
-            DebugMod.LogConsole("Error while attempting to pause, check ModLog.txt");
+            DebugMod.LogConsole("Error while attempting to pause, please create a bug report");
             DebugMod.Log("Error while attempting force pause:\n" + e);
         }
     }
@@ -82,7 +82,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Reset Frame Counter", category = "Time")]
     public static void ResetFrameCounter()
     {
-        DebugMod.LogConsole($"Frame Counter reset (was {frameCounter})");
+        DebugMod.LogConsole($"Frame counter reset (was {frameCounter})");
         frameCounter = 0;
     }
 }

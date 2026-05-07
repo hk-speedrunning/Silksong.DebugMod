@@ -19,6 +19,8 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Give Quest Items", category = "Consumables")]
     public static void GiveQuestItems()
     {
+        bool didSomething = false;
+
         foreach (FullQuestBase quest in QuestManager.GetActiveQuests())
         {
             foreach (FullQuestBase.QuestTarget target in quest.Targets)
@@ -29,9 +31,19 @@ public static partial class BindableFunctions
                     if (amountToGive > 0)
                     {
                         item.Collect(amountToGive);
+                        didSomething = true;
                     }
                 }
             }
+        }
+
+        if (didSomething)
+        {
+            DebugMod.LogConsole("Gave necessary items for all active quests");
+        }
+        else
+        {
+            DebugMod.LogConsole("No active quests that need items, doing nothing");
         }
     }
 }

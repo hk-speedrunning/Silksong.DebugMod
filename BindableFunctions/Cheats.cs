@@ -18,7 +18,7 @@ public static partial class BindableFunctions
                 ctr++;
             }
         }
-        DebugMod.LogConsole($"Killing {ctr} HealthManagers in scene!");
+        DebugMod.LogConsole($"Killing {ctr} HealthManagers in scene");
     }
 
     [BindableMethod(name = "Infinite Jump", category = "Cheats")]

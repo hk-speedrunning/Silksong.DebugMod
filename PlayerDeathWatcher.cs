@@ -22,16 +22,10 @@ public static class PlayerDeathWatcher
 
     public static void LogDeathDetails()
     {
-        DebugMod.LogConsole(string.Concat(new string[]
-        {
-            "Hero death detected. Game playtime: ",
-            PlayerData.instance.playTime.ToString(),
-            // " Shade Zone: ",
-            // PlayerData.instance.shadeMapZone.ToString(),
-            // " Shade Geo: ",
-            // PlayerData.instance.geoPool.ToString(),
-            " Respawn scene: ",
-            PlayerData.instance.respawnScene.ToString()
-        }));
+        DebugMod.LogConsole("Hero death detected");
+        DebugMod.LogConsole($"\tGame playtime: {PlayerData.instance.playTime}");
+        DebugMod.LogConsole($"\tRespawn scene: {PlayerData.instance.respawnScene}");
+        DebugMod.LogConsole($"\tCocoon scene: {PlayerData.instance.HeroCorpseScene}");
+        DebugMod.LogConsole($"\tCocoon rosaries: {PlayerData.instance.HeroCorpseMoneyPool}");
     }
 }

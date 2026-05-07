@@ -16,7 +16,19 @@ public static partial class BindableFunctions
     public static void ShowHitboxes()
     {
         if (++DebugMod.settings.ShowHitBoxes > 2) DebugMod.settings.ShowHitBoxes = 0;
-        DebugMod.LogConsole("Toggled show hitboxes: " + DebugMod.settings.ShowHitBoxes);
+
+        switch (DebugMod.settings.ShowHitBoxes)
+        {
+            case 0:
+                DebugMod.LogConsole("Not showing hitboxes");
+                break;
+            case 1:
+                DebugMod.LogConsole("Showing hitboxes");
+                break;
+            case 2:
+                DebugMod.LogConsole("Showing all hitboxes");
+                break;
+        }
     }
 
     [BindableMethod(name = "Force Camera Follow", category = "Visual")]
@@ -74,13 +86,13 @@ public static partial class BindableFunctions
         {
             color.a = 0f;
             gameObject.GetComponent<SpriteRenderer>().color = color;
-            DebugMod.LogConsole("Rendering HeroLight invisible...");
+            DebugMod.LogConsole("Making hero light invisible");
         }
         else
         {
             color.a = 0.7f;
             gameObject.GetComponent<SpriteRenderer>().color = color;
-            DebugMod.LogConsole("Rendering HeroLight visible...");
+            DebugMod.LogConsole("Making hero light visible");
         }
     }
 
@@ -90,13 +102,13 @@ public static partial class BindableFunctions
         if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(false);
-            DebugMod.LogConsole("Disabling HUD...");
+            DebugMod.LogConsole("Disabling HUD");
         }
         else
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
             HudHelper.RefreshSpool();
-            DebugMod.LogConsole("Enabling HUD...");
+            DebugMod.LogConsole("Enabling HUD");
         }
     }
 
@@ -111,48 +123,27 @@ public static partial class BindableFunctions
     [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
     public static void ResetZoom()
     {
-        // Set zoom to default
         GameCameras.instance.tk2dCam.ZoomFactor = defaultZoom;
-
-        // Update FOV
         DebugMod.LBB.OnCameraFovChanged(defaultFOV);
-        
-        // Log statement
-        DebugMod.LogConsole($"Zoom factor was reset (Zoom: {defaultZoom}, FOV: {defaultFOV})");
+        DebugMod.LogConsole("Zoom level was reset");
     }
 
     [BindableMethod(name = "Zoom In", category = "Visual")]
     public static void ZoomIn()
     {
-        // Increase zoom factor
         GameCameras.instance.tk2dCam.zoomFactor *= 1.1f;
-
-        // Calculate new FOV
         float currentFOV = CalculateNewFOV(defaultFOV, GameCameras.instance.tk2dCam.ZoomFactor);
-
-        // Update FOV
         DebugMod.LBB.OnCameraFovChanged(currentFOV);
-
-        // Log statement
-        DebugMod.LogConsole("Zoom level increased to: " 
-            + GameCameras.instance.tk2dCam.ZoomFactor + " (FOV: " + currentFOV + ")");
+        DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
     [BindableMethod(name = "Zoom Out", category = "Visual")]
     public static void ZoomOut()
     {
-        // Decrease zoom factor
         GameCameras.instance.tk2dCam.zoomFactor *= 0.9f;
-
-        // Calculate new FOV
         float currentFOV = CalculateNewFOV(defaultFOV, GameCameras.instance.tk2dCam.ZoomFactor);
-
-        // Update FOV
         DebugMod.LBB.OnCameraFovChanged(currentFOV);
-
-        // Log statement
-        DebugMod.LogConsole("Zoom level increased to: "
-            + GameCameras.instance.tk2dCam.ZoomFactor + " (FOV: " + currentFOV + ")");
+        DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
     static float CalculateNewFOV(float baseFOV, float zoomFactor)
@@ -169,13 +160,13 @@ public static partial class BindableFunctions
         {
             color.a = 0f;
             component.color = color;
-            DebugMod.LogConsole("Rendering Hero sprite invisible...");
+            DebugMod.LogConsole("Making hero sprite invisible");
         }
         else
         {
             color.a = 1f;
             component.color = color;
-            DebugMod.LogConsole("Rendering Hero sprite visible...");
+            DebugMod.LogConsole("Making hero sprite visible");
         }
     }
 
@@ -184,6 +175,6 @@ public static partial class BindableFunctions
     {
         bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;
         GameCameras.instance.cameraShakeFSM.enabled = newValue;
-        DebugMod.LogConsole($"{(newValue ? "Enabling" : "Disabling")} Camera Shake...");
+        DebugMod.LogConsole($"{(newValue ? "Enabling" : "Disabling")} camera shake");
     }
 }
