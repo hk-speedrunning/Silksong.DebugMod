@@ -97,7 +97,7 @@ public class Settings
             "Savestates",
             "Number of Savestate Pages",
             10,
-            "The number of pages of available savestates. Takes effect on restart."
+            "The number of pages of available savestates."
         );
         maxSavestatePages.Value = MaxSavePages;
         maxSavestatePages.SettingChanged += (_, _) =>
@@ -105,6 +105,7 @@ public class Settings
             if (maxSavestatePages.Value > 0)
             {
                 MaxSavePages = maxSavestatePages.Value;
+                GUIController.Instance?.savestatePageUpdateTime = Time.realtimeSinceStartup;
             }
         };
 

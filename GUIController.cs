@@ -30,6 +30,8 @@ public class GUIController : MonoBehaviour
 
     private float? lastRescale;
     private const float RebuildDelay = 0.1f;
+    internal float? savestatePageUpdateTime;
+    private const float SavestatePageUpdateDelay = 2f;
 
     public GameObject canvas;
 
@@ -215,6 +217,15 @@ public class GUIController : MonoBehaviour
         if (!CanvasTextField.AnyFieldFocused)
         {
             HandleKeybinds();
+        }
+
+        // ModMenu is stupid and updates the setting every time a key is pressed in the input field,
+        // so reduce it to (hopefully) just one update since this is a relatively slow operation
+        if (savestatePageUpdateTime != null && Time.realtimeSinceStartup > savestatePageUpdateTime + SavestatePageUpdateDelay)
+        {
+            savestatePageUpdateTime = null;
+            SaveStateManager.LoadFileStates();
+            SaveStatesPanel.Instance?.PageCountChanged();
         }
 
         if (DebugMod.infiniteSilk

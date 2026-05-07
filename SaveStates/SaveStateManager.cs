@@ -20,19 +20,7 @@ public static class SaveStateManager
 
     internal static void Initialize()
     {
-        NumPages = DebugMod.settings.MaxSavePages;
-
         quickState = new SaveState();
-
-        for (int i = 0; i < NumPages; i++)
-        {
-            fileStates.Add(i, new SaveState[STATES_PER_PAGE]);
-            for (int j = 0; j < STATES_PER_PAGE; j++)
-            {
-                fileStates[i][j] = new SaveState();
-            }
-        }
-
         LoadFileStates();
     }
 
@@ -166,6 +154,22 @@ public static class SaveStateManager
     {
         try
         {
+            if (DebugMod.settings.MaxSavePages <= 0)
+            {
+                DebugMod.settings.MaxSavePages = 1;
+            }
+            NumPages = DebugMod.settings.MaxSavePages;
+
+            fileStates.Clear();
+            for (int i = 0; i < NumPages; i++)
+            {
+                fileStates.Add(i, new SaveState[STATES_PER_PAGE]);
+                for (int j = 0; j < STATES_PER_PAGE; j++)
+                {
+                    fileStates[i][j] = new SaveState();
+                }
+            }
+
             if (!Directory.Exists(saveStatesBaseDirectory))
             {
                 string legacyPath = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");

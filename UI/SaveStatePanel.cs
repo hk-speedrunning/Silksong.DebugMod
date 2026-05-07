@@ -339,6 +339,14 @@ public class SaveStatesPanel : CanvasPanel
 
         selectStateOperation = SelectOperation.None;
     }
+
+    internal void PageCountChanged()
+    {
+        if (currentPage >= SaveStateManager.NumPages)
+        {
+            currentPage = 0;
+        }
+    }
 }
 
 public enum SelectOperation
