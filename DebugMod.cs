@@ -416,6 +416,20 @@ public partial class DebugMod : BaseUnityPlugin
         return !playerInvincible;
     }
 
+    [HarmonyPatch(typeof(HeroController), nameof(HeroController.CanBeBarnacleGrabbed))]
+    [HarmonyPrefix]
+    private static bool HeroController_CanBeBarnacleGrabbed(ref bool __result)
+    {
+        // This function does not check for invincibility, unlike other types of grabs
+        if (playerInvincible)
+        {
+            __result = false;
+            return false;
+        }
+
+        return true;
+    }
+
     /// <summary>
     /// Add all public static methods on a type to the keybinds list. Methods must be decorated with the BindableMethod attribute.
     /// </summary>
