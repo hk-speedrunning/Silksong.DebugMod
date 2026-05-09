@@ -1,4 +1,5 @@
 using BepInEx.Configuration;
+using DebugMod.Helpers;
 using DebugMod.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -13,6 +14,7 @@ public class Settings
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
+    private static ConfigEntry<string> debugModLanguage;
 
     private static ConfigEntry<int> maxSavestatePages;
     private static ConfigEntry<bool> numpadForSavestates;
@@ -91,6 +93,20 @@ public class Settings
                 InfoPanel.Instance.Destroy();
                 InfoPanel.BuildPanel();
             }
+        };
+
+        debugModLanguage = config.Bind(
+            "General",
+            "DebugMod UI Language",
+            "en",
+            "Language used by DebugMod UI. Use 'en' to keep DebugMod in English while playing Silksong in Chinese for text speed, 'zh' for Simplified Chinese, or 'auto' to follow the game language."
+        );
+        debugModLanguage.Value = DebugModLanguage;
+        debugModLanguage.SettingChanged += (_, _) =>
+        {
+            DebugModLanguage = debugModLanguage.Value;
+            Utils.ClearLanguageCache();
+            GUIController.Instance?.BuildMenus();
         };
 
         maxSavestatePages = config.Bind(
@@ -175,4 +191,6 @@ public class Settings
     public bool AltInfoPanel = false;
 
     public bool ExpandedInfoPanel = false;
+
+    public string DebugModLanguage = "en";
 }

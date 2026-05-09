@@ -8,7 +8,7 @@ public class CanvasText : CanvasNode
     protected Text t;
 
     private string text;
-    private Font font = UICommon.arial;
+    private Font font = UICommon.GetUIFont();
     private int fontSize = UICommon.FontSize;
     private FontStyle fontStyle = FontStyle.Normal;
     private TextAnchor alignment = TextAnchor.UpperLeft;

@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -252,9 +251,10 @@ public partial class DebugMod : BaseUnityPlugin
         // Wait for load since there is no confirm option when switching language
         // and rebuiling every time is very slow
         // TODO: use Silksong.I18N language override instead, once that gets implemented
-        if (GUIController.Instance.language != Language.CurrentLanguage())
+        string debugModLanguage = Utils.CurrentDebugModLanguage();
+        if (GUIController.Instance.language != debugModLanguage)
         {
-            LogDebug($"Detected language change from {GUIController.Instance.language} to {Language.CurrentLanguage()}, rebuilding UI");
+            LogDebug($"Detected language change from {GUIController.Instance.language} to {debugModLanguage}, rebuilding UI");
             GUIController.Instance.BuildMenus();
         }
 

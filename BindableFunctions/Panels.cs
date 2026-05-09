@@ -1,4 +1,5 @@
-﻿using DebugMod.UI;
+﻿using DebugMod.Helpers;
+using DebugMod.UI;
 
 namespace DebugMod;
 
@@ -76,5 +77,12 @@ public static partial class BindableFunctions
         {
             DebugMod.LogConsole("Not showing cursor while unpaused");
         }
+    }
+
+    public static void CycleDebugModLanguage()
+    {
+        DebugMod.settings.DebugModLanguage = Utils.NextDebugModLanguage(DebugMod.settings.DebugModLanguage);
+        Utils.ClearLanguageCache();
+        GUIController.Instance.BuildMenus();
     }
 }

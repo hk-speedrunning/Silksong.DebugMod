@@ -10,6 +10,20 @@ namespace DebugMod.UI;
 
 public static class UICommon
 {
+    private static readonly string[] preferredUIFontNames =
+    [
+        "Microsoft YaHei",
+        "Microsoft YaHei UI",
+        "DengXian",
+        "SimHei",
+        "Noto Sans SC",
+        "Noto Sans CJK SC",
+        "Source Han Sans SC",
+        "WenQuanYi Zen Hei",
+        "PingFang SC",
+        "Heiti SC",
+    ];
+
     // Values that should not scale with the resolution
     public const int BORDER_THICKNESS = 1;
 
@@ -46,11 +60,14 @@ public static class UICommon
     public static Font trajanBold;
     public static Font trajanNormal;
     public static Font arial;
+    public static Font uiFont;
 
     public static readonly Dictionary<string, Texture2D> images = new();
 
     public static int ScaleWidth(int unscaled) => (int)(unscaled * Screen.width / 1920f);
     public static int ScaleHeight(int unscaled) => (int)(unscaled * Screen.height / 1080f);
+    public static Font GetUIFont() => uiFont ?? arial ?? trajanNormal ?? trajanBold;
+    public static Font GetHeaderFont() => GetUIFont();
 
     private static Color RGB(int r, int g, int b) => new(r / 255f, g / 255f, b / 255f);
     private static Color RGBA(int r, int g, int b, int a) => new(r / 255f, g / 255f, b / 255f, a / 255f);
@@ -133,9 +150,21 @@ public static class UICommon
             }
         }
 
-        arial?.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
+        try
+        {
+            uiFont = Font.CreateDynamicFontFromOSFont(preferredUIFontNames, FontSize);
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogWarn($"Failed to create UI font from OS fonts: {e.Message}");
+        }
+
+        (uiFont ?? arial)?.RequestCharactersInTexture(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? 是否快速槽位加载保存读入写入页面具线轴工具技能升级血条场景状态位置速度输入完成度敌人",
+            FontSize);
 
         if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
+        if (uiFont == null) DebugMod.LogWarn("Could not create a Chinese-capable UI font, falling back to game fonts");
 
         string[] resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 

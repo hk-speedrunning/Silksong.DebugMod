@@ -16,6 +16,8 @@ internal static class Utils
     internal static readonly string defaultTranslationSheet = $"Mods.{DebugMod.Id}";
     internal static string translationSheet = defaultTranslationSheet;
     internal static Dictionary<string, string> fallbackSheet;
+    internal static string fallbackLanguage;
+    internal static Dictionary<string, string> englishKeyLookup;
 
     internal static PlayMakerFSM FindFSM(string goName, string fsmName)
     {
@@ -52,28 +54,15 @@ internal static class Utils
 
     internal static string LanguageSheetFallback(string key)
     {
-        if (fallbackSheet == null)
+        string currentLanguage = CurrentDebugModLanguage();
+        if (fallbackSheet == null || fallbackLanguage != currentLanguage)
         {
-            try
+            fallbackLanguage = currentLanguage;
+            fallbackSheet = [];
+
+            foreach (string languageFile in FallbackLanguageFiles(currentLanguage))
             {
-                DebugMod.LogWarn("Entry not found in language sheet, manually loading English translations...");
-                DebugMod.LogWarn("(This can happen if Silksong.I18N is not installed.)");
-
-                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
-                Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(path));
-
-                fallbackSheet = [];
-                foreach (KeyValuePair<string, object> pair in dictionary)
-                {
-                    fallbackSheet.Add(pair.Key, (string)pair.Value);
-                }
-
-                DebugMod.Log($"Loaded English translations with {fallbackSheet.Count} keys");
-            }
-            catch (Exception e)
-            {
-                DebugMod.LogError($"Could not manually load translations: {e}");
-                fallbackSheet = [];
+                LoadFallbackFile(languageFile, fallbackSheet);
             }
         }
 
@@ -86,16 +75,159 @@ internal static class Utils
         return key;
     }
 
+    internal static void ClearLanguageCache()
+    {
+        fallbackSheet = null;
+        fallbackLanguage = null;
+    }
+
+    internal static string CurrentDebugModLanguage()
+    {
+        string language = NormalizeDebugModLanguage(DebugMod.settings?.DebugModLanguage);
+        return language == "auto" ? GameLanguageFile(Language.CurrentLanguage()) : language;
+    }
+
+    internal static string CurrentDebugModLanguageNameKey()
+    {
+        string language = NormalizeDebugModLanguage(DebugMod.settings?.DebugModLanguage);
+        if (language == "auto")
+        {
+            return "LANGUAGE_AUTO";
+        }
+
+        return CurrentDebugModLanguage() == "zh" ? "LANGUAGE_ZH" : "LANGUAGE_EN";
+    }
+
+    internal static string NextDebugModLanguage(string language)
+    {
+        return NormalizeDebugModLanguage(language) switch
+        {
+            "en" => "zh",
+            "zh" => "auto",
+            _ => "en"
+        };
+    }
+
+    internal static string NormalizeDebugModLanguage(string language)
+    {
+        language = (language ?? "en").Trim().ToLowerInvariant().Replace('_', '-');
+        return language switch
+        {
+            "" => "en",
+            "english" => "en",
+            "zh-cn" => "zh",
+            "zh-hans" => "zh",
+            "simplified-chinese" => "zh",
+            "chinese" => "zh",
+            "follow-game" => "auto",
+            "game" => "auto",
+            _ => language
+        };
+    }
+
+    private static string GameLanguageFile(LanguageCode language)
+    {
+        return language.ToString().ToLowerInvariant().Replace('_', '-');
+    }
+
+    private static IEnumerable<string> FallbackLanguageFiles(string languageFile)
+    {
+        languageFile = NormalizeDebugModLanguage(languageFile);
+
+        yield return "en";
+
+        if (languageFile == "en")
+        {
+            yield break;
+        }
+
+        yield return languageFile;
+
+        int separator = languageFile.IndexOf('-');
+        string baseLanguage = separator >= 0 ? languageFile[..separator] : languageFile;
+        if (baseLanguage != languageFile && baseLanguage != "en")
+        {
+            yield return baseLanguage;
+        }
+    }
+
+    private static void LoadFallbackFile(string languageFile, Dictionary<string, string> target)
+    {
+        try
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", $"{languageFile}.json");
+            if (!File.Exists(path))
+            {
+                DebugMod.LogWarn($"Bundled translation file not found: {path}");
+                return;
+            }
+
+            Dictionary<string, string> dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
+            if (dictionary == null)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<string, string> pair in dictionary)
+            {
+                target[pair.Key] = pair.Value;
+            }
+
+            DebugMod.Log($"Loaded {languageFile} translations with {dictionary.Count} keys");
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Could not manually load {languageFile} translations: {e}");
+        }
+    }
+
     internal static string Localize(string key)
     {
+        if (translationSheet == defaultTranslationSheet)
+        {
+            return LanguageSheetFallback(key);
+        }
+
         string result = Language.Get(key, translationSheet);
 
-        if (result == "" || result.StartsWith("#!#"))
+        if (result == "" || result == key || result.StartsWith("#!#"))
         {
             result = LanguageSheetFallback(key);
         }
 
         return result;
+    }
+
+    internal static string LocalizeAction(string actionName)
+    {
+        englishKeyLookup ??= LoadEnglishKeyLookup();
+        return englishKeyLookup.TryGetValue(actionName, out string key) ? Localize(key) : actionName;
+    }
+
+    private static Dictionary<string, string> LoadEnglishKeyLookup()
+    {
+        Dictionary<string, string> lookup = [];
+
+        try
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
+            Dictionary<string, string> dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
+            if (dictionary == null)
+            {
+                return lookup;
+            }
+
+            foreach (KeyValuePair<string, string> pair in dictionary)
+            {
+                lookup.TryAdd(pair.Value, pair.Key);
+            }
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Could not load action localization lookup: {e}");
+        }
+
+        return lookup;
     }
 #nullable enable
 

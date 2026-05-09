@@ -96,6 +96,8 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendToggleControl("GAMEPLAY_MODUI_TOGGLEINFOPANEL", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
         AppendToggleControl("GAMEPLAY_MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
+        AppendRow(1);
+        AppendLanguageControl();
 
         AppendSectionHeader("CATEGORY_TIME");
         AppendRow(1);
@@ -825,7 +827,7 @@ public class MainPanel : CanvasPanel
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
-                keybindName.Text = action.Name; // TODO: Localize this?
+                keybindName.Text = Utils.LocalizeAction(action.Name);
                 keybindName.Alignment = TextAnchor.MiddleLeft;
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
@@ -977,7 +979,7 @@ public class MainPanel : CanvasPanel
 
         CanvasText text = currentTab.AppendFixed(new CanvasText(name), SectionHeaderHeight);
         text.Text = Utils.Localize(name);
-        text.Font = UICommon.trajanBold;
+        text.Font = UICommon.GetHeaderFont();
         text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
 
@@ -1041,6 +1043,15 @@ public class MainPanel : CanvasPanel
     }
 
     private CanvasPanel AppendBasicControl(string name, Action effect) => AppendButtonControl(name, effect, null);
+
+    private CanvasPanel AppendLanguageControl()
+    {
+        return AppendButtonControl("GAMEPLAY_MODUI_DEBUGMODLANGUAGE", BindableFunctions.CycleDebugModLanguage, button =>
+        {
+            string languageName = Utils.Localize(Utils.CurrentDebugModLanguageNameKey());
+            button.Text.Text = string.Format(Utils.Localize("GAMEPLAY_MODUI_DEBUGMODLANGUAGEFORMAT"), languageName);
+        });
+    }
 
     // TODO: replace this with checkbox
     private CanvasPanel AppendToggleControl(string name, Func<bool> getter, Action effect)
