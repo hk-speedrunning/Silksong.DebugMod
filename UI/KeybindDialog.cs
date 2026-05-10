@@ -80,11 +80,11 @@ public class KeybindDialog : CanvasDialog
     {
         if (DebugMod.settings.binds.TryGetValue(action, out KeyCode keycode))
         {
-            return keycode == KeyCode.None ? Utils.Localize("KEYBIND_REBINDPROMPT") : keycode.ToString();
+            return keycode == KeyCode.None ? Localization.Get("KEYBIND_REBINDPROMPT") : keycode.ToString();
         }
         else
         {
-            return Utils.Localize("KEYBIND_UNBOUND");
+            return Localization.Get("KEYBIND_UNBOUND");
         }
     }
 

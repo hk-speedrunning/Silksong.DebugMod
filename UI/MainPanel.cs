@@ -304,7 +304,7 @@ public class MainPanel : CanvasPanel
         {
             CanvasButton button = controlRow.Add(new CanvasButton("Button"));
             button.Size = controlRow.Size;
-            button.Text.Text = Utils.Localize("ITEMS_ADD");
+            button.Text.Text = Localization.Get("ITEMS_ADD");
             button.OnClicked += BindableFunctions.Lifeblood;
         }
 
@@ -976,7 +976,7 @@ public class MainPanel : CanvasPanel
         currentTab.AppendPadding(SectionEndPadding);
 
         CanvasText text = currentTab.AppendFixed(new CanvasText(name), SectionHeaderHeight);
-        text.Text = Utils.Localize(name);
+        text.Text = Localization.Get(name);
         text.Font = UICommon.trajanBold;
         text.FontSize = SectionHeaderFontSize;
         text.Alignment = TextAnchor.MiddleCenter;
@@ -1011,7 +1011,7 @@ public class MainPanel : CanvasPanel
         control.Horizontal = true;
 
         CanvasButton button = control.AppendFlex(new CanvasButton("Button"));
-        button.Text.Text = Utils.Localize(name);
+        button.Text.Text = Localization.Get(name);
 
         button.OnClicked += () =>
         {
@@ -1063,7 +1063,7 @@ public class MainPanel : CanvasPanel
         control.InnerPadding = -UICommon.BORDER_THICKNESS;
 
         CanvasButton label = control.AppendFlex(new CanvasButton("Label"));
-        label.Text.Text = Utils.Localize(name);
+        label.Text.Text = Localization.Get(name);
         label.RemoveHoverBorder();
         label.OnUpdate += () => label.SetImage(Mathf.Approximately(getter(), defaultValue) ? UICommon.panelBG : UICommon.panelStrongBG);
 
@@ -1170,7 +1170,7 @@ public class MainPanel : CanvasPanel
         {
             CanvasText label = builder.AppendFixed(new CanvasText("Label"), ListingHeight * 2);
             label.Alignment = TextAnchor.MiddleCenter;
-            label.Text = Utils.Localize(name);
+            label.Text = Localization.Get(name);
         }
 
         builder.Build();
@@ -1210,7 +1210,7 @@ public class MainPanel : CanvasPanel
 
         CanvasText label = containerBuilder.AppendFixed(new CanvasText("Label"), labelHeight);
         label.Alignment = TextAnchor.MiddleCenter;
-        label.Text = Utils.Localize(name);
+        label.Text = Localization.Get(name);
 
         containerBuilder.AppendFlexPadding();
         containerBuilder.AppendPadding(UICommon.Margin); // Evens spacing between tile border and control row border
@@ -1299,7 +1299,7 @@ public class MainPanel : CanvasPanel
             CanvasButton button = Add(new CanvasButton($"{tab.Name}TabButton"));
             button.Size = new Vector2(tabButtonWidth, TabButtonHeight);
             button.SetImage(UICommon.panelBG);
-            button.Text.Text = Utils.Localize(tab.Name);
+            button.Text.Text = Localization.Get(tab.Name);
             button.OnClicked += () => DebugMod.settings.MainPanelCurrentTab = tab.Name;
             button.OnUpdate += () => button.Toggled = DebugMod.settings.MainPanelCurrentTab == tab.Name;
             tabButtons.Add(button);

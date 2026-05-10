@@ -74,8 +74,8 @@ public class InfoPanel : CanvasPanel
 
         AppendInfo("INFOPANEL_NEEDLEBASE", () => $"{PlayerData.instance.nailDamage} (n{PlayerData.instance.nailUpgrades})");
         AppendInfo("INFOPANEL_LASTDAMAGEAMOUNT", () => DebugMod.lastHit != null ?
-            $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : Utils.Localize("INFOPANEL_NONE"));
-        AppendInfo("INFOPANEL_LASTDAMAGETYPE", () => DebugMod.lastHit?.AttackType.ToString() ?? Utils.Localize("INFOPANEL_NONE"));
+            $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : Localization.Get("INFOPANEL_NONE"));
+        AppendInfo("INFOPANEL_LASTDAMAGETYPE", () => DebugMod.lastHit?.AttackType.ToString() ?? Localization.Get("INFOPANEL_NONE"));
         AppendInfo("INFOPANEL_LASTDAMAGESCALING", GetScaling);
 
         y += sectionBreak;
@@ -176,7 +176,7 @@ public class InfoPanel : CanvasPanel
             profilerText.Size = new Vector2(labelWidth + infoWidth, Size.y);
             profilerText.OnUpdate += () =>
             {
-                string info = Utils.Localize("INFOPANEL_PROFILER") + "\n";
+                string info = Localization.Get("INFOPANEL_PROFILER") + "\n";
 
                 Dictionary<string, float> times = Profiler.GetTimes();
                 foreach (KeyValuePair<string, float> pair in times)
@@ -198,7 +198,7 @@ public class InfoPanel : CanvasPanel
         labelText.LocalPosition = new Vector2(x, y);
         labelText.Size = new Vector2(labelWidth, ListingHeight);
         labelText.Alignment = TextAnchor.MiddleLeft;
-        labelText.Text = Utils.Localize(label);
+        labelText.Text = Localization.Get(label);
 
         // Info text is offset slightly downward so the different fonts (approximately) line up
         CanvasText infoText = Add(new CanvasText($"Info{counter}", overflow: HorizontalWrapMode.Overflow));
@@ -292,7 +292,7 @@ public class InfoPanel : CanvasPanel
 
     private static string GetScaling()
     {
-        if (DebugMod.lastScaling == null) return Utils.Localize("INFOPANEL_NONE");
+        if (DebugMod.lastScaling == null) return Localization.Get("INFOPANEL_NONE");
 
         string[] scaleMultipliers =
         [
@@ -318,12 +318,12 @@ public class InfoPanel : CanvasPanel
         return HeroController.instance.transitionState switch
         {
             HeroTransitionState.WAITING_TO_TRANSITION => string.Format(
-                Utils.Localize("INFOPANEL_TRANSITIONSTATE_DONEFORMAT"), DebugMod.GetLoadTime()),
-            HeroTransitionState.EXITING_SCENE => Utils.Localize("INFOPANEL_TRANSITIONSTATE_EXITING"),
-            HeroTransitionState.WAITING_TO_ENTER_LEVEL => Utils.Localize("INFOPANEL_TRANSITIONSTATE_WAITINGTOENTER"),
-            HeroTransitionState.ENTERING_SCENE => Utils.Localize("INFOPANEL_TRANSITIONSTATE_ENTERING"),
-            HeroTransitionState.DROPPING_DOWN => Utils.Localize("INFOPANEL_TRANSITIONSTATE_DROPPINGDOWN"),
-            _ => Utils.Localize("INFOPANEL_UNKNOWN")
+                Localization.Get("INFOPANEL_TRANSITIONSTATE_DONEFORMAT"), DebugMod.GetLoadTime()),
+            HeroTransitionState.EXITING_SCENE => Localization.Get("INFOPANEL_TRANSITIONSTATE_EXITING"),
+            HeroTransitionState.WAITING_TO_ENTER_LEVEL => Localization.Get("INFOPANEL_TRANSITIONSTATE_WAITINGTOENTER"),
+            HeroTransitionState.ENTERING_SCENE => Localization.Get("INFOPANEL_TRANSITIONSTATE_ENTERING"),
+            HeroTransitionState.DROPPING_DOWN => Localization.Get("INFOPANEL_TRANSITIONSTATE_DROPPINGDOWN"),
+            _ => Localization.Get("INFOPANEL_UNKNOWN")
         };
     }
 
@@ -331,14 +331,14 @@ public class InfoPanel : CanvasPanel
     {
         return DebugMod.RefCamera.mode switch
         {
-            CameraController.CameraMode.FROZEN => Utils.Localize("INFOPANEL_CAMERAMODE_FROZEN"),
-            CameraController.CameraMode.FOLLOWING => Utils.Localize("INFOPANEL_CAMERAMODE_FOLLOWING"),
-            CameraController.CameraMode.LOCKED => Utils.Localize("INFOPANEL_CAMERAMODE_LOCKED"),
-            CameraController.CameraMode.PANNING => Utils.Localize("INFOPANEL_CAMERAMODE_PANNING"),
-            CameraController.CameraMode.FADEOUT => Utils.Localize("INFOPANEL_CAMERAMODE_FADEOUT"),
-            CameraController.CameraMode.FADEIN => Utils.Localize("INFOPANEL_CAMERAMODE_FADEIN"),
-            CameraController.CameraMode.PREVIOUS => Utils.Localize("INFOPANEL_CAMERAMODE_PREVIOUS"),
-            _ => Utils.Localize("INFOPANEL_UNKNOWN")
+            CameraController.CameraMode.FROZEN => Localization.Get("INFOPANEL_CAMERAMODE_FROZEN"),
+            CameraController.CameraMode.FOLLOWING => Localization.Get("INFOPANEL_CAMERAMODE_FOLLOWING"),
+            CameraController.CameraMode.LOCKED => Localization.Get("INFOPANEL_CAMERAMODE_LOCKED"),
+            CameraController.CameraMode.PANNING => Localization.Get("INFOPANEL_CAMERAMODE_PANNING"),
+            CameraController.CameraMode.FADEOUT => Localization.Get("INFOPANEL_CAMERAMODE_FADEOUT"),
+            CameraController.CameraMode.FADEIN => Localization.Get("INFOPANEL_CAMERAMODE_FADEIN"),
+            CameraController.CameraMode.PREVIOUS => Localization.Get("INFOPANEL_CAMERAMODE_PREVIOUS"),
+            _ => Localization.Get("INFOPANEL_UNKNOWN")
         };
     }
 
