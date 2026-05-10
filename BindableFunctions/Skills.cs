@@ -2,7 +2,7 @@
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "ACTION_GIVEALLSKILLS", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_GIVEALLSKILLS", category = "CATEGORY_SKILLS")]
     public static void GiveAllSkills()
     {
         PlayerData.instance.hasDash = true;
@@ -27,7 +27,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Giving player all skills and upgrades");
     }
 
-    [BindableMethod(name = "ACTION_TOGGLESWIFTSTEP", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLESWIFTSTEP", category = "CATEGORY_SKILLS")]
     public static void ToggleSwiftStep()
     {
         if (!PlayerData.instance.hasDash)
@@ -42,7 +42,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLEDRIFTERSCLOAK", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLEDRIFTERSCLOAK", category = "CATEGORY_SKILLS")]
     public static void ToggleDriftersCloak()
     {
         if (!PlayerData.instance.hasBrolly)
@@ -57,7 +57,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLECLINGGRIP", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLECLINGGRIP", category = "CATEGORY_SKILLS")]
     public static void ToggleClingGrip()
     {
         if (!PlayerData.instance.hasWalljump)
@@ -72,7 +72,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLENEEDOLIN", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLENEEDOLIN", category = "CATEGORY_SKILLS")]
     public static void ToggleNeedolin()
     {
         if (!PlayerData.instance.hasNeedolin)
@@ -89,7 +89,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLECLAWLINE", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLECLAWLINE", category = "CATEGORY_SKILLS")]
     public static void ToggleClawline()
     {
         if (!PlayerData.instance.hasHarpoonDash)
@@ -104,7 +104,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLEFAYDOWNCLOAK", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLEFAYDOWNCLOAK", category = "CATEGORY_SKILLS")]
     public static void ToggleFaydownCloak()
     {
         if (!PlayerData.instance.hasDoubleJump)
@@ -119,7 +119,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLESILKSOAR", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLESILKSOAR", category = "CATEGORY_SKILLS")]
     public static void ToggleSilkSoar()
     {
         if (!PlayerData.instance.hasSuperJump)
@@ -134,7 +134,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLEBEASTLINGCALL", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLEBEASTLINGCALL", category = "CATEGORY_SKILLS")]
     public static void ToggleBeastlingCall()
     {
         if (!PlayerData.instance.hasNeedolin && !PlayerData.instance.UnlockedFastTravelTeleport)
@@ -155,7 +155,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLEELEGYOFTHEDEEP", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLEELEGYOFTHEDEEP", category = "CATEGORY_SKILLS")]
     public static void ToggleElegyOfTheDeep()
     {
         if (!PlayerData.instance.hasNeedolin && !PlayerData.instance.hasNeedolinMemoryPowerup)
@@ -176,7 +176,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TOGGLENEEDLESTRIKE", category = "CATEGORY_SKILLS")]
+    [BindableMethod(name = "SKILLS_TOGGLENEEDLESTRIKE", category = "CATEGORY_SKILLS")]
     public static void ToggleNeedleStrike()
     {
         if (!PlayerData.instance.hasChargeSlash)

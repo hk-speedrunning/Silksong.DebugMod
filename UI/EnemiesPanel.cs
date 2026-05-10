@@ -149,7 +149,7 @@ public class EnemiesPanel : CanvasPanel
         hpBarsButton.OnUpdate += () => hpBarsButton.Toggled = hpBars;
         hpBarsButton.OnClicked += BindableFunctions.ToggleEnemyHPBars;
 
-        UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["ACTION_TOGGLEHPBARS"]);
+        UICommon.AppendKeybindButton(footerBuilder, DebugMod.bindActions["ENEMIES_TOGGLEHPBARS"]);
     }
 
     private void DoUpdate()

@@ -122,13 +122,13 @@ public partial class DebugMod : BaseUnityPlugin
             settings.FirstRun = false;
 
             settings.binds = [];
-            settings.binds.Add("GAMEPLAY_MODUI_TOGGLEALLUI", KeyCode.F2);
+            settings.binds.Add("MODUI_TOGGLEALLUI", KeyCode.F2);
         }
 
-        if (!settings.binds.ContainsKey("GAMEPLAY_MODUI_TOGGLEALLUI"))
+        if (!settings.binds.ContainsKey("MODUI_TOGGLEALLUI"))
         {
             LogWarn("Toggle All UI was unset, resetting to the default value");
-            settings.binds.Add("GAMEPLAY_MODUI_TOGGLEALLUI", KeyCode.F2);
+            settings.binds.Add("MODUI_TOGGLEALLUI", KeyCode.F2);
         }
 
         int alphaStart = (int)(settings.NumPadForSaveStates ? KeyCode.Keypad0 : KeyCode.Alpha0);

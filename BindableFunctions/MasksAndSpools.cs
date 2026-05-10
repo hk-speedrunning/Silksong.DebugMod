@@ -5,7 +5,7 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "ACTION_GIVEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_GIVEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveMask()
     {
         if (PlayerData.instance.maxHealthBase < 10)
@@ -22,7 +22,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_GIVESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpool()
     {
         if (PlayerData.instance.silkMax < 18)
@@ -41,7 +41,7 @@ public static partial class BindableFunctions
         EventRegister.SendEvent("SPOOL UNBROKEN");
     }
 
-    [BindableMethod(name = "ACTION_TAKEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeAwayMask()
     {
         if (PlayerData.instance.maxHealthBase > 1)
@@ -59,7 +59,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TAKESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeAwaySpool()
     {
         if (PlayerData.instance.silkMax > 9)
@@ -99,7 +99,7 @@ public static partial class BindableFunctions
         return true;
     }
 
-    [BindableMethod(name = "ACTION_ADDHEALTH", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_ADDHEALTH", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void AddHealth()
     {
         if (CanModifyHealth(PlayerData.instance.health + 1))
@@ -111,7 +111,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_TAKEHEALTH", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKEHEALTH", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeHealth()
     {
         if (CanModifyHealth(PlayerData.instance.health - 1))
@@ -123,7 +123,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "ACTION_ADDSILK", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_ADDSILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void AddSilk()
     {
         HeroController.instance.AddSilk(1, true);
@@ -131,7 +131,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Added silk");
     }
 
-    [BindableMethod(name = "ACTION_TAKESILK", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKESILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeSilk()
     {
         HeroController.instance.TakeSilk(1);
@@ -139,7 +139,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Attempting to take silk");
     }
 
-    [BindableMethod(name = "ACTION_ADDLIFEBLOOD", category = "CATEGORY_MASKSANDSPOOLS")]
+    [BindableMethod(name = "MASKSANDSPOOLS_ADDLIFEBLOOD", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void Lifeblood()
     {
         bool wasInLifebloodState = HeroController.instance.IsInLifebloodState;

@@ -5,7 +5,7 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "GAMEPLAY_CHEATS_KILLALL", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_KILLALL", category = "CATEGORY_CHEATS")]
     public static void KillAll()
     {
         int ctr = 0;
@@ -21,35 +21,35 @@ public static partial class BindableFunctions
         DebugMod.LogConsole($"Killing {ctr} HealthManagers in scene");
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_INFINITEJUMP", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_INFINITEJUMP", category = "CATEGORY_CHEATS")]
     public static void ToggleInfiniteJump()
     {
         PlayerData.instance.infiniteAirJump = !PlayerData.instance.infiniteAirJump;
         DebugMod.LogConsole("Infinite Jump set to " + PlayerData.instance.infiniteAirJump.ToString().ToUpper());
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_INFINITESILK", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_INFINITESILK", category = "CATEGORY_CHEATS")]
     public static void ToggleInfiniteSilk()
     {
         DebugMod.infiniteSilk = !DebugMod.infiniteSilk;
         DebugMod.LogConsole("Infinite Silk set to " + DebugMod.infiniteSilk.ToString().ToUpper());
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_INFINITEHP", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_INFINITEHP", category = "CATEGORY_CHEATS")]
     public static void ToggleInfiniteHP()
     {
         DebugMod.infiniteHP = !DebugMod.infiniteHP;
         DebugMod.LogConsole("Infinite HP set to " + DebugMod.infiniteHP.ToString().ToUpper());
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_INFINITETOOLS", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_INFINITETOOLS", category = "CATEGORY_CHEATS")]
     public static void ToggleInfiniteTools()
     {
         DebugMod.infiniteTools = !DebugMod.infiniteTools;
         DebugMod.LogConsole("Infinite Tools set to " + DebugMod.infiniteTools.ToString().ToUpper());
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_INVINCIBILITY", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_INVINCIBILITY", category = "CATEGORY_CHEATS")]
     public static void ToggleInvincibility()
     {
         DebugMod.playerInvincible = !DebugMod.playerInvincible;
@@ -58,7 +58,7 @@ public static partial class BindableFunctions
         PlayerData.instance.isInvincible = DebugMod.playerInvincible;
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_NOCLIP", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_NOCLIP", category = "CATEGORY_CHEATS")]
     public static void ToggleNoclip()
     {
         DebugMod.noclip = !DebugMod.noclip;
@@ -75,7 +75,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "GAMEPLAY_CHEATS_TOGGLEHEROCOLLIDER", category = "CATEGORY_CHEATS")]
+    [BindableMethod(name = "CHEATS_TOGGLEHEROCOLLIDER", category = "CATEGORY_CHEATS")]
     public static void ToggleHeroCollider()
     {
         if (DebugMod.heroColliderDisabled)

@@ -24,7 +24,7 @@ public class Settings
         // We store all the settings ourselves
         config.SaveOnConfigSet = false;
 
-        string toggleAllUIName = "ACTION_TOGGLEALLUI";
+        string toggleAllUIName = "MODUI_TOGGLEALLUI";
 
         toggleAllUI = config.Bind(
             "General",

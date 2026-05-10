@@ -2,21 +2,21 @@
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "ACTION_GIVEROSARIES", category = "CATEGORY_CONSUMABLES")]
+    [BindableMethod(name = "CONSUMABLES_GIVEROSARIES", category = "CATEGORY_CONSUMABLES")]
     public static void GiveRosaries()
     {
         HeroController.instance.AddGeo(1000);
         DebugMod.LogConsole("Giving player 1000 rosaries");
     }
 
-    [BindableMethod(name = "ACTION_GIVESHELLSHARDS", category = "CATEGORY_CONSUMABLES")]
+    [BindableMethod(name = "CONSUMABLES_GIVESHELLSHARDS", category = "CATEGORY_CONSUMABLES")]
     public static void GiveShellShards()
     {
         HeroController.instance.AddShards(100);
         DebugMod.LogConsole("Giving player 100 shell shards");
     }
 
-    [BindableMethod(name = "ITEMS_CONSUMABLES_GIVEQUESTITEMS", category = "CATEGORY_CONSUMABLES")]
+    [BindableMethod(name = "CONSUMABLES_GIVEQUESTITEMS", category = "CATEGORY_CONSUMABLES")]
     public static void GiveQuestItems()
     {
         bool didSomething = false;

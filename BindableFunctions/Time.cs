@@ -9,16 +9,16 @@ public static partial class BindableFunctions
 {
     internal static int frameCounter = 0;
 
-    [BindableMethod(name = "ACTION_INCREASETIMESCALE", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_INCREASETIMESCALE", category = "CATEGORY_TIME")]
     public static void TimescaleUp() => TimeScale.CustomTimeScale = Mathf.Round(TimeScale.CustomTimeScale * 10 + 1f) / 10f;
 
-    [BindableMethod(name = "ACTION_DECREASETIMESCALE", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_DECREASETIMESCALE", category = "CATEGORY_TIME")]
     public static void TimescaleDown() => TimeScale.CustomTimeScale = Mathf.Round(TimeScale.CustomTimeScale * 10 - 1f) / 10f;
 
-    [BindableMethod(name = "ACTION_RESETTIMESCALE", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_RESETTIMESCALE", category = "CATEGORY_TIME")]
     public static void TimescaleReset() => TimeScale.CustomTimeScale = 1f;
 
-    [BindableMethod(name = "GAMEPLAY_TIME_FREEZEGAME", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_FREEZEGAME", category = "CATEGORY_TIME")]
     public static void PauseGameNoUI()
     {
         TimeScale.Frozen = !TimeScale.Frozen; // <- this will set timescale accordingly
@@ -34,7 +34,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "GAMEPLAY_TIME_FORCEPAUSE", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_FORCEPAUSE", category = "CATEGORY_TIME")]
     public static void ForcePause()
     {
         try
@@ -64,7 +64,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "GAMEPLAY_TIME_ADVANCEFRAME", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_ADVANCEFRAME", category = "CATEGORY_TIME")]
     public static void AdvanceFrame()
     {
         if (TimeScale.Frozen == false) TimeScale.Frozen = true;
@@ -79,7 +79,7 @@ public static partial class BindableFunctions
         TimeScale.Frozen = true;
     }
 
-    [BindableMethod(name = "GAMEPLAY_TIME_RESETFRAMECOUNTER", category = "CATEGORY_TIME")]
+    [BindableMethod(name = "TIME_RESETFRAMECOUNTER", category = "CATEGORY_TIME")]
     public static void ResetFrameCounter()
     {
         DebugMod.LogConsole($"Frame counter reset (was {frameCounter})");
