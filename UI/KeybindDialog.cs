@@ -54,7 +54,7 @@ public class KeybindDialog : CanvasDialog
 
         CanvasText nameText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
         nameText.Alignment = TextAnchor.MiddleCenter;
-        nameText.OnUpdate += () => nameText.Text = actions[index].Localize();
+        nameText.OnUpdate += () => nameText.Text = Localization.Get(actions[index].Name);
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
         row.Horizontal = true;
@@ -100,6 +100,13 @@ public class KeybindDialog : CanvasDialog
 
             float height = singlePanels[0].Size.y * actions.Length + UICommon.Margin * (actions.Length - 1);
             Get<CanvasImage>("Background").Size = new Vector2(PanelWidth, height);
+
+            // If the dialog was pushed back onto the screen, it might be too high up now
+            // (the calculation uses Size.y which might be larger than the visible size)
+            if (Mathf.Approximately(Position.y + Size.y + UICommon.Margin, Screen.height))
+            {
+                LocalPosition = new Vector2(LocalPosition.x, LocalPosition.y - Size.y + height);
+            }
         }
     }
 }

@@ -824,7 +824,7 @@ public class MainPanel : CanvasPanel
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
-                keybindName.Text = action.Localize();
+                keybindName.Text = Localization.Get(action.Name);
                 keybindName.Alignment = TextAnchor.MiddleLeft;
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));

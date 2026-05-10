@@ -63,7 +63,7 @@ public class SaveStatesPanel : CanvasPanel
                 SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             };
 
-            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Load Quickslot"]);
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["ACTION_QUICKSLOTLOAD"]);
 
             quickslot.AppendPadding(UICommon.Margin);
 
@@ -75,7 +75,7 @@ public class SaveStatesPanel : CanvasPanel
                 SaveStateManager.SetQuickState(SaveStateManager.SaveNewState());
             };
 
-            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["Save Quickslot"]);
+            UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["ACTION_QUICKSLOTSAVE"]);
 
             quickslot.AppendPadding(UICommon.Margin);
 
