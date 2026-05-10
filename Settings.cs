@@ -24,27 +24,29 @@ public class Settings
         // We store all the settings ourselves
         config.SaveOnConfigSet = false;
 
+        string toggleAllUIName = "ACTION_TOGGLEALLUI";
+
         toggleAllUI = config.Bind(
             "General",
             "Toggle All UI Keybind",
             KeyCode.F2,
             "Press this key to toggle DebugMod's UI."
         );
-        toggleAllUI.Value = binds.GetValueOrDefault("Toggle All UI", KeyCode.None);
+        toggleAllUI.Value = binds.GetValueOrDefault(toggleAllUIName, KeyCode.None);
         toggleAllUI.SettingChanged += (_, _) =>
         {
             if (toggleAllUI.Value == KeyCode.None)
             {
-                DebugMod.UpdateBind("Toggle All UI", null);
+                DebugMod.UpdateBind(toggleAllUIName, null);
             }
             else
             {
-                DebugMod.UpdateBind("Toggle All UI", toggleAllUI.Value);
+                DebugMod.UpdateBind(toggleAllUIName, toggleAllUI.Value);
             }
         };
         DebugMod.bindUpdated += (name, key) =>
         {
-            if (name == "Toggle All UI")
+            if (name == toggleAllUIName)
             {
                 toggleAllUI.Value = key ?? KeyCode.None;
             }

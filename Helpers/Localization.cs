@@ -9,43 +9,41 @@ namespace DebugMod.Helpers;
 
 internal static class Localization
 {
-    internal static readonly List<string> sheets = [$"Mods.{DebugMod.Id}"];
-    internal static Dictionary<string, string> fallbackSheet;
+    private static readonly List<string> sheets = [$"Mods.{DebugMod.Id}"];
+    private static Dictionary<string, string> fallbackSheet;
+    private static bool warnedEntryMissing;
 
-    internal static string LanguageSheetFallback(string key)
+    internal static Dictionary<string, string> FallbackSheet
     {
-        if (fallbackSheet == null)
+        get
         {
-            try
+            if (fallbackSheet == null)
             {
-                DebugMod.LogWarn("Entry not found in language sheet, manually loading English translations...");
-                DebugMod.LogWarn("(This can happen if Silksong.I18N is not installed.)");
-
-                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
-                Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(path));
-
-                fallbackSheet = [];
-                foreach (KeyValuePair<string, object> pair in dictionary)
-                {
-                    fallbackSheet.Add(pair.Key, (string)pair.Value);
-                }
-
-                DebugMod.Log($"Loaded English translations with {fallbackSheet.Count} keys");
+                LoadFallbackSheet();
             }
-            catch (Exception e)
+
+            return fallbackSheet;
+        }
+    }
+
+    private static void LoadFallbackSheet()
+    {
+        try
+        {
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
+            Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(path));
+
+            fallbackSheet = [];
+            foreach (KeyValuePair<string, object> pair in dictionary)
             {
-                DebugMod.LogError($"Could not manually load translations: {e}");
-                fallbackSheet = [];
+                fallbackSheet.Add(pair.Key, (string)pair.Value);
             }
         }
-
-        if (fallbackSheet.TryGetValue(key, out string value))
+        catch (Exception e)
         {
-            return value;
+            DebugMod.LogError($"Could not load fallback sheet: {e}");
+            fallbackSheet = [];
         }
-
-        DebugMod.LogError($"'{key}' is not a valid key in the language sheet.");
-        return key;
     }
 
     internal static string Get(string key)
@@ -59,7 +57,19 @@ internal static class Localization
             }
         }
 
-        return LanguageSheetFallback(key);
+        if (!warnedEntryMissing)
+        {
+            DebugMod.LogWarn("Entry not found in language sheet (is Silksong.I18N installed?)");
+            warnedEntryMissing = true;
+        }
+
+        if (FallbackSheet.TryGetValue(key, out string value))
+        {
+            return value;
+        }
+
+        DebugMod.LogError($"'{key}' is not a valid key in the language sheet.");
+        return key;
     }
 
     internal static void AddSheet(string sheet)

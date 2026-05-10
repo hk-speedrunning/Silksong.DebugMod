@@ -54,7 +54,7 @@ public class KeybindDialog : CanvasDialog
 
         CanvasText nameText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
         nameText.Alignment = TextAnchor.MiddleCenter;
-        nameText.OnUpdate += () => nameText.Text = actions[index].Name; // TODO: localize
+        nameText.OnUpdate += () => nameText.Text = actions[index].Localize();
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
         row.Horizontal = true;

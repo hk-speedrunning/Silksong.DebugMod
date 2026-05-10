@@ -5,7 +5,7 @@ namespace DebugMod;
 public static partial class BindableFunctions
 {
 
-    [BindableMethod(name = "Toggle HP Bars", category = "Enemies")]
+    [BindableMethod(name = "ACTION_TOGGLEHPBARS", category = "CATEGORY_ENEMIES")]
     public static void ToggleEnemyHPBars()
     {
         EnemiesPanel.hpBars = !EnemiesPanel.hpBars;

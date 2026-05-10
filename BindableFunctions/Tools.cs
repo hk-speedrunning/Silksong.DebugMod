@@ -5,7 +5,7 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "Unlock All Tools", category = "Tools")]
+    [BindableMethod(name = "ITEMS_TOOLS_UNLOCKALLTOOLS", category = "CATEGORY_TOOLS")]
     public static void UnlockAllTools()
     {
         HashSet<string> upgrades =
@@ -33,7 +33,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Unlocked all tools");
     }
 
-    [BindableMethod(name = "Unlock All Crests", category = "Tools")]
+    [BindableMethod(name = "ITEMS_CRESTS_UNLOCKALLCRESTS", category = "CATEGORY_TOOLS")]
     public static void UnlockAllCrests()
     {
         ToolItemManager.UnlockAllCrests();
@@ -59,14 +59,14 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Unlocked all crests");
     }
 
-    [BindableMethod(name = "Craft Tools", category = "Tools")]
+    [BindableMethod(name = "ITEMS_TOOLS_CRAFTTOOLS", category = "CATEGORY_TOOLS")]
     public static void CraftTools()
     {
         ToolItemManager.TryReplenishTools(true, ToolItemManager.ReplenishMethod.Bench);
         DebugMod.LogConsole("Crafted new tools");
     }
 
-    [BindableMethod(name = "Toggle Cursed", category = "Tools")]
+    [BindableMethod(name = "ITEMS_CRESTS_TOGGLECURSED", category = "CATEGORY_TOOLS")]
     public static void ToggleCursed()
     {
         if (Gameplay.CursedCrest.IsEquipped)
@@ -85,7 +85,7 @@ public static partial class BindableFunctions
         HeroController.instance.UpdateSilkCursed();
     }
 
-    [BindableMethod(name = "Toggle Cloakless", category = "Tools")]
+    [BindableMethod(name = "ITEMS_CRESTS_TOGGLECLOAKLESS", category = "CATEGORY_TOOLS")]
     public static void ToggleCloakless()
     {
         if (Gameplay.CloaklessCrest.IsEquipped)

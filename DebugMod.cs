@@ -83,7 +83,6 @@ public partial class DebugMod : BaseUnityPlugin
     public void Awake()
     {
         LoadSettings();
-        settings.InitMenu(Config);
 
         if (settings.LogUnityExceptions
             // If there's an existing unity log source, then messages are logged already
@@ -100,6 +99,8 @@ public partial class DebugMod : BaseUnityPlugin
             };
         }
 
+        settings.InitMenu(Config);
+
         bindActions.Clear();
         foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
         {
@@ -109,7 +110,7 @@ public partial class DebugMod : BaseUnityPlugin
             {
                 BindableMethod attr = (BindableMethod)attributes[0];
                 BindAction action = new(attr, method);
-                bindActions.Add(attr.name, action);
+                bindActions.Add(action.Name, action);
                 bindsByMethod.Add(method, action);
             }
         }
@@ -442,7 +443,7 @@ public partial class DebugMod : BaseUnityPlugin
             {
                 Log($"Adding new keybind: {attr.name} (from {BindableFunctionsClass.Name})");
                 BindAction action = new(attr, method);
-                bindActions.Add(attr.name, action);
+                bindActions.Add(action.Name, action);
                 bindsByMethod.Add(method, action);
             }
         }
@@ -465,7 +466,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
         Log($"Adding new keybind: {name}");
         BindAction action = new(name, category, allowLock, method);
-        bindActions.Add(name, action);
+        bindActions.Add(action.Name, action);
         bindsByMethod.Add(method.Method, action);
     }
 

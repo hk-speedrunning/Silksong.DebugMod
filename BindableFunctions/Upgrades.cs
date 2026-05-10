@@ -2,7 +2,7 @@
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "Increase Needle Damage", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_INCREASENEEDLEDAMAGE", category = "CATEGORY_UPGRADES")]
     public static void IncreaseNeedleDamage()
     {
         if (PlayerData.instance.nailDamage == 0)
@@ -25,7 +25,7 @@ public static partial class BindableFunctions
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
     }
 
-    [BindableMethod(name = "Decrease Needle Damage", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_DECREASENEEDLEDAMAGE", category = "CATEGORY_UPGRADES")]
     public static void DecreaseNeedleDamage()
     {
         if (PlayerData.instance.nailUpgrades == 0 || DebugMod.extraNailDamage > 0)
@@ -50,7 +50,7 @@ public static partial class BindableFunctions
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
     }
 
-    [BindableMethod(name = "Increment Crafting Kit", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_INCREMENTCRAFTINGKIT", category = "CATEGORY_UPGRADES")]
     public static void IncrementKits()
     {
         if (PlayerData.instance.ToolKitUpgrades < 4)
@@ -64,7 +64,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Decrement Crafting Kit", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_DECREMENTCRAFTINGKIT", category = "CATEGORY_UPGRADES")]
     public static void DecrementKits()
     {
         if (PlayerData.instance.ToolKitUpgrades > 0)
@@ -78,7 +78,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Increment Tool Pouch", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_INCREMENTTOOLPOUCH", category = "CATEGORY_UPGRADES")]
     public static void IncrementPouches()
     {
         if (PlayerData.instance.ToolPouchUpgrades < 4)
@@ -92,7 +92,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Decrement Tool Pouch", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_DECREMENTTOOLPOUCH", category = "CATEGORY_UPGRADES")]
     public static void DecrementPouches()
     {
         if (PlayerData.instance.ToolPouchUpgrades > 0)
@@ -106,14 +106,14 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Increment Silk Hearts", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_INCREMENTSILKHEARTS", category = "CATEGORY_UPGRADES")]
     public static void IncrementSilkHeart()
     {
         PlayerData.instance.silkRegenMax++;
         DebugMod.LogConsole($"Incremented silk hearts (now {PlayerData.instance.silkRegenMax})");
     }
 
-    [BindableMethod(name = "Decrement Silk Hearts", category = "Upgrades")]
+    [BindableMethod(name = "ACTION_DECREMENTSILKHEARTS", category = "CATEGORY_UPGRADES")]
     public static void DecrementSilkHeart()
     {
         if (PlayerData.instance.silkRegenMax > 0)
@@ -127,7 +127,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Unlock All Maps", category = "Upgrades")]
+    [BindableMethod(name = "ITEMS_UPGRADES_ALLMAPS", category = "CATEGORY_UPGRADES")]
     public static void UnlockAllMaps()
     {
         if (PlayerData.instance.HasAllMaps)
@@ -222,7 +222,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Unlocked all maps");
     }
 
-    [BindableMethod(name = "Unlock All Fast Travel", category = "Upgrades")]
+    [BindableMethod(name = "ITEMS_UPGRADES_ALLFASTTRAVEL", category = "CATEGORY_UPGRADES")]
     public static void UnlockAllFastTravel()
     {
         if (PlayerData.instance.UnlockedAqueductStation

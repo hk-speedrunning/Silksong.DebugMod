@@ -4,7 +4,7 @@ namespace DebugMod;
 
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "Toggle All UI", category = "Mod UI", allowLock = false)]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLEALLUI", category = "CATEGORY_MODUI", allowLock = false)]
     public static void ToggleAllPanels()
     {
         bool active = !(
@@ -22,32 +22,32 @@ public static partial class BindableFunctions
         DebugMod.settings.SaveStatePanelVisible = active;
     }
 
-    [BindableMethod(name = "Toggle Main Panel", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLEMAINPANEL", category = "CATEGORY_MODUI")]
     public static void ToggleMainPanel()
     {
         DebugMod.settings.MainPanelVisible = !DebugMod.settings.MainPanelVisible;
     }
 
 
-    [BindableMethod(name = "Toggle Enemies Panel", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLEENEMIESPANEL", category = "CATEGORY_MODUI")]
     public static void ToggleEnemiesPanel()
     {
         DebugMod.settings.EnemiesPanelVisible = !DebugMod.settings.EnemiesPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Console Panel", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLECONSOLEPANEL", category = "CATEGORY_MODUI")]
     public static void ToggleConsolePanel()
     {
         DebugMod.settings.ConsoleVisible = !DebugMod.settings.ConsoleVisible;
     }
 
-    [BindableMethod(name = "Toggle Info Panel", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLEINFOPANEL", category = "CATEGORY_MODUI")]
     public static void ToggleInfoPanel()
     {
         DebugMod.settings.InfoPanelVisible = !DebugMod.settings.InfoPanelVisible;
     }
 
-    [BindableMethod(name = "Toggle Savestates Panel", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_TOGGLESAVESTATESPANEL", category = "CATEGORY_MODUI")]
     public static void ToggleSaveStatePanel()
     {
         DebugMod.settings.SaveStatePanelVisible = !DebugMod.settings.SaveStatePanelVisible;
@@ -57,13 +57,13 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Expand/Collapse Savestates", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_EXPANDCOLLAPSESAVESTATES", category = "CATEGORY_MODUI")]
     public static void ToggleExpandedSaveStatePanel()
     {
         SaveStatesPanel.Instance.ToggleView();
     }
 
-    [BindableMethod(name = "Toggle Cursor", category = "Mod UI")]
+    [BindableMethod(name = "GAMEPLAY_MODUI_ALWAYSSHOWCURSOR", category = "CATEGORY_MODUI")]
     public static void ToggleAlwaysShowCursor()
     {
         DebugMod.settings.ShowCursorWhileUnpaused = !DebugMod.settings.ShowCursorWhileUnpaused;

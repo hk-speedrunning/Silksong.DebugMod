@@ -12,7 +12,7 @@ public static partial class BindableFunctions
     const float defaultFOV = 24f;
     const float defaultZoom = 1f;
 
-    [BindableMethod(name = "Show Hitboxes", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_TOGGLEHITBOXES", category = "CATEGORY_VISUAL")]
     public static void ShowHitboxes()
     {
         if (++DebugMod.settings.ShowHitBoxes > 2) DebugMod.settings.ShowHitBoxes = 0;
@@ -31,7 +31,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Force Camera Follow", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_FORCECAMERAFOLLOW", category = "CATEGORY_VISUAL")]
     public static void ForceCameraFollow()
     {
         if (!DebugMod.cameraFollow)
@@ -47,7 +47,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Preview Cocoon Position", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_PREVIEWCOCOONPOSITION", category = "CATEGORY_VISUAL")]
     public static void PreviewCocoonPosition()
     {
         CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
@@ -65,19 +65,19 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Toggle Vignette", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_TOGGLEVIGNETTE", category = "CATEGORY_VISUAL")]
     public static void ToggleVignette()
     {
         VisualMaskHelper.ToggleVignette();
     }
 
-    [BindableMethod(name = "Deactivate Visual Masks", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_DEACTIVATEVISUALMASKS", category = "CATEGORY_VISUAL")]
     public static void DoDeactivateVisualMasks()
     {
         VisualMaskHelper.ToggleAllMasks();
     }
 
-    [BindableMethod(name = "Toggle Hero Light", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_TOGGLEHEROLIGHT", category = "CATEGORY_VISUAL")]
     public static void ToggleHeroLight()
     {
         GameObject gameObject = DebugMod.RefKnight.transform.Find("HeroLight").gameObject;
@@ -96,7 +96,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Toggle HUD", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_TOGGLEHUD", category = "CATEGORY_VISUAL")]
     public static void ToggleHUD()
     {
         if (GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy)
@@ -120,15 +120,7 @@ public static partial class BindableFunctions
         return GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy;
     }
 
-    [BindableMethod(name = "Reset Camera Zoom", category = "Visual")]
-    public static void ResetZoom()
-    {
-        GameCameras.instance.tk2dCam.ZoomFactor = defaultZoom;
-        DebugMod.LBB.OnCameraFovChanged(defaultFOV);
-        DebugMod.LogConsole("Zoom level was reset");
-    }
-
-    [BindableMethod(name = "Zoom In", category = "Visual")]
+    [BindableMethod(name = "ACTION_ZOOMIN", category = "CATEGORY_VISUAL")]
     public static void ZoomIn()
     {
         GameCameras.instance.tk2dCam.zoomFactor *= 1.1f;
@@ -137,7 +129,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
-    [BindableMethod(name = "Zoom Out", category = "Visual")]
+    [BindableMethod(name = "ACTION_ZOOMOUT", category = "CATEGORY_VISUAL")]
     public static void ZoomOut()
     {
         GameCameras.instance.tk2dCam.zoomFactor *= 0.9f;
@@ -146,12 +138,20 @@ public static partial class BindableFunctions
         DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
+    [BindableMethod(name = "ACTION_RESETZOOM", category = "CATEGORY_VISUAL")]
+    public static void ResetZoom()
+    {
+        GameCameras.instance.tk2dCam.ZoomFactor = defaultZoom;
+        DebugMod.LBB.OnCameraFovChanged(defaultFOV);
+        DebugMod.LogConsole("Zoom level was reset");
+    }
+
     static float CalculateNewFOV(float baseFOV, float zoomFactor)
     {
         return 2 * Mathf.Atan(Mathf.Tan(baseFOV / 2 * Mathf.Deg2Rad) / zoomFactor) * Mathf.Rad2Deg;
     }
 
-    [BindableMethod(name = "Hide Hero", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_HIDEHERO", category = "CATEGORY_VISUAL")]
     public static void HideHero()
     {
         tk2dSprite component = DebugMod.RefKnight.GetComponent<tk2dSprite>();
@@ -170,7 +170,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Toggle Camera Shake", category = "Visual")]
+    [BindableMethod(name = "GAMEPLAY_VISUAL_TOGGLECAMERASHAKE", category = "CATEGORY_VISUAL")]
     public static void ToggleCameraShake()
     {
         bool newValue = !GameCameras.instance.cameraShakeFSM.enabled;

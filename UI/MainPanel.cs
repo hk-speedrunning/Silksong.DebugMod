@@ -28,20 +28,20 @@ public class MainPanel : CanvasPanel
 
     public static MainPanel Instance { get; private set; }
 
-    private static readonly List<(string, string)> keybindCategoryOrder =
+    private static readonly List<string> keybindCategoryOrder =
     [
-        ("Cheats", "CATEGORY_CHEATS"),
-        ("Savestates", "CATEGORY_SAVESTATES"),
-        ("Mod UI", "CATEGORY_MODUI"),
-        ("Time", "CATEGORY_TIME"),
-        ("Enemies", "CATEGORY_ENEMIES"),
-        ("Skills", "CATEGORY_SKILLS"),
-        ("Upgrades", "CATEGORY_UPGRADES"),
-        ("Tools", "CATEGORY_TOOLS"),
-        ("Consumables", "CATEGORY_CONSUMABLES"),
-        ("Masks & Spools", "CATEGORY_MASKSANDSPOOLS"),
-        ("Visual", "CATEGORY_VISUAL"),
-        ("Misc", "CATEGORY_MISC")
+        "CATEGORY_CHEATS",
+        "CATEGORY_SAVESTATES",
+        "CATEGORY_MODUI",
+        "CATEGORY_TIME",
+        "CATEGORY_ENEMIES",
+        "CATEGORY_SKILLS",
+        "CATEGORY_UPGRADES",
+        "CATEGORY_TOOLS",
+        "CATEGORY_CONSUMABLES",
+        "CATEGORY_MASKSANDSPOOLS",
+        "CATEGORY_VISUAL",
+        "CATEGORY_MISC"
     ];
 
     private readonly List<CanvasPanel> tabs = [];
@@ -797,7 +797,7 @@ public class MainPanel : CanvasPanel
         AddTab("MAINPANEL_TAB_KEYBINDS");
 
         Dictionary<string, List<BindAction>> keybindData = [];
-        foreach ((string category, _) in keybindCategoryOrder)
+        foreach (string category in keybindCategoryOrder)
         {
             keybindData.Add(category, []);
         }
@@ -806,16 +806,15 @@ public class MainPanel : CanvasPanel
         {
             if (!keybindData.ContainsKey(action.Category))
             {
-                // TODO: localization of custom categories
-                keybindCategoryOrder.Add((action.Category, action.Category));
+                keybindCategoryOrder.Add(action.Category);
                 keybindData.Add(action.Category, []);
             }
             keybindData[action.Category].Add(action);
         }
 
-        foreach ((string category, string displayName) in keybindCategoryOrder)
+        foreach (string category in keybindCategoryOrder)
         {
-            CanvasText header = AppendSectionHeader(displayName);
+            CanvasText header = AppendSectionHeader(category);
             header.FontSize = KeybindHeaderFontSize;
             header.Alignment = TextAnchor.MiddleLeft;
 
@@ -825,7 +824,7 @@ public class MainPanel : CanvasPanel
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
-                keybindName.Text = action.Name; // TODO: Localize this?
+                keybindName.Text = action.Localize();
                 keybindName.Alignment = TextAnchor.MiddleLeft;
 
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));

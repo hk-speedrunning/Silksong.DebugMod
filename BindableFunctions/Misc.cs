@@ -9,7 +9,7 @@ namespace DebugMod;
 [HarmonyPatch]
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "Toggle Act 3", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_TOGGLEACT3", category = "CATEGORY_MISC")]
     public static void ToggleAct3()
     {
         PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
@@ -17,7 +17,7 @@ public static partial class BindableFunctions
             + ", reload the scene to apply changes");
     }
 
-    [BindableMethod(name = "Set Hazard Respawn", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_SETHAZARDRESPAWN", category = "CATEGORY_MISC")]
     public static void SetHazardRespawn()
     {
         Vector3 manualRespawn = DebugMod.RefKnight.transform.position;
@@ -25,7 +25,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Manual respawn point on this map set to" + manualRespawn);
     }
 
-    [BindableMethod(name = "Hazard Respawn", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_HAZARDRESPAWN", category = "CATEGORY_MISC")]
     public static void Respawn()
     {
         if (GameManager.instance.IsGameplayScene() && !HeroController.instance.cState.dead &&
@@ -52,7 +52,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Damage Self", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_DAMAGESELF", category = "CATEGORY_MISC")]
     public static void SelfDamage()
     {
         if (PlayerData.instance.health <= 0)
@@ -82,7 +82,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Kill Self", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_KILLSELF", category = "CATEGORY_MISC")]
     public static void KillSelf()
     {
         if (!HeroController.instance.cState.dead && !HeroController.instance.cState.transitioning)
@@ -92,7 +92,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Break Cocoon", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_BREAKCOCOON", category = "CATEGORY_MISC")]
     public static void BreakCocoon()
     {
         HeroController.instance?.CocoonBroken();
@@ -101,21 +101,21 @@ public static partial class BindableFunctions
 
     private static string saveLevelStateAction;
 
-    [BindableMethod(name = "Reset Scene Data", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_RESETCURRENTSCENEDATA", category = "CATEGORY_MISC")]
     public static void ResetCurrentScene()
     {
         saveLevelStateAction = GameManager.instance.GetSceneNameString();
         DebugMod.LogConsole("Clearing scene data from this scene, reload the scene to apply changes");
     }
 
-    [BindableMethod(name = "Block Scene Data Changes", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_BLOCKSCENEDATACHANGES", category = "CATEGORY_MISC")]
     public static void BlockCurrentSceneChanges()
     {
         saveLevelStateAction = "block";
         DebugMod.LogConsole("Scene data changes made since entering this scene will not be saved");
     }
 
-    [BindableMethod(name = "Queue Walljump Interrupt", category = "Misc")]
+    [BindableMethod(name = "ACTION_QUEUEWALLJUMPINTERRUPT", category = "CATEGORY_MISC")]
     public static void QueueWallJump()
     {
         HeroController.instance.queuedWallJumpInterrupt = true;
@@ -148,14 +148,14 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "Lock Keybinds", category = "Misc")]
+    [BindableMethod(name = "GAMEPLAY_MISC_LOCKKEYBINDS", category = "CATEGORY_MISC")]
     public static void ToggleLockKeyBinds()
     {
         DebugMod.KeyBindLock = !DebugMod.KeyBindLock;
         DebugMod.LogConsole($"{(DebugMod.KeyBindLock ? "Removing" : "Adding")} the ability to use keybinds");
     }
 
-    [BindableMethod(name = "Reset Cheats", category = "Misc")]
+    [BindableMethod(name = "ACTION_RESETCHEATS", category = "CATEGORY_MISC")]
     public static void Reset()
     {
         var pd = PlayerData.instance;
