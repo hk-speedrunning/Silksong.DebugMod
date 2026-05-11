@@ -157,6 +157,7 @@ public static class VisualMaskHelper
         DebugMod.LogConsole($"Deactivated {ctr} masks" + (HeroController.instance.vignette.enabled ? " and toggling vignette off" : string.Empty));
 
         // The vignette counts as a visual mask :)
+        vignetteDisabled = true;
         DisableVignette(true);
 
         return ctr;

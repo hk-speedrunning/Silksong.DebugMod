@@ -9,9 +9,6 @@ namespace DebugMod;
 [HarmonyPatch]
 public static partial class BindableFunctions
 {
-    const float defaultFOV = 24f;
-    const float defaultZoom = 1f;
-
     [BindableMethod(name = "VISUAL_TOGGLEHITBOXES", category = "CATEGORY_VISUAL")]
     public static void ShowHitboxes()
     {
@@ -124,8 +121,7 @@ public static partial class BindableFunctions
     public static void ZoomIn()
     {
         GameCameras.instance.tk2dCam.zoomFactor *= 1.1f;
-        float currentFOV = CalculateNewFOV(defaultFOV, GameCameras.instance.tk2dCam.ZoomFactor);
-        DebugMod.LBB.OnCameraFovChanged(currentFOV);
+        ZoomHelper.UpdateCameraFOV();
         DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
@@ -133,22 +129,16 @@ public static partial class BindableFunctions
     public static void ZoomOut()
     {
         GameCameras.instance.tk2dCam.zoomFactor *= 0.9f;
-        float currentFOV = CalculateNewFOV(defaultFOV, GameCameras.instance.tk2dCam.ZoomFactor);
-        DebugMod.LBB.OnCameraFovChanged(currentFOV);
+        ZoomHelper.UpdateCameraFOV();
         DebugMod.LogConsole($"Zoom level increased to {GameCameras.instance.tk2dCam.ZoomFactor}");
     }
 
     [BindableMethod(name = "VISUAL_RESETZOOM", category = "CATEGORY_VISUAL")]
     public static void ResetZoom()
     {
-        GameCameras.instance.tk2dCam.ZoomFactor = defaultZoom;
-        DebugMod.LBB.OnCameraFovChanged(defaultFOV);
+        GameCameras.instance.tk2dCam.ZoomFactor = ZoomHelper.DEFAULT_ZOOM;
+        ZoomHelper.UpdateCameraFOV();
         DebugMod.LogConsole("Zoom level was reset");
-    }
-
-    static float CalculateNewFOV(float baseFOV, float zoomFactor)
-    {
-        return 2 * Mathf.Atan(Mathf.Tan(baseFOV / 2 * Mathf.Deg2Rad) / zoomFactor) * Mathf.Rad2Deg;
     }
 
     [BindableMethod(name = "VISUAL_HIDEHERO", category = "CATEGORY_VISUAL")]

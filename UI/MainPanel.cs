@@ -184,6 +184,7 @@ public class MainPanel : CanvasPanel
                 if (f > 0f)
                 {
                     GameCameras.instance.tk2dCam.zoomFactor = f;
+                    ZoomHelper.UpdateCameraFOV();
                 }
             },
             BindableFunctions.ZoomIn,
