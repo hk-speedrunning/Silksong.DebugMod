@@ -23,9 +23,9 @@ public class HitboxRender : MonoBehaviour
         public static readonly HitboxType Breakable = new(new Color(1f, 0.75f, 0.8f));       // pink
         public static readonly HitboxType Gate = new(new Color(0.0f, 0.0f, 0.5f));           // dark blue
         public static readonly HitboxType HazardRespawn = new(new Color(0.5f, 0.0f, 0.5f));  // purple
-        public static readonly HitboxType NonMantleRegion = new(new Color(1f, 0.4f, 0.5f));  // salmon
-        public static readonly HitboxType AlertRegion = new(new Color(0.7f, 0.7f, 0.7f));    // gray
-        public static readonly HitboxType Other = new(new Color(0.9f, 0.6f, 0.4f));          // orange
+        public static readonly HitboxType NonMantleRegion = new(new Color(0f, 0.3f, 0f));  // dark green
+        public static readonly HitboxType AlertRegion = new(new Color(0.9f, 0.6f, 0.4f));    // orange
+        public static readonly HitboxType Other = new(new Color(0.7f, 0.7f, 0.7f));    // gray
 
 
         public readonly Color Color;
@@ -86,7 +86,7 @@ public class HitboxRender : MonoBehaviour
         GameObject go = collider2D.gameObject;
         if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder")
             || collider2D.GetComponent<CogMultiHitter>()
-            || (collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>())
+            || (collider2D.GetComponent<TriggerEnterEvent>() && collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>()) // This is a messed up heuristic but it works for now. Workaround for sand worm regions.
             )
         {
             return HitboxType.Enemy;
