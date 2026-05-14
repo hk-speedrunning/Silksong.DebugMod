@@ -106,3 +106,5 @@ If Silksong.ModList is not installed, DebugMod will silently fail to load.
 - Initial Port, Core development & UI Overhaul - spacemonkeyy
 - Minor bugfixing, nitpicking & maintenance - Jamie
 - Additional fixes - Flib, cometcake575, Freya Holmér, Foxyrobo
+- Translation credits:
+  - Chinese: DUUScarlet & yuniBiscuit
