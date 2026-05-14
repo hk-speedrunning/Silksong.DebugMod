@@ -50,6 +50,7 @@
     <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.26.0" PrivateAssets="all" />
     <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
     <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
+    <PackageReference Include="Silksong.I18N" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

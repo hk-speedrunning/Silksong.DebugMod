@@ -1,6 +1,6 @@
-using BepInEx.Bootstrap;
 using DebugMod.Helpers;
 using DebugMod.Hitbox;
+using DebugMod.Interop;
 using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
@@ -124,13 +124,25 @@ public class GUIController : MonoBehaviour
             ConfirmDialog.BuildPanel();
 
             resolution = new Size(Screen.width, Screen.height);
-            language = Language.CurrentLanguage();
+            language = GetLanguage();
 
             DebugMod.LogDebug("UI built");
         }
         catch (Exception e)
         {
             DebugMod.LogError($"Error building UI: {e}");
+        }
+    }
+
+    private LanguageCode GetLanguage()
+    {
+        if (InteropHelper.IsModInstalled(InteropHelper.I18NModId, "1.1.0"))
+        {
+            return I18NInterop.GetLanguage();
+        }
+        else
+        {
+            return Language.CurrentLanguage();
         }
     }
 
@@ -154,7 +166,7 @@ public class GUIController : MonoBehaviour
         }
 
         // Move out of the way of benchwarp if it's installed
-        if (Chainloader.PluginInfos.ContainsKey("io.github.homothetyhk.benchwarp"))
+        if (InteropHelper.IsModInstalled(InteropHelper.BenchwarpModId))
         {
             // Could also check if the benchwarp GUI object is active, but there is no easy and fast way to find the object
             bool benchwarpActive = GameManager.instance.IsGamePaused() && !GameManager.instance.IsNonGameplayScene();
@@ -213,6 +225,13 @@ public class GUIController : MonoBehaviour
         }
 
         if (DebugMod.GetSceneName() == "Menu_Title") return;
+
+        LanguageCode currentLanguage = GetLanguage();
+        if (language != currentLanguage)
+        {
+            DebugMod.LogDebug($"Detected language change from {language} to {currentLanguage}, rebuilding UI");
+            BuildMenus();
+        }
 
         if (!CanvasTextField.AnyFieldFocused)
         {
