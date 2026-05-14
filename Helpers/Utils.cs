@@ -44,8 +44,9 @@ internal static class Utils
     // Rewritten ToolItemManager.AutoEquip() that works on any game version
     internal static void AutoEquipCrest(ToolCrest crest, bool removeTools)
     {
-        crest ??= ToolItemManager.GetCrestByName(PlayerData.instance.PreviousCrestID);
-        crest ??= ToolItemManager.GetAllCrests().FirstOrDefault(c => c.IsVisible);
+        if (!crest) crest = ToolItemManager.GetCrestByName(PlayerData.instance.PreviousCrestID);
+        if (!crest) crest = ToolItemManager.GetAllCrests().FirstOrDefault(c => c.IsVisible);
+        if (!crest) return;
 
         if (crest.name != PlayerData.instance.CurrentCrestID)
         {
