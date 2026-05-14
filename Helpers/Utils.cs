@@ -1,4 +1,5 @@
 using HutongGames.PlayMaker;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,6 +40,35 @@ internal static class Utils
 
         return go;
     }
+
+    // Rewritten ToolItemManager.AutoEquip() that works on any game version
+    internal static void AutoEquipCrest(ToolCrest crest, bool removeTools)
+    {
+        crest ??= ToolItemManager.GetCrestByName(PlayerData.instance.PreviousCrestID);
+        crest ??= ToolItemManager.GetAllCrests().FirstOrDefault(c => c.IsVisible);
+
+        if (crest.name != PlayerData.instance.CurrentCrestID)
+        {
+            PlayerData.instance.PreviousCrestID = PlayerData.instance.CurrentCrestID;
+        }
+
+        ToolItemManager.SetEquippedCrest(crest.name);
+        PlayerData.instance.IsCurrentCrestTemp = false;
+
+        if (removeTools)
+        {
+            List<string> equips = [];
+            for (int i = 0; i < crest.Slots.Length; i++)
+            {
+                equips.Add("");
+            }
+
+            ToolItemManager.SetEquippedTools(crest.name, equips);
+        }
+
+        ToolItemManager.SendEquippedChangedEvent();
+    }
+
 #nullable enable
 
 

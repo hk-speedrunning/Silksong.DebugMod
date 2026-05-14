@@ -324,7 +324,7 @@ public class MainPanel : CanvasPanel
                 if (PlayerData.instance.CurrentCrestID == crest.name)
                 {
                     // Choose an unlocked crest and equip it
-                    ToolItemManager.AutoEquip(null, false, false);
+                    Utils.AutoEquipCrest(null, false);
                 }
             }
             else
@@ -391,7 +391,7 @@ public class MainPanel : CanvasPanel
 
                 if (PlayerData.instance.CurrentCrestID.StartsWith("Hunter"))
                 {
-                    ToolItemManager.AutoEquip(next, false, false);
+                    Utils.AutoEquipCrest(next, false);
                 }
             },
             includeLabel: false,

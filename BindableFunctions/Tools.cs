@@ -1,4 +1,5 @@
-﻿using GlobalSettings;
+﻿using DebugMod.Helpers;
+using GlobalSettings;
 using System.Collections.Generic;
 
 namespace DebugMod;
@@ -73,12 +74,12 @@ public static partial class BindableFunctions
         {
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
-            ToolItemManager.AutoEquip(null, false, false);
+            Utils.AutoEquipCrest(null, false);
             DebugMod.LogConsole("Disabled cursed state");
         }
         else
         {
-            ToolItemManager.AutoEquip(Gameplay.CursedCrest, false, true);
+            Utils.AutoEquipCrest(Gameplay.CursedCrest, true);
             DebugMod.LogConsole("Enabled cursed state");
         }
 
@@ -92,12 +93,12 @@ public static partial class BindableFunctions
         {
             ToolItemManager.ResetPreviousCrest();
             PlayerData.instance.PreviousCrestID = "";
-            ToolItemManager.AutoEquip(null, false, false);
+            Utils.AutoEquipCrest(null, false);
             DebugMod.LogConsole("Disabled cloakless state");
         }
         else
         {
-            ToolItemManager.AutoEquip(Gameplay.CloaklessCrest, false, true);
+            Utils.AutoEquipCrest(Gameplay.CloaklessCrest, true);
             DebugMod.LogConsole("Enabled cloakless state");
         }
 
