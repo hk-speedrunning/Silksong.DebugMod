@@ -291,7 +291,7 @@ public partial class DebugMod : BaseUnityPlugin
         if (_loadingChar)
         {
             string playtime = TimeSpan.FromSeconds(PlayerData.instance.playTime).ToString(@"hh\:mm\:ss");
-            LogConsole($"DebugMod {Version} on Silksong {PlayerData.instance.version}");
+            LogConsole($"DebugMod {Version} on Silksong {Constants.GetConstantValue<string>("GAME_VERSION")}");
             LogConsole($"\tSave slot: {PlayerData.instance.profileID}");
             LogConsole($"\tProfile playtime: {playtime}");
             LogConsole($"\tCompletion: {PlayerData.instance.completionPercentage}%");
