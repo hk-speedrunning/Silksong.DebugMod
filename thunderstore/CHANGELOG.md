@@ -1,5 +1,38 @@
 ## Changelog
 
+### v1.0.0
+
+- Added optional dependencies on I18N & ModMenu.
+- Added Chinese localization (thanks @DUUScarlet & @yuniBiscuit!)
+- New Items Panel:
+  - Individual tool unlock buttons (including cycling between tool variants)
+  - Individual crests, including Hunter evolution level & cursed/cloakless states.
+  - Keys & items, including all unique keys & quill variants. if you wanted those.
+  - Consumables (rosary strings, shard bundles, simple keys, silkeaters & more!).
+  - Buttons to unlock all maps & fast travel
+- Adding Lifeblood now correctly enters plasmified state.
+- Zoom & Timescale now have reworked UI controls, with increment/decrement/reset as well as setting values directly.
+- Zoom now correctly scales blurred background objects (thanks @FoxyRobo!)
+- HP bars now have additional text for staggerable bosses, showing their stagger counter & whether stuns are blocked.
+- Invincibility now prevents Hornet from being grabbed by barnacles.
+- Savestates:
+    - Loading out of a memory no longer resets tool amounts incorrectly.
+    - Loading now correctly resets anklet & frost timers.
+    - States now store Hornet's facing direction for all newly created savestates.
+    - Fixed soft/hardlocks loading out of Silk Heart pickups, Cradle Elevator & other cutscenes.
+    - Loading during hazard respawns should now be less disorienting.
+    - Fixed inconsistent positioning when loading states in 4th Chorus' room.
+    - Added specific state overrides for Cogwork Dancers & Karmelita's arena waves, and wrong-direction screams in HHA.
+    - Added a Refresh File Slots function to load states without restarting the game.
+- Hitbox viewer improvements:
+    - The default "uncategorized" colour has been changed from orange to grey to reduce visual noise.
+    - Pink breakable objects now show in reduced mode only if they are pogoable.
+    - Multihit hazards & attacks were not being correctly detected; these are now correctly detected as Red.
+    - Elevators now correctly update hitbox types when their doors become NonSlider.
+    - New categories: Enemy Alert Regions (orange), Non Mantle regions (dark green)
+- Hopefully better compatibility with future versions of GlitchedDebug; we're looking into further improvements we can make to avoid breaking compatibility every few updates :)
+    - For now, glitched runners can reenable the slower glitch-safe savestate loading in Mod Settings as "Safe Savestate Loading".
+
 ### v0.3.6
 
 - Fixed a regression in v0.3.5 causing savestate loads to persist scene data.
