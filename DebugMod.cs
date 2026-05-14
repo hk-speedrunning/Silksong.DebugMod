@@ -125,6 +125,17 @@ public partial class DebugMod : BaseUnityPlugin
             settings.binds.Add("MODUI_TOGGLEALLUI", KeyCode.F2);
         }
 
+        // Keybinds are stored differently as of 1.0.0
+        foreach (BindAction action in bindActions.Values)
+        {
+            string englishName = Localization.FallbackSheet.GetValueOrDefault(action.Name);
+            if (englishName != null && settings.binds.TryGetValue(englishName, out KeyCode keycode))
+            {
+                settings.binds.TryAdd(action.Name, keycode);
+                settings.binds.Remove(englishName);
+            }
+        }
+
         if (!settings.binds.ContainsKey("MODUI_TOGGLEALLUI"))
         {
             LogWarn("Toggle All UI was unset, resetting to the default value");
@@ -199,6 +210,8 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void SaveSettings()
     {
+        settings.binds = new Dictionary<string, KeyCode>(settings.binds.OrderBy(pair => pair.Key));
+
         try
         {
             string path = Path.Combine(ModBaseDirectory, "Settings.json");
