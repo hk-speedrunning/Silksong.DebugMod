@@ -125,6 +125,7 @@ public class GUIController : MonoBehaviour
 
             resolution = new Size(Screen.width, Screen.height);
             language = GetLanguage();
+            benchwarpShifted = false;
 
             DebugMod.LogDebug("UI built");
         }
