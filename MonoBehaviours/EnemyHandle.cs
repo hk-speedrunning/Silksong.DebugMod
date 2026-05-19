@@ -41,7 +41,7 @@ public class EnemyHandle : MonoBehaviour
         hm = GetComponent<HealthManager>();
         sprite = GetComponent<tk2dSprite>();
         collider = GetComponent<BoxCollider2D>();
-        
+
         staggerFsm = gameObject.GetTemplatedFsm("stun_control");
 
         if (!EnemiesPanel.enemyPool.Contains(this))
@@ -82,19 +82,19 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar == null)
             {
-                barTexture = new Texture2D(BarWidth, 1);
-                Color[] colors = new Color[BarWidth];
-                Array.Fill(colors, Color.red.SetAlpha(0.5f));
-                barTexture.SetPixels(colors);
+                barTexture = new Texture2D(1, 1);
+                barTexture.SetPixel(0, 0, Color.red.SetAlpha(0.5f));
                 barTexture.Apply();
 
                 hpBar = new CanvasPanel($"{gameObject.name} HP Bar");
                 hpBar.Size = new Vector2(BarWidth, BarHeight);
 
-                CanvasImage background = UICommon.AddBackground(hpBar);
-                background.SetImage(barTexture);
-                background.Border.Size = hpBar.Size;
-                background.Border.Thickness = 2;
+                CanvasImage bar = hpBar.Add(new CanvasImage("Bar"));
+                bar.SetImage(barTexture);
+
+                CanvasBorder border = hpBar.Add(new CanvasBorder("Border"));
+                border.Size = hpBar.Size;
+                border.Thickness = 2;
 
                 CanvasText text = hpBar.Add(new CanvasText("HP"));
                 text.Size = hpBar.Size;
@@ -132,7 +132,7 @@ public class EnemyHandle : MonoBehaviour
             barPos.y = Screen.height - barPos.y - hpBar.Size.y;
 
             hpBar.LocalPosition = barPos;
-            hpBar.Get<CanvasImage>("Background").Size = new Vector2(BarWidth * Mathf.Clamp01(HP / (float)MaxHP), BarHeight);
+            hpBar.Get<CanvasImage>("Bar").Size = new Vector2(BarWidth * Mathf.Clamp01(HP / (float)MaxHP), BarHeight);
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
             if (staggerFsm != null)
@@ -148,7 +148,7 @@ public class EnemyHandle : MonoBehaviour
     private string GetStaggerText()
     {
         if (staggerFsm == null) return "Stun disabled"; // shouldn't be called
-        
+
         FsmInt max = staggerFsm.FsmVariables.GetFsmInt("Stun Hit Max");
         FsmFloat hits = staggerFsm.FsmVariables.GetFsmFloat("Hits Total");
 
@@ -159,16 +159,16 @@ public class EnemyHandle : MonoBehaviour
         {
             return $"{GetStunControlPrefix()} {hits.Value:0.##}/{max.Value + 0.1f}";
         }
-        
+
         // Unsure if this is even used here, but it might make sense for the eventual HK port _shrug_
         // prefixes combos as such: t.t (h.h/m)
 
         FsmInt comboMax = staggerFsm.FsmVariables.GetFsmInt("Stun Combo");
         FsmFloat comboHits = staggerFsm.FsmVariables.GetFsmFloat("Combo Counter");
         FsmFloat comboTime = staggerFsm.FsmVariables.GetFsmFloat("Combo Time");
-        
+
         string comboCount = staggerFsm.ActiveStateName == "In Combo" ? comboHits.Value.ToString() : "_";
-        
+
         Wait waitAction = inComboState.GetFirstActionOrDefault<Wait>()!;
         float time = comboTime.Value - waitAction.timer;
         return $"{GetStunControlPrefix()} {time:.0} ({comboCount}/{comboMax.Value}) {hits?.Value:0.##}/{max?.Value + 0.1f}";
@@ -177,10 +177,10 @@ public class EnemyHandle : MonoBehaviour
     private string GetStunControlPrefix()
     {
         if (staggerFsm == null) return ""; // shouldn't be called
-        
+
         return staggerFsm.ActiveStateName == "Stop" ? "NoStun" : "";
     }
-    
+
     [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.Start))]
     [HarmonyPostfix]
     private static void HealthManager_Start(HealthManager __instance)
