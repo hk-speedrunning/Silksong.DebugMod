@@ -387,6 +387,7 @@ public class SaveState
 
         yield return null;
 
+        PlayerData.instance.ResetCutsceneBools();
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
 
         // JsonUtility doesn't serialize null fields, so they won't get reset to null when loading.
