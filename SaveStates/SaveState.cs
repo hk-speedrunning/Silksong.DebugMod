@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
@@ -44,17 +43,16 @@ public class SaveState
         public SceneData.SerializableBoolData[] semiPersistentBools;
         public SceneData.SerializableIntData[] semiPersistentInts;
         public Vector3 savePos;
-        public FieldInfo cameraLockArea;
-        public object lockArea;
         public bool facingLeft; // for backwards compatibility
         public bool facingRight;
         public bool isKinematized;
         public HeroController.HunterUpgCrestStateInfo evoState;
         public bool isMaggoted;
+        public Dictionary<string, int> toolAmountsOverride;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
-        public Dictionary<string, object> customData;
+        public Dictionary<string, string> customData;
 
         internal SaveStateData() { }
 
@@ -63,17 +61,20 @@ public class SaveState
             saveStateIdentifier = _data.saveStateIdentifier;
             saveScene = _data.saveScene;
 
-            cameraLockArea = _data.cameraLockArea;
             savedPd = _data.savedPd;
             savedSd = _data.savedSd;
             savePos = _data.savePos;
-            lockArea = _data.lockArea;
             facingLeft = _data.facingLeft;
             facingRight = _data.facingRight;
             isKinematized = _data.isKinematized;
             evoState = _data.evoState;
             isMaggoted = _data.isMaggoted;
             roomSpecificOptions = _data.roomSpecificOptions;
+
+            if (_data.toolAmountsOverride is not null)
+            {
+                toolAmountsOverride = Utils.CopyDictionary(_data.toolAmountsOverride);
+            }
 
             if (_data.semiPersistentBools is not null)
             {
@@ -112,7 +113,7 @@ public class SaveState
 
             if (_data.customData != null)
             {
-                customData = new Dictionary<string, object>(_data.customData);
+                customData = Utils.CopyDictionary(_data.customData);
             }
         }
 
@@ -154,23 +155,22 @@ public class SaveState
         data.semiPersistentBools = SaveSemiPersistent(SceneData.instance.persistentBools);
         data.semiPersistentInts = SaveSemiPersistent(SceneData.instance.persistentInts);
         data.savePos = HeroController.instance.gameObject.transform.position;
-        data.cameraLockArea = (data.cameraLockArea ?? typeof(CameraController).GetField("currentLockArea", BindingFlags.Instance | BindingFlags.NonPublic));
-        data.lockArea = data.cameraLockArea.GetValue(GameManager.instance.cameraCtrl);
         data.facingLeft = !HeroController.instance.cState.facingRight;
         data.facingRight = HeroController.instance.cState.facingRight;
         data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
         data.evoState = HeroController.instance.hunterUpgState;
         data.isMaggoted = HeroController.instance.cState.isMaggoted;
 
+        // NonSerialized fields that need to be saved manually
+        data.toolAmountsOverride = Utils.CopyDictionary(PlayerData.instance.toolAmountsOverride);
+
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
         data.loadedSceneActiveScenes = scenes.Select(s => s.activeSceneWhenLoaded).ToArray();
 
-        if (OnSave != null)
-        {
-            data.customData = [];
-            OnSave.Invoke(this);
-        }
+        data.customData = [];
+
+        OnSave?.Invoke(this);
 
         DebugMod.LogConsole("Created savestate");
         return true;
@@ -387,13 +387,11 @@ public class SaveState
 
         yield return null;
 
-        PlayerData.instance.ResetCutsceneBools();
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
 
-        // JsonUtility doesn't serialize null fields, so they won't get reset to null when loading.
-        // But we don't want to reset every PlayerData field since then savestates lose forwards compatibility.
-        // This problem is rare enough to just handle it manually.
-        PlayerData.instance.toolAmountsOverride = data.savedPd.toolAmountsOverride;
+        // NonSerialized fields
+        PlayerData.instance.ResetCutsceneBools();
+        PlayerData.instance.toolAmountsOverride = Utils.CopyDictionary(data.toolAmountsOverride);
 
         SceneWatcher.LoadedSceneInfo[] sceneData = data
             .loadedScenes
@@ -433,11 +431,6 @@ public class SaveState
             }
 
             GameManager.instance.BeginScene();
-        }
-
-        if (data.lockArea != null)
-        {
-            GameManager.instance.cameraCtrl.LockToArea(data.lockArea as CameraLockArea);
         }
 
         HeroController.instance.CharmUpdate();

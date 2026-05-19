@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEngine;
+using System.Threading.Tasks;
 using static DebugMod.SaveStates.SaveState;
 
 namespace DebugMod.SaveStates;
@@ -85,7 +86,10 @@ public static class SaveStateManager
         try
         {
             string filePath = GetFilePath(page, index);
-            File.WriteAllText(filePath, JsonUtility.ToJson(data, prettyPrint: true));
+
+            // Don't use Unity's JsonUtility because it can't serialize dictionaries
+            // Json.NET is slower so use Task.Run() to not lag the game
+            Task.Run(() => File.WriteAllText(filePath, JsonConvert.SerializeObject(data, Formatting.Indented)));
         }
         catch (Exception ex)
         {
@@ -241,7 +245,7 @@ public static class SaveStateManager
             string filePath = GetFilePath(page, index);
             if (File.Exists(filePath))
             {
-                return JsonUtility.FromJson<SaveStateData>(File.ReadAllText(filePath));
+                return JsonConvert.DeserializeObject<SaveStateData>(File.ReadAllText(filePath));
             }
         }
         catch (Exception ex)
