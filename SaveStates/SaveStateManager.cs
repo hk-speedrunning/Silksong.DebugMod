@@ -221,7 +221,8 @@ public static class SaveStateManager
 
                         if (index >= 0 && index < STATES_PER_PAGE)
                         {
-                            fileStates[page][index].data = LoadFromFile(page, index);
+                            int fixedPage = page;
+                            Task.Run(() => fileStates[fixedPage][index].data = LoadFromFile(fixedPage, index));
                         }
                     }
                     catch (Exception ex)
@@ -245,6 +246,7 @@ public static class SaveStateManager
             string filePath = GetFilePath(page, index);
             if (File.Exists(filePath))
             {
+                // TODO: Use a faster serializer like JsonUtility so this doesn't lag
                 return JsonConvert.DeserializeObject<SaveStateData>(File.ReadAllText(filePath));
             }
         }
