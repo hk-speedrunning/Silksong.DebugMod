@@ -1,5 +1,15 @@
 ## Changelog
 
+### v1.0.1
+
+- BREAKING: changed the way savestates are serialized; memory savestates may need to be re-created to continue resetting tools correctly.
+- Changed the Thunderstore package to reduce confusion; installers now auto-download I18N & ModMenu for ease of use. Manual installations remain unaffected.
+- Fixed crest buttons not working on older patches.
+- Update translation immediately when changing I18N.LanguageOverride.
+- Fixed savestate panel moving offscreen when UI is rebuilt.
+- Fixed HP bars displaying incorrectly.
+
+
 ### v1.0.0
 
 - Added optional dependencies on I18N & ModMenu.
