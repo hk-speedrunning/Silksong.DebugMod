@@ -9,10 +9,9 @@ internal static class InteropHelper
     internal static string BenchwarpModId = "io.github.homothetyhk.benchwarp";
     internal static string I18NModId = "org.silksong-modding.i18n";
 
-    internal static T GetPlugin<T>(string id)
-        where T : BaseUnityPlugin
+    internal static BaseUnityPlugin GetPlugin(string id)
     {
-        return (T)Chainloader.PluginInfos[id].Instance;
+        return Chainloader.PluginInfos[id].Instance;
     }
 
     internal static bool IsModInstalled(string id)
