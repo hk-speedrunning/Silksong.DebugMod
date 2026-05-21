@@ -365,6 +365,16 @@ public class SaveState
         DialogueYesNoBox.ForceClose();
         QuestYesNoBox.ForceClose();
 
+        // Force end cutscenes to fix audio
+        foreach (CinematicPlayer cinematicPlayer in Object.FindObjectsByType<CinematicPlayer>(FindObjectsSortMode.None))
+        {
+            if (cinematicPlayer.videoType == CinematicPlayer.VideoType.InGameVideo)
+            {
+                cinematicPlayer.actCard = null;
+                yield return cinematicPlayer.FinishInGameVideo();
+            }
+        }
+
         EventRegister.SendEvent("REST AREA MUSIC STOP");
         ToolItemManager.SetIsInCutscene(false);
         CameraBlurPlane.Spacing = 0f;
