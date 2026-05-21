@@ -8,18 +8,6 @@ namespace DebugMod.Helpers;
 
 internal static class Utils
 {
-    internal static Dictionary<TKey, TValue> CopyDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
-    {
-        if (dictionary == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new Dictionary<TKey, TValue>(dictionary);
-        }
-    }
-
     internal static PlayMakerFSM FindFSM(string goName, string fsmName)
     {
         return PlayMakerFSM.FindFsmOnGameObject(GameObject.Find(goName), fsmName);

@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using UnityEngine;
 using static DebugMod.SaveStates.SaveState;
 
 namespace DebugMod.SaveStates;
@@ -85,11 +84,9 @@ public static class SaveStateManager
     {
         try
         {
+            data.BeforeSerialize();
             string filePath = GetFilePath(page, index);
-
-            // Don't use Unity's JsonUtility because it can't serialize dictionaries
-            // Json.NET is slower so use Task.Run() to not lag the game
-            Task.Run(() => File.WriteAllText(filePath, JsonConvert.SerializeObject(data, Formatting.Indented)));
+            File.WriteAllText(filePath, JsonUtility.ToJson(data, prettyPrint: true));
         }
         catch (Exception ex)
         {
@@ -221,8 +218,7 @@ public static class SaveStateManager
 
                         if (index >= 0 && index < STATES_PER_PAGE)
                         {
-                            int fixedPage = page;
-                            Task.Run(() => fileStates[fixedPage][index].data = LoadFromFile(fixedPage, index));
+                            fileStates[page][index].data = LoadFromFile(page, index);
                         }
                     }
                     catch (Exception ex)
@@ -246,8 +242,9 @@ public static class SaveStateManager
             string filePath = GetFilePath(page, index);
             if (File.Exists(filePath))
             {
-                // TODO: Use a faster serializer like JsonUtility so this doesn't lag
-                return JsonConvert.DeserializeObject<SaveStateData>(File.ReadAllText(filePath));
+                SaveStateData data = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(filePath));
+                data.AfterDeserialize();
+                return data;
             }
         }
         catch (Exception ex)

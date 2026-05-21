@@ -46,13 +46,14 @@ public class SaveState
         public bool facingLeft; // for backwards compatibility
         public bool facingRight;
         public bool isKinematized;
-        public HeroController.HunterUpgCrestStateInfo evoState;
+        public int evoState;
         public bool isMaggoted;
-        public Dictionary<string, int> toolAmountsOverride;
+        public List<string> toolAmountsOverride;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
-        public Dictionary<string, string> customData;
+        [SerializeField] private List<string> customDataList;
+        [NonSerialized] public Dictionary<string, string> customData;
 
         internal SaveStateData() { }
 
@@ -73,7 +74,7 @@ public class SaveState
 
             if (_data.toolAmountsOverride is not null)
             {
-                toolAmountsOverride = Utils.CopyDictionary(_data.toolAmountsOverride);
+                toolAmountsOverride = new List<string>(_data.toolAmountsOverride);
             }
 
             if (_data.semiPersistentBools is not null)
@@ -113,7 +114,30 @@ public class SaveState
 
             if (_data.customData != null)
             {
-                customData = Utils.CopyDictionary(_data.customData);
+                customData = new Dictionary<string, string>(_data.customData);
+            }
+        }
+
+        public void BeforeSerialize()
+        {
+            customData ??= [];
+            customDataList = [];
+
+            foreach (var kvp in customData)
+            {
+                customDataList.Add($"{kvp.Key}:::{kvp.Value}");
+            }
+        }
+
+        public void AfterDeserialize()
+        {
+            customDataList ??= [];
+            customData = [];
+
+            foreach (string item in customDataList)
+            {
+                string[] parts = item.Split(":::");
+                customData[parts[0]] = parts[1];
             }
         }
 
@@ -128,7 +152,6 @@ public class SaveState
 
     internal SaveState()
     {
-
         data = new SaveStateData();
     }
 
@@ -158,11 +181,18 @@ public class SaveState
         data.facingLeft = !HeroController.instance.cState.facingRight;
         data.facingRight = HeroController.instance.cState.facingRight;
         data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
-        data.evoState = HeroController.instance.hunterUpgState;
+        data.evoState = HeroController.instance.hunterUpgState.CurrentMeterHits;
         data.isMaggoted = HeroController.instance.cState.isMaggoted;
 
-        // NonSerialized fields that need to be saved manually
-        data.toolAmountsOverride = Utils.CopyDictionary(PlayerData.instance.toolAmountsOverride);
+        if (PlayerData.instance.toolAmountsOverride != null)
+        {
+            // Unity seems to refuse to serialize all sensible ways of storing this
+            data.toolAmountsOverride = [];
+            foreach (var kvp in PlayerData.instance.toolAmountsOverride)
+            {
+                data.toolAmountsOverride.Add($"{kvp.Key}:{kvp.Value}");
+            }
+        }
 
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
@@ -391,10 +421,21 @@ public class SaveState
         yield return null;
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
+        PlayerData.instance.ResetCutsceneBools(); // These fields are NonSerialized so aren't overwritten
 
-        // NonSerialized fields
-        PlayerData.instance.ResetCutsceneBools();
-        PlayerData.instance.toolAmountsOverride = Utils.CopyDictionary(data.toolAmountsOverride);
+        if (data.toolAmountsOverride != null)
+        {
+            PlayerData.instance.toolAmountsOverride = [];
+            foreach (string item in data.toolAmountsOverride)
+            {
+                string[] parts = item.Split(':');
+                PlayerData.instance.toolAmountsOverride[parts[0]] = int.Parse(parts[1]);
+            }
+        }
+        else
+        {
+            PlayerData.instance.toolAmountsOverride = null;
+        }
 
         SceneWatcher.LoadedSceneInfo[] sceneData = data
             .loadedScenes
@@ -619,7 +660,8 @@ public class SaveState
             HeroController.instance.SetIsMaggoted(true);
             Utils.FindFSM("Maggots", "Maggot Effect").SetState("Is Maggoted?");
         }
-        HeroController.instance.hunterUpgState = data.evoState;
+
+        HeroController.instance.hunterUpgState = new HeroController.HunterUpgCrestStateInfo { CurrentMeterHits = data.evoState };
 
         // Reset timers
         if (ToolItemManager.IsToolEquipped("Sprintmaster"))
