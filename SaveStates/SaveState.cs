@@ -220,6 +220,8 @@ public class SaveState
             yield break;
         }
 
+        DebugMod.LogDebug($"Loading savestate: {data.saveStateIdentifier}");
+
         System.Diagnostics.Stopwatch loadingStateTimer = new();
         loadingStateTimer.Start();
 
@@ -295,6 +297,7 @@ public class SaveState
     {
         //prevents silly things from happening
         TimeScale.Frozen = true;
+        Time.fixedDeltaTime = 0.02f;
 
         BeforeLoad?.Invoke(this);
 
