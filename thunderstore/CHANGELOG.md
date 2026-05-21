@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.0.2
+
+- Fixed v1.0.2 causing crashes on main menu with I18N missing.
+- Fixed loading savestates during Cross Stitch cutscene causing janky movement (due to rescaled FixedTime)
+- Fixed loading savestates during certain cutscenes causing audio to be ducked after following transitions.
+- Reverted change to savestate serializer; use other workarounds to fix fields broken by Unity's serializer.
+- Reduced lag when loading file slots using Refresh File Slots & on startup
+
 ### v1.0.1
 
 - BREAKING: changed the way savestates are serialized; memory savestates may need to be re-created to continue resetting tools correctly.
