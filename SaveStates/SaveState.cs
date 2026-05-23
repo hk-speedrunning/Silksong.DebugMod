@@ -417,11 +417,8 @@ public class SaveState
         // Prevent silk spool regen from continuing after (or during!) the load.
         HeroController.instance.ResetSilkRegen();
 
-        if (HeroController.instance.transform.parent)
-        {
-            HeroController.instance.transform.SetParent(null, true);
-            Object.DontDestroyOnLoad(HeroController.instance);
-        }
+        // Unparents player object and fixes interpolation
+        HeroController.instance.ElevatorReset();
 
         // If another scene load operation is in progress, loading the scene will hang
         yield return ScenePreloader.ForceEndPendingOperations();
