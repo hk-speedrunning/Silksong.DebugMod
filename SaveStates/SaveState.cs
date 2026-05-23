@@ -375,6 +375,29 @@ public class SaveState
             }
         }
 
+        // Fast-forwards mist void-out (would cause audio to break if normal preload fix was used instead)
+        foreach (SceneTransitionZoneBase zone in Object.FindObjectsByType<SceneTransitionZoneBase>(FindObjectsSortMode.None))
+        {
+            if (zone.respawnRoutine != null)
+            {
+                zone.StopCoroutine(zone.respawnRoutine);
+                GameManager.instance.BeginSceneTransition
+                (
+                    new DebugModSaveStateSceneLoadInfo
+                    {
+                        SceneName = zone.TargetScene,
+                        EntryGateName = zone.TargetGate,
+                        EntryDelay = 0f,
+                        PreventCameraFadeOut = true,
+                        WaitForSceneTransitionCameraFade = false,
+                        Visualization = GameManager.SceneLoadVisualizations.Default,
+                        AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
+                    }
+                );
+                yield return new WaitUntil(() => !GameManager.instance.isLoading);
+            }
+        }
+
         EventRegister.SendEvent("REST AREA MUSIC STOP");
         ToolItemManager.SetIsInCutscene(false);
         CameraBlurPlane.Spacing = 0f;
