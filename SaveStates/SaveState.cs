@@ -325,6 +325,8 @@ public class SaveState
 
     private IEnumerator LoadImpl()
     {
+        bool interruptedTransitionZone = false;
+
         //prevents silly things from happening
         TimeScale.Frozen = true;
         Time.fixedDeltaTime = 0.02f;
@@ -380,7 +382,9 @@ public class SaveState
         {
             if (zone.respawnRoutine != null)
             {
+                interruptedTransitionZone = true;
                 zone.StopCoroutine(zone.respawnRoutine);
+                zone.respawnRoutine = null;
                 GameManager.instance.BeginSceneTransition
                 (
                     new DebugModSaveStateSceneLoadInfo
@@ -395,6 +399,7 @@ public class SaveState
                     }
                 );
                 yield return new WaitUntil(() => !GameManager.instance.isLoading);
+                FinishInterruptedAudioTransition();
             }
         }
 
@@ -555,6 +560,11 @@ public class SaveState
         HeroController.instance.gameObject.layer = (int)PhysLayers.PLAYER;
         HeroController.instance.FinishedEnteringScene();
 
+        if (interruptedTransitionZone)
+        {
+            FinishInterruptedAudioTransition();
+        }
+
         RoomSpecific.BackwardsCompat(data.saveScene, ref data.roomSpecificOptions);
 
         if (!string.IsNullOrEmpty(data.roomSpecificOptions))
@@ -593,6 +603,14 @@ public class SaveState
 
         //set timescale back
         TimeScale.Frozen = false;
+    }
+
+    private static void FinishInterruptedAudioTransition()
+    {
+        AudioManager.BlockAudioChange = false;
+        AudioManager.CustomSceneManagerReady();
+        AudioManager.CustomSceneManagerSnapshotReady();
+        AudioManager.UnpauseActorSnapshot();
     }
 
     private static void RestoreSemiPersistent<TValue, TContainer>(TContainer[] list, SceneData.PersistentItemDataCollection<TValue, TContainer> collection)
