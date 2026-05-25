@@ -496,9 +496,25 @@ public class SaveState
             yield return new WaitUntil(() => GameManager.instance.IsInSceneTransition == false);
             for (int i = 1; i < sceneData.Length; i++)
             {
+                while (SceneManager.loadedSceneCount > i)
+                {
+                    // When we load a scene with a corresponding boss scene, we get more scenes than we expected. Unload the additional scenes.
+                    DebugMod.LogDebug($"{SceneManager.loadedSceneCount} scenes loaded, expected {i} ({SceneWatcher.LoadedScenes.Join(lsi => $"{lsi.name}")})");
+                    if (SceneWatcher.LoadedScenes[i].name == sceneData[i].name)
+                    {
+                        DebugMod.LogDebug($"Extra scene matches state, skipping load {i} ({sceneData[i].name})");
+                        i++;
+                        continue;
+                    }
+                    var unloadOp = SceneManager.UnloadSceneAsync((Scene)SceneWatcher.LoadedScenes[i].sceneObject!);
+                    yield return unloadOp;
+                }
+                if (i >= sceneData.Length) { continue; } // Ensure we skip final load
+                
                 SceneWatcher.LoadedSceneInfo.activeInfo = sceneData[i];
-                var loadop = Addressables.LoadSceneAsync($"Scenes/{sceneData[i].name}", LoadSceneMode.Additive);
-                yield return loadop;
+                DebugMod.LogDebug($"Loading  scene {i}: {sceneData[i].name}");
+                var loadOp = Addressables.LoadSceneAsync($"Scenes/{sceneData[i].name}", LoadSceneMode.Additive);
+                yield return loadOp;
                 SceneWatcher.LoadedSceneInfo.activeInfo = null;
                 GameManager.instance.RefreshTilemapInfo(sceneData[i].name);
                 GameManager.instance.cameraCtrl.SceneInit();

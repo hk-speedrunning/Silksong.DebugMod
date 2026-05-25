@@ -22,7 +22,7 @@ public static class SceneWatcher
         if (mode == LoadSceneMode.Single)
             scenes.Clear();
 
-        LoadedSceneInfo d = new LoadedSceneInfo(scene.name, scene.name);
+        LoadedSceneInfo d = new(scene);
         scenes.Add(d);
 
         if (checkSceneManager && Object.FindObjectsByType<CustomSceneManager>(FindObjectsSortMode.None)
@@ -74,11 +74,18 @@ public static class SceneWatcher
         public string activeSceneWhenLoaded { get; internal set; }
         public readonly int id;
 
+        public readonly Scene? sceneObject;
+
         public LoadedSceneInfo(string name, string activeSceneName)
         {
             this.name = name;
             this.id = counter++;
             this.activeSceneWhenLoaded = activeSceneName;
+        }
+
+        public LoadedSceneInfo(Scene scene) : this(scene.name, scene.name)
+        {
+            this.sceneObject = scene;
         }
 
         public void LoadHook()
