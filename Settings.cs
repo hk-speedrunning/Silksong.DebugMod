@@ -16,7 +16,6 @@ public class Settings
 
     private static ConfigEntry<int> maxSavestatePages;
     private static ConfigEntry<bool> numpadForSavestates;
-    private static ConfigEntry<bool> savestateGlitchFixes;
     private static ConfigEntry<bool> safeSavestateLoading;
 
     internal void InitMenu(ConfigFile config)
@@ -120,15 +119,6 @@ public class Settings
         numpadForSavestates.Value = NumPadForSaveStates;
         numpadForSavestates.SettingChanged += (_, _) => NumPadForSaveStates = numpadForSavestates.Value;
 
-        savestateGlitchFixes = config.Bind(
-            "Savestates",
-            "Savestate Glitch Fixes",
-            true,
-            "Automatically clear glitched state (such as forms of storage) when loading a savestate."
-        );
-        savestateGlitchFixes.Value = SaveStateGlitchFixes;
-        savestateGlitchFixes.SettingChanged += (_, _) => SaveStateGlitchFixes = savestateGlitchFixes.Value;
-
         safeSavestateLoading = config.Bind(
             "Savestates",
             "Safe Savestate Loading",
@@ -167,8 +157,6 @@ public class Settings
     public float NoClipSpeedModifier = 1f;
 
     public bool ShowCursorWhileUnpaused = false;
-
-    public bool SaveStateGlitchFixes = true;
 
     public bool SafeSaveStateLoading = false;
 

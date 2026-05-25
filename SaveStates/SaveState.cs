@@ -582,7 +582,7 @@ public class SaveState
         yield return RoomSpecific.DoGenericFixes(data.saveScene);
 
         //removes things like bench storage no clip float etc
-        if (DebugMod.settings.SaveStateGlitchFixes) SaveStateGlitchFixes();
+        SaveStateGlitchFixes();
 
         AfterLoad?.Invoke(this);
 
