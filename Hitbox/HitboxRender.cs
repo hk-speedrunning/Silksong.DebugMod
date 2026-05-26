@@ -76,7 +76,7 @@ public class HitboxRender : MonoBehaviour
             HitboxType type = CategorizeHitbox(collider2D);
             if (type != null)
             {
-                colliders.Add(collider2D, type);
+                colliders.TryAdd(collider2D, type);
             }
         }
     }
