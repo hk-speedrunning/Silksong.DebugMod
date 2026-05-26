@@ -330,6 +330,9 @@ public class SaveState
         Time.fixedDeltaTime = 0.02f;
 
         BeforeLoad?.Invoke(this);
+        
+        // Dupe loading only works with safe loading enabled, so force it on if asked by extension to dupe.
+        var loadSafely = DebugMod.settings.SafeSaveStateLoading || LoadDuped;
 
         //called here because this needs to be done here
         if (DebugMod.savestateFixes)
@@ -391,7 +394,7 @@ public class SaveState
                         PreventCameraFadeOut = true,
                         WaitForSceneTransitionCameraFade = false,
                         Visualization = GameManager.SceneLoadVisualizations.Default,
-                        AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
+                        AlwaysUnloadUnusedAssets = loadSafely
                     }
                 );
                 yield return new WaitUntil(() => !GameManager.instance.isLoading);
@@ -433,7 +436,7 @@ public class SaveState
         GameManager.instance.entryGateName = "dreamGate";
         GameManager.instance.startedOnThisScene = true;
 
-        if (DebugMod.settings.SafeSaveStateLoading)
+        if (loadSafely)
         {
             string dummyScene = "Demo Start";
             Addressables.LoadSceneAsync($"Scenes/{dummyScene}");
@@ -485,7 +488,7 @@ public class SaveState
                 PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
                 Visualization = GameManager.SceneLoadVisualizations.Default,
-                AlwaysUnloadUnusedAssets = DebugMod.settings.SafeSaveStateLoading
+                AlwaysUnloadUnusedAssets = loadSafely
             }
         );
 
@@ -534,7 +537,7 @@ public class SaveState
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
         EventRegister.SendEvent("END FOLLOWERS INSTANT");
 
-        if (DebugMod.settings.SafeSaveStateLoading)
+        if (loadSafely)
         {
             // Probably just being paranoid?
             yield return null;
