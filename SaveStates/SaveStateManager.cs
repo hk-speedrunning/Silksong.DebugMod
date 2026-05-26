@@ -115,14 +115,20 @@ public static class SaveStateManager
     #region loading
     public static void LoadState(SaveState state)
     {
-        if (state.IsSet() && LoadTest())
+        bool shouldLoad = LoadLockout();
+        if (!shouldLoad && DebugMod.overrideLoadLockout)
+        {
+            DebugMod.LogConsole($"Overriding savestate lockout");
+            shouldLoad = true;
+        }
+        
+        if (state.IsSet() && shouldLoad)
         {
             GameManager.instance.StartCoroutine(state.Load());
         }
     }
 
-    private static bool LoadTest()
-    {
+    private static bool LoadLockout() {
         if (PlayerDeathWatcher.playerDead)
         {
             DebugMod.LogConsole("Savestates cannot be loaded when dead");
@@ -137,15 +143,8 @@ public static class SaveStateManager
 
         if (loadingSavestate != null)
         {
-            if (DebugMod.overrideLoadLockout)
-            {
-                DebugMod.LogConsole("Overriding savestate lockout");
-            }
-            else
-            {
-                DebugMod.LogConsole("Cannot load a savestate while another savestate is loading");
-                return false;
-            }
+            DebugMod.LogConsole("Cannot load a savestate while another savestate is loading");
+            return false;
         }
 
         return true;
