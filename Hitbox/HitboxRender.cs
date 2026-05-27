@@ -1,5 +1,6 @@
 ﻿using DebugMod.Helpers;
 using GlobalEnums;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,6 @@ namespace DebugMod.Hitbox;
 
 public class HitboxRender : MonoBehaviour
 {
-    // ReSharper disable once StructCanBeMadeReadOnly
     private class HitboxType
     {
         public static int count = 0;
@@ -41,9 +41,12 @@ public class HitboxRender : MonoBehaviour
     private readonly Dictionary<Collider2D, HitboxType> colliders = [];
 
     public static float LineWidth => Math.Max(0.7f, Screen.width / 960f * GameCameras.instance.tk2dCam.ZoomFactor);
+    
+    public static HitboxRender Instance { get; private set; }
 
     private void Start()
     {
+        Instance = this;
         foreach (Collider2D col in Resources.FindObjectsOfTypeAll<Collider2D>())
         {
             TryAddHitboxes(col);
@@ -155,8 +158,12 @@ public class HitboxRender : MonoBehaviour
         var keys = colliders.Keys.ToArray();
         foreach (Collider2D key in keys)
         {
-            if (!key) continue;
-
+            if (!key)
+            {
+                colliders.Remove(key);
+                continue;
+            }
+            
             HitboxType value = colliders[key];
             if (value == HitboxType.Terrain || value == HitboxType.NonSliderTerrain)
             {
@@ -179,6 +186,8 @@ public class HitboxRender : MonoBehaviour
         for (int i = array.Length - 1; i >= 0; i--)
         {
             var pair = array[i];
+            if (pair.Key.gameObject.layer == (int)PhysLayers.IGNORE_RAYCAST) continue;
+            
             DrawHitbox(camera, pair.Key, pair.Value, lineWidth);
         }
     }
@@ -284,5 +293,17 @@ public class HitboxRender : MonoBehaviour
             Vector2 pointB = LocalToScreenPoint(camera, collider2D, points[i + 1]);
             Drawing.DrawLine(pointA, pointB, hitboxType.Color, lineWidth, true);
         }
+    }
+}
+
+[HarmonyPatch]
+public static class HitboxPatches
+{
+    [HarmonyPatch(typeof(DamageHero), nameof(DamageHero.OnEnable))]
+    [HarmonyPrefix]
+    public static void DamageHeroEnabled(DamageHero __instance)
+    {
+        if (!HitboxRender.Instance) return;
+        HitboxRender.Instance.UpdateHitbox(__instance.gameObject);
     }
 }
