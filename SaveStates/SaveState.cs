@@ -335,8 +335,7 @@ public class SaveState
         var loadSafely = DebugMod.settings.SafeSaveStateLoading || LoadDuped;
 
         //called here because this needs to be done here
-        if (DebugMod.savestateFixes)
-        {
+        #region glitchfixes
             //TODO: Cleaner way to do this? Also get it to actually work
             //prevent hazard respawning
             if (DebugMod.CurrentHazardCoro != null)
@@ -359,7 +358,7 @@ public class SaveState
 
             // Reset problematic cstates
             HeroController.instance.cState.hazardDeath = false;
-        }
+        #endregion
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");

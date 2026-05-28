@@ -69,7 +69,6 @@ public partial class DebugMod : BaseUnityPlugin
     public static bool heroColliderDisabled;
     public static bool cameraFollow;
     public static bool KeyBindLock;
-    public static bool savestateFixes = true;
     public static bool overrideLoadLockout = false;
     public static int extraNailDamage;
     public static bool forcePaused;
