@@ -145,7 +145,7 @@ public class HitboxRender : MonoBehaviour
 
     private void OnGUI()
     {
-        if (Event.current?.type != EventType.Repaint || Camera.main == null || GameManager.instance == null || GameManager.instance.isPaused)
+        if (Event.current?.type != EventType.Repaint || Camera.main == null || GameManager.instance == null)
         {
             return;
         }
