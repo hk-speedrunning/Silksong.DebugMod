@@ -1,5 +1,15 @@
 ## Changelog
 
+### v1.0.3
+
+- Fixed audio issue loading savestates during mist voidout on Release Patch.
+- Fixed jagged movement after loading state while on an elevator.
+- Improvements for glitched runners:
+    - Show hitboxes while paused.
+    - Load dupes with boss scenes reliably.
+    - Remove SaveStateGlitchFixes setting; see GlitchDebug v0.2.0.
+    - Override Savestate Lockout now bypasses all load protections, allowing loading during hardlocks.
+
 ### v1.0.2
 
 - Fixed v1.0.2 causing crashes on main menu with I18N missing.
