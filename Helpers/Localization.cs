@@ -74,6 +74,6 @@ internal static class Localization
 
     internal static void AddSheet(string sheet)
     {
-        sheets.Insert(0, sheet);
+        sheets.Add(sheet);
     }
 }
