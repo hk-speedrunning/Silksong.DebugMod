@@ -67,6 +67,21 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Crafted new tools");
     }
 
+    [BindableMethod(name = "CRESTS_FREEEQUIP", category = "CATEGORY_TOOLS")]
+    public static void FreeEquip()
+    {
+        if (DebugMod.freeEquip)
+        {
+            DebugMod.freeEquip = false;
+            DebugMod.LogConsole("You can no longer change crests and tools away from a bench");
+        }
+        else
+        {
+            DebugMod.freeEquip = true;
+            DebugMod.LogConsole("You can now change crests and tools away from a bench");
+        }
+    }
+
     [BindableMethod(name = "CRESTS_TOGGLECURSED", category = "CATEGORY_TOOLS")]
     public static void ToggleCursed()
     {

@@ -72,6 +72,7 @@ public partial class DebugMod : BaseUnityPlugin
     public static bool overrideLoadLockout = false;
     public static int extraNailDamage;
     public static bool forcePaused;
+    public static bool freeEquip;
 
     public static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
@@ -437,6 +438,31 @@ public partial class DebugMod : BaseUnityPlugin
         }
 
         return true;
+    }
+
+    [HarmonyPatch(typeof(InventoryItemToolManager), nameof(InventoryItemToolManager.CanChangeEquips), [])]
+    [HarmonyPrefix]
+    private static bool InventoryItemToolManager_CanChangeEquips(ref bool __result)
+    {
+        if (freeEquip)
+        {
+            __result = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetIsInventoryOpen))]
+    [HarmonyPrefix]
+    private static void GameManager_SetIsInventoryOpen(bool value)
+    {
+        if (freeEquip && !value)
+        {
+            // Would normally be called by the inventory FSM,
+            // but the action is skipped if atBench is false
+            ToolItemManager.SendEquippedChangedEvent();
+        }
     }
 
     /// <summary>

@@ -310,8 +310,9 @@ public class MainPanel : CanvasPanel
         }
 
         AppendSectionHeader("CATEGORY_CRESTS");
-        AppendRow(1);
+        AppendRow(1, 1);
         AppendBasicControl("CRESTS_UNLOCKALLCRESTS", BindableFunctions.UnlockAllCrests);
+        AppendToggleControl("CRESTS_FREEEQUIP", () => DebugMod.freeEquip, BindableFunctions.FreeEquip);
 
         static void ToggleCrest(ToolCrest crest)
         {
