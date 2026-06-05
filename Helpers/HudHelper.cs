@@ -47,6 +47,7 @@ public static class HudHelper
     public static void RefreshSpool()
     {
         SilkSpool spool = GameCameras.instance.silkSpool;
+        spool.usingSilk.RemoveAll(x => x != SilkSpool.SilkUsingFlags.Normal);
         spool.DrawSpool();
 
         Transform parent = spool.activeParent.transform.parent;
