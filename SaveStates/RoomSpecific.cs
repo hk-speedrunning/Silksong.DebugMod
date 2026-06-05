@@ -238,27 +238,34 @@ public static class RoomSpecific
     {
         int stage = int.Parse(options);
 
-        GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
-
-        string childName = stage switch
+        IEnumerator Routine()
         {
-            0 => "Entry Scenery",
-            1 => "Deepnest Scenery",
-            2 => "Hive Scenery",
-            3 => "End Scenery",
-            _ => null
-        };
+            yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
-        sceneryRoot.FindChildObject(childName).SetActive(true);
+            GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
 
-        static void FadeOutFadeGroup(string path)
-        {
-            Utils.FindGameObjectByPath(path).GetComponent<NestedFadeGroup>().FadeTo(0f, 0f);
+            string childName = stage switch
+            {
+                0 => "Entry Scenery",
+                1 => "Deepnest Scenery",
+                2 => "Hive Scenery",
+                3 => "End Scenery",
+                _ => null
+            };
+
+            sceneryRoot.FindChildObject(childName).SetActive(true);
+
+            static void FadeOutFadeGroup(string path)
+            {
+                Utils.FindGameObjectByPath(path).GetComponent<NestedFadeGroup>().FadeTo(0f, 0f);
+            }
+
+            FadeOutFadeGroup("Memory Control/Weaver_Memory_Lighting");
+            FadeOutFadeGroup("Memory Control/Beast_Memory_Lighting");
+            FadeOutFadeGroup("Memory Control/Hive_Memory_Lighting");
         }
 
-        FadeOutFadeGroup("Memory Control/Weaver_Memory_Lighting");
-        FadeOutFadeGroup("Memory Control/Beast_Memory_Lighting");
-        FadeOutFadeGroup("Memory Control/Hive_Memory_Lighting");
+        DebugMod.instance.StartCoroutine(Routine());
     }
 
     internal static void DoBattleScene(string scene, string objectName, int wave)
