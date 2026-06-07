@@ -55,11 +55,9 @@ For any questions or bug reports, please join the [Modding Discord](https://disc
 
 ## Upcoming Features
 
-- Reorganising the Items tab with more granular control over tools & many additional items.
 - Hollow Knight DebugMod parity: as of right now this needs;
   - Respawn Boss (+ Arena). _This may already be covered by scene data but it's possible bosses have varying implementations reliant on PlayerData._
   - Give specific keys/items & bellway / ventrica access
-  - Grant melodies & hearts
 - Expose some way for extensions to present their own UI in Main Panel. Currently they are only appended to the Keybinds list.
 
 ## Installation

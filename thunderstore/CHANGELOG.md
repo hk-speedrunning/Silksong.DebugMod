@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.0.4
+
+- Added `Equip Anywhere` button to Items panel, enabling changing loadouts away from a bench.
+- Fixed Red Memory savestates with Safe Savestate Loading disabled.
+- Fixed visual glitch when loading states while held by a Wraith.
+- Fixed unlocalised text when rebinding keys.
+- Toggle All UI now reveals all even if individual panels are already shown.
+
 ### v1.0.3
 
 - Fixed audio issue loading savestates during mist voidout on Release Patch.
