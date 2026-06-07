@@ -399,7 +399,7 @@ public class GUIController : MonoBehaviour
                             {
                                 DebugMod.UpdateBind(bindName, null);
                                 i--;
-                                DebugMod.LogWarn($"The key {Enum.GetName(typeof(KeyCode), kc)} has been unbound from {bindName}");
+                                DebugMod.LogWarn($"The key {Enum.GetName(typeof(KeyCode), kc)} has been unbound from {Localization.Get(bindName)}");
                             }
                             else if (kc != KeyCode.Escape)
                             {
