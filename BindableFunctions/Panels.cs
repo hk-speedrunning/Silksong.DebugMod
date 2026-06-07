@@ -8,10 +8,10 @@ public static partial class BindableFunctions
     public static void ToggleAllPanels()
     {
         bool active = !(
-            DebugMod.settings.InfoPanelVisible ||
-            DebugMod.settings.EnemiesPanelVisible ||
-            DebugMod.settings.MainPanelVisible ||
-            DebugMod.settings.ConsoleVisible ||
+            DebugMod.settings.InfoPanelVisible &&
+            DebugMod.settings.EnemiesPanelVisible &&
+            DebugMod.settings.MainPanelVisible &&
+            DebugMod.settings.ConsoleVisible &&
             DebugMod.settings.SaveStatePanelVisible
             );
 
