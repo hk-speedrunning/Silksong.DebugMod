@@ -384,7 +384,7 @@ public class GUIController : MonoBehaviour
                                 {
                                     if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
                                     {
-                                        DebugMod.LogConsole($"{kc} already bound to {method}, press again to confirm");
+                                        DebugMod.LogConsole($"{kc} already bound to {Localization.Get(method)}, press again to confirm");
                                         keyWarning = kc;
                                     }
                                 }
