@@ -314,13 +314,6 @@ public class SaveState
                 break;
             }
         }
-
-        // EVEN MORE redundancy (Bone_East_08 is evil)
-        if (DebugMod.GetSceneName().StartsWith("Bone_East_08"))
-        {
-            HeroController.instance.transform.position = data.savePos;
-            DebugMod.noclipPos = HeroController.instance.transform.position;
-        }
     }
 
     private IEnumerator LoadImpl()
@@ -332,7 +325,8 @@ public class SaveState
         BeforeLoad?.Invoke(this);
 
         // Dupe loading only works with safe loading enabled, so force it on if asked by extension to dupe.
-        var loadSafely = DebugMod.settings.SafeSaveStateLoading || LoadDuped;
+        var loadSafely = DebugMod.settings.SafeSaveStateLoading || LoadDuped
+            || data.saveScene == "Bone_East_08"; // Also, this scene is just evil
 
         //called here because this needs to be done here
         #region glitchfixes

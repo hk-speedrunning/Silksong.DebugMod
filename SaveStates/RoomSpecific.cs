@@ -324,10 +324,6 @@ public static class RoomSpecific
     {
         switch (scene)
         {
-            case "Bone_East_08":
-                // Wait for lava platforms to load in so we don't fall through them
-                yield return new WaitUntil(() => !GameManager.instance.isLoading);
-                break;
             case "Hang_04":
             case "Hang_06":
                 // Hornet always turns towards this object when the roar plays, but for HHA its position
@@ -344,6 +340,8 @@ public static class RoomSpecific
                 GameManager.instance.StartCoroutine(MemoryFixes());
                 break;
         }
+
+        yield break;
     }
 
     internal static IEnumerator MemoryFixes()
