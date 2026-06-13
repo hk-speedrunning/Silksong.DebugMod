@@ -1,4 +1,5 @@
-﻿using DebugMod.UI.Canvas;
+﻿using DebugMod.Helpers;
+using DebugMod.UI.Canvas;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -117,23 +118,21 @@ public static class UICommon
     {
         foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
         {
-            if (f != null && f.name == "TrajanPro-Bold")
-            {
-                trajanBold = f;
-            }
+            if (!f) continue;
 
-            if (f != null && f.name == "TrajanPro-Regular")
+            switch (f.name)
             {
-                trajanNormal = f;
-            }
-
-            if (f != null && f.name == "ARIAL")
-            {
-                arial = f;
+                case "TrajanPro-Bold":
+                    trajanBold = f;
+                    break;
+                case "TrajanPro-Regular":
+                    trajanNormal = f;
+                    break;
+                case "ARIAL":
+                    arial = f;
+                    break;
             }
         }
-
-        arial?.RequestCharactersInTexture("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ", 13);
 
         if (trajanBold == null || trajanNormal == null || arial == null) DebugMod.LogError("Could not find game fonts");
 
@@ -169,5 +168,7 @@ public static class UICommon
                 }
             }
         }
+
+        Trolls.OnResourcesLoaded();
     }
 }
