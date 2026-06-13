@@ -330,34 +330,36 @@ public class SaveState
         Time.fixedDeltaTime = 0.02f;
 
         BeforeLoad?.Invoke(this);
-        
+
         // Dupe loading only works with safe loading enabled, so force it on if asked by extension to dupe.
         var loadSafely = DebugMod.settings.SafeSaveStateLoading || LoadDuped;
 
         //called here because this needs to be done here
         #region glitchfixes
-            //TODO: Cleaner way to do this? Also get it to actually work
-            //prevent hazard respawning
-            if (DebugMod.CurrentHazardCoro != null)
-                HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
-            if (DebugMod.CurrentInvulnCoro != null)
-                HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
-            if (HeroController.instance.hazardRespawnRoutine != null)
-                HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
-            DebugMod.CurrentHazardCoro = null;
-            DebugMod.CurrentInvulnCoro = null;
-            HeroController.instance.hazardRespawnRoutine = null;
-            HeroController.instance.hazardInvulnRoutine = null;
+        //TODO: Cleaner way to do this? Also get it to actually work
+        //prevent hazard respawning
+        if (DebugMod.CurrentHazardCoro != null)
+            HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
+        if (DebugMod.CurrentInvulnCoro != null)
+            HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
+        if (HeroController.instance.hazardRespawnRoutine != null)
+            HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
+        DebugMod.CurrentHazardCoro = null;
+        DebugMod.CurrentInvulnCoro = null;
+        HeroController.instance.hazardRespawnRoutine = null;
+        HeroController.instance.hazardInvulnRoutine = null;
 
-            //fixes knockback storage
-            HeroController.instance.CancelDamageRecoil();
+        //fixes knockback storage
+        HeroController.instance.CancelDamageRecoil();
 
-            //ends hazard respawn animation
-            var invPulse = HeroController.instance.GetComponent<InvulnerablePulse>();
-            invPulse.StopInvulnerablePulse();
+        //ends hazard respawn animation
+        var invPulse = HeroController.instance.GetComponent<InvulnerablePulse>();
+        invPulse.StopInvulnerablePulse();
 
-            // Reset problematic cstates
-            HeroController.instance.cState.hazardDeath = false;
+        // Reset problematic cstates
+        HeroController.instance.cState.hazardDeath = false;
+
+        EventRegister.SendEvent("HAZARD RESPAWN RESET");
         #endregion
 
         // Close inventory and dialogue
@@ -512,7 +514,7 @@ public class SaveState
                     yield return unloadOp;
                 }
                 if (i >= sceneData.Length) { continue; } // Ensure we skip final load
-                
+
                 SceneWatcher.LoadedSceneInfo.activeInfo = sceneData[i];
                 DebugMod.LogDebug($"Loading  scene {i}: {sceneData[i].name}");
                 var loadOp = Addressables.LoadSceneAsync($"Scenes/{sceneData[i].name}", LoadSceneMode.Additive);
