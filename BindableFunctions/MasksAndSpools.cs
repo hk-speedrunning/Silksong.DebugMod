@@ -76,6 +76,62 @@ public static partial class BindableFunctions
         }
     }
 
+    [BindableMethod(name = "MASKSANDSPOOLS_GIVEMASKSHARD", category = "CATEGORY_MASKSANDSPOOLS")]
+    public static void GiveMaskShard()
+    {
+        if (PlayerData.instance.heartPieces < 3)
+        {
+            PlayerData.instance.heartPieces++;
+            DebugMod.LogConsole($"Added mask shard (now {PlayerData.instance.heartPieces})");
+        }
+        else
+        {
+            DebugMod.LogConsole("Already have max number of mask shards");
+        }
+    }
+
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKEMASKSHARD", category = "CATEGORY_MASKSANDSPOOLS")]
+    public static void TakeMaskShard()
+    {
+        if (PlayerData.instance.heartPieces > 0)
+        {
+            PlayerData.instance.heartPieces--;
+            DebugMod.LogConsole($"Removed mask shard (now {PlayerData.instance.heartPieces})");
+        }
+        else
+        {
+            DebugMod.LogConsole("Already at 0 mask shards");
+        }
+    }
+
+    [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
+    public static void GiveSpoolFragment()
+    {
+        if (PlayerData.instance.silkSpoolParts < 1)
+        {
+            PlayerData.instance.silkSpoolParts++;
+            DebugMod.LogConsole("Added spool fragment");
+        }
+        else
+        {
+            DebugMod.LogConsole("Already have a spool fragment");
+        }
+    }
+
+    [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
+    public static void TakeSpoolFragment()
+    {
+        if (PlayerData.instance.silkSpoolParts > 0)
+        {
+            PlayerData.instance.silkSpoolParts--;
+            DebugMod.LogConsole("Removed spool fragment");
+        }
+        else
+        {
+            DebugMod.LogConsole("Already at 0 spool fragments");
+        }
+    }
+
     private static bool CanModifyHealth(int health)
     {
         if (health <= 0)

@@ -277,6 +277,11 @@ public class MainPanel : CanvasPanel
                 EventRegister.SendEvent("SPOOL UNBROKEN");
             }
         }
+        AppendTileRow(2);
+        AppendIncrementTile("MASKSANDSPOOLS_MASKSHARDS", () => PlayerData.instance.heartPieces,
+            value => PlayerData.instance.heartPieces = value, "Inv_MaskShard", max: 3, wrap: true);
+        AppendIncrementTile("MASKSANDSPOOLS_SPOOLFRAGMENTS", () => PlayerData.instance.silkSpoolParts,
+            value => PlayerData.instance.silkSpoolParts = value, "Inv_SpoolFragment", max: 1, wrap: true);
         AppendTileRow(3);
         AppendIncrementTile("MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, image: "Inv_Health", min: 1, max: 10);
         static void SetHealth(int value)
@@ -299,7 +304,6 @@ public class MainPanel : CanvasPanel
                 HeroController.instance.TakeSilk(PlayerData.instance.silk - value);
             }
         }
-
         AppendWideTile("MASKSANDSPOOLS_LIFEBLOOD", BuildLifebloodTile, image: "Inv_Lifeblood");
         static void BuildLifebloodTile(CanvasPanel controlRow)
         {
@@ -1182,7 +1186,7 @@ public class MainPanel : CanvasPanel
         return tile;
     }
 
-    private CanvasPanel AppendWideTile(string name, Action<CanvasPanel> controlBuilder, string image = "IconX")
+    private CanvasPanel AppendWideTile(string name, Action<CanvasPanel> controlBuilder, string image)
     {
         CanvasPanel row = currentRow ?? AppendTileRow(2);
 
@@ -1200,8 +1204,10 @@ public class MainPanel : CanvasPanel
         builder.InnerPadding = UICommon.Margin;
         builder.OuterPadding = tile.ContentMargin(UICommon.Margin);
 
+        Texture2D texture = UICommon.images.GetValueOrDefault(image);
+        if (!texture) texture = UICommon.images["IconX"];
         CanvasImage icon = builder.AppendSquare(new CanvasImage("Icon"));
-        icon.SetImage(UICommon.images[image]);
+        icon.SetImage(texture);
 
         PanelBuilder containerBuilder = new(builder.AppendFlex(new CanvasPanel("Container")));
 
