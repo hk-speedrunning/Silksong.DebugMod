@@ -135,6 +135,7 @@
     "ITEMS_WHITEKEY": "White Key",
     "KEYBIND_REBINDPROMPT": "Press a key...",
     "KEYBIND_UNBOUND": "Unbound",
+    "KEYBINDDIALOG_TITLE": "Edit Keybind",
     "MAINPANEL_TAB_GAMEPLAY": "Gameplay",
     "MAINPANEL_TAB_ITEMS": "Items",
     "MAINPANEL_TAB_KEYBINDS": "Keybinds",

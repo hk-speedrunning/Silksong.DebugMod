@@ -52,9 +52,9 @@ public class KeybindDialog : CanvasDialog
         builder.InnerPadding = UICommon.Margin;
         builder.DynamicLength = true;
 
-        CanvasText nameText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
-        nameText.Alignment = TextAnchor.MiddleCenter;
-        nameText.OnUpdate += () => nameText.Text = Localization.Get(actions[index].Name);
+        CanvasText titleText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
+        titleText.Alignment = TextAnchor.MiddleCenter;
+        titleText.Text = Localization.Get("KEYBINDDIALOG_TITLE");
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
         row.Horizontal = true;
