@@ -54,7 +54,18 @@ public class KeybindDialog : CanvasDialog
 
         CanvasText titleText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
         titleText.Alignment = TextAnchor.MiddleCenter;
-        titleText.Text = Localization.Get("KEYBINDDIALOG_TITLE");
+        titleText.OnUpdate += () =>
+        {
+            if (actions.Length > 1)
+            {
+                titleText.Text = Localization.Get(actions[index].Name);
+            }
+            else
+            {
+                // Makes it more obvious what the dialog is for
+                titleText.Text = Localization.Get("KEYBINDDIALOG_TITLE");
+            }
+        };
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
         row.Horizontal = true;
