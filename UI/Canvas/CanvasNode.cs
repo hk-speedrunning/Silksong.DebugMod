@@ -25,6 +25,7 @@ public abstract class CanvasNode
     internal int childCount = 1;
 
     public string Name { get; set; }
+    public bool DontDestroy { get; set; }
 
     public CanvasNode Parent
     {
@@ -228,23 +229,32 @@ public abstract class CanvasNode
 
     public virtual void Destroy()
     {
-        foreach (CanvasNode element in ChildList())
-        {
-            element.Destroy();
-        }
-
-        if (gameObject)
-        {
-            Object.Destroy(gameObject);
-
-            for (CanvasNode parent = Parent; parent != null; parent = parent.Parent)
-            {
-                parent.childCount -= childCount;
-            }
-        }
-
         ActiveSelf = false;
-        allNodes.Remove(this);
+        OnUpdate = null;
+
+        if (!DontDestroy)
+        {
+            foreach (CanvasNode element in ChildList())
+            {
+                element.Destroy();
+            }
+
+            if (gameObject)
+            {
+                Object.Destroy(gameObject);
+
+                for (CanvasNode parent = Parent; parent != null; parent = parent.Parent)
+                {
+                    parent.childCount -= childCount;
+                }
+            }
+
+            allNodes.Remove(this);
+        }
+        else
+        {
+            Parent = null;
+        }
     }
 
     protected virtual bool GetClipRect(out Rect clipRect)
@@ -310,7 +320,18 @@ public abstract class CanvasNode
 
         EventTrigger.Entry entry = new();
         entry.eventID = type;
-        entry.callback.AddListener(data => callback((T)data));
+        entry.callback.AddListener(data =>
+        {
+            try
+            {
+                callback((T)data);
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Event trigger {type} for {GetQualifiedName()} failed");
+                DebugMod.LogError(e.ToString());
+            }
+        });
         eventTrigger.triggers.Add(entry);
     }
 

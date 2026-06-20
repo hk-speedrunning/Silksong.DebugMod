@@ -18,16 +18,20 @@ public class KeybindDialog : CanvasDialog
     public static void BuildPanel()
     {
         Instance = new KeybindDialog();
-        Instance.Build();
     }
 
     public KeybindDialog() : base(nameof(KeybindDialog))
     {
+    }
+
+    protected override void BuildDialog()
+    {
+        base.BuildDialog();
         Get<CanvasImage>("Background").RemoveBorder();
 
         float y = 0f;
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < actions.Length; i++)
         {
             CanvasPanel panel = BuildSinglePanel(i);
             panel.LocalPosition = new Vector2(0f, y);
@@ -54,18 +58,16 @@ public class KeybindDialog : CanvasDialog
 
         CanvasText titleText = builder.AppendFixed(new CanvasText("BindName"), RowHeight);
         titleText.Alignment = TextAnchor.MiddleCenter;
-        titleText.OnUpdate += () =>
+
+        if (actions.Length > 1)
         {
-            if (actions.Length > 1)
-            {
-                titleText.Text = Localization.Get(actions[index].Name);
-            }
-            else
-            {
-                // Makes it more obvious what the dialog is for
-                titleText.Text = Localization.Get("KEYBINDDIALOG_TITLE");
-            }
-        };
+            titleText.Text = Localization.Get(actions[index].Name);
+        }
+        else
+        {
+            // Makes it more obvious what the dialog is for
+            titleText.Text = Localization.Get("KEYBINDDIALOG_TITLE");
+        }
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("KeycodeRow"), RowHeight));
         row.Horizontal = true;
@@ -101,23 +103,11 @@ public class KeybindDialog : CanvasDialog
 
     public void Toggle(CanvasNode anchor, params BindAction[] actions)
     {
-        if (TryToggle(anchor))
+        if (TryStartToggle(anchor))
         {
             this.actions = actions;
-            for (int i = 0; i < singlePanels.Count; i++)
-            {
-                singlePanels[i].ActiveSelf = actions.Length > i;
-            }
 
-            float height = singlePanels[0].Size.y * actions.Length + UICommon.Margin * (actions.Length - 1);
-            Get<CanvasImage>("Background").Size = new Vector2(PanelWidth, height);
-
-            // If the dialog was pushed back onto the screen, it might be too high up now
-            // (the calculation uses Size.y which might be larger than the visible size)
-            if (Mathf.Approximately(Position.y + Size.y + UICommon.Margin, Screen.height))
-            {
-                LocalPosition = new Vector2(LocalPosition.x, LocalPosition.y - Size.y + height);
-            }
+            Show();
         }
     }
 }

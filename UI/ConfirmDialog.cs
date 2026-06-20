@@ -12,19 +12,25 @@ public class ConfirmDialog : CanvasDialog
 
     public static ConfirmDialog Instance { get; private set; }
 
-    private readonly CanvasText prompt;
+    private CanvasText prompt;
 
+    private string promptText;
     private Action onAccept;
     private Action onReject;
 
     public static void BuildPanel()
     {
         Instance = new ConfirmDialog();
-        Instance.Build();
     }
 
     public ConfirmDialog() : base(nameof(ConfirmDialog))
     {
+    }
+
+    protected override void BuildDialog()
+    {
+        base.BuildDialog();
+
         Size = new Vector2(PanelWidth, 0);
 
         using PanelBuilder builder = new(this);
@@ -33,6 +39,7 @@ public class ConfirmDialog : CanvasDialog
 
         prompt = builder.AppendFixed(new CanvasText("Prompt"), PromptHeight);
         prompt.Alignment = TextAnchor.MiddleCenter;
+        prompt.Text = promptText;
 
         using PanelBuilder row = new(builder.AppendFixed(new CanvasPanel("Row"), UICommon.ControlHeight));
         row.Horizontal = true;
@@ -57,11 +64,13 @@ public class ConfirmDialog : CanvasDialog
 
     public void Toggle(CanvasNode anchor, string prompt, Action onAccept, Action onReject)
     {
-        if (TryToggle(anchor))
+        if (TryStartToggle(anchor))
         {
-            this.prompt.Text = prompt;
+            promptText = prompt;
             this.onAccept = onAccept;
             this.onReject = onReject;
+
+            Show();
         }
     }
 }

@@ -22,6 +22,7 @@ public class CanvasButton : CanvasImage
                 hoverBorder.ActiveSelf = false;
             }
         };
+        hoverBorder.DontDestroy = true;
         hoverBorder.Build();
     }
 

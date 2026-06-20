@@ -11,7 +11,14 @@ public class CanvasDialog : CanvasPanel
 
     public CanvasDialog(string name) : base(name)
     {
-        ActiveSelf = false;
+    }
+
+    // Dialogs are more dynamic than panels, so they are rebuilt every time they are shown
+    protected virtual void BuildDialog()
+    {
+        // Start from a clean slate
+        Destroy();
+
         OnUpdate += DoUpdate;
 
         UICommon.AddBackground(this);
@@ -35,7 +42,7 @@ public class CanvasDialog : CanvasPanel
         }
     }
 
-    protected bool TryToggle(CanvasNode anchor)
+    protected bool TryStartToggle(CanvasNode anchor)
     {
         if (ActiveInHierarchy && this.anchor == anchor)
         {
@@ -46,6 +53,13 @@ public class CanvasDialog : CanvasPanel
         this.anchor = anchor;
         anchorPos = anchor.Position;
         initialClickEnded = false;
+
+        return true;
+    }
+
+    protected void Show()
+    {
+        BuildDialog();
 
         float x = (int)(anchor.Position.x + anchor.Size.x - UICommon.Margin);
         float xOver = x + Size.x - (Screen.width - UICommon.Margin);
@@ -64,12 +78,14 @@ public class CanvasDialog : CanvasPanel
         LocalPosition = new Vector2(x, y);
         ActiveSelf = true;
 
-        return true;
+        Build();
     }
 
     public void Hide()
     {
         anchor = null;
-        ActiveSelf = false;
+        initialClickEnded = false;
+
+        Destroy();
     }
 }

@@ -78,6 +78,14 @@ public class CanvasPanel : CanvasNode
             Remove(panel.Name);
         }
     }
+
+    public override void Destroy()
+    {
+        base.Destroy();
+
+        elements.Clear();
+        byName.Clear();
+    }
 }
 
 public enum CollapseMode
