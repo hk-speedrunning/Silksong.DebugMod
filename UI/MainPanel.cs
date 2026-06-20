@@ -243,9 +243,6 @@ public class MainPanel : CanvasPanel
             value => PlayerData.instance.ToolKitUpgrades = value, "Inv_CraftingKit", max: 4, wrap: true);
         AppendIncrementTile("UPGRADES_TOOLPOUCH", () => PlayerData.instance.ToolPouchUpgrades,
             value => PlayerData.instance.ToolPouchUpgrades = value, "Inv_ToolPouch", max: 4, wrap: true);
-        AppendRow(1, 1);
-        AppendBasicControl("UPGRADES_ALLMAPS", BindableFunctions.UnlockAllMaps);
-        AppendBasicControl("UPGRADES_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
 
         AppendSectionHeader("CATEGORY_MASKSANDSPOOLS");
         AppendTileRow(2);
@@ -740,6 +737,51 @@ public class MainPanel : CanvasPanel
             ("Belltown House Key", "ITEMS_BELLHOMEKEY", "Inv_BellhomeKey"),
             ("Craw Summons", "ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
         ]);
+
+        AppendSectionHeader("CATEGORY_WORLD");
+        AppendRow(1, 1);
+        AppendBasicControl("WORLD_ALLMAPS", BindableFunctions.UnlockAllMaps);
+        AppendBasicControl("WORLD_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_DEEPDOCKSBELLWAY", () => PlayerData.instance.UnlockedDocksStation,
+            () => PlayerData.instance.UnlockedDocksStation = !PlayerData.instance.UnlockedDocksStation);
+        AppendToggleControl("WORLD_FARFIELDSBELLWAY", () => PlayerData.instance.UnlockedBoneforestEastStation,
+            () => PlayerData.instance.UnlockedBoneforestEastStation = !PlayerData.instance.UnlockedBoneforestEastStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_GREYMOORBELLWAY", () => PlayerData.instance.UnlockedGreymoorStation,
+            () => PlayerData.instance.UnlockedGreymoorStation = !PlayerData.instance.UnlockedGreymoorStation);
+        AppendToggleControl("WORLD_BELLHARTBELLWAY", () => PlayerData.instance.UnlockedBelltownStation,
+            () => PlayerData.instance.UnlockedBelltownStation = !PlayerData.instance.UnlockedBelltownStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_SHELLWOODBELLWAY", () => PlayerData.instance.UnlockedShellwoodStation,
+            () => PlayerData.instance.UnlockedShellwoodStation = !PlayerData.instance.UnlockedShellwoodStation);
+        AppendToggleControl("WORLD_BLASTEDSTEPSBELLWAY", () => PlayerData.instance.UnlockedCoralTowerStation,
+            () => PlayerData.instance.UnlockedCoralTowerStation = !PlayerData.instance.UnlockedCoralTowerStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_THESLABBELLWAY", () => PlayerData.instance.UnlockedPeakStation,
+            () => PlayerData.instance.UnlockedPeakStation = !PlayerData.instance.UnlockedPeakStation);
+        AppendToggleControl("WORLD_GRANDBELLWAY", () => PlayerData.instance.UnlockedCityStation,
+            () => PlayerData.instance.UnlockedCityStation = !PlayerData.instance.UnlockedCityStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_BILEWATERBELLWAY", () => PlayerData.instance.UnlockedShadowStation,
+            () => PlayerData.instance.UnlockedShadowStation = !PlayerData.instance.UnlockedShadowStation);
+        AppendToggleControl("WORLD_PUTRIFIEDDUCTSBELLWAY", () => PlayerData.instance.UnlockedAqueductStation,
+            () => PlayerData.instance.UnlockedAqueductStation = !PlayerData.instance.UnlockedAqueductStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_MEMORIUMVENTRICA", () => PlayerData.instance.UnlockedArboriumTube,
+            () => PlayerData.instance.UnlockedArboriumTube = !PlayerData.instance.UnlockedArboriumTube);
+        AppendToggleControl("WORLD_HIGHHALLSVENTRICA", () => PlayerData.instance.UnlockedHangTube,
+            () => PlayerData.instance.UnlockedHangTube = !PlayerData.instance.UnlockedHangTube);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_FIRSTSHRINEVENTRICA", () => PlayerData.instance.UnlockedEnclaveTube,
+            () => PlayerData.instance.UnlockedEnclaveTube = !PlayerData.instance.UnlockedEnclaveTube);
+        AppendToggleControl("WORLD_CHORALCHAMBERSVENTRICA", () => PlayerData.instance.UnlockedSongTube,
+            () => PlayerData.instance.UnlockedSongTube = !PlayerData.instance.UnlockedSongTube);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_GRANDBELLWAYVENTRICA", () => PlayerData.instance.UnlockedCityBellwayTube,
+            () => PlayerData.instance.UnlockedCityBellwayTube = !PlayerData.instance.UnlockedCityBellwayTube);
+        AppendToggleControl("WORLD_UNDERWORKSVENTRICA", () => PlayerData.instance.UnlockedUnderTube,
+            () => PlayerData.instance.UnlockedUnderTube = !PlayerData.instance.UnlockedUnderTube);
 
         AppendSectionHeader("CATEGORY_CONSUMABLES");
         AppendRow(1);

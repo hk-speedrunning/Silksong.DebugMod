@@ -127,7 +127,7 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "UPGRADES_ALLMAPS", category = "CATEGORY_UPGRADES")]
+    [BindableMethod(name = "WORLD_ALLMAPS", category = "CATEGORY_UPGRADES")]
     public static void UnlockAllMaps()
     {
         if (PlayerData.instance.HasAllMaps)
@@ -222,7 +222,7 @@ public static partial class BindableFunctions
         DebugMod.LogConsole("Unlocked all maps");
     }
 
-    [BindableMethod(name = "UPGRADES_ALLFASTTRAVEL", category = "CATEGORY_UPGRADES")]
+    [BindableMethod(name = "WORLD_ALLFASTTRAVEL", category = "CATEGORY_UPGRADES")]
     public static void UnlockAllFastTravel()
     {
         if (PlayerData.instance.UnlockedAqueductStation
