@@ -17,6 +17,8 @@ public class ConfirmDialog : CanvasDialog
     private string promptText;
     private Action onAccept;
     private Action onReject;
+    private int width;
+    private int lines;
 
     public static void BuildPanel()
     {
@@ -31,13 +33,13 @@ public class ConfirmDialog : CanvasDialog
     {
         base.BuildDialog();
 
-        Size = new Vector2(PanelWidth, 0);
+        Size = new Vector2(width, 0);
 
         using PanelBuilder builder = new(this);
         builder.DynamicLength = true;
         builder.Padding = UICommon.Margin;
 
-        prompt = builder.AppendFixed(new CanvasText("Prompt"), PromptHeight);
+        prompt = builder.AppendFixed(new CanvasText("Prompt"), PromptHeight * lines);
         prompt.Alignment = TextAnchor.MiddleCenter;
         prompt.Text = promptText;
 
@@ -62,13 +64,15 @@ public class ConfirmDialog : CanvasDialog
         };
     }
 
-    public void Toggle(CanvasNode anchor, string prompt, Action onAccept, Action onReject)
+    public void Toggle(CanvasNode anchor, string prompt, Action onAccept, Action onReject, int? width = null, int lines = 1)
     {
         if (TryStartToggle(anchor))
         {
             promptText = prompt;
             this.onAccept = onAccept;
             this.onReject = onReject;
+            this.width = width ?? PanelWidth;
+            this.lines = lines;
 
             Show();
         }

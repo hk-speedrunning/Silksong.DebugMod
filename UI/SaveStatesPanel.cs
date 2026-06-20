@@ -14,6 +14,7 @@ public class SaveStatesPanel : CanvasPanel
     public static int IconPadding => UICommon.ScaleHeight(4);
 
     public static SaveStatesPanel Instance { get; private set; }
+    public static bool loadedAnySavestate;
 
     public static bool ShouldBeVisible => DebugMod.settings.SaveStatePanelVisible || InSelectState;
     public static bool ShouldBeExpanded => DebugMod.settings.SaveStatePanelExpanded || InSelectState;
@@ -30,6 +31,8 @@ public class SaveStatesPanel : CanvasPanel
 
     public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
+        SaveState.AfterLoad += _ => loadedAnySavestate = true;
+
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
         OnUpdate += DoUpdate;
@@ -60,7 +63,20 @@ public class SaveStatesPanel : CanvasPanel
             load.OnClicked += () =>
             {
                 CancelSelectState(true);
-                SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+
+                if (PlayerData.instance.playTime >= 3600 * 2 && !loadedAnySavestate)
+                {
+                    ConfirmDialog.Instance.Toggle(load, Localization.Get("SAVESTATEPANEL_LOADWARNING"),
+                        () =>
+                        {
+                            SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+                        },
+                        () => { }, width: UICommon.ScaleWidth(250), lines: 3);
+                }
+                else
+                {
+                    SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+                }
             };
 
             UICommon.AppendKeybindButton(quickslot, DebugMod.bindActions["SAVESTATES_QUICKSLOTLOAD"]);
