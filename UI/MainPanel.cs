@@ -279,9 +279,11 @@ public class MainPanel : CanvasPanel
         }
         AppendTileRow(2);
         AppendIncrementTile("MASKSANDSPOOLS_MASKSHARDS", () => PlayerData.instance.heartPieces,
-            value => PlayerData.instance.heartPieces = value, "Inv_MaskShard", max: 3, wrap: true);
+            value => PlayerData.instance.heartPieces = value, "Inv_MaskShard", max: 3,
+            customAdd: BindableFunctions.GiveMaskShard, customRemove: BindableFunctions.TakeMaskShard);
         AppendIncrementTile("MASKSANDSPOOLS_SPOOLFRAGMENTS", () => PlayerData.instance.silkSpoolParts,
-            value => PlayerData.instance.silkSpoolParts = value, "Inv_SpoolFragment", max: 1, wrap: true);
+            value => PlayerData.instance.silkSpoolParts = value, "Inv_SpoolFragment", max: 1,
+            customAdd: BindableFunctions.GiveSpoolFragment, customRemove: BindableFunctions.TakeSpoolFragment);
         AppendTileRow(3);
         AppendIncrementTile("MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, image: "Inv_Health", min: 1, max: 10);
         static void SetHealth(int value)

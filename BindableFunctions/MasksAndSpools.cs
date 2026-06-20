@@ -86,7 +86,8 @@ public static partial class BindableFunctions
         }
         else
         {
-            DebugMod.LogConsole("Already have max number of mask shards");
+            PlayerData.instance.heartPieces = 0;
+            GiveMask();
         }
     }
 
@@ -100,7 +101,8 @@ public static partial class BindableFunctions
         }
         else
         {
-            DebugMod.LogConsole("Already at 0 mask shards");
+            PlayerData.instance.heartPieces = 3;
+            TakeAwayMask();
         }
     }
 
@@ -114,7 +116,8 @@ public static partial class BindableFunctions
         }
         else
         {
-            DebugMod.LogConsole("Already have a spool fragment");
+            PlayerData.instance.silkSpoolParts = 0;
+            GiveSpool();
         }
     }
 
@@ -128,7 +131,8 @@ public static partial class BindableFunctions
         }
         else
         {
-            DebugMod.LogConsole("Already at 0 spool fragments");
+            PlayerData.instance.silkSpoolParts = 1;
+            TakeAwaySpool();
         }
     }
 
