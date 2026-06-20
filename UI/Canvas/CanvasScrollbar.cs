@@ -7,22 +7,28 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasScrollbar : CanvasNode
 {
-    public static int MIN_GRIP_HEIGHT => UICommon.ScaleHeight(30);
+    public static int MinGripHeight => UICommon.ScaleHeight(30);
 
-    private readonly CanvasButton grip;
+    private readonly CanvasButton button;
+    private readonly CanvasImage grip;
     private readonly CanvasImage trackUpper;
     private readonly CanvasImage trackLower;
 
-    public CanvasScrollView ScrollView { get; set; }
+    public CanvasScrollView ScrollView
+    { get; set; }
 
     public CanvasScrollbar(string name) : base(name)
     {
         OnUpdate += DoUpdate;
 
-        grip = new CanvasButton("Grip");
+        button = new CanvasButton("Button");
+        button.Parent = this;
+        button.ImageOnly(UICommon.clearBG);
+
+        grip = new CanvasImage("Grip");
         grip.Parent = this;
-        grip.RemoveText();
-        grip.RemoveHoverBorder();
+        grip.SetImage(UICommon.panelStrongBG);
+        grip.AddBorder();
 
         trackUpper = new CanvasImage("TrackUpper");
         trackUpper.Parent = this;
@@ -36,6 +42,7 @@ public class CanvasScrollbar : CanvasNode
         yield return trackUpper;
         yield return trackLower;
         yield return grip;
+        yield return button;
     }
 
     public override void Build()
@@ -43,6 +50,7 @@ public class CanvasScrollbar : CanvasNode
         // Round width down to nearest odd integer
         Size = new Vector2((int)((Size.x - 1) / 2) * 2 + 1, Size.y);
         trackUpper.Size = trackLower.Size = new Vector2(Size.x, 0);
+        button.Size = Size;
 
         Texture2D trackTex = new Texture2D((int)Size.x, 1);
         Color[] colors = new Color[trackTex.width];
@@ -56,15 +64,33 @@ public class CanvasScrollbar : CanvasNode
 
         // grip height / scrollbar height = scroll view height / content height
         float gripHeight = Size.y * ScrollView.Size.y / ScrollView.Content.Size.y;
-        gripHeight = Mathf.Clamp(gripHeight, MIN_GRIP_HEIGHT, Size.y);
+        gripHeight = Mathf.Clamp(gripHeight, MinGripHeight, Size.y);
         grip.Size = new Vector2(Size.x, (int)gripHeight);
 
         base.Build();
 
-        grip.AddEventTrigger(EventTriggerType.Drag, eventData =>
+        button.OnClicked += () =>
+        {
+            float mouseY = Screen.height - Input.mousePosition.y;
+
+            if (mouseY >= grip.Position.y && mouseY <= grip.Position.y + grip.Size.y)
+            {
+                // We clicked on the grip, so don't snap it into place
+                return;
+            }
+
+            float y = mouseY - Position.y - grip.Size.y / 2f;
+            y = Mathf.Clamp(y, 0, Size.y - grip.Size.y);
+
+            ScrollView.SetScrollPercentage(y / (Size.y - grip.Size.y));
+            UpdateGripPosition(y);
+        };
+
+        button.AddEventTrigger(EventTriggerType.Drag, eventData =>
         {
             float y = grip.LocalPosition.y - eventData.delta.y;
             y = Mathf.Clamp(y, 0, Size.y - grip.Size.y);
+
             ScrollView.SetScrollPercentage(y / (Size.y - grip.Size.y));
             UpdateGripPosition(y);
         });
