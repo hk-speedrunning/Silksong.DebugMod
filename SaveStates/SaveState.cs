@@ -763,5 +763,18 @@ public class SaveState
     {
         return loadingSavestate == null;
     }
+
+    // Fixes issue where the inventory FSM can unfreeze time while the game is still paused
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetIsInventoryOpen))]
+    [HarmonyPrefix]
+    private static bool GameManager_SetIsInventoryOpen(bool value)
+    {
+        if (!value && !PlayerData.instance.isInventoryOpen && GameManager.instance.isPaused)
+        {
+            return false;
+        }
+
+        return true;
+    }
     #endregion
 }
