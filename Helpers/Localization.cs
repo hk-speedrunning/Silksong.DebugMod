@@ -48,13 +48,12 @@ internal static class Localization
 
     internal static string Get(string key)
     {
-        foreach (string sheet in sheets)
+        foreach (string sheetName in sheets)
         {
-            string result = Language.Get(key, sheet);
-            if (result != "" && !result.StartsWith("#!#"))
-            {
-                return result;
-            }
+            // Silent reimplementation of Language.Get to avoid I18N warning us of extensions missing keys
+            if (Language._currentEntrySheets == null || !Language._currentEntrySheets.ContainsKey(sheetName)) continue;
+            if (!Language._currentEntrySheets.TryGetValue(sheetName, out Dictionary<string, string> sheet)) continue;
+            if (sheet.TryGetValue(key, out string result)) return result;
         }
 
         if (!warnedEntryMissing)
