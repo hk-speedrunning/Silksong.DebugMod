@@ -50,6 +50,8 @@ public class CanvasBorder : CanvasNode
         }
     }
 
+    protected override bool Interactable => false;
+
     public CanvasBorder(string name) : base(name) { }
 
     protected override void OnUpdateSize()

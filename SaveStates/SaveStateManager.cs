@@ -14,14 +14,17 @@ public static class SaveStateManager
     public static int NumPages { get; private set; }
 
     private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
+    private static readonly string savestatePacksDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
 
-    private static readonly Dictionary<int, SaveState[]> fileStates = new();
+    private static readonly Dictionary<int, SaveState[]> fileStates = [];
     private static SaveState quickState;
+
+    private static List<string> packNames = [];
 
     internal static void Initialize()
     {
         quickState = new SaveState();
-        LoadFileStates();
+        LoadSavestateFiles();
     }
 
     public static SaveState GetQuickState() => quickState;
@@ -121,14 +124,15 @@ public static class SaveStateManager
             DebugMod.LogConsole($"Overriding savestate lockout");
             shouldLoad = true;
         }
-        
+
         if (state.IsSet() && shouldLoad)
         {
             GameManager.instance.StartCoroutine(state.Load());
         }
     }
 
-    private static bool LoadLockout() {
+    private static bool LoadLockout()
+    {
         if (PlayerDeathWatcher.playerDead)
         {
             DebugMod.LogConsole("Savestates cannot be loaded when dead");
@@ -150,7 +154,7 @@ public static class SaveStateManager
         return true;
     }
 
-    public static void LoadFileStates()
+    public static void LoadSavestateFiles()
     {
         try
         {
@@ -226,6 +230,19 @@ public static class SaveStateManager
                     }
                 }
             }
+
+            packNames.Clear();
+
+            if (!Directory.Exists(savestatePacksDirectory))
+            {
+                Directory.CreateDirectory(savestatePacksDirectory);
+            }
+
+            foreach (string path in Directory.EnumerateFiles(savestatePacksDirectory, "*.zip"))
+            {
+                packNames.Add(Path.GetFileNameWithoutExtension(path));
+            }
+
         }
         catch (Exception ex)
         {
@@ -254,5 +271,14 @@ public static class SaveStateManager
 
         return new SaveStateData();
     }
+    #endregion
+
+    #region packs
+
+    public static List<string> GetPackNames()
+    {
+        return packNames;
+    }
+
     #endregion
 }

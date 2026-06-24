@@ -122,6 +122,7 @@ public class GUIController : MonoBehaviour
             CanvasButton.BuildHoverBorder();
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
+            DropdownDialog.BuildPanel();
 
             resolution = new Size(Screen.width, Screen.height);
             language = GetLanguage();
@@ -244,7 +245,7 @@ public class GUIController : MonoBehaviour
         if (savestatePageUpdateTime != null && Time.realtimeSinceStartup > savestatePageUpdateTime + SavestatePageUpdateDelay)
         {
             savestatePageUpdateTime = null;
-            SaveStateManager.LoadFileStates();
+            SaveStateManager.LoadSavestateFiles();
             SaveStatesPanel.Instance?.PageCountChanged();
         }
 

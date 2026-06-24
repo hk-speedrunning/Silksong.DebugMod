@@ -15,6 +15,8 @@ public class CanvasTextField : CanvasText
 
     private InputField inputField;
 
+    public bool Clickable { get; set; } = true;
+
     public event Action<string> OnSubmit;
 
     protected override bool Interactable => true;
@@ -46,7 +48,7 @@ public class CanvasTextField : CanvasText
 
         AddEventTrigger(EventTriggerType.PointerDown, _ =>
         {
-            if (!IsFocused())
+            if (Clickable && !IsFocused())
             {
                 // For some reason clicking the input field doesn't clear the selection,
                 // but I actually prefer it that way

@@ -1,5 +1,6 @@
 using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
+using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
 using GlobalSettings;
 using System;
@@ -96,6 +97,35 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendToggleControl("MODUI_TOGGLEINFOPANEL", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
         AppendToggleControl("MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
+
+        AppendSectionHeader("CATEGORY_SAVESTATES");
+
+        string currentPackName = null;
+
+        AppendRow(1);
+        AppendDropdown(
+            "PackSwitcher",
+            () => currentPackName ?? Localization.Get("SAVESTATES_PACKSWITCHERPLACEHOLDER"),
+            () =>
+            {
+                List<string> names = SaveStateManager.GetPackNames();
+                if (names.Count > 0)
+                {
+                    return names;
+                }
+                else
+                {
+                    return [Localization.Get("SAVESTATES_NOPACKSLISTING")];
+                }
+            },
+            value =>
+            {
+                if (value != Localization.Get("SAVESTATES_NOPACKSLISTING"))
+                {
+                    currentPackName = value;
+                }
+            }
+        );
 
         AppendSectionHeader("CATEGORY_TIME");
         AppendRow(1);
@@ -1336,6 +1366,26 @@ public class MainPanel : CanvasPanel
         }
 
         return AppendWideTile(name, Builder, image);
+    }
+
+    private CanvasPanel AppendDropdown(string name, Func<string> current, Func<List<string>> options, Action<string> setter)
+    {
+        currentRow ??= AppendRow(1);
+
+        CanvasPanel control = AppendRowElement(name);
+
+        CanvasButton button = control.Add(new CanvasButton("Current"));
+        button.Size = control.Size;
+        button.Text.Alignment = TextAnchor.MiddleLeft;
+        button.Text.OnUpdate += () => button.Text.Text = current();
+        button.OnClicked += () => DropdownDialog.Instance.Toggle(button, options(), setter);
+
+        CanvasImage icon = control.Add(new CanvasImage("DropdownIcon"));
+        icon.LocalPosition = new Vector2(control.Size.x - control.Size.y, 0f);
+        icon.Size = new Vector2(control.Size.y, control.Size.y);
+        icon.SetImage(UICommon.images["IconDownMin"]);
+
+        return control;
     }
 
     public override void Build()

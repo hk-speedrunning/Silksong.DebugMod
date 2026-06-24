@@ -7,6 +7,8 @@ namespace DebugMod.UI.Canvas;
 
 public class CanvasButton : CanvasImage
 {
+    public static int TextMargin => UICommon.ScaleWidth(4);
+
     internal static CanvasBorder hoverBorder;
 
     internal static void BuildHoverBorder()
@@ -63,6 +65,7 @@ public class CanvasButton : CanvasImage
     {
         CanvasTextField textField = new("ButtonTextField");
         textField.Parent = this;
+        textField.Size = Size;
         textField.Alignment = TextAnchor.MiddleCenter;
         text = textField;
         return textField;
@@ -99,16 +102,31 @@ public class CanvasButton : CanvasImage
 
     protected override void OnUpdateSize()
     {
-        if (text != null)
+        RepositionText();
+        base.OnUpdateSize();
+    }
+
+    private void RepositionText()
+    {
+        if (text == null) return;
+
+        if (text.Alignment == TextAnchor.MiddleCenter)
         {
+            text.LocalPosition = Vector2.zero;
             text.Size = Size;
         }
-
-        base.OnUpdateSize();
+        else
+        {
+            // Give some space between the text and the button border
+            text.LocalPosition = new Vector2(TextMargin, TextMargin);
+            text.Size = Size - text.LocalPosition * 2;
+        }
     }
 
     public override void Build()
     {
+        RepositionText();
+
         base.Build();
 
         AddEventTrigger(EventTriggerType.PointerDown, _ => OnClicked?.Invoke());

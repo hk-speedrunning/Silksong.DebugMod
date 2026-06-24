@@ -5,9 +5,11 @@ namespace DebugMod.UI;
 
 public class CanvasDialog : CanvasPanel
 {
-    private CanvasNode anchor;
+    protected CanvasNode anchor;
     private Vector2 anchorPos;
     private bool initialClickEnded;
+
+    protected virtual bool CustomPositioning => false;
 
     public CanvasDialog(string name) : base(name)
     {
@@ -61,21 +63,25 @@ public class CanvasDialog : CanvasPanel
     {
         BuildDialog();
 
-        float x = (int)(anchor.Position.x + anchor.Size.x - UICommon.Margin);
-        float xOver = x + Size.x - (Screen.width - UICommon.Margin);
-        if (xOver > 0)
+        if (!CustomPositioning)
         {
-            x -= xOver;
+            float x = (int)(anchor.Position.x + anchor.Size.x - UICommon.Margin);
+            float xOver = x + Size.x - (Screen.width - UICommon.Margin);
+            if (xOver > 0)
+            {
+                x -= xOver;
+            }
+
+            float y = (int)(anchor.Position.y + anchor.Size.y - UICommon.Margin);
+            float yOver = y + Size.y - (Screen.height - UICommon.Margin);
+            if (yOver > 0)
+            {
+                y -= yOver;
+            }
+
+            LocalPosition = new Vector2(x, y);
         }
 
-        float y = (int)(anchor.Position.y + anchor.Size.y - UICommon.Margin);
-        float yOver = y + Size.y - (Screen.height - UICommon.Margin);
-        if (yOver > 0)
-        {
-            y -= yOver;
-        }
-
-        LocalPosition = new Vector2(x, y);
         ActiveSelf = true;
 
         Build();
