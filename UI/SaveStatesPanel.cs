@@ -23,6 +23,11 @@ public class SaveStatesPanel : CanvasPanel
     private SelectOperation selectStateOperation;
     private int currentPage;
 
+    static SaveStatesPanel()
+    {
+        SaveStateManager.PackChanged += () => Instance?.PackChanged();
+    }
+
     public static void BuildPanel()
     {
         Instance = new SaveStatesPanel();
@@ -356,12 +361,9 @@ public class SaveStatesPanel : CanvasPanel
         selectStateOperation = SelectOperation.None;
     }
 
-    internal void PageCountChanged()
+    private void PackChanged()
     {
-        if (currentPage >= SaveStateManager.NumPages)
-        {
-            currentPage = 0;
-        }
+        currentPage = 0;
     }
 }
 

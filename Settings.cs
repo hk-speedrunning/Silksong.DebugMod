@@ -14,7 +14,6 @@ public class Settings
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
 
-    private static ConfigEntry<int> maxSavestatePages;
     private static ConfigEntry<bool> numpadForSavestates;
     private static ConfigEntry<bool> safeSavestateLoading;
 
@@ -94,22 +93,6 @@ public class Settings
             }
         };
 
-        maxSavestatePages = config.Bind(
-            "Savestates",
-            "Number of Savestate Pages",
-            10,
-            "The number of pages of available savestates."
-        );
-        maxSavestatePages.Value = MaxSavePages;
-        maxSavestatePages.SettingChanged += (_, _) =>
-        {
-            if (maxSavestatePages.Value > 0)
-            {
-                MaxSavePages = maxSavestatePages.Value;
-                GUIController.Instance?.savestatePageUpdateTime = Time.realtimeSinceStartup;
-            }
-        };
-
         numpadForSavestates = config.Bind(
             "Savestates",
             "Savestate Numpad Hotkeys",
@@ -132,6 +115,8 @@ public class Settings
     [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
     public Dictionary<string, KeyCode> binds = new();
 
+    public string CurrentSavestatePack = "";
+
     public bool FirstRun = true;
 
     public bool MainPanelVisible = true;
@@ -151,8 +136,6 @@ public class Settings
     public bool NumPadForSaveStates = false;
 
     public int ShowHitBoxes;
-
-    public int MaxSavePages = 10;
 
     public float NoClipSpeedModifier = 1f;
 

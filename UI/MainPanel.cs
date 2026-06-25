@@ -100,31 +100,12 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("CATEGORY_SAVESTATES");
 
-        string currentPackName = null;
-
         AppendRow(1);
         AppendDropdown(
             "PackSwitcher",
-            () => currentPackName ?? Localization.Get("SAVESTATES_PACKSWITCHERPLACEHOLDER"),
-            () =>
-            {
-                List<string> names = SaveStateManager.GetPackNames();
-                if (names.Count > 0)
-                {
-                    return names;
-                }
-                else
-                {
-                    return [Localization.Get("SAVESTATES_NOPACKSLISTING")];
-                }
-            },
-            value =>
-            {
-                if (value != Localization.Get("SAVESTATES_NOPACKSLISTING"))
-                {
-                    currentPackName = value;
-                }
-            }
+            () => SaveStateManager.CurrentPack,
+            () => SaveStateManager.GetPackNames().Where(name => name != SaveStateManager.CurrentPack).ToList(),
+            SaveStateManager.SwitchPack
         );
 
         AppendSectionHeader("CATEGORY_TIME");

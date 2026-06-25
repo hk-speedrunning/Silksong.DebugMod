@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using static DebugMod.SaveStates.SaveState;
@@ -11,12 +12,31 @@ public static class SaveStateManager
 {
     public const int STATES_PER_PAGE = 10;
 
-    public static int NumPages { get; private set; }
+    private static readonly string pageDirectoryPattern = @"^(\d+)$";
+    private static readonly string savestateFilePattern = @"^savestate(\d)\.json$";
+    private static readonly string defaultPackName = "My Savestates";
 
     private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
-    private static readonly string savestatePacksDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
+    private static readonly string defaultPackDirectory = Path.Combine(saveStatesBaseDirectory, defaultPackName);
 
-    private static readonly Dictionary<int, SaveState[]> fileStates = [];
+    public static int NumPages => fileStates.Count;
+
+    public static string CurrentPack
+    {
+        get
+        {
+            return DebugMod.settings.CurrentSavestatePack;
+        }
+
+        private set
+        {
+            DebugMod.settings.CurrentSavestatePack = value;
+        }
+    }
+
+    public static event Action PackChanged;
+
+    private static List<SaveState[]> fileStates = [];
     private static SaveState quickState;
 
     private static List<string> packNames = [];
@@ -45,11 +65,6 @@ public static class SaveStateManager
             fileStates[page][index].data = state.data.DeepCopy();
             SaveToFile(state.data, page, index);
         }
-    }
-
-    private static string GetFilePath(int page, int index)
-    {
-        return Path.Combine(saveStatesBaseDirectory, page.ToString(), $"savestate{index}.json");
     }
 
     #region saving
@@ -87,8 +102,10 @@ public static class SaveStateManager
     {
         try
         {
+            string filePath = Path.Combine(saveStatesBaseDirectory, CurrentPack, page.ToString(), $"savestate{index}.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
             data.BeforeSerialize();
-            string filePath = GetFilePath(page, index);
             File.WriteAllText(filePath, JsonUtility.ToJson(data, prettyPrint: true));
         }
         catch (Exception ex)
@@ -158,22 +175,6 @@ public static class SaveStateManager
     {
         try
         {
-            if (DebugMod.settings.MaxSavePages <= 0)
-            {
-                DebugMod.settings.MaxSavePages = 1;
-            }
-            NumPages = DebugMod.settings.MaxSavePages;
-
-            fileStates.Clear();
-            for (int i = 0; i < NumPages; i++)
-            {
-                fileStates.Add(i, new SaveState[STATES_PER_PAGE]);
-                for (int j = 0; j < STATES_PER_PAGE; j++)
-                {
-                    fileStates[i][j] = new SaveState();
-                }
-            }
-
             if (!Directory.Exists(saveStatesBaseDirectory))
             {
                 string legacyPath = Path.Combine(DebugMod.ModBaseDirectory, "Savestates Current Patch");
@@ -188,85 +189,120 @@ public static class SaveStateManager
                 }
             }
 
-            // Cleanup empty directories in case the page count was decreased
-            foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
-            {
-                string name = Path.GetFileName(path);
-                if (!int.TryParse(name, out int i) || i < 0 || i >= NumPages)
-                {
-                    try
-                    {
-                        // Will throw an exception if the directory is not empty
-                        Directory.Delete(path);
-                    }
-                    catch { }
-                }
-            }
-
-            for (int page = 0; page < NumPages; page++)
-            {
-                string pageDirectory = Path.Combine(saveStatesBaseDirectory, page.ToString());
-                if (!Directory.Exists(pageDirectory))
-                {
-                    Directory.CreateDirectory(pageDirectory);
-                    continue;
-                }
-
-                foreach (string path in Directory.GetFiles(pageDirectory))
-                {
-                    try
-                    {
-                        string fileName = Path.GetFileName(path);
-                        int index = int.Parse(Regex.Match(fileName, @"^savestate(\d+).json$").Groups[1].Value);
-
-                        if (index >= 0 && index < STATES_PER_PAGE)
-                        {
-                            fileStates[page][index].data = LoadFromFile(page, index);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        DebugMod.LogError(ex.ToString());
-                    }
-                }
-            }
-
             packNames.Clear();
 
-            if (!Directory.Exists(savestatePacksDirectory))
+            // Detect old savestate file layout and move into a default pack
+            if (!Directory.Exists(defaultPackDirectory))
             {
-                Directory.CreateDirectory(savestatePacksDirectory);
+                foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
+                {
+                    string name = Path.GetFileName(path);
+
+                    if (Regex.IsMatch(name, pageDirectoryPattern))
+                    {
+                        Directory.CreateDirectory(defaultPackDirectory);
+                        Directory.Move(path, Path.Combine(defaultPackDirectory, name));
+                    }
+                }
             }
 
-            foreach (string path in Directory.EnumerateFiles(savestatePacksDirectory, "*.zip"))
+            foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
             {
-                packNames.Add(Path.GetFileNameWithoutExtension(path));
+                if (Directory.EnumerateDirectories(path).Any(pagePath => Regex.IsMatch(Path.GetFileName(pagePath), pageDirectoryPattern)
+                    && Directory.EnumerateFiles(pagePath).Any(savestatePath => Regex.IsMatch(Path.GetFileName(savestatePath), savestateFilePattern))))
+                {
+                    packNames.Add(Path.GetFileName(path));
+                }
             }
+
+            if (CurrentPack == "" || !packNames.Contains(CurrentPack))
+            {
+                CurrentPack = defaultPackName;
+                Directory.CreateDirectory(defaultPackDirectory);
+            }
+
+            LoadPack(DebugMod.settings.CurrentSavestatePack);
 
         }
         catch (Exception ex)
         {
             DebugMod.LogError(ex.ToString());
-            throw;
         }
     }
 
-    private static SaveStateData LoadFromFile(int page, int index)
+    private static void LoadPack(string name)
+    {
+        CurrentPack = name;
+        fileStates.Clear();
+
+        string baseDirectory = Path.Combine(saveStatesBaseDirectory, name);
+
+        foreach (string pageDirectory in Directory.EnumerateDirectories(baseDirectory))
+        {
+            Match pageMatch = Regex.Match(Path.GetFileName(pageDirectory), pageDirectoryPattern);
+            if (!pageMatch.Success)
+            {
+                continue;
+            }
+
+            int page = int.Parse(pageMatch.Groups[1].Value);
+
+            while (fileStates.Count <= page)
+            {
+                AddFileSlotPage();
+            }
+
+            foreach (string savestateFile in Directory.EnumerateFiles(pageDirectory))
+            {
+                Match savestateMatch = Regex.Match(Path.GetFileName(savestateFile), savestateFilePattern);
+                if (!savestateMatch.Success)
+                {
+                    continue;
+                }
+
+                int index = int.Parse(savestateMatch.Groups[1].Value);
+
+                if (index < STATES_PER_PAGE)
+                {
+                    fileStates[page][index].data = LoadFromFile(savestateFile);
+                }
+            }
+        }
+
+        if (fileStates.Count == 0)
+        {
+            AddFileSlotPage();
+        }
+
+        PackChanged?.Invoke();
+    }
+
+    private static void AddFileSlotPage()
+    {
+        SaveState[] array = new SaveState[STATES_PER_PAGE];
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            array[i] = new SaveState();
+        }
+
+        fileStates.Add(array);
+    }
+
+    private static SaveStateData LoadFromFile(string path)
     {
         try
         {
-            string filePath = GetFilePath(page, index);
-            if (File.Exists(filePath))
+            if (File.Exists(path))
             {
-                SaveStateData data = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(filePath));
+                SaveStateData data = JsonUtility.FromJson<SaveStateData>(File.ReadAllText(path));
                 data.AfterDeserialize();
                 return data;
             }
         }
         catch (Exception ex)
         {
-            DebugMod.LogDebug(ex.Message);
-            throw;
+            DebugMod.LogError(ex.Message);
         }
 
         return new SaveStateData();
@@ -274,11 +310,18 @@ public static class SaveStateManager
     #endregion
 
     #region packs
+    public static List<string> GetPackNames() => packNames;
 
-    public static List<string> GetPackNames()
+    public static void SwitchPack(string name)
     {
-        return packNames;
+        try
+        {
+            LoadPack(name);
+        }
+        catch (Exception ex)
+        {
+            DebugMod.LogError(ex.ToString());
+        }
     }
-
     #endregion
 }
