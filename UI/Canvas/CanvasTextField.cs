@@ -16,6 +16,7 @@ public class CanvasTextField : CanvasText
     private InputField inputField;
 
     public bool Clickable { get; set; } = true;
+    public bool Persistent { get; set; }
 
     public event Action<string> OnSubmit;
 
@@ -35,7 +36,16 @@ public class CanvasTextField : CanvasText
         inputField.onSubmit.AddListener(text =>
         {
             Text = text;
-            OnSubmit?.Invoke(text);
+
+            try
+            {
+                OnSubmit?.Invoke(text);
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Error submitting text field {GetQualifiedName()}: {e}");
+                throw;
+            }
         });
 
         inputField.onEndEdit.AddListener(_ =>
@@ -44,6 +54,14 @@ public class CanvasTextField : CanvasText
             t.text = Text;
             AnyFieldFocused = false;
             InputManager.enabled = true;
+        });
+
+        inputField.onValueChanged.AddListener(_ =>
+        {
+            if (Persistent)
+            {
+                Text = inputField.text;
+            }
         });
 
         AddEventTrigger(EventTriggerType.PointerDown, _ =>

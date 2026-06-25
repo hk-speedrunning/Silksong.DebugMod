@@ -2,6 +2,7 @@ using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using GlobalSettings;
 using System;
 using System.Collections.Generic;
@@ -98,16 +99,6 @@ public class MainPanel : CanvasPanel
         AppendToggleControl("MODUI_TOGGLEINFOPANEL", () => DebugMod.settings.InfoPanelVisible, BindableFunctions.ToggleInfoPanel);
         AppendToggleControl("MODUI_ALWAYSSHOWCURSOR", () => DebugMod.settings.ShowCursorWhileUnpaused, BindableFunctions.ToggleAlwaysShowCursor);
 
-        AppendSectionHeader("CATEGORY_SAVESTATES");
-
-        AppendRow(1);
-        AppendDropdown(
-            "PackSwitcher",
-            () => SaveStateManager.CurrentPack,
-            () => SaveStateManager.GetPackNames().Where(name => name != SaveStateManager.CurrentPack).ToList(),
-            SaveStateManager.SwitchPack
-        );
-
         AppendSectionHeader("CATEGORY_TIME");
         AppendRow(1);
         AppendNumericControl(
@@ -202,6 +193,71 @@ public class MainPanel : CanvasPanel
             BindableFunctions.ZoomOut,
             BindableFunctions.ResetZoom
         );
+
+        AppendSectionHeader("CATEGORY_SAVESTATES");
+
+        AppendRow(1);
+        AppendDropdown(
+            "PackSwitcher",
+            () => SaveStateManager.CurrentPack,
+            SaveStateManager.GetPackNames,
+            value =>
+            {
+                if (value != SaveStateManager.CurrentPack)
+                {
+                    SaveStateManager.SwitchPack(value);
+                }
+            }
+        );
+
+        AppendRow(1, 1, 1);
+        CanvasPanel renamePackPanel = null;
+        renamePackPanel = AppendBasicControl("SAVESTATES_RENAMEPACK", () =>
+        {
+            TextEntryDialog.Instance.Toggle(
+                renamePackPanel,
+                "SAVESTATES_RENAMEPACKPROMPT",
+                SaveStateManager.RenameCurrentPack,
+                SaveStateManager.CurrentPack,
+                name =>
+                {
+                    if (name == SaveStateManager.CurrentPack)
+                    {
+                        // No need to display an error for this
+                        return "";
+                    }
+
+                    return SaveStateManager.ValidateNewPackName(name);
+                }
+            );
+        });
+        CanvasPanel createPackPanel = null;
+        createPackPanel = AppendBasicControl("SAVESTATES_CREATEPACK", () =>
+        {
+            int i = 1;
+
+            while (SaveStateManager.GetPackNames().Contains($"SavestatePack{i}"))
+            {
+                i++;
+            }
+
+            TextEntryDialog.Instance.Toggle(
+                createPackPanel,
+                "SAVESTATES_CREATEPACKPROMPT",
+                SaveStateManager.CreateNewPack,
+                $"SavestatePack{i}",
+                SaveStateManager.ValidateNewPackName
+            );
+        });
+        CanvasPanel deletePackPanel = null;
+        deletePackPanel = AppendBasicControl("SAVESTATES_DELETEPACK", () =>
+        {
+            ConfirmDialog.Instance.Toggle(
+                deletePackPanel,
+                "SAVESTATES_DELETEPACKPROMPT",
+                SaveStateManager.DeleteCurrentPack
+            );
+        });
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);
@@ -1042,6 +1098,7 @@ public class MainPanel : CanvasPanel
         text.Alignment = TextAnchor.MiddleCenter;
 
         ResetRow();
+        lastRowCount = 0;
 
         return text;
     }

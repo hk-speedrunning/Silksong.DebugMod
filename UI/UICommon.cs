@@ -1,5 +1,6 @@
 ﻿using DebugMod.Helpers;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +33,7 @@ public static class UICommon
     // Catppuccin Macchiato: https://catppuccin.com/palette
     public static readonly Color baseColor = RGB(36, 39, 58);
     public static readonly Color strongColor = RGB(73, 77, 100);
+    public static readonly Color darkBaseColor = RGB(24, 25, 38);
     public static readonly Color borderColor = RGB(202, 211, 245);
     public static readonly Color accentColor = RGB(138, 173, 244);
     public static readonly Color highlightColor = RGB(245, 169, 127);
@@ -41,6 +43,7 @@ public static class UICommon
 
     public static readonly Texture2D panelBG = SolidColor(baseColor, 100);
     public static readonly Texture2D panelStrongBG = SolidColor(strongColor, 220);
+    public static readonly Texture2D panelDarkBG = SolidColor(darkBaseColor);
     public static readonly Texture2D dialogBG = SolidColor(baseColor);
     public static readonly Texture2D clearBG = SolidColor(baseColor, 0);
 

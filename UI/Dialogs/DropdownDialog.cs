@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace DebugMod.UI;
+namespace DebugMod.UI.Dialogs;
 
 public class DropdownDialog : CanvasDialog
 {
@@ -22,9 +22,7 @@ public class DropdownDialog : CanvasDialog
 
     protected override bool CustomPositioning => true;
 
-    public DropdownDialog() : base(nameof(DropdownDialog))
-    {
-    }
+    public DropdownDialog() : base(nameof(DropdownDialog)) { }
 
     protected override void BuildDialog()
     {

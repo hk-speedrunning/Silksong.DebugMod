@@ -5,6 +5,7 @@ using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -121,6 +122,7 @@ public class GUIController : MonoBehaviour
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
             DropdownDialog.BuildPanel();
+            TextEntryDialog.BuildPanel();
 
             resolution = new Size(Screen.width, Screen.height);
             language = GetLanguage();

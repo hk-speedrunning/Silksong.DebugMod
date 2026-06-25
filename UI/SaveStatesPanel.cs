@@ -1,6 +1,7 @@
 ﻿using DebugMod.Helpers;
 using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -71,12 +72,12 @@ public class SaveStatesPanel : CanvasPanel
 
                 if (PlayerData.instance.playTime >= 3600 * 2 && !loadedAnySavestate)
                 {
-                    ConfirmDialog.Instance.Toggle(load, Localization.Get("SAVESTATEPANEL_LOADWARNING"),
+                    ConfirmDialog.Instance.Toggle(load, "SAVESTATEPANEL_LOADWARNING",
                         () =>
                         {
                             SaveStateManager.LoadState(SaveStateManager.GetQuickState());
                         },
-                        () => { }, width: UICommon.ScaleWidth(250), lines: 3);
+                        width: UICommon.ScaleWidth(250), lines: 3);
                 }
                 else
                 {
@@ -230,7 +231,7 @@ public class SaveStatesPanel : CanvasPanel
 
                 if (SaveStateManager.GetFileState(currentPage, index).IsSet())
                 {
-                    ConfirmDialog.Instance.Toggle(write, Localization.Get("SAVESTATEPANEL_OVERWRITEPROMPT"), action, () => CancelSelectState(true));
+                    ConfirmDialog.Instance.Toggle(write, "SAVESTATEPANEL_OVERWRITEPROMPT", action, () => CancelSelectState(true));
                 }
                 else
                 {

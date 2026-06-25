@@ -15,6 +15,7 @@ public static class SaveStateManager
     private static readonly string pageDirectoryPattern = @"^(\d+)$";
     private static readonly string savestateFilePattern = @"^savestate(\d)\.json$";
     private static readonly string defaultPackName = "My Savestates";
+    private static readonly string extraFilesPrefix = "notasavestatepack-";
 
     private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
     private static readonly string defaultPackDirectory = Path.Combine(saveStatesBaseDirectory, defaultPackName);
@@ -40,6 +41,7 @@ public static class SaveStateManager
     private static SaveState quickState;
 
     private static List<string> packNames = [];
+    private static string lastPackName;
 
     internal static void Initialize()
     {
@@ -206,12 +208,56 @@ public static class SaveStateManager
                 }
             }
 
-            foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
+            foreach (string path in Directory.EnumerateFileSystemEntries(saveStatesBaseDirectory))
             {
-                if (Directory.EnumerateDirectories(path).Any(pagePath => Regex.IsMatch(Path.GetFileName(pagePath), pageDirectoryPattern)
+                if (Directory.Exists(path)
+                    && Directory.EnumerateDirectories(path).Any(pagePath => Regex.IsMatch(Path.GetFileName(pagePath), pageDirectoryPattern)
                     && Directory.EnumerateFiles(pagePath).Any(savestatePath => Regex.IsMatch(Path.GetFileName(savestatePath), savestateFilePattern))))
                 {
                     packNames.Add(Path.GetFileName(path));
+                }
+                else
+                {
+                    // Packs directory needs to stay clear or pack operations can break
+
+                    try
+                    {
+                        // Just delete a directory if it's empty
+                        Directory.Delete(path);
+                        continue;
+                    }
+                    catch { }
+
+                    try
+                    {
+                        // Rename it to a safe name otherwise
+                        string newPath = Path.Combine(DebugMod.ModBaseDirectory,
+                            extraFilesPrefix + Path.GetFileName(path));
+
+                        if (Directory.Exists(path))
+                        {
+                            Directory.Move(path, newPath);
+                        }
+                        else
+                        {
+                            File.Move(path, newPath);
+                        }
+                    }
+                    catch { }
+
+                    try
+                    {
+                        // Well, I tried being nice...
+                        if (Directory.Exists(path))
+                        {
+                            Directory.Delete(path, recursive: true);
+                        }
+                        else
+                        {
+                            File.Delete(path);
+                        }
+                    }
+                    catch { }
                 }
             }
 
@@ -221,8 +267,7 @@ public static class SaveStateManager
                 Directory.CreateDirectory(defaultPackDirectory);
             }
 
-            LoadPack(DebugMod.settings.CurrentSavestatePack);
-
+            LoadPack(CurrentPack);
         }
         catch (Exception ex)
         {
@@ -316,12 +361,112 @@ public static class SaveStateManager
     {
         try
         {
+            lastPackName = CurrentPack;
             LoadPack(name);
         }
         catch (Exception ex)
         {
             DebugMod.LogError(ex.ToString());
         }
+    }
+
+    public static void RenameCurrentPack(string newName)
+    {
+        if (ValidateNewPackName(newName) != "")
+        {
+            return;
+        }
+
+        string currentDirectory = GetPackDirectory(CurrentPack);
+        string newDirectory = GetPackDirectory(newName);
+
+        if (Directory.Exists(currentDirectory))
+        {
+            Directory.Move(currentDirectory, newDirectory);
+        }
+
+        for (int i = 0; i < packNames.Count; i++)
+        {
+            if (packNames[i] == CurrentPack)
+            {
+                packNames[i] = newName;
+            }
+        }
+
+        CurrentPack = newName;
+    }
+
+    public static void CreateNewPack(string name)
+    {
+        if (ValidateNewPackName(name) != "")
+        {
+            return;
+        }
+
+        fileStates.Clear();
+        AddFileSlotPage();
+
+        packNames.Add(name);
+        CurrentPack = name;
+    }
+
+    public static void DeleteCurrentPack()
+    {
+        if (!packNames.Remove(CurrentPack))
+        {
+            return;
+        }
+
+        string directory = GetPackDirectory(CurrentPack);
+
+        if (Directory.Exists(directory))
+        {
+            Directory.Delete(Path.Combine(saveStatesBaseDirectory, CurrentPack), recursive: true);
+        }
+
+        if (packNames.Count == 0)
+        {
+            CreateNewPack(defaultPackName);
+        }
+        else
+        {
+            LoadPack(packNames.Contains(lastPackName) ? lastPackName : packNames[0]);
+        }
+
+        lastPackName = null;
+    }
+
+    public static string GetPackDirectory(string name)
+    {
+        return Path.Combine(saveStatesBaseDirectory, name);
+    }
+
+    public static string ValidateNewPackName(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return "SAVESTATES_ERRORPACKNAMEEMPTY";
+        }
+
+        if (name.StartsWith(extraFilesPrefix))
+        {
+            return "SAVESTATES_ERRORGENERIC";
+        }
+
+        if (packNames.Contains(name))
+        {
+            return "SAVESTATES_ERRORPACKALREADYEXISTS";
+        }
+
+        foreach (char c in Path.GetInvalidFileNameChars())
+        {
+            if (name.Contains(c))
+            {
+                return "SAVESTATES_ERRORINVALIDPACKNAMECHAR";
+            }
+        }
+
+        return "";
     }
     #endregion
 }
