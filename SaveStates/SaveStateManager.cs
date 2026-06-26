@@ -208,7 +208,7 @@ public static class SaveStateManager
                 }
             }
 
-            foreach (string path in Directory.EnumerateFileSystemEntries(saveStatesBaseDirectory))
+            foreach (string path in Directory.EnumerateFileSystemEntries(saveStatesBaseDirectory).OrderBy(x => x))
             {
                 if (Directory.Exists(path)
                     && Directory.EnumerateDirectories(path).Any(pagePath => Regex.IsMatch(Path.GetFileName(pagePath), pageDirectoryPattern)
@@ -282,7 +282,7 @@ public static class SaveStateManager
 
         string baseDirectory = Path.Combine(saveStatesBaseDirectory, name);
 
-        foreach (string pageDirectory in Directory.EnumerateDirectories(baseDirectory))
+        foreach (string pageDirectory in Directory.EnumerateDirectories(baseDirectory).OrderBy(x => x))
         {
             Match pageMatch = Regex.Match(Path.GetFileName(pageDirectory), pageDirectoryPattern);
             if (!pageMatch.Success)
@@ -297,7 +297,7 @@ public static class SaveStateManager
                 AddFileSlotPage();
             }
 
-            foreach (string savestateFile in Directory.EnumerateFiles(pageDirectory))
+            foreach (string savestateFile in Directory.EnumerateFiles(pageDirectory).OrderBy(x => x))
             {
                 Match savestateMatch = Regex.Match(Path.GetFileName(savestateFile), savestateFilePattern);
                 if (!savestateMatch.Success)
@@ -407,6 +407,7 @@ public static class SaveStateManager
         AddFileSlotPage();
 
         packNames.Add(name);
+        packNames.Sort();
         CurrentPack = name;
     }
 
@@ -430,7 +431,7 @@ public static class SaveStateManager
         }
         else
         {
-            LoadPack(packNames.Contains(lastPackName) ? lastPackName : packNames[0]);
+            SwitchPack(packNames.Contains(lastPackName) ? lastPackName : packNames[0]);
         }
 
         lastPackName = null;
