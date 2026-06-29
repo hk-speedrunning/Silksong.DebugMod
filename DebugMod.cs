@@ -49,6 +49,7 @@ public partial class DebugMod : BaseUnityPlugin
 
     public static DebugMod instance;
 
+    private Harmony harmony;
     public static Settings settings { get; set; } = new Settings();
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
@@ -154,7 +155,7 @@ public partial class DebugMod : BaseUnityPlugin
         SaveStateManager.Initialize();
         TimeScale.Initialize();
 
-        Harmony harmony = new(Id);
+        harmony = new Harmony(Id);
         harmony.PatchAll();
 
         SceneManager.activeSceneChanged += LevelActivated;
@@ -178,7 +179,12 @@ public partial class DebugMod : BaseUnityPlugin
 
     private void OnEnable() => TimeScale.Initialize();
     private void OnDisable() => TimeScale.Reset();
-    private void OnDestroy() => TimeScale.Release();
+    private void OnDestroy()
+    {
+        harmony?.UnpatchSelf();
+
+        TimeScale.Release();
+    }
 
     public DebugMod()
     {
