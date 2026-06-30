@@ -88,6 +88,10 @@ public class GUIController : MonoBehaviour
     {
         try
         {
+            resolution = new Size(Screen.width, Screen.height);
+            language = GetLanguage();
+            benchwarpShifted = false;
+
             if (canvas)
             {
                 foreach (EnemyHandle handle in EnemiesPanel.enemyPool)
@@ -123,10 +127,6 @@ public class GUIController : MonoBehaviour
             ConfirmDialog.BuildPanel();
             DropdownDialog.BuildPanel();
             TextEntryDialog.BuildPanel();
-
-            resolution = new Size(Screen.width, Screen.height);
-            language = GetLanguage();
-            benchwarpShifted = false;
 
             DebugMod.LogDebug("UI built");
         }

@@ -180,6 +180,8 @@
     "MODUI_TOGGLEINFOPANEL": "Toggle Info Panel",
     "MODUI_TOGGLEMAINPANEL": "Toggle Main Panel",
     "MODUI_TOGGLESAVESTATESPANEL": "Toggle Savestates Panel",
+    "SAVESTATEPANEL_DELETEPAGEPROMPT": "Delete non-empty file slot page?",
+    "SAVESTATEPANEL_DELETESTATEPROMPT": "Delete this savestate?",
     "SAVESTATEPANEL_EMPTY": "Empty",
     "SAVESTATEPANEL_FILESLOTREAD": "Read",
     "SAVESTATEPANEL_FILESLOTWRITE": "Write",

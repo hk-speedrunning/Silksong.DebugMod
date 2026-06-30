@@ -49,6 +49,7 @@ public static class SaveStateManager
         LoadSavestateFiles();
     }
 
+    #region operations
     public static SaveState GetQuickState() => quickState;
     public static SaveState GetFileState(int page, int index) => fileStates[page][index];
 
@@ -64,10 +65,128 @@ public static class SaveStateManager
     {
         if (state.IsSet())
         {
-            fileStates[page][index].data = state.data.DeepCopy();
-            SaveToFile(state.data, page, index);
+            SetFileStateForce(state, page, index);
         }
     }
+
+    public static void DeleteFileState(int page, int index)
+    {
+        fileStates[page][index].data = new SaveStateData();
+        SaveToFile(page, index);
+    }
+
+    public static void SetFileStateForce(SaveState state, int page, int index)
+    {
+        fileStates[page][index].data = state.data.DeepCopy();
+        SaveToFile(page, index);
+    }
+
+    public static void RenameFileState(int page, int index, string name)
+    {
+        if (fileStates[page][index].IsSet())
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                fileStates[page][index].data.saveStateIdentifier = name;
+                SaveToFile(page, index);
+            }
+            else
+            {
+                DebugMod.LogConsole("Invalid name for savestate");
+            }
+        }
+    }
+
+    public static void SwapFileStates(int page1, int index1, int page2, int index2)
+    {
+        SaveState state1 = GetFileState(page1, index1);
+        SaveState state2 = GetFileState(page2, index2);
+
+        fileStates[page1][index1] = state2;
+        fileStates[page2][index2] = state1;
+    }
+
+    public static void AddPage(int page)
+    {
+        SaveState[] array = new SaveState[STATES_PER_PAGE];
+
+        for (int i = 0; i < array.Length; i++)
+        {
+            array[i] = new SaveState();
+        }
+
+        for (int i = fileStates.Count - 1; i >= page; i--)
+        {
+            Directory.Move(GetPagePath(CurrentPack, i), GetPagePath(CurrentPack, i + 1));
+        }
+
+        Directory.CreateDirectory(GetPagePath(CurrentPack, page));
+
+        fileStates.Insert(page, array);
+    }
+
+    public static bool RemovePage(int page, bool force)
+    {
+        if (fileStates.Count > 1)
+        {
+            SaveState[] array = fileStates[page];
+            string path = GetPagePath(CurrentPack, page);
+
+            if (array.Any(x => x.IsSet()))
+            {
+                if (force)
+                {
+                    Directory.Delete(path, recursive: true);
+                    fileStates.Remove(array);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                Directory.Delete(path);
+                fileStates.Remove(array);
+            }
+        }
+
+        for (int i = page; i < fileStates.Count; i++)
+        {
+            Directory.Move(GetPagePath(CurrentPack, i + 1), GetPagePath(CurrentPack, i));
+        }
+
+        return true;
+    }
+
+    public static void SwapPages(int a, int b)
+    {
+        if (a >= 0 && a < fileStates.Count && b >= 0 && b < fileStates.Count && a != b)
+        {
+            string tempPath = Path.Combine(saveStatesBaseDirectory, CurrentPack, "Temp");
+            Directory.Move(GetPagePath(CurrentPack, a), tempPath);
+            Directory.Move(GetPagePath(CurrentPack, b), GetPagePath(CurrentPack, a));
+            Directory.Move(tempPath, GetPagePath(CurrentPack, b));
+
+            (fileStates[a], fileStates[b]) = (fileStates[b], fileStates[a]);
+        }
+    }
+
+    public static string GetPackPath(string pack)
+    {
+        return Path.Combine(saveStatesBaseDirectory, pack);
+    }
+
+    private static string GetPagePath(string pack, int page)
+    {
+        return Path.Combine(GetPackPath(pack), page.ToString());
+    }
+
+    private static string GetSavestatePath(string pack, int page, int index)
+    {
+        return Path.Combine(GetPagePath(pack, page), $"savestate{index}.json");
+    }
+    #endregion
 
     #region saving
     public static SaveState SaveNewState()
@@ -100,36 +219,29 @@ public static class SaveStateManager
         return true;
     }
 
-    private static void SaveToFile(SaveStateData data, int page, int index)
+    private static void SaveToFile(int page, int index)
     {
         try
         {
-            string filePath = Path.Combine(saveStatesBaseDirectory, CurrentPack, page.ToString(), $"savestate{index}.json");
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            SaveState state = fileStates[page][index];
+            string filePath = GetSavestatePath(CurrentPack, page, index);
 
-            data.BeforeSerialize();
-            File.WriteAllText(filePath, JsonUtility.ToJson(data, prettyPrint: true));
+            if (state.IsSet())
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
+                state.data.BeforeSerialize();
+                File.WriteAllText(filePath, JsonUtility.ToJson(state.data, prettyPrint: true));
+            }
+            else if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
         catch (Exception ex)
         {
             DebugMod.LogDebug(ex.Message);
             throw;
-        }
-    }
-
-    public static void RenameFileState(int page, int index, string name)
-    {
-        if (fileStates[page][index].IsSet())
-        {
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                fileStates[page][index].data.saveStateIdentifier = name;
-                SaveToFile(fileStates[page][index].data, page, index);
-            }
-            else
-            {
-                DebugMod.LogConsole("Invalid name for savestate");
-            }
         }
     }
     #endregion
@@ -294,7 +406,7 @@ public static class SaveStateManager
 
             while (fileStates.Count <= page)
             {
-                AddFileSlotPage();
+                AddPage(fileStates.Count);
             }
 
             foreach (string savestateFile in Directory.EnumerateFiles(pageDirectory).OrderBy(x => x))
@@ -316,22 +428,10 @@ public static class SaveStateManager
 
         if (fileStates.Count == 0)
         {
-            AddFileSlotPage();
+            AddPage(0);
         }
 
         PackChanged?.Invoke();
-    }
-
-    private static void AddFileSlotPage()
-    {
-        SaveState[] array = new SaveState[STATES_PER_PAGE];
-
-        for (int i = 0; i < array.Length; i++)
-        {
-            array[i] = new SaveState();
-        }
-
-        fileStates.Add(array);
     }
 
     private static SaveStateData LoadFromFile(string path)
@@ -377,8 +477,8 @@ public static class SaveStateManager
             return;
         }
 
-        string currentDirectory = GetPackDirectory(CurrentPack);
-        string newDirectory = GetPackDirectory(newName);
+        string currentDirectory = GetPackPath(CurrentPack);
+        string newDirectory = GetPackPath(newName);
 
         if (Directory.Exists(currentDirectory))
         {
@@ -404,7 +504,7 @@ public static class SaveStateManager
         }
 
         fileStates.Clear();
-        AddFileSlotPage();
+        AddPage(0);
 
         packNames.Add(name);
         packNames.Sort();
@@ -418,7 +518,7 @@ public static class SaveStateManager
             return;
         }
 
-        string directory = GetPackDirectory(CurrentPack);
+        string directory = GetPackPath(CurrentPack);
 
         if (Directory.Exists(directory))
         {
@@ -435,11 +535,6 @@ public static class SaveStateManager
         }
 
         lastPackName = null;
-    }
-
-    public static string GetPackDirectory(string name)
-    {
-        return Path.Combine(saveStatesBaseDirectory, name);
     }
 
     public static string ValidateNewPackName(string name)

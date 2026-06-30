@@ -94,4 +94,9 @@ public class CanvasDialog : CanvasPanel
 
         Destroy();
     }
+
+    public bool IsOpenFor(CanvasNode node)
+    {
+        return anchor == node;
+    }
 }

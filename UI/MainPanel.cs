@@ -1422,6 +1422,17 @@ public class MainPanel : CanvasPanel
         icon.LocalPosition = new Vector2(control.Size.x - control.Size.y, 0f);
         icon.Size = new Vector2(control.Size.y, control.Size.y);
         icon.SetImage(UICommon.images["IconDownMin"]);
+        icon.OnUpdate += () =>
+        {
+            if (DropdownDialog.Instance.IsOpenFor(button))
+            {
+                icon.SetImage(UICommon.images["IconUpMin"]);
+            }
+            else
+            {
+                icon.SetImage(UICommon.images["IconDownMin"]);
+            }
+        };
 
         return control;
     }

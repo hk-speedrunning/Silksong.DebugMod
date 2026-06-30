@@ -23,10 +23,12 @@ public class SaveStatesPanel : CanvasPanel
 
     private SelectOperation selectStateOperation;
     private int currentPage;
+    private bool editMode;
 
     static SaveStatesPanel()
     {
         SaveStateManager.PackChanged += () => Instance?.PackChanged();
+        SaveState.AfterLoad += _ => loadedAnySavestate = true;
     }
 
     public static void BuildPanel()
@@ -37,8 +39,6 @@ public class SaveStatesPanel : CanvasPanel
 
     public SaveStatesPanel() : base(nameof(SaveStatesPanel))
     {
-        SaveState.AfterLoad += _ => loadedAnySavestate = true;
-
         LocalPosition = new Vector2(Screen.width / 2f - UICommon.SaveStatePanelWidth / 2f, UICommon.ScreenMargin);
         Size = new Vector2(UICommon.SaveStatePanelWidth, 0);
         OnUpdate += DoUpdate;
@@ -132,25 +132,85 @@ public class SaveStatesPanel : CanvasPanel
         builder.AppendPadding((int)collapsed.Size.y - builder.OuterPadding * 2);
 
         {
-            using PanelBuilder pageControl = new(builder.AppendFixed(new CanvasPanel("Page"), UICommon.ScaleHeight(15)));
-            pageControl.Horizontal = true;
+            PanelBuilder pageRow = new(builder.AppendFixed(new CanvasPanel("PageRow"), UICommon.ScaleHeight(16)));
+            pageRow.InnerPadding = UICommon.Margin;
+            pageRow.Horizontal = true;
 
-            CanvasText pageText = pageControl.AppendFixed(new CanvasText("Current"), UICommon.ScaleWidth(85));
+            using PanelBuilder leftSide = new(pageRow.AppendFlex(new CanvasPanel("Left")));
+            leftSide.Horizontal = true;
+
+            CanvasButton movePageLeft = pageRow.AppendSquare(new CanvasButton("MovePageLeft"));
+            OnUpdate += () => movePageLeft.ActiveSelf = editMode;
+            movePageLeft.ImageOnly(UICommon.images["IconX"]);
+            movePageLeft.OnClicked += () =>
+            {
+                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage - 1));
+                currentPage = WrapPageNumber(currentPage - 1);
+            };
+
+            CanvasButton prevPage = pageRow.AppendSquare(new CanvasButton("Prev"));
+            prevPage.ImageOnly(UICommon.images["IconLeft"]);
+            prevPage.OnClicked += PrevPage;
+
+            CanvasText pageText = pageRow.AppendFixed(new CanvasText("Page Number"), UICommon.ScaleWidth(85));
             pageText.Alignment = TextAnchor.MiddleLeft;
             pageText.OnUpdate += () => pageText.Text = string.Format(
                 Localization.Get("SAVESTATEPANEL_PAGEFORMAT"), currentPage + 1, SaveStateManager.NumPages);
 
-            CanvasButton prevPage = pageControl.AppendSquare(new CanvasButton("Prev"));
-            prevPage.ImageOnly(UICommon.images["IconMinus"]);
-            prevPage.OnClicked += PrevPage;
-
-            pageControl.AppendPadding(UICommon.Margin);
-
-            CanvasButton nextPage = pageControl.AppendSquare(new CanvasButton("Next"));
-            nextPage.ImageOnly(UICommon.images["IconPlus"]);
+            CanvasButton nextPage = pageRow.AppendSquare(new CanvasButton("Next"));
+            nextPage.ImageOnly(UICommon.images["IconRight"]);
             nextPage.OnClicked += NextPage;
 
-            CanvasText currentOperation = pageControl.AppendFlex(new CanvasText("CurrentOperation"));
+            CanvasButton movePageRight = pageRow.AppendSquare(new CanvasButton("MovePageRight"));
+            OnUpdate += () => movePageRight.ActiveSelf = editMode;
+            movePageRight.ImageOnly(UICommon.images["IconX"]);
+            movePageRight.OnClicked += () =>
+            {
+                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage + 1));
+                currentPage = WrapPageNumber(currentPage + 1);
+            };
+
+            using PanelBuilder rightSide = new(pageRow.AppendFlex(new CanvasPanel("Right")));
+            rightSide.Horizontal = true;
+
+            pageRow.Build();
+
+            CanvasButton editButton = leftSide.AppendSquare(new CanvasButton("Edit"));
+            editButton.ImageOnly(UICommon.images["IconEditOff"]);
+            editButton.OnUpdate += () => editButton.SetImage(UICommon.images[editMode ? "IconEditOn" : "IconEditOff"]);
+            editButton.OnClicked += () => editMode = !editMode;
+
+            leftSide.AppendPadding(UICommon.Margin);
+
+            CanvasButton addPageButton = leftSide.AppendSquare(new CanvasButton("AddPage"));
+            OnUpdate += () => addPageButton.ActiveSelf = editMode;
+            addPageButton.ImageOnly(UICommon.images["IconPlus"]);
+            addPageButton.OnClicked += () =>
+            {
+                SaveStateManager.AddPage(currentPage + 1);
+                currentPage++;
+            };
+
+            leftSide.AppendPadding(UICommon.Margin);
+
+            CanvasButton removePageButton = leftSide.AppendSquare(new CanvasButton("RemovePage"));
+            OnUpdate += () => removePageButton.ActiveSelf = editMode;
+            removePageButton.ImageOnly(UICommon.images["IconX"]);
+            removePageButton.OnClicked += () =>
+            {
+                if (!SaveStateManager.RemovePage(currentPage, false))
+                {
+                    ConfirmDialog.Instance.Toggle(removePageButton, "SAVESTATEPANEL_DELETEPAGEPROMPT",
+                        () => SaveStateManager.RemovePage(currentPage, true), width: 250);
+                }
+
+                if (currentPage >= SaveStateManager.NumPages)
+                {
+                    currentPage = SaveStateManager.NumPages - 1;
+                }
+            };
+
+            CanvasText currentOperation = rightSide.AppendFlex(new CanvasText("CurrentOperation"));
             currentOperation.Alignment = TextAnchor.MiddleRight;
             currentOperation.OnUpdate += () => currentOperation.Text = PrettyPrintSelectOperation(selectStateOperation);
         }
@@ -169,21 +229,92 @@ public class SaveStatesPanel : CanvasPanel
 
             CanvasTextField name = fileSlot.AppendFlex(new CanvasTextField("Name"));
             name.Alignment = TextAnchor.MiddleLeft;
+            name.Overflow = HorizontalWrapMode.Overflow;
             name.OnUpdate += () => name.UpdateDefaultText(SaveStateManager.GetFileState(currentPage, index).ToString());
             name.OnSubmit += text => SaveStateManager.RenameFileState(currentPage, index, text);
 
-            CanvasPanel renameWrapper = fileSlot.AppendSquare(new CanvasPanel("RenameWrapper"));
-            renameWrapper.CollapseMode = CollapseMode.AllowNoRenaming;
-            using PanelBuilder wrapper = new(renameWrapper);
-            wrapper.Padding = IconPadding;
-
-            CanvasButton rename = wrapper.AppendFlex(new CanvasButton("Rename"));
-            rename.ImageOnly(UICommon.images["IconEditText"]);
-            rename.OnClicked += () =>
             {
-                CancelSelectState(true);
-                name.Activate();
-            };
+                CanvasPanel iconsWrapper = fileSlot.AppendLazy(new CanvasPanel("IconsWrapper"));
+                using PanelBuilder wrapper = new(iconsWrapper);
+                wrapper.OuterPadding = IconPadding;
+                wrapper.InnerPadding = UICommon.Margin;
+                wrapper.Horizontal = true;
+                wrapper.DynamicLength = true;
+
+                CanvasButton moveUp = wrapper.AppendSquare(new CanvasButton("MoveUp"));
+                OnUpdate += () => moveUp.ActiveSelf = editMode;
+                moveUp.ImageOnly(UICommon.images["IconUp"]);
+                moveUp.OnClicked += () =>
+                {
+                    int otherPage;
+                    int otherIndex;
+
+                    if (index > 0)
+                    {
+                        otherPage = currentPage;
+                        otherIndex = index - 1;
+                    }
+                    else
+                    {
+                        otherPage = currentPage - 1;
+                        otherIndex = SaveStateManager.STATES_PER_PAGE - 1;
+
+                        if (otherPage < 0)
+                        {
+                            return;
+                        }
+                    }
+
+                    SaveStateManager.SwapFileStates(currentPage, index, otherPage, otherIndex);
+                };
+
+                CanvasButton moveDown = wrapper.AppendSquare(new CanvasButton("MoveDown"));
+                OnUpdate += () => moveDown.ActiveSelf = editMode;
+                moveDown.ImageOnly(UICommon.images["IconDown"]);
+                moveDown.OnClicked += () =>
+                {
+                    int otherPage;
+                    int otherIndex;
+
+                    if (index < SaveStateManager.STATES_PER_PAGE - 1)
+                    {
+                        otherPage = currentPage;
+                        otherIndex = index + 1;
+                    }
+                    else
+                    {
+                        otherPage = currentPage + 1;
+                        otherIndex = 0;
+
+                        if (otherPage >= SaveStateManager.NumPages)
+                        {
+                            return;
+                        }
+                    }
+
+                    SaveStateManager.SwapFileStates(currentPage, index, otherPage, otherIndex);
+                };
+
+                CanvasButton delete = wrapper.AppendSquare(new CanvasButton("Delete"));
+                OnUpdate += () => delete.ActiveSelf = editMode;
+                delete.ImageOnly(UICommon.images["IconX"]);
+                delete.OnClicked += () =>
+                {
+                    ConfirmDialog.Instance.Toggle(delete, "SAVESTATEPANEL_DELETESTATEPROMPT",
+                        () => SaveStateManager.DeleteFileState(currentPage, index));
+                };
+
+                CanvasButton rename = wrapper.AppendSquare(new CanvasButton("Rename"));
+                rename.ImageOnly(UICommon.images["IconEditText"]);
+                rename.OnClicked += () =>
+                {
+                    CancelSelectState(true);
+                    name.Activate();
+                };
+
+                // Removes padding from right edge
+                wrapper.AppendPadding(-wrapper.OuterPadding - wrapper.InnerPadding);
+            }
 
             fileSlot.AppendPadding(UICommon.Margin);
 
@@ -319,11 +450,7 @@ public class SaveStatesPanel : CanvasPanel
     {
         if (ShouldBeVisible && ShouldBeExpanded)
         {
-            currentPage++;
-            if (currentPage >= SaveStateManager.NumPages)
-            {
-                currentPage -= SaveStateManager.NumPages;
-            }
+            currentPage = WrapPageNumber(currentPage + 1);
         }
     }
 
@@ -331,12 +458,22 @@ public class SaveStatesPanel : CanvasPanel
     {
         if (ShouldBeVisible && ShouldBeExpanded)
         {
-            currentPage--;
-            if (currentPage < 0)
-            {
-                currentPage += SaveStateManager.NumPages;
-            }
+            currentPage = WrapPageNumber(currentPage - 1);
         }
+    }
+
+    private int WrapPageNumber(int x)
+    {
+        if (x < 0)
+        {
+            x += SaveStateManager.NumPages;
+        }
+        else if (x >= SaveStateManager.NumPages)
+        {
+            x -= SaveStateManager.NumPages;
+        }
+
+        return x;
     }
 
     public void EnterSelectState(SelectOperation operation)

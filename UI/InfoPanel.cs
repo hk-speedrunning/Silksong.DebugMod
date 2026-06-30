@@ -201,11 +201,12 @@ public class InfoPanel : CanvasPanel
         labelText.Text = Localization.Get(label);
 
         // Info text is offset slightly downward so the different fonts (approximately) line up
-        CanvasText infoText = Add(new CanvasText($"Info{counter}", overflow: HorizontalWrapMode.Overflow));
+        CanvasText infoText = Add(new CanvasText($"Info{counter}"));
         infoText.LocalPosition = new Vector2(x + labelWidth, y + ListingHeight / 10f);
         infoText.Size = new Vector2(infoWidth, ListingHeight);
         infoText.Font = UICommon.trajanBold;
         infoText.Alignment = TextAnchor.MiddleLeft;
+        infoText.Overflow = HorizontalWrapMode.Overflow;
         infoText.OnUpdate += () => infoText.Text = info();
 
         // Alt implementation:
