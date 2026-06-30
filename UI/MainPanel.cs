@@ -196,68 +196,20 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("CATEGORY_SAVESTATES");
 
+        // XXX: Temporary UI
+        string currentPack = null;
+
         AppendRow(1);
         AppendDropdown(
             "PackSwitcher",
-            () => SaveStateManager.CurrentPack,
+            () => currentPack ?? "No pack selected",
             SaveStateManager.GetPackNames,
-            value =>
-            {
-                if (value != SaveStateManager.CurrentPack)
-                {
-                    SaveStateManager.SwitchPack(value);
-                }
-            }
+            value => currentPack = value
         );
 
-        AppendRow(1, 1, 1);
-        CanvasPanel renamePackPanel = null;
-        renamePackPanel = AppendBasicControl("SAVESTATES_RENAMEPACK", () =>
-        {
-            TextEntryDialog.Instance.Toggle(
-                renamePackPanel,
-                "SAVESTATES_RENAMEPACKPROMPT",
-                SaveStateManager.RenameCurrentPack,
-                SaveStateManager.CurrentPack,
-                name =>
-                {
-                    if (name == SaveStateManager.CurrentPack)
-                    {
-                        // No need to display an error for this
-                        return "";
-                    }
-
-                    return SaveStateManager.ValidateNewPackName(name);
-                }
-            );
-        });
-        CanvasPanel createPackPanel = null;
-        createPackPanel = AppendBasicControl("SAVESTATES_CREATEPACK", () =>
-        {
-            int i = 1;
-
-            while (SaveStateManager.GetPackNames().Contains($"SavestatePack{i}"))
-            {
-                i++;
-            }
-
-            TextEntryDialog.Instance.Toggle(
-                createPackPanel,
-                "SAVESTATES_CREATEPACKPROMPT",
-                SaveStateManager.CreateNewPack,
-                $"SavestatePack{i}",
-                SaveStateManager.ValidateNewPackName
-            );
-        });
-        CanvasPanel deletePackPanel = null;
-        deletePackPanel = AppendBasicControl("SAVESTATES_DELETEPACK", () =>
-        {
-            ConfirmDialog.Instance.Toggle(
-                deletePackPanel,
-                "SAVESTATES_DELETEPACKPROMPT",
-                SaveStateManager.DeleteCurrentPack
-            );
-        });
+        AppendRow(1, 1);
+        AppendBasicControl("SAVESTATES_IMPORTPACK", () => SaveStateManager.ImportPack(currentPack));
+        AppendBasicControl("SAVESTATES_EXPORTPACK", () => SaveStateManager.ExportPack(currentPack));
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);

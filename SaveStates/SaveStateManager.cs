@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -14,34 +15,18 @@ public static class SaveStateManager
 
     private static readonly string pageDirectoryPattern = @"^(\d+)$";
     private static readonly string savestateFilePattern = @"^savestate(\d)\.json$";
-    private static readonly string defaultPackName = "My Savestates";
-    private static readonly string extraFilesPrefix = "notasavestatepack-";
 
     private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
-    private static readonly string defaultPackDirectory = Path.Combine(saveStatesBaseDirectory, defaultPackName);
+    private static readonly string packsBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
 
     public static int NumPages => fileStates.Count;
 
-    public static string CurrentPack
-    {
-        get
-        {
-            return DebugMod.settings.CurrentSavestatePack;
-        }
-
-        private set
-        {
-            DebugMod.settings.CurrentSavestatePack = value;
-        }
-    }
-
     public static event Action PackChanged;
 
-    private static List<SaveState[]> fileStates = [];
+    private static readonly List<SaveState[]> fileStates = [];
     private static SaveState quickState;
 
-    private static List<string> packNames = [];
-    private static string lastPackName;
+    private static readonly List<string> packNames = [];
 
     internal static void Initialize()
     {
@@ -50,6 +35,7 @@ public static class SaveStateManager
     }
 
     #region operations
+
     public static SaveState GetQuickState() => quickState;
     public static SaveState GetFileState(int page, int index) => fileStates[page][index];
 
@@ -117,10 +103,10 @@ public static class SaveStateManager
 
         for (int i = fileStates.Count - 1; i >= page; i--)
         {
-            Directory.Move(GetPagePath(CurrentPack, i), GetPagePath(CurrentPack, i + 1));
+            Directory.Move(GetPagePath(i), GetPagePath(i + 1));
         }
 
-        Directory.CreateDirectory(GetPagePath(CurrentPack, page));
+        Directory.CreateDirectory(GetPagePath(page));
 
         fileStates.Insert(page, array);
     }
@@ -130,7 +116,7 @@ public static class SaveStateManager
         if (fileStates.Count > 1)
         {
             SaveState[] array = fileStates[page];
-            string path = GetPagePath(CurrentPack, page);
+            string path = GetPagePath(page);
 
             if (array.Any(x => x.IsSet()))
             {
@@ -153,7 +139,7 @@ public static class SaveStateManager
 
         for (int i = page; i < fileStates.Count; i++)
         {
-            Directory.Move(GetPagePath(CurrentPack, i + 1), GetPagePath(CurrentPack, i));
+            Directory.Move(GetPagePath(i + 1), GetPagePath(i));
         }
 
         return true;
@@ -163,32 +149,29 @@ public static class SaveStateManager
     {
         if (a >= 0 && a < fileStates.Count && b >= 0 && b < fileStates.Count && a != b)
         {
-            string tempPath = Path.Combine(saveStatesBaseDirectory, CurrentPack, "Temp");
-            Directory.Move(GetPagePath(CurrentPack, a), tempPath);
-            Directory.Move(GetPagePath(CurrentPack, b), GetPagePath(CurrentPack, a));
-            Directory.Move(tempPath, GetPagePath(CurrentPack, b));
+            string tempPath = Path.Combine(saveStatesBaseDirectory, "Temp");
+            Directory.Move(GetPagePath(a), tempPath);
+            Directory.Move(GetPagePath(b), GetPagePath(a));
+            Directory.Move(tempPath, GetPagePath(b));
 
             (fileStates[a], fileStates[b]) = (fileStates[b], fileStates[a]);
         }
     }
 
-    public static string GetPackPath(string pack)
+    private static string GetPagePath(int page)
     {
-        return Path.Combine(saveStatesBaseDirectory, pack);
+        return Path.Combine(saveStatesBaseDirectory, page.ToString());
     }
 
-    private static string GetPagePath(string pack, int page)
+    private static string GetSavestatePath(int page, int index)
     {
-        return Path.Combine(GetPackPath(pack), page.ToString());
+        return Path.Combine(GetPagePath(page), $"savestate{index}.json");
     }
 
-    private static string GetSavestatePath(string pack, int page, int index)
-    {
-        return Path.Combine(GetPagePath(pack, page), $"savestate{index}.json");
-    }
     #endregion
 
     #region saving
+
     public static SaveState SaveNewState()
     {
         if (SaveTest())
@@ -224,7 +207,7 @@ public static class SaveStateManager
         try
         {
             SaveState state = fileStates[page][index];
-            string filePath = GetSavestatePath(CurrentPack, page, index);
+            string filePath = GetSavestatePath(page, index);
 
             if (state.IsSet())
             {
@@ -244,15 +227,17 @@ public static class SaveStateManager
             throw;
         }
     }
+
     #endregion
 
     #region loading
+
     public static void LoadState(SaveState state)
     {
         bool shouldLoad = LoadLockout();
         if (!shouldLoad && DebugMod.overrideLoadLockout)
         {
-            DebugMod.LogConsole($"Overriding savestate lockout");
+            DebugMod.LogConsole("Overriding savestate lockout");
             shouldLoad = true;
         }
 
@@ -303,83 +288,15 @@ public static class SaveStateManager
                 }
             }
 
+            LoadAllSavestates();
+
             packNames.Clear();
+            Directory.CreateDirectory(packsBaseDirectory);
 
-            // Detect old savestate file layout and move into a default pack
-            if (!Directory.Exists(defaultPackDirectory))
+            foreach (string path in Directory.EnumerateFileSystemEntries(packsBaseDirectory, "*.zip").OrderBy(x => x))
             {
-                foreach (string path in Directory.EnumerateDirectories(saveStatesBaseDirectory))
-                {
-                    string name = Path.GetFileName(path);
-
-                    if (Regex.IsMatch(name, pageDirectoryPattern))
-                    {
-                        Directory.CreateDirectory(defaultPackDirectory);
-                        Directory.Move(path, Path.Combine(defaultPackDirectory, name));
-                    }
-                }
+                packNames.Add(Path.GetFileNameWithoutExtension(path));
             }
-
-            foreach (string path in Directory.EnumerateFileSystemEntries(saveStatesBaseDirectory).OrderBy(x => x))
-            {
-                if (Directory.Exists(path)
-                    && Directory.EnumerateDirectories(path).Any(pagePath => Regex.IsMatch(Path.GetFileName(pagePath), pageDirectoryPattern)
-                    && Directory.EnumerateFiles(pagePath).Any(savestatePath => Regex.IsMatch(Path.GetFileName(savestatePath), savestateFilePattern))))
-                {
-                    packNames.Add(Path.GetFileName(path));
-                }
-                else
-                {
-                    // Packs directory needs to stay clear or pack operations can break
-
-                    try
-                    {
-                        // Just delete a directory if it's empty
-                        Directory.Delete(path);
-                        continue;
-                    }
-                    catch { }
-
-                    try
-                    {
-                        // Rename it to a safe name otherwise
-                        string newPath = Path.Combine(DebugMod.ModBaseDirectory,
-                            extraFilesPrefix + Path.GetFileName(path));
-
-                        if (Directory.Exists(path))
-                        {
-                            Directory.Move(path, newPath);
-                        }
-                        else
-                        {
-                            File.Move(path, newPath);
-                        }
-                    }
-                    catch { }
-
-                    try
-                    {
-                        // Well, I tried being nice...
-                        if (Directory.Exists(path))
-                        {
-                            Directory.Delete(path, recursive: true);
-                        }
-                        else
-                        {
-                            File.Delete(path);
-                        }
-                    }
-                    catch { }
-                }
-            }
-
-            if (CurrentPack == "" || !packNames.Contains(CurrentPack))
-            {
-                CurrentPack = defaultPackName;
-                Directory.CreateDirectory(defaultPackDirectory);
-            }
-
-            LoadPack(CurrentPack);
         }
         catch (Exception ex)
         {
@@ -387,14 +304,12 @@ public static class SaveStateManager
         }
     }
 
-    private static void LoadPack(string name)
+    private static void LoadAllSavestates()
     {
-        CurrentPack = name;
         fileStates.Clear();
+        Directory.CreateDirectory(saveStatesBaseDirectory);
 
-        string baseDirectory = Path.Combine(saveStatesBaseDirectory, name);
-
-        foreach (string pageDirectory in Directory.EnumerateDirectories(baseDirectory).OrderBy(x => x))
+        foreach (string pageDirectory in Directory.EnumerateDirectories(saveStatesBaseDirectory).OrderBy(x => x))
         {
             Match pageMatch = Regex.Match(Path.GetFileName(pageDirectory), pageDirectoryPattern);
             if (!pageMatch.Success)
@@ -430,8 +345,6 @@ public static class SaveStateManager
         {
             AddPage(0);
         }
-
-        PackChanged?.Invoke();
     }
 
     private static SaveStateData LoadFromFile(string path)
@@ -452,89 +365,62 @@ public static class SaveStateManager
 
         return new SaveStateData();
     }
+
     #endregion
 
     #region packs
+
     public static List<string> GetPackNames() => packNames;
 
-    public static void SwitchPack(string name)
+    public static void ImportPack(string name)
     {
-        try
-        {
-            lastPackName = CurrentPack;
-            LoadPack(name);
-        }
-        catch (Exception ex)
-        {
-            DebugMod.LogError(ex.ToString());
-        }
-    }
+        string packPath = GetPackPath(name);
 
-    public static void RenameCurrentPack(string newName)
-    {
-        if (ValidateNewPackName(newName) != "")
+        if (!packNames.Contains(name) || !File.Exists(packPath))
         {
             return;
         }
 
-        string currentDirectory = GetPackPath(CurrentPack);
-        string newDirectory = GetPackPath(newName);
+        // TODO: backup current savestates
+        Directory.Delete(saveStatesBaseDirectory, recursive: true);
 
-        if (Directory.Exists(currentDirectory))
+        try
         {
-            Directory.Move(currentDirectory, newDirectory);
+            ZipFile.ExtractToDirectory(GetPackPath(name), saveStatesBaseDirectory);
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogConsole("Error extracting pack zip");
+            DebugMod.LogError(e.ToString());
         }
 
-        for (int i = 0; i < packNames.Count; i++)
-        {
-            if (packNames[i] == CurrentPack)
-            {
-                packNames[i] = newName;
-            }
-        }
+        LoadAllSavestates();
 
-        CurrentPack = newName;
+        DebugMod.settings.LastLoadedPack = name;
+        PackChanged?.Invoke();
+
+        DebugMod.LogConsole($"Imported pack {name}");
     }
 
-    public static void CreateNewPack(string name)
+    public static void ExportPack(string name)
     {
         if (ValidateNewPackName(name) != "")
         {
             return;
         }
 
-        fileStates.Clear();
-        AddPage(0);
+        string packPath = GetPackPath(name);
 
-        packNames.Add(name);
-        packNames.Sort();
-        CurrentPack = name;
-    }
+        File.Delete(packPath);
+        ZipFile.CreateFromDirectory(saveStatesBaseDirectory, packPath);
 
-    public static void DeleteCurrentPack()
-    {
-        if (!packNames.Remove(CurrentPack))
+        if (!packNames.Contains(name))
         {
-            return;
+            packNames.Add(name);
+            packNames.Sort();
         }
 
-        string directory = GetPackPath(CurrentPack);
-
-        if (Directory.Exists(directory))
-        {
-            Directory.Delete(Path.Combine(saveStatesBaseDirectory, CurrentPack), recursive: true);
-        }
-
-        if (packNames.Count == 0)
-        {
-            CreateNewPack(defaultPackName);
-        }
-        else
-        {
-            SwitchPack(packNames.Contains(lastPackName) ? lastPackName : packNames[0]);
-        }
-
-        lastPackName = null;
+        DebugMod.LogConsole($"Exported pack {name}");
     }
 
     public static string ValidateNewPackName(string name)
@@ -542,16 +428,6 @@ public static class SaveStateManager
         if (string.IsNullOrEmpty(name))
         {
             return "SAVESTATES_ERRORPACKNAMEEMPTY";
-        }
-
-        if (name.StartsWith(extraFilesPrefix))
-        {
-            return "SAVESTATES_ERRORGENERIC";
-        }
-
-        if (packNames.Contains(name))
-        {
-            return "SAVESTATES_ERRORPACKALREADYEXISTS";
         }
 
         foreach (char c in Path.GetInvalidFileNameChars())
@@ -563,6 +439,11 @@ public static class SaveStateManager
         }
 
         return "";
+    }
+
+    private static string GetPackPath(string name)
+    {
+        return Path.Combine(packsBaseDirectory, $"{name}.zip");
     }
     #endregion
 }

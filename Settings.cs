@@ -115,9 +115,9 @@ public class Settings
     [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
     public Dictionary<string, KeyCode> binds = new();
 
-    public string CurrentSavestatePack = "";
-
     public bool FirstRun = true;
+
+    public string LastLoadedPack = "";
 
     public bool MainPanelVisible = true;
 
