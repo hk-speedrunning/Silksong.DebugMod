@@ -197,20 +197,11 @@ public class MainPanel : CanvasPanel
 
         AppendSectionHeader("CATEGORY_SAVESTATES");
 
-        // XXX: Temporary UI
-        string currentPack = null;
-
-        AppendRow(1);
-        AppendDropdown(
-            "PackSwitcher",
-            () => currentPack ?? "No pack selected",
-            SaveStateManager.GetPackNames,
-            value => currentPack = value
-        );
-
         AppendRow(1, 1);
-        AppendBasicControl("SAVESTATES_IMPORTPACK", () => SaveStateManager.ImportPack(currentPack));
-        AppendBasicControl("SAVESTATES_EXPORTPACK", () => SaveStateManager.ExportPack(currentPack));
+        CanvasPanel importPack = null;
+        importPack = AppendBasicControl("SAVESTATES_IMPORTPACK", () => ImportPackDialog.Instance.Toggle(importPack));
+        CanvasPanel exportPack = null;
+        exportPack = AppendBasicControl("SAVESTATES_EXPORTPACK", () => ExportPackDialog.Instance.Toggle(exportPack));
 
         AppendRow(1, 1);
         AppendToggleControl("SAVESTATES_SAVESTATEONDEATH", () => DebugMod.stateOnDeath, BindableFunctions.LoadStateOnDeath);
@@ -1365,37 +1356,6 @@ public class MainPanel : CanvasPanel
         }
 
         return AppendWideTile(name, Builder, image);
-    }
-
-    private CanvasPanel AppendDropdown(string name, Func<string> current, Func<List<string>> options, Action<string> setter)
-    {
-        currentRow ??= AppendRow(1);
-
-        CanvasPanel control = AppendRowElement(name);
-
-        CanvasButton button = control.Add(new CanvasButton("Current"));
-        button.Size = control.Size;
-        button.Text.Alignment = TextAnchor.MiddleLeft;
-        button.Text.OnUpdate += () => button.Text.Text = current();
-        button.OnClicked += () => DropdownDialog.Instance.Toggle(button, options(), setter);
-
-        CanvasImage icon = control.Add(new CanvasImage("DropdownIcon"));
-        icon.LocalPosition = new Vector2(control.Size.x - control.Size.y, 0f);
-        icon.Size = new Vector2(control.Size.y, control.Size.y);
-        icon.SetImage(UICommon.images["IconDownMin"]);
-        icon.OnUpdate += () =>
-        {
-            if (DropdownDialog.Instance.IsOpenFor(button))
-            {
-                icon.SetImage(UICommon.images["IconUpMin"]);
-            }
-            else
-            {
-                icon.SetImage(UICommon.images["IconDownMin"]);
-            }
-        };
-
-        return control;
     }
 
     public override void Build()

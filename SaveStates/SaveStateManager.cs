@@ -376,8 +376,14 @@ public static class SaveStateManager
     {
         string packPath = GetPackPath(name);
 
-        if (!packNames.Contains(name) || !File.Exists(packPath))
+        if (!packNames.Contains(name))
         {
+            return;
+        }
+
+        if (!File.Exists(packPath))
+        {
+            packNames.Remove(name);
             return;
         }
 

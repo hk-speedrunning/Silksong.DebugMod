@@ -126,7 +126,8 @@ public class GUIController : MonoBehaviour
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
             DropdownDialog.BuildPanel();
-            TextEntryDialog.BuildPanel();
+            ImportPackDialog.BuildPanel();
+            ExportPackDialog.BuildPanel();
 
             DebugMod.LogDebug("UI built");
         }

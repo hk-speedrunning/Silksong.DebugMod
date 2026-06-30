@@ -11,9 +11,7 @@ public class CanvasDialog : CanvasPanel
 
     protected virtual bool CustomPositioning => false;
 
-    public CanvasDialog(string name) : base(name)
-    {
-    }
+    public CanvasDialog(string name) : base(name) { }
 
     // Dialogs are more dynamic than panels, so they are rebuilt every time they are shown
     protected virtual void BuildDialog()
@@ -29,7 +27,7 @@ public class CanvasDialog : CanvasPanel
 
     private void DoUpdate()
     {
-        if (initialClickEnded && !IsMouseOver() && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
+        if (initialClickEnded && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && !ClickedOnDialogOrChild())
         {
             Hide();
         }
@@ -42,6 +40,41 @@ public class CanvasDialog : CanvasPanel
         {
             initialClickEnded = true;
         }
+    }
+
+    // Return true if the mouse is over this dialog or another dialog anchored to this one
+    private bool ClickedOnDialogOrChild()
+    {
+        for (int i = 0; i < allNodes.Count;)
+        {
+            CanvasNode node = allNodes[i];
+
+            if (node is CanvasDialog dialog && dialog.ActiveSelf && dialog.IsMouseOver())
+            {
+                CanvasNode current = dialog;
+
+                while (current != null)
+                {
+                    if (current is CanvasDialog dialog2)
+                    {
+                        if (current == this)
+                        {
+                            return true;
+                        }
+
+                        current = dialog2.anchor;
+                    }
+                    else
+                    {
+                        current = node.Parent;
+                    }
+                }
+            }
+
+            i += node.childCount;
+        }
+
+        return false;
     }
 
     protected bool TryStartToggle(CanvasNode anchor)

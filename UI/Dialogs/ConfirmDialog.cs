@@ -45,7 +45,7 @@ public class ConfirmDialog : CanvasDialog
         row.InnerPadding = UICommon.Margin;
 
         CanvasButton yes = row.AppendFlex(new CanvasButton("Yes"));
-        yes.Text.Text = Localization.Get("CONFIRM_YES");
+        yes.Text.Text = Localization.Get("DIALOG_YES");
         yes.OnClicked += () =>
         {
             onAccept();
@@ -53,7 +53,7 @@ public class ConfirmDialog : CanvasDialog
         };
 
         CanvasButton no = row.AppendFlex(new CanvasButton("No"));
-        no.Text.Text = Localization.Get("CONFIRM_NO");
+        no.Text.Text = Localization.Get("DIALOG_NO");
         no.OnClicked += () =>
         {
             onReject?.Invoke();
