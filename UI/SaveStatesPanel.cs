@@ -107,9 +107,9 @@ public class SaveStatesPanel : CanvasPanel
             wrapper.Padding = IconPadding;
 
             CanvasButton toggleViewButton = wrapper.AppendFlex(new CanvasButton("ToggleView"));
-            toggleViewButton.ImageOnly(UICommon.images["IconPlus"]);
+            toggleViewButton.ImageOnly(UICommon.images["IconDown"]);
             toggleViewButton.OnUpdate += () => toggleViewButton.SetImage(
-                ShouldBeExpanded ? UICommon.images["IconMinus"] : UICommon.images["IconPlus"]);
+                ShouldBeExpanded ? UICommon.images["IconUp"] : UICommon.images["IconDown"]);
             toggleViewButton.OnClicked += ToggleView;
         }
 
@@ -137,50 +137,17 @@ public class SaveStatesPanel : CanvasPanel
             pageRow.Horizontal = true;
 
             using PanelBuilder leftSide = new(pageRow.AppendFlex(new CanvasPanel("Left")));
+            leftSide.InnerPadding = UICommon.Margin;
             leftSide.Horizontal = true;
-
-            CanvasButton movePageLeft = pageRow.AppendSquare(new CanvasButton("MovePageLeft"));
-            OnUpdate += () => movePageLeft.ActiveSelf = editMode;
-            movePageLeft.ImageOnly(UICommon.images["IconX"]);
-            movePageLeft.OnClicked += () =>
-            {
-                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage - 1));
-                currentPage = WrapPageNumber(currentPage - 1);
-            };
-
-            CanvasButton prevPage = pageRow.AppendSquare(new CanvasButton("Prev"));
-            prevPage.ImageOnly(UICommon.images["IconLeft"]);
-            prevPage.OnClicked += PrevPage;
-
-            CanvasText pageText = pageRow.AppendFixed(new CanvasText("Page Number"), UICommon.ScaleWidth(85));
-            pageText.Alignment = TextAnchor.MiddleLeft;
-            pageText.OnUpdate += () => pageText.Text = string.Format(
-                Localization.Get("SAVESTATEPANEL_PAGEFORMAT"), currentPage + 1, SaveStateManager.NumPages);
-
-            CanvasButton nextPage = pageRow.AppendSquare(new CanvasButton("Next"));
-            nextPage.ImageOnly(UICommon.images["IconRight"]);
-            nextPage.OnClicked += NextPage;
-
-            CanvasButton movePageRight = pageRow.AppendSquare(new CanvasButton("MovePageRight"));
-            OnUpdate += () => movePageRight.ActiveSelf = editMode;
-            movePageRight.ImageOnly(UICommon.images["IconX"]);
-            movePageRight.OnClicked += () =>
-            {
-                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage + 1));
-                currentPage = WrapPageNumber(currentPage + 1);
-            };
-
-            using PanelBuilder rightSide = new(pageRow.AppendFlex(new CanvasPanel("Right")));
-            rightSide.Horizontal = true;
-
-            pageRow.Build();
-
+            
+            // Edit button + Page Edit cluster
+            
             CanvasButton editButton = leftSide.AppendSquare(new CanvasButton("Edit"));
             editButton.ImageOnly(UICommon.images["IconEditOff"]);
             editButton.OnUpdate += () => editButton.SetImage(UICommon.images[editMode ? "IconEditOn" : "IconEditOff"]);
             editButton.OnClicked += () => editMode = !editMode;
-
-            leftSide.AppendPadding(UICommon.Margin);
+            
+            leftSide.AppendPadding(leftSide.ChildBreadth());
 
             CanvasButton addPageButton = leftSide.AppendSquare(new CanvasButton("AddPage"));
             OnUpdate += () => addPageButton.ActiveSelf = editMode;
@@ -190,8 +157,6 @@ public class SaveStatesPanel : CanvasPanel
                 SaveStateManager.AddPage(currentPage + 1);
                 currentPage++;
             };
-
-            leftSide.AppendPadding(UICommon.Margin);
 
             CanvasButton removePageButton = leftSide.AppendSquare(new CanvasButton("RemovePage"));
             OnUpdate += () => removePageButton.ActiveSelf = editMode;
@@ -209,6 +174,44 @@ public class SaveStatesPanel : CanvasPanel
                     currentPage = SaveStateManager.NumPages - 1;
                 }
             };
+            
+            CanvasButton movePageLeft = leftSide.AppendSquare(new CanvasButton("MovePageLeft"));
+            OnUpdate += () => movePageLeft.ActiveSelf = editMode;
+            movePageLeft.ImageOnly(UICommon.images["IconLeft"]);
+            movePageLeft.OnClicked += () =>
+            {
+                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage - 1));
+                currentPage = WrapPageNumber(currentPage - 1);
+            };
+            
+            CanvasButton movePageRight = leftSide.AppendSquare(new CanvasButton("MovePageRight"));
+            OnUpdate += () => movePageRight.ActiveSelf = editMode;
+            movePageRight.ImageOnly(UICommon.images["IconRight"]);
+            movePageRight.OnClicked += () =>
+            {
+                SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage + 1));
+                currentPage = WrapPageNumber(currentPage + 1);
+            };
+            
+            // Page nav cluster
+            
+            CanvasButton prevPage = pageRow.AppendSquare(new CanvasButton("Prev"));
+            prevPage.ImageOnly(UICommon.images["IconLeftMin"]);
+            prevPage.OnClicked += PrevPage;
+
+            CanvasText pageText = pageRow.AppendFixed(new CanvasText("Page Number"), UICommon.ScaleWidth(80));
+            pageText.Alignment = TextAnchor.MiddleCenter;
+            pageText.OnUpdate += () => pageText.Text = string.Format(
+                Localization.Get("SAVESTATEPANEL_PAGEFORMAT"), currentPage + 1, SaveStateManager.NumPages);
+
+            CanvasButton nextPage = pageRow.AppendSquare(new CanvasButton("Next"));
+            nextPage.ImageOnly(UICommon.images["IconRightMin"]);
+            nextPage.OnClicked += NextPage;
+
+            using PanelBuilder rightSide = new(pageRow.AppendFlex(new CanvasPanel("Right")));
+            rightSide.Horizontal = true;
+
+            pageRow.Build();
 
             CanvasText currentOperation = rightSide.AppendFlex(new CanvasText("CurrentOperation"));
             currentOperation.Alignment = TextAnchor.MiddleRight;
@@ -243,7 +246,7 @@ public class SaveStatesPanel : CanvasPanel
 
                 CanvasButton moveUp = wrapper.AppendSquare(new CanvasButton("MoveUp"));
                 OnUpdate += () => moveUp.ActiveSelf = editMode;
-                moveUp.ImageOnly(UICommon.images["IconUp"]);
+                moveUp.ImageOnly(UICommon.images["IconUpMin"]);
                 moveUp.OnClicked += () =>
                 {
                     int otherPage;
@@ -270,7 +273,7 @@ public class SaveStatesPanel : CanvasPanel
 
                 CanvasButton moveDown = wrapper.AppendSquare(new CanvasButton("MoveDown"));
                 OnUpdate += () => moveDown.ActiveSelf = editMode;
-                moveDown.ImageOnly(UICommon.images["IconDown"]);
+                moveDown.ImageOnly(UICommon.images["IconDownMin"]);
                 moveDown.OnClicked += () =>
                 {
                     int otherPage;
