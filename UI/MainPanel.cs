@@ -6,6 +6,7 @@ using DebugMod.UI.Dialogs;
 using GlobalSettings;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
@@ -210,6 +211,14 @@ public class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendBasicControl("SAVESTATES_IMPORTPACK", () => SaveStateManager.ImportPack(currentPack));
         AppendBasicControl("SAVESTATES_EXPORTPACK", () => SaveStateManager.ExportPack(currentPack));
+
+        AppendRow(1, 1);
+        AppendToggleControl("SAVESTATES_SAVESTATEONDEATH", () => DebugMod.stateOnDeath, BindableFunctions.LoadStateOnDeath);
+        AppendBasicControl("SAVESTATES_OPENSAVESTATESFOLDER", () => Process.Start(SaveStateManager.saveStatesBaseDirectory));
+
+        AppendRow(1, 1);
+        AppendToggleControl("SAVESTATES_OVERRIDELOADLOCKOUT", () => DebugMod.overrideLoadLockout, BindableFunctions.OverrideLoadLockout);
+        AppendBasicControl("SAVESTATES_OPENPACKSFOLDER", () => Process.Start(SaveStateManager.packsBaseDirectory));
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);

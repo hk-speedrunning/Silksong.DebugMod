@@ -16,8 +16,8 @@ public static class SaveStateManager
     private static readonly string pageDirectoryPattern = @"^(\d+)$";
     private static readonly string savestateFilePattern = @"^savestate(\d)\.json$";
 
-    private static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
-    private static readonly string packsBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
+    public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
+    public static readonly string packsBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
 
     public static int NumPages => fileStates.Count;
 

@@ -139,14 +139,14 @@ public class SaveStatesPanel : CanvasPanel
             using PanelBuilder leftSide = new(pageRow.AppendFlex(new CanvasPanel("Left")));
             leftSide.InnerPadding = UICommon.Margin;
             leftSide.Horizontal = true;
-            
+
             // Edit button + Page Edit cluster
-            
+
             CanvasButton editButton = leftSide.AppendSquare(new CanvasButton("Edit"));
             editButton.ImageOnly(UICommon.images["IconEditOff"]);
             editButton.OnUpdate += () => editButton.SetImage(UICommon.images[editMode ? "IconEditOn" : "IconEditOff"]);
             editButton.OnClicked += () => editMode = !editMode;
-            
+
             leftSide.AppendPadding(leftSide.ChildBreadth());
 
             CanvasButton addPageButton = leftSide.AppendSquare(new CanvasButton("AddPage"));
@@ -166,7 +166,7 @@ public class SaveStatesPanel : CanvasPanel
                 if (!SaveStateManager.RemovePage(currentPage, false))
                 {
                     ConfirmDialog.Instance.Toggle(removePageButton, "SAVESTATEPANEL_DELETEPAGEPROMPT",
-                        () => SaveStateManager.RemovePage(currentPage, true), width: 250);
+                        () => SaveStateManager.RemovePage(currentPage, true), width: UICommon.ScaleWidth(250));
                 }
 
                 if (currentPage >= SaveStateManager.NumPages)
@@ -174,7 +174,7 @@ public class SaveStatesPanel : CanvasPanel
                     currentPage = SaveStateManager.NumPages - 1;
                 }
             };
-            
+
             CanvasButton movePageLeft = leftSide.AppendSquare(new CanvasButton("MovePageLeft"));
             OnUpdate += () => movePageLeft.ActiveSelf = editMode;
             movePageLeft.ImageOnly(UICommon.images["IconLeft"]);
@@ -183,7 +183,7 @@ public class SaveStatesPanel : CanvasPanel
                 SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage - 1));
                 currentPage = WrapPageNumber(currentPage - 1);
             };
-            
+
             CanvasButton movePageRight = leftSide.AppendSquare(new CanvasButton("MovePageRight"));
             OnUpdate += () => movePageRight.ActiveSelf = editMode;
             movePageRight.ImageOnly(UICommon.images["IconRight"]);
@@ -192,9 +192,9 @@ public class SaveStatesPanel : CanvasPanel
                 SaveStateManager.SwapPages(currentPage, WrapPageNumber(currentPage + 1));
                 currentPage = WrapPageNumber(currentPage + 1);
             };
-            
+
             // Page nav cluster
-            
+
             CanvasButton prevPage = pageRow.AppendSquare(new CanvasButton("Prev"));
             prevPage.ImageOnly(UICommon.images["IconLeftMin"]);
             prevPage.OnClicked += PrevPage;
