@@ -110,6 +110,8 @@ public class ExportPackDialog : CanvasDialog
     {
         if (TryStartToggle(anchor))
         {
+            SaveStateManager.RefreshSavestatePacks();
+
             Show();
         }
     }

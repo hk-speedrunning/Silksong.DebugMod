@@ -205,7 +205,7 @@
     "SAVESTATES_IMPORTINDIALOG": "Import",
     "SAVESTATES_IMPORTPACK": "Import Pack",
     "SAVESTATES_IMPORTPACKPROMPT": "Select a pack to import",
-    "SAVESTATES_IMPORTWARNING": "Importing a pack will delete all of your existing savestates. If you have existing savestates, please export them first.",
+    "SAVESTATES_IMPORTWARNING": "Importing a pack will delete all of your existing savestates. A backup will automatically be created, in case you need to recover them.",
     "SAVESTATES_LOADFROMFILE": "Load new state from file",
     "SAVESTATES_NEXTSAVESTATEPAGE": "Next Save Page",
     "SAVESTATES_NOPACKSELECTED": "No pack selected",

@@ -18,6 +18,7 @@ public static class SaveStateManager
 
     public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
     public static readonly string packsBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
+    public static readonly string backupsDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Backups");
 
     public static int NumPages => fileStates.Count;
 
@@ -289,14 +290,7 @@ public static class SaveStateManager
             }
 
             LoadAllSavestates();
-
-            packNames.Clear();
-            Directory.CreateDirectory(packsBaseDirectory);
-
-            foreach (string path in Directory.EnumerateFileSystemEntries(packsBaseDirectory, "*.zip").OrderBy(x => x))
-            {
-                packNames.Add(Path.GetFileNameWithoutExtension(path));
-            }
+            RefreshSavestatePacks();
         }
         catch (Exception ex)
         {
@@ -347,6 +341,17 @@ public static class SaveStateManager
         }
     }
 
+    public static void RefreshSavestatePacks()
+    {
+        packNames.Clear();
+        Directory.CreateDirectory(packsBaseDirectory);
+
+        foreach (string path in Directory.EnumerateFileSystemEntries(packsBaseDirectory, "*.zip").OrderBy(x => x))
+        {
+            packNames.Add(Path.GetFileNameWithoutExtension(path));
+        }
+    }
+
     private static SaveStateData LoadFromFile(string path)
     {
         try
@@ -387,7 +392,8 @@ public static class SaveStateManager
             return;
         }
 
-        // TODO: backup current savestates
+        BackupSavestates();
+
         Directory.Delete(saveStatesBaseDirectory, recursive: true);
 
         try
@@ -408,8 +414,30 @@ public static class SaveStateManager
         DebugMod.LogConsole($"Imported pack {name}");
     }
 
+    private static void BackupSavestates()
+    {
+        string savestatesName = DebugMod.settings.LastLoadedPack;
+        if (string.IsNullOrEmpty(savestatesName)) savestatesName = "Savestates";
+
+        string path = Path.Combine(backupsDirectory, $"{savestatesName} {DateTime.Now:yy-MM-dd-HH-mm-ss}.zip");
+
+        Directory.CreateDirectory(backupsDirectory);
+        File.Delete(path);
+        ZipFile.CreateFromDirectory(saveStatesBaseDirectory, path);
+
+        DirectoryInfo directory = new(backupsDirectory);
+        List<FileInfo> files = directory.EnumerateFiles().OrderBy(x => x.CreationTime).ToList();
+
+        for (int i = 0; i < files.Count - 20; i++)
+        {
+            files[i].Delete();
+        }
+    }
+
     public static void ExportPack(string name)
     {
+        RefreshSavestatePacks();
+
         if (ValidateNewPackName(name) != "")
         {
             return;

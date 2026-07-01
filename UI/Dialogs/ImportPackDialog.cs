@@ -115,6 +115,9 @@ public class ImportPackDialog : CanvasDialog
     {
         if (TryStartToggle(anchor))
         {
+            selectedPack = null;
+            SaveStateManager.RefreshSavestatePacks();
+
             Show();
         }
     }
