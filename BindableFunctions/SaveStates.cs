@@ -58,8 +58,8 @@ public static partial class BindableFunctions
     [BindableMethod(name = "SAVESTATES_REFRESHFILESLOTS", category = "CATEGORY_SAVESTATES")]
     public static void RefreshFileSlots()
     {
-        SaveStateManager.LoadFileStates();
-        DebugMod.LogConsole("Reimporting file slots from disk");
+        SaveStateManager.LoadSavestateFiles();
+        DebugMod.LogConsole("Reimporting savestates from disk");
     }
 
     [BindableMethod(name = "SAVESTATES_SAVESTATEONDEATH", category = "CATEGORY_SAVESTATES")]

@@ -15,6 +15,9 @@ public class CanvasTextField : CanvasText
 
     private InputField inputField;
 
+    public bool Clickable { get; set; } = true;
+    public bool Persistent { get; set; }
+
     public event Action<string> OnSubmit;
 
     protected override bool Interactable => true;
@@ -33,7 +36,16 @@ public class CanvasTextField : CanvasText
         inputField.onSubmit.AddListener(text =>
         {
             Text = text;
-            OnSubmit?.Invoke(text);
+
+            try
+            {
+                OnSubmit?.Invoke(text);
+            }
+            catch (Exception e)
+            {
+                DebugMod.LogError($"Error submitting text field {GetQualifiedName()}: {e}");
+                throw;
+            }
         });
 
         inputField.onEndEdit.AddListener(_ =>
@@ -44,9 +56,17 @@ public class CanvasTextField : CanvasText
             InputManager.enabled = true;
         });
 
+        inputField.onValueChanged.AddListener(_ =>
+        {
+            if (Persistent)
+            {
+                Text = inputField.text;
+            }
+        });
+
         AddEventTrigger(EventTriggerType.PointerDown, _ =>
         {
-            if (!IsFocused())
+            if (Clickable && !IsFocused())
             {
                 // For some reason clicking the input field doesn't clear the selection,
                 // but I actually prefer it that way

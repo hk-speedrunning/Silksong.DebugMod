@@ -92,18 +92,29 @@ public class PanelBuilder : IDisposable
             throw new Exception("Flex elements are not supported for a dynamic-length PanelBuilder");
         }
 
-        float flexLength = (Length() - totalFixedLength) / flexCount;
+        float totalFlexLength = Length() - totalFixedLength;
+
+        // Calculation is done with ints so everything is still aligned properly
+        int flexLength = flexCount == 0 ? 0 : (int)(totalFlexLength / flexCount);
+        int flexRemainder = (int)(totalFlexLength - flexLength * flexCount);
 
         if (Length() < totalFixedLength && flexCount != 0)
         {
             DebugMod.LogWarn($"{panel.GetQualifiedName()} has no room for flex elements, assigning 0 width");
             flexLength = 0;
+            flexRemainder = 0;
         }
 
         float t = OuterPadding;
+        int flexIndex = 0;
 
         foreach (Entry entry in entries)
         {
+            if (entry.type == LengthType.Flex)
+            {
+                flexIndex++;
+            }
+
             float length = entry.type switch
             {
                 LengthType.Square => ChildBreadth(),
@@ -111,6 +122,11 @@ public class PanelBuilder : IDisposable
                 LengthType.Lazy => Horizontal ? entry.element.Size.x : entry.element.Size.y,
                 _ => entry.length
             };
+
+            if (entry.type == LengthType.Flex && flexIndex == flexCount)
+            {
+                length += flexRemainder;
+            }
 
             if (entry.element != null)
             {

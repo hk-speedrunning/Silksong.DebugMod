@@ -5,6 +5,7 @@ using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -30,8 +31,6 @@ public class GUIController : MonoBehaviour
 
     private float? lastRescale;
     private const float RebuildDelay = 0.1f;
-    internal float? savestatePageUpdateTime;
-    private const float SavestatePageUpdateDelay = 2f;
 
     public GameObject canvas;
 
@@ -89,6 +88,10 @@ public class GUIController : MonoBehaviour
     {
         try
         {
+            resolution = new Size(Screen.width, Screen.height);
+            language = GetLanguage();
+            benchwarpShifted = false;
+
             if (canvas)
             {
                 foreach (EnemyHandle handle in EnemiesPanel.enemyPool)
@@ -122,10 +125,9 @@ public class GUIController : MonoBehaviour
             CanvasButton.BuildHoverBorder();
             KeybindDialog.BuildPanel();
             ConfirmDialog.BuildPanel();
-
-            resolution = new Size(Screen.width, Screen.height);
-            language = GetLanguage();
-            benchwarpShifted = false;
+            DropdownDialog.BuildPanel();
+            ImportPackDialog.BuildPanel();
+            ExportPackDialog.BuildPanel();
 
             DebugMod.LogDebug("UI built");
         }
@@ -237,15 +239,6 @@ public class GUIController : MonoBehaviour
         if (!CanvasTextField.AnyFieldFocused)
         {
             HandleKeybinds();
-        }
-
-        // ModMenu is stupid and updates the setting every time a key is pressed in the input field,
-        // so reduce it to (hopefully) just one update since this is a relatively slow operation
-        if (savestatePageUpdateTime != null && Time.realtimeSinceStartup > savestatePageUpdateTime + SavestatePageUpdateDelay)
-        {
-            savestatePageUpdateTime = null;
-            SaveStateManager.LoadFileStates();
-            SaveStatesPanel.Instance?.PageCountChanged();
         }
 
         if (DebugMod.infiniteSilk

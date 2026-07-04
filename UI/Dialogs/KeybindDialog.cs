@@ -3,7 +3,7 @@ using DebugMod.UI.Canvas;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DebugMod.UI;
+namespace DebugMod.UI.Dialogs;
 
 public class KeybindDialog : CanvasDialog
 {
@@ -20,9 +20,7 @@ public class KeybindDialog : CanvasDialog
         Instance = new KeybindDialog();
     }
 
-    public KeybindDialog() : base(nameof(KeybindDialog))
-    {
-    }
+    public KeybindDialog() : base(nameof(KeybindDialog)) { }
 
     protected override void BuildDialog()
     {

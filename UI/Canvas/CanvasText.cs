@@ -13,7 +13,7 @@ public class CanvasText : CanvasNode
     private FontStyle fontStyle = FontStyle.Normal;
     private TextAnchor alignment = TextAnchor.UpperLeft;
     private Color color = UICommon.textColor;
-    private HorizontalWrapMode overflow;
+    private HorizontalWrapMode overflow = HorizontalWrapMode.Wrap;
 
     public string Text
     {
@@ -65,6 +65,16 @@ public class CanvasText : CanvasNode
         }
     }
 
+    public HorizontalWrapMode Overflow
+    {
+        get => overflow;
+        set
+        {
+            overflow = value;
+            if (t) t.horizontalOverflow = overflow;
+        }
+    }
+
     public Color Color
     {
         get => color;
@@ -77,11 +87,7 @@ public class CanvasText : CanvasNode
 
     protected override bool Interactable => false;
 
-    public CanvasText(string name,
-        HorizontalWrapMode overflow = HorizontalWrapMode.Wrap) : base(name)
-    {
-        this.overflow = overflow;
-    }
+    public CanvasText(string name) : base(name) { }
 
     protected override void OnUpdateLocalPosition()
     {
@@ -107,12 +113,12 @@ public class CanvasText : CanvasNode
         RoundPosition();
 
         t = gameObject.AddComponent<Text>();
-        t.horizontalOverflow = overflow;
         t.text = text;
         t.font = font;
         t.fontSize = fontSize;
         t.fontStyle = fontStyle;
         t.alignment = alignment;
+        t.horizontalOverflow = overflow;
         t.color = color;
     }
 }

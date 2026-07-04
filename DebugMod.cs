@@ -187,10 +187,7 @@ public partial class DebugMod : BaseUnityPlugin
     {
         try
         {
-            if (!Directory.Exists(ModBaseDirectory))
-            {
-                Directory.CreateDirectory(ModBaseDirectory);
-            }
+            Directory.CreateDirectory(ModBaseDirectory);
 
             string path = Path.Combine(ModBaseDirectory, "Settings.json");
 

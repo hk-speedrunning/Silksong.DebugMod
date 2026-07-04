@@ -1,9 +1,12 @@
 using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
+using DebugMod.SaveStates;
 using DebugMod.UI.Canvas;
+using DebugMod.UI.Dialogs;
 using GlobalSettings;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
@@ -191,6 +194,22 @@ public class MainPanel : CanvasPanel
             BindableFunctions.ZoomOut,
             BindableFunctions.ResetZoom
         );
+
+        AppendSectionHeader("CATEGORY_SAVESTATES");
+
+        AppendRow(1, 1);
+        CanvasPanel importPack = null;
+        importPack = AppendBasicControl("SAVESTATES_IMPORTPACK", () => ImportPackDialog.Instance.Toggle(importPack));
+        CanvasPanel exportPack = null;
+        exportPack = AppendBasicControl("SAVESTATES_EXPORTPACK", () => ExportPackDialog.Instance.Toggle(exportPack));
+
+        AppendRow(1, 1);
+        AppendToggleControl("SAVESTATES_SAVESTATEONDEATH", () => DebugMod.stateOnDeath, BindableFunctions.LoadStateOnDeath);
+        AppendBasicControl("SAVESTATES_OPENSAVESTATESFOLDER", () => Process.Start(SaveStateManager.saveStatesBaseDirectory));
+
+        AppendRow(1, 1);
+        AppendToggleControl("SAVESTATES_OVERRIDELOADLOCKOUT", () => DebugMod.overrideLoadLockout, BindableFunctions.OverrideLoadLockout);
+        AppendBasicControl("SAVESTATES_OPENPACKSFOLDER", () => Process.Start(SaveStateManager.packsBaseDirectory));
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);
@@ -1031,6 +1050,7 @@ public class MainPanel : CanvasPanel
         text.Alignment = TextAnchor.MiddleCenter;
 
         ResetRow();
+        lastRowCount = 0;
 
         return text;
     }
