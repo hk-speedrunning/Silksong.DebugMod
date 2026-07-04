@@ -5,6 +5,8 @@ using DebugMod.SaveStates;
 using DebugMod.UI;
 using GlobalEnums;
 using HarmonyLib;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using System;
@@ -235,14 +237,15 @@ public partial class DebugMod : BaseUnityPlugin
 
     private int PlayerDamaged(int damageAmount)
     {
-
         int damage = infiniteHP ? 0 : damageAmount;
+
         if (stateOnDeath && SaveState.loadingSavestate == null && (PlayerData.instance.health - damage <= 0))
         {
             SaveStateManager.LoadState(SaveStateManager.GetQuickState());
             LogConsole("Lethal damage prevented, savestate loading");
             return 0;
         }
+
         return damage;
     }
 
@@ -397,6 +400,11 @@ public partial class DebugMod : BaseUnityPlugin
     [HarmonyPrefix]
     private static bool HeroController_TakeDamage(GameObject go, HazardType hazardType)
     {
+        if (playerInvincible)
+        {
+            PlayerData.instance.isInvincible = true;
+        }
+
         if (playerInvincible && !noclip && hazardType == HazardType.LAVA && go.name.Contains("Lava Box"))
         {
             HeroController.instance.ShroomBounce();
@@ -435,6 +443,21 @@ public partial class DebugMod : BaseUnityPlugin
         }
 
         return true;
+    }
+
+    [HarmonyPatch(typeof(PlayMakerFSM), nameof(PlayMakerFSM.Start))]
+    [HarmonyPrefix]
+    private static void PlayMakerFSM_Start(PlayMakerFSM __instance)
+    {
+        // The Underworks saw block FSM is bugged and damages you even if you are invincible
+        if (__instance.gameObject.name == "Hero Damager" && __instance.FsmName == "Multihitter")
+        {
+            CanHeroTakeDamage action = __instance.GetState("Start Hit?")?.Actions.OfType<CanHeroTakeDamage>().FirstOrDefault();
+            if (action != null && action.canTakeDmgEvent.Name == "HIT" && action.cannotTakeDmgEvent.Name == "HIT")
+            {
+                action.cannotTakeDmgEvent = new FsmEvent("CANCEL");
+            }
+        }
     }
 
     [HarmonyPatch(typeof(InventoryItemToolManager), nameof(InventoryItemToolManager.CanChangeEquips), [])]
