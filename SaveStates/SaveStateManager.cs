@@ -445,6 +445,11 @@ public static class SaveStateManager
 
         string packPath = GetPackPath(name);
 
+        if (File.Exists(packPath))
+        {
+            BackupPack(name);
+        }
+
         File.Delete(packPath);
         ZipFile.CreateFromDirectory(saveStatesBaseDirectory, packPath);
 
@@ -455,6 +460,23 @@ public static class SaveStateManager
         }
 
         DebugMod.LogConsole($"Exported pack {name}");
+    }
+
+    private static void BackupPack(string name)
+    {
+        string path = Path.Combine(backupsDirectory, $"{name} {DateTime.Now:yy-MM-dd-HH-mm-ss}.zip");
+
+        Directory.CreateDirectory(backupsDirectory);
+        File.Delete(path);
+        File.Copy(GetPackPath(name), path);
+
+        DirectoryInfo directory = new(backupsDirectory);
+        List<FileInfo> files = directory.EnumerateFiles().OrderBy(x => x.CreationTime).ToList();
+
+        for (int i = 0; i < files.Count - 20; i++)
+        {
+            files[i].Delete();
+        }
     }
 
     public static string ValidateNewPackName(string name)
