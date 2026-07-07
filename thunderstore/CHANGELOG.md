@@ -1,5 +1,19 @@
 ## Changelog
 
+### v1.1.0
+
+- Added support for Importing & Exporting savestate packs; see the new Savestates section in the Gameplay tab.
+	- _Place the pack zip into `<DebugModData>/Savestate Packs/` & then press Import Pack & select the pack you want to import._
+	- New section also exposes toggle controls for existing features `Load Quickslot on Death` & `Override Lockout`.
+- Added an Edit mode to the savestates panel; now alongside renaming, you can also move & delete file slots, and insert/move/delete entire pages!
+	- This update also removes the `Number of Pages` setting; loading packs will automatically adjust to the correct page count.
+- Added Mask Shards, Spool Fragments & individual fast travel unlock buttons to the Items panel.
+- Savestate improvements, including:
+	- Warns the user when loading state would overwrite a highly progressed save file. (Only applies to mouse users & dismissed per-session.)
+	- Do not unfreeze time when pausing immediately after a savestate load.
+- Fixed Underworks saw blocks bypassing invulnerability.
+- Smaller UX tweaks
+
 ### v1.0.4
 
 - Added `Equip Anywhere` button to Items panel, enabling changing loadouts away from a bench.
