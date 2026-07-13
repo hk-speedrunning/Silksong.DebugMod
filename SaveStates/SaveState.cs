@@ -136,8 +136,13 @@ public class SaveState
 
             foreach (string item in customDataList)
             {
-                string[] parts = item.Split(":::");
-                customData[parts[0]] = parts[1];
+                int splitIndex = item.IndexOf(":::", StringComparison.Ordinal);
+                if (splitIndex > 0)
+                {
+                    string key = item[..splitIndex];
+                    string value = item[(splitIndex + 3)..];
+                    customData[key] = value;
+                }
             }
         }
 
