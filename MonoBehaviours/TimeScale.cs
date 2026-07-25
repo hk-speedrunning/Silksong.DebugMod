@@ -83,6 +83,8 @@ public static class TimeScale
     {
         tFreeze?.Release();
         tScale?.Release();
+
+        UnhookFreezeCoroutines();
     }
 
     // This allows DebugMod to control timescale independently of Silksong,
