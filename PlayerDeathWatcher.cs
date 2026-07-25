@@ -2,9 +2,14 @@
 
 public static class PlayerDeathWatcher
 {
-    static PlayerDeathWatcher()
+    public static void Init()
     {
         ModHooks.BeforePlayerDeadHook += SetPlayerDead;
+    }
+
+    public static void Unload()
+    {
+        ModHooks.BeforePlayerDeadHook -= SetPlayerDead;
     }
 
     public static bool playerDead;

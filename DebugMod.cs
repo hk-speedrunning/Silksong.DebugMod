@@ -151,6 +151,8 @@ public partial class DebugMod : BaseUnityPlugin
         harmony = new Harmony(Id);
         harmony.PatchAll();
 
+        PlayerDeathWatcher.Init();
+
         SceneManager.activeSceneChanged += LevelActivated;
         ModHooks.AfterSavegameLoadHook += LoadCharacter;
         ModHooks.NewGameHook += NewCharacter;
@@ -195,6 +197,8 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.TakeHealthHook -= PlayerDamaged;
         ModHooks.ApplicationQuitHook -= SaveSettings;
         ModHooks.FinishedLoadingModsHook -= OnFinishedLoadingMods;
+
+        PlayerDeathWatcher.Unload();
 
         TimeScale.Release();
     }
