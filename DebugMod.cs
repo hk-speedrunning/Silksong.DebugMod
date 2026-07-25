@@ -163,6 +163,12 @@ public partial class DebugMod : BaseUnityPlugin
 
         KeyBindLock = false;
 
+        bool isHotReload = GameManager.SilentInstance != null;
+        if (isHotReload)
+        {
+            OnFinishedLoadingMods();
+        }
+
         Log("Initialized");
     }
 
