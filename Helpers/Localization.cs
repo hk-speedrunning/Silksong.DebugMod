@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using TeamCherry.Localization;
 
 namespace DebugMod.Helpers;
@@ -22,15 +21,22 @@ internal static class Localization
                 LoadFallbackSheet();
             }
 
-            return fallbackSheet;
+            return fallbackSheet ?? [];
         }
     }
 
     private static void LoadFallbackSheet()
     {
+        // When loaded with `ScriptEngine`, Info.Location is only available after Awake and `Assembly.Location` is empty
+        string location = DebugMod.instance.Info.Location;
+        if (string.IsNullOrEmpty(location))
+        {
+            return;
+        }
+
         try
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "languages", "en.json");
+            string path = Path.Combine(Path.GetDirectoryName(location), "languages", "en.json");
             Dictionary<string, object> dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(path));
 
             fallbackSheet = [];
