@@ -91,14 +91,7 @@ public partial class DebugMod : BaseUnityPlugin
             // so no need to log them separately
             && !BepInEx.Logging.Logger.Sources.Any(x => x is BepInEx.Logging.UnityLogSource))
         {
-            Application.logMessageReceived += (condition, stackTrace, type) =>
-            {
-                if (type is LogType.Error or LogType.Exception && condition.Contains("Exception"))
-                {
-                    string message = $"[UNITY] {condition}\n{stackTrace}";
-                    LogError(message.Trim());
-                }
-            };
+            Application.logMessageReceived += HandleUnityLog;
         }
 
         settings.InitMenu(Config);
@@ -164,17 +157,27 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.BeforeSceneLoadHook += OnLevelUnload;
         ModHooks.TakeHealthHook += PlayerDamaged;
         ModHooks.ApplicationQuitHook += SaveSettings;
-
-        ModHooks.FinishedLoadingModsHook += () =>
-        {
-            UICommon.LoadResources();
-            GUIController.Instance.BuildMenus();
-            SceneWatcher.Init();
-        };
+        ModHooks.FinishedLoadingModsHook += OnFinishedLoadingMods;
 
         KeyBindLock = false;
 
         Log("Initialized");
+    }
+
+    private void HandleUnityLog(string condition, string stackTrace, LogType type)
+    {
+        if (type is LogType.Error or LogType.Exception && condition.Contains("Exception"))
+        {
+            string message = $"[UNITY] {condition}\n{stackTrace}";
+            LogError(message.Trim());
+        }
+    }
+
+    private void OnFinishedLoadingMods()
+    {
+        UICommon.LoadResources();
+        GUIController.Instance.BuildMenus();
+        SceneWatcher.Init();
     }
 
     private void OnEnable() => TimeScale.Initialize();
@@ -182,6 +185,16 @@ public partial class DebugMod : BaseUnityPlugin
     private void OnDestroy()
     {
         harmony?.UnpatchSelf();
+
+        Application.logMessageReceived -= HandleUnityLog;
+
+        SceneManager.activeSceneChanged -= LevelActivated;
+        ModHooks.AfterSavegameLoadHook -= LoadCharacter;
+        ModHooks.NewGameHook -= NewCharacter;
+        ModHooks.BeforeSceneLoadHook -= OnLevelUnload;
+        ModHooks.TakeHealthHook -= PlayerDamaged;
+        ModHooks.ApplicationQuitHook -= SaveSettings;
+        ModHooks.FinishedLoadingModsHook -= OnFinishedLoadingMods;
 
         TimeScale.Release();
     }
