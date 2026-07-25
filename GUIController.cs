@@ -41,20 +41,34 @@ public class GUIController : MonoBehaviour
         KeyCode.Mouse0
     };
 
+    private static GUIController _instance;
+
     public static GUIController Instance
     {
         get
         {
-            if (!field)
+            if (!_instance)
             {
                 DebugMod.Log("Creating new GUIController");
 
                 GameObject go = new("GUIController");
-                field = go.AddComponent<GUIController>();
+                _instance = go.AddComponent<GUIController>();
                 DontDestroyOnLoad(go);
             }
 
-            return field;
+            return _instance;
+        }
+    }
+
+    public static void Unload()
+    {
+        hitboxes.Unload();
+
+        if (_instance)
+        {
+            if (_instance.canvas) Destroy(_instance.canvas);
+            Destroy(_instance.gameObject);
+            _instance = null;
         }
     }
 

@@ -201,6 +201,7 @@ public partial class DebugMod : BaseUnityPlugin
         PlayerDeathWatcher.Unload();
         SceneWatcher.Unload();
         CocoonPreviewer.Unload();
+        GUIController.Unload();
 
         TimeScale.Release();
     }
