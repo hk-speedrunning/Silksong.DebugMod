@@ -199,6 +199,7 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.FinishedLoadingModsHook -= OnFinishedLoadingMods;
 
         PlayerDeathWatcher.Unload();
+        SceneWatcher.Unload();
 
         TimeScale.Release();
     }
