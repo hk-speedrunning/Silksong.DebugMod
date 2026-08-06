@@ -256,7 +256,7 @@ public class MainPanel : CanvasPanel
             DebugMod.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
         AppendIncrementTile("UPGRADES_SILKHEARTS", () => PlayerData.instance.silkRegenMax,
-            value => PlayerData.instance.silkRegenMax = value, "Inv_SilkHeart", max: 3, wrap: true);
+            value => PlayerData.instance.silkRegenMax = value, "Inv_SilkHeart");
         AppendTileRow(2);
         AppendIncrementTile("UPGRADES_CRAFTINGKIT", () => PlayerData.instance.ToolKitUpgrades,
             value => PlayerData.instance.ToolKitUpgrades = value, "Inv_CraftingKit", max: 4, wrap: true);
