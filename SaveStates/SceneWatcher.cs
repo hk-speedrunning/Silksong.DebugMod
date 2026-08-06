@@ -40,13 +40,23 @@ public static class SceneWatcher
         for (int i = 0; i < USceneManager.sceneCount; i++)
             AddScene(USceneManager.GetSceneAt(i), LoadSceneMode.Additive, false);
 
-        USceneManager.sceneLoaded += (scene, mode) => AddScene(scene, mode);
-        USceneManager.sceneUnloaded += s =>
-        {
-            var index = scenes.FindIndex(d => d.name == s.name);
-            if (index == -1) return;
-            scenes.RemoveAt(index);
-        };
+        USceneManager.sceneLoaded += OnSceneLoaded;
+        USceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
+
+    public static void Unload()
+    {
+        USceneManager.sceneLoaded -= OnSceneLoaded;
+        USceneManager.sceneUnloaded -= OnSceneUnloaded;
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) => AddScene(scene, mode);
+
+    private static void OnSceneUnloaded(Scene s)
+    {
+        var index = scenes.FindIndex(d => d.name == s.name);
+        if (index == -1) return;
+        scenes.RemoveAt(index);
     }
 
     [HarmonyPatch(typeof(CustomSceneManager), nameof(CustomSceneManager.Start))]

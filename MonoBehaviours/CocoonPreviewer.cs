@@ -1,4 +1,5 @@
-﻿using DebugMod.UI;
+﻿using System.Collections.Generic;
+using DebugMod.UI;
 using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
@@ -7,8 +8,24 @@ public class CocoonPreviewer : MonoBehaviour
 {
     public bool previewEnabled;
 
+    private static readonly List<GameObject> activeCocoonPreviews = [];
+
     private GameObject cocoon;
     private GameObject compass;
+
+    public static void Unload()
+    {
+        foreach (GameObject cocoon in activeCocoonPreviews)
+        {
+            if (cocoon) Destroy(cocoon);
+        }
+        activeCocoonPreviews.Clear();
+
+        if (GameManager.SilentInstance is { } gameManager && gameManager.TryGetComponent(out CocoonPreviewer previewer))
+        {
+            Destroy(previewer);
+        }
+    }
 
     public void Update()
     {
@@ -24,6 +41,7 @@ public class CocoonPreviewer : MonoBehaviour
             {
                 GameObject prefab = FindAnyObjectByType<CustomSceneManager>().heroCorpsePrefab;
                 cocoon = Instantiate(prefab, new Vector3(position.x, position.y, prefab.transform.position.z), Quaternion.identity);
+                activeCocoonPreviews.Add(cocoon);
 
                 Destroy(cocoon.GetComponent<BoxCollider2D>());
                 Destroy(cocoon.GetComponent<HarpoonHook>());
