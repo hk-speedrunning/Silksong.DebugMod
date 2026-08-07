@@ -91,6 +91,9 @@ public static class SaveStateManager
 
         fileStates[page1][index1] = state2;
         fileStates[page2][index2] = state1;
+
+        SaveToFile(page1, index1);
+        SaveToFile(page2, index2);
     }
 
     public static void AddPage(int page)
