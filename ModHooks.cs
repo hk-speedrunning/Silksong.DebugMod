@@ -20,17 +20,6 @@ internal static class ModHooks
     }
     #endregion
 
-    #region ApplicationQuitHook
-    public static event Action ApplicationQuitHook;
-
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.OnApplicationQuit))]
-    [HarmonyPostfix]
-    private static void GameManager_OnApplicationQuit()
-    {
-        ApplicationQuitHook?.Invoke();
-    }
-    #endregion
-
     #region BeforePlayerDeadHook
 
     public static event Action BeforePlayerDeadHook;

@@ -84,6 +84,7 @@ public partial class DebugMod : BaseUnityPlugin
 
     public void Awake()
     {
+        settings.InitMenu(Config);
         LoadSettings();
 
         if (settings.LogUnityExceptions
@@ -93,8 +94,6 @@ public partial class DebugMod : BaseUnityPlugin
         {
             Application.logMessageReceived += HandleUnityLog;
         }
-
-        settings.InitMenu(Config);
 
         bindActions.Clear();
         foreach (MethodInfo method in typeof(BindableFunctions).GetMethods(BindingFlags.Public | BindingFlags.Static))
@@ -110,32 +109,15 @@ public partial class DebugMod : BaseUnityPlugin
             }
         }
 
-        if (settings.FirstRun || settings.binds == null)
-        {
-            LogWarn("First run detected, setting default binds");
-
-            settings.FirstRun = false;
-
-            settings.binds = [];
-            settings.binds.Add("MODUI_TOGGLEALLUI", KeyCode.F2);
-        }
-
-        // Keybinds are stored differently as of 1.0.0
-        foreach (BindAction action in bindActions.Values)
-        {
-            string englishName = Localization.FallbackSheet.GetValueOrDefault(action.Name);
-            if (englishName != null && settings.binds.TryGetValue(englishName, out KeyCode keycode))
-            {
-                settings.binds.TryAdd(action.Name, keycode);
-                settings.binds.Remove(englishName);
-            }
-        }
-
         if (!settings.binds.ContainsKey("MODUI_TOGGLEALLUI"))
         {
             LogWarn("Toggle All UI was unset, resetting to the default value");
             settings.binds.Add("MODUI_TOGGLEALLUI", KeyCode.F2);
+            SaveSettings();
         }
+
+        // Updates the config entry
+        bindUpdated?.Invoke("MODUI_TOGGLEALLUI", settings.binds["MODUI_TOGGLEALLUI"]);
 
         int alphaStart = (int)(settings.NumPadForSaveStates ? KeyCode.Keypad0 : KeyCode.Alpha0);
 
@@ -158,7 +140,6 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.NewGameHook += NewCharacter;
         ModHooks.BeforeSceneLoadHook += OnLevelUnload;
         ModHooks.TakeHealthHook += PlayerDamaged;
-        ModHooks.ApplicationQuitHook += SaveSettings;
         ModHooks.FinishedLoadingModsHook += OnFinishedLoadingMods;
 
         KeyBindLock = false;
@@ -201,7 +182,6 @@ public partial class DebugMod : BaseUnityPlugin
         ModHooks.NewGameHook -= NewCharacter;
         ModHooks.BeforeSceneLoadHook -= OnLevelUnload;
         ModHooks.TakeHealthHook -= PlayerDamaged;
-        ModHooks.ApplicationQuitHook -= SaveSettings;
         ModHooks.FinishedLoadingModsHook -= OnFinishedLoadingMods;
 
         PlayerDeathWatcher.Unload();
@@ -217,7 +197,7 @@ public partial class DebugMod : BaseUnityPlugin
         instance = this;
     }
 
-    private void LoadSettings()
+    private static void LoadSettings()
     {
         try
         {
@@ -238,7 +218,7 @@ public partial class DebugMod : BaseUnityPlugin
         }
     }
 
-    private void SaveSettings()
+    internal static void SaveSettings()
     {
         settings.binds = new Dictionary<string, KeyCode>(settings.binds.OrderBy(pair => pair.Key));
 
@@ -264,6 +244,7 @@ public partial class DebugMod : BaseUnityPlugin
         {
             settings.binds.Remove(name);
         }
+        SaveSettings();
         bindUpdated?.Invoke(name, key);
     }
 

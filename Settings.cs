@@ -9,6 +9,23 @@ namespace DebugMod;
 
 public class Settings
 {
+    [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+    public Dictionary<string, KeyCode> binds = new();
+
+    private string lastLoadedPack = "";
+    private string mainPanelCurrentTab;
+    private int showHitBoxes;
+    private bool showCursorWhileUnpaused;
+
+    private bool mainPanelVisible = true;
+    private bool enemiesPanelVisible = true;
+    private bool consoleVisible = true;
+    private bool infoPanelVisible = true;
+    private bool saveStatePanelVisible = true;
+    private bool saveStatePanelExpanded = false;
+
+    private bool logUnityExceptions = true;
+
     private static ConfigEntry<KeyCode> toggleAllUI;
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
@@ -16,6 +33,166 @@ public class Settings
 
     private static ConfigEntry<bool> numpadForSavestates;
     private static ConfigEntry<bool> safeSavestateLoading;
+
+    public string LastLoadedPack
+    {
+        get => lastLoadedPack;
+        set
+        {
+            lastLoadedPack = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public string MainPanelCurrentTab
+    {
+        get => mainPanelCurrentTab;
+        set
+        {
+            mainPanelCurrentTab = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public int ShowHitBoxes
+    {
+        get => showHitBoxes;
+        set
+        {
+            showHitBoxes = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool ShowCursorWhileUnpaused
+    {
+        get => showCursorWhileUnpaused;
+        set
+        {
+            showCursorWhileUnpaused = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool MainPanelVisible
+    {
+        get => mainPanelVisible;
+        set
+        {
+            mainPanelVisible = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool EnemiesPanelVisible
+    {
+        get => enemiesPanelVisible;
+        set
+        {
+            enemiesPanelVisible = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool ConsoleVisible
+    {
+        get => consoleVisible;
+        set
+        {
+            consoleVisible = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool InfoPanelVisible
+    {
+        get => infoPanelVisible;
+        set
+        {
+            infoPanelVisible = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool SaveStatePanelVisible
+    {
+        get => saveStatePanelVisible;
+        set
+        {
+            saveStatePanelVisible = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool SaveStatePanelExpanded
+    {
+        get => saveStatePanelExpanded;
+        set
+        {
+            saveStatePanelExpanded = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool LogUnityExceptions
+    {
+        get => logUnityExceptions;
+        set
+        {
+            logUnityExceptions = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public float NoClipSpeedModifier
+    {
+        get => noclipSpeedModifier.Value;
+        set
+        {
+            noclipSpeedModifier.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool AltInfoPanel
+    {
+        get => altInfoPanel.Value;
+        set
+        {
+            altInfoPanel.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool ExpandedInfoPanel
+    {
+        get => expandedInfoPanel.Value;
+        set
+        {
+            expandedInfoPanel.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool NumPadForSaveStates
+    {
+        get => numpadForSavestates.Value;
+        set
+        {
+            numpadForSavestates.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
+    public bool SafeSaveStateLoading
+    {
+        get => safeSavestateLoading.Value;
+        set
+        {
+            safeSavestateLoading.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
 
     internal void InitMenu(ConfigFile config)
     {
@@ -30,7 +207,6 @@ public class Settings
             KeyCode.F2,
             "Press this key to toggle DebugMod's UI."
         );
-        toggleAllUI.Value = binds.GetValueOrDefault(toggleAllUIName, KeyCode.None);
         toggleAllUI.SettingChanged += (_, _) =>
         {
             if (toggleAllUI.Value == KeyCode.None)
@@ -56,8 +232,6 @@ public class Settings
             1f,
             "You can also hold shift in noclip to get an additional 2x multiplier."
         );
-        noclipSpeedModifier.Value = NoClipSpeedModifier;
-        noclipSpeedModifier.SettingChanged += (_, _) => NoClipSpeedModifier = noclipSpeedModifier.Value;
 
         altInfoPanel = config.Bind(
             "General",
@@ -65,7 +239,6 @@ public class Settings
             false,
             "Adds some decoration to the info panel."
         );
-        altInfoPanel.Value = AltInfoPanel;
         altInfoPanel.SettingChanged += (_, _) =>
         {
             if (AltInfoPanel != altInfoPanel.Value)
@@ -82,7 +255,6 @@ public class Settings
             false,
             "Shows additional niche info on the info panel."
         );
-        expandedInfoPanel.Value = ExpandedInfoPanel;
         expandedInfoPanel.SettingChanged += (_, _) =>
         {
             if (ExpandedInfoPanel != expandedInfoPanel.Value)
@@ -99,8 +271,6 @@ public class Settings
             false,
             "Use the numpad keys instead of the regular number keys to select file states in the savestate panel. Takes effect on restart."
         );
-        numpadForSavestates.Value = NumPadForSaveStates;
-        numpadForSavestates.SettingChanged += (_, _) => NumPadForSaveStates = numpadForSavestates.Value;
 
         safeSavestateLoading = config.Bind(
             "Savestates",
@@ -108,44 +278,5 @@ public class Settings
             false,
             "Fixes some obscure issues when using savestates, but makes loading take longer."
         );
-        safeSavestateLoading.Value = SafeSaveStateLoading;
-        safeSavestateLoading.SettingChanged += (_, _) => SafeSaveStateLoading = safeSavestateLoading.Value;
     }
-
-    [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
-    public Dictionary<string, KeyCode> binds = new();
-
-    public bool FirstRun = true;
-
-    public string LastLoadedPack = "";
-
-    public bool MainPanelVisible = true;
-
-    public string MainPanelCurrentTab;
-
-    public bool EnemiesPanelVisible = true;
-
-    public bool ConsoleVisible = true;
-
-    public bool InfoPanelVisible = true;
-
-    public bool SaveStatePanelVisible = true;
-
-    public bool SaveStatePanelExpanded = false;
-
-    public bool NumPadForSaveStates = false;
-
-    public int ShowHitBoxes;
-
-    public float NoClipSpeedModifier = 1f;
-
-    public bool ShowCursorWhileUnpaused = false;
-
-    public bool SafeSaveStateLoading = false;
-
-    public bool LogUnityExceptions = true;
-
-    public bool AltInfoPanel = false;
-
-    public bool ExpandedInfoPanel = false;
 }
