@@ -241,12 +241,8 @@ public class Settings
         );
         altInfoPanel.SettingChanged += (_, _) =>
         {
-            if (AltInfoPanel != altInfoPanel.Value)
-            {
-                AltInfoPanel = altInfoPanel.Value;
-                InfoPanel.Instance.Destroy();
-                InfoPanel.BuildPanel();
-            }
+            InfoPanel.Instance.Destroy();
+            InfoPanel.BuildPanel();
         };
 
         expandedInfoPanel = config.Bind(
@@ -257,12 +253,8 @@ public class Settings
         );
         expandedInfoPanel.SettingChanged += (_, _) =>
         {
-            if (ExpandedInfoPanel != expandedInfoPanel.Value)
-            {
-                ExpandedInfoPanel = expandedInfoPanel.Value;
-                InfoPanel.Instance.Destroy();
-                InfoPanel.BuildPanel();
-            }
+            InfoPanel.Instance.Destroy();
+            InfoPanel.BuildPanel();
         };
 
         numpadForSavestates = config.Bind(
