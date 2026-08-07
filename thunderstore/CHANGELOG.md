@@ -1,5 +1,14 @@
 ## Changelog
 
+### v1.1.1
+
+- Removed cap on Silk Hearts.
+- Fixed moved savestates not being synced to disk; your files should now remain in-sync.
+- Updated Chinese localization for new features as of `v1.1`.
+- Allowed hot-reloading to make development easier.
+- Settings now save when edited, preventing them from disappearing when alt-f4ing.
+- Prevented potential errors when loading savestates with malformed customData.
+
 ### v1.1.0
 
 - Added support for Importing & Exporting savestate packs; see the new Savestates section in the Gameplay tab.
