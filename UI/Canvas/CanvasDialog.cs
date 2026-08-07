@@ -1,4 +1,5 @@
 ﻿using DebugMod.UI.Canvas;
+using System.Collections;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -49,7 +50,7 @@ public class CanvasDialog : CanvasPanel
         {
             CanvasNode node = allNodes[i];
 
-            if (node is CanvasDialog dialog && dialog.ActiveSelf && dialog.IsMouseOver())
+            if (node is CanvasDialog dialog && dialog.IsMouseOver())
             {
                 CanvasNode current = dialog;
 
@@ -66,7 +67,7 @@ public class CanvasDialog : CanvasPanel
                     }
                     else
                     {
-                        current = node.Parent;
+                        current = current.Parent;
                     }
                 }
             }
@@ -120,16 +121,26 @@ public class CanvasDialog : CanvasPanel
         Build();
     }
 
+    // Delayed close so clicking this dialog doesn't close a parent dialog
     public void Hide()
     {
-        anchor = null;
-        initialClickEnded = false;
+        ActiveSelf = false;
 
-        Destroy();
+        DebugMod.instance.StartCoroutine(Routine());
+
+        IEnumerator Routine()
+        {
+            yield return null;
+
+            anchor = null;
+            initialClickEnded = false;
+
+            Destroy();
+        }
     }
 
     public bool IsOpenFor(CanvasNode node)
     {
-        return anchor == node;
+        return anchor == node && ActiveSelf;
     }
 }

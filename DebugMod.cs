@@ -48,9 +48,11 @@ public partial class DebugMod : BaseUnityPlugin
 
 
     public static DebugMod instance;
-
     private Harmony harmony;
+
     public static Settings settings { get; set; } = new Settings();
+    private static bool settingsLoaded;
+
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
     private static float _loadTime;
@@ -209,6 +211,7 @@ public partial class DebugMod : BaseUnityPlugin
             {
                 settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
                 settings ??= new Settings();
+                settingsLoaded = true;
                 Log("Loaded settings");
             }
         }
@@ -220,13 +223,18 @@ public partial class DebugMod : BaseUnityPlugin
 
     internal static void SaveSettings()
     {
+        if (!settingsLoaded)
+        {
+            return;
+        }
+
         settings.binds = new Dictionary<string, KeyCode>(settings.binds.OrderBy(pair => pair.Key));
 
         try
         {
             string path = Path.Combine(ModBaseDirectory, "Settings.json");
             File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
-            Log("Saved settings");
+            LogDebug("Saved settings");
         }
         catch (Exception e)
         {

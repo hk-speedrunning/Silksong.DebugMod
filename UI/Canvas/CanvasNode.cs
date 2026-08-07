@@ -34,7 +34,15 @@ public abstract class CanvasNode
         {
             if (parent != value)
             {
+                CanvasNode old = parent;
                 parent = value;
+
+                // If object has already been built, update child counts and positions
+                if (GameObject)
+                {
+                    Reparent(old, value);
+                }
+
                 OnUpdateParent();
             }
         }
@@ -213,6 +221,22 @@ public abstract class CanvasNode
         {
             renderer.EnableRectClipping(clipRect);
         }
+    }
+
+    private void Reparent(CanvasNode oldParent, CanvasNode newParent)
+    {
+        for (CanvasNode node = oldParent; node != null; node = node.Parent)
+        {
+            node.childCount -= childCount;
+        }
+
+        for (CanvasNode node = newParent; node != null; node = node.Parent)
+        {
+            node.childCount += childCount;
+        }
+
+        allNodes.Remove(this);
+        allNodes.Insert(allNodes.IndexOf(newParent) + 1, this);
     }
 
     public void Update()
