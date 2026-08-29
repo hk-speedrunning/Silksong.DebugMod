@@ -211,13 +211,17 @@ public partial class DebugMod : BaseUnityPlugin
             {
                 settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
                 settings ??= new Settings();
-                settingsLoaded = true;
                 Log("Loaded settings");
             }
         }
         catch (Exception e)
         {
             LogError($"Error loading settings: {e}");
+        }
+        finally
+        {
+            // Very important to always set this, as settings can't be saved if false
+            settingsLoaded = true;
         }
     }
 
