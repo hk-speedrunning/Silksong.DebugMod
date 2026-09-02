@@ -87,7 +87,9 @@
 
       <PropertyGroup>
         <ModlistVersion>0.3.1</ModlistVersion>
-        <ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/v$(ModlistVersion)/silksong_modding-Modlist-$(ModlistVersion).zip/</ModlistUrl>
+        <!-- Use Thunderstore for now, since the silksong-modding GitHub is blocked. Ideally this would be on NuGet -->
+        <!--ModlistUrl>https://github.com/silksong-modding/Silksong.ModList/releases/download/v$(ModlistVersion)/silksong_modding-Modlist-$(ModlistVersion).zip/</ModlistUrl-->
+        <ModlistUrl>https://thunderstore.io/package/download/silksong_modding/Modlist/$(ModlistVersion)/</ModlistUrl>
       </PropertyGroup>
       <DownloadFile Condition="!Exists('$(IntermediateOutputPath)/Silksong.Modlist.$(ModlistVersion).zip')" SourceUrl="$(ModlistUrl)" DestinationFolder="$(IntermediateOutputPath)" DestinationFileName="Silksong.Modlist.$(ModlistVersion).zip" />
       <Unzip SourceFiles="$(IntermediateOutputPath)/Silksong.Modlist.$(ModlistVersion).zip" DestinationFolder="$(IntermediateOutputPath)/archive/Silksong.Modlist" />
