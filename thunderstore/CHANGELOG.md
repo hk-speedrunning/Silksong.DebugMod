@@ -1,5 +1,10 @@
 ## Changelog
 
+### v1.1.2
+
+- Fixed an issue added in v1.1.1 causing new installations to not save settings.
+- Switched to `silksong_modding-BepInExPack`; ensure your installer is up-to-date!
+
 ### v1.1.1
 
 - Removed cap on Silk Hearts.
