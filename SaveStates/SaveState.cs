@@ -343,6 +343,14 @@ public class SaveState
             HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
         if (HeroController.instance.hazardRespawnRoutine != null)
             HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
+
+        // Stop HeroController.Die and GameManager.PlayerDead
+        var abortDeath = HeroController.instance.cState.dead;
+        if (abortDeath)
+        {
+            HeroController.instance.StopAllCoroutines();
+            HeroController.instance.cState.dead = false;
+        }
         DebugMod.CurrentHazardCoro = null;
         DebugMod.CurrentInvulnCoro = null;
         HeroController.instance.hazardRespawnRoutine = null;
@@ -425,6 +433,10 @@ public class SaveState
 
         // If another scene load operation is in progress, loading the scene will hang
         yield return ScenePreloader.ForceEndPendingOperations();
+        // CustomSceneManager.Start fails to run if the scene is immediately unloaded. Leaves the scene dark on next respawn.
+        // Without this wait, on the next respawn the scene stays black.
+        if (abortDeath && ScenePreloader._forceEndedOperations.Count > 0)
+            yield return null; 
         foreach (ScenePreloader.SceneLoadOp op in ScenePreloader._forceEndedOperations)
         {
             yield return Addressables.UnloadSceneAsync(op.Operation);
