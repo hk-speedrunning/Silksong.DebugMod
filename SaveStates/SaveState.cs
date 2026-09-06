@@ -365,8 +365,8 @@ public class SaveState
         EventRegister.SendEvent("INVENTORY CANCEL");
         DialogueBox.EndConversation();
         DialogueBox.HideInstant();
-        DialogueYesNoBox.ForceClose();
-        QuestYesNoBox.ForceClose();
+        if (DialogueYesNoBox._instance.pane.isActiveAndEnabled) DialogueYesNoBox.ForceClose();
+        if (QuestYesNoBox._instance.pane.isActiveAndEnabled) QuestYesNoBox.ForceClose();
 
         // Force end cutscenes to fix audio
         foreach (CinematicPlayer cinematicPlayer in Object.FindObjectsByType<CinematicPlayer>(FindObjectsSortMode.None))
