@@ -1,6 +1,7 @@
 using DebugMod.Helpers;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
+using DebugMod.MonoBehaviours;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,6 +52,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private KeyCode repeatingNavigationKey;
     private float nextNavigationRepeat;
     private string queryBeforeWordDelete;
+    private readonly object freezeOwner = new();
     private readonly object inputBlocker = new();
 
     public static bool IsOpen => _instance != null && _instance.panel != null && _instance.panel.ActiveSelf;
@@ -76,6 +78,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     {
         try
         {
+            TimeScale.VoteFreeze(freezeOwner, false);
             SetGameInputBlocked(false);
         }
         catch (Exception e)
@@ -217,6 +220,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void Open()
     {
         if (panel == null) BuildPanel();
+        TimeScale.VoteFreeze(freezeOwner, true);
         navigation.Clear();
         ClearQuery();
         selectedIndex = 0;
@@ -230,6 +234,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void Close()
     {
         _closedFrame = Time.frameCount;
+        TimeScale.VoteFreeze(freezeOwner, false);
         SetGameInputBlocked(false);
         panel.ActiveSelf = false;
         repeatingNavigationKey = KeyCode.None;
