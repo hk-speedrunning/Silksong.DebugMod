@@ -46,9 +46,11 @@ public sealed class CommandPaletteController : MonoBehaviour
     private CanvasText placeholderText;
     private readonly List<PaletteRow> rows = [];
     private readonly List<CommandPaletteItem.SubmenuItem> navigation = [];
+    private readonly List<PaletteEntry> history = [];
     private List<PaletteEntry> filteredItems = [];
     private string query = "";
     private int selectedIndex;
+    private bool showingHistory;
     private KeyCode repeatingNavigationKey;
     private float nextNavigationRepeat;
     private string queryBeforeWordDelete;
@@ -133,7 +135,13 @@ public sealed class CommandPaletteController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (navigation.Count == 0) Close();
+            if (showingHistory)
+            {
+                ClearQuery();
+                selectedIndex = 0;
+                Render();
+            }
+            else if (navigation.Count == 0) Close();
             else NavigateBack();
             return;
         }
@@ -182,7 +190,15 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void MoveSelection(int offset)
     {
         if (filteredItems.Count == 0) return;
-        selectedIndex = (selectedIndex + offset + filteredItems.Count) % filteredItems.Count;
+        if (offset < 0 && selectedIndex == 0 && navigation.Count == 0 && string.IsNullOrEmpty(query) && !showingHistory && history.Count > 0)
+        {
+            showingHistory = true;
+            placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH_HISTORY");
+            Render();
+            return;
+        }
+
+        selectedIndex = Mathf.Clamp(selectedIndex + offset, 0, filteredItems.Count - 1);
         Render();
     }
     
@@ -275,12 +291,12 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void ActivateSelected()
     {
         if (filteredItems.Count == 0) return;
-        Activate(filteredItems[selectedIndex].Item);
+        Activate(filteredItems[selectedIndex]);
     }
 
-    private void Activate(CommandPaletteItem item)
+    private void Activate(PaletteEntry entry)
     {
-        switch (item)
+        switch (entry.Item)
         {
             case CommandPaletteItem.SubmenuItem submenu:
                 navigation.Add(submenu);
@@ -290,14 +306,27 @@ public sealed class CommandPaletteController : MonoBehaviour
                 StartCoroutine(ActivateQueryField());
                 break;
             case CommandPaletteItem.ToggleItem toggle:
+                Remember(entry);
                 toggle.Toggle();
                 Close();
                 break;
             case CommandPaletteItem.ActionItem action:
+                Remember(entry);
                 action.Execute();
                 Close();
                 break;
         }
+    }
+
+    private void Remember(PaletteEntry entry)
+    {
+        if (string.IsNullOrEmpty(entry.Detail) && navigation.Count > 0)
+        {
+            entry = new PaletteEntry(entry.Item, string.Join($" {SubmenuIndicator} ", navigation.Select(item => item.Title)));
+        }
+
+        history.RemoveAll(historyEntry => historyEntry.Item == entry.Item);
+        history.Insert(0, entry);
     }
 
     private IEnumerator ActivateQueryField()
@@ -372,7 +401,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             button.OnClicked += () =>
             {
                 selectedIndex = row.ItemIndex;
-                Activate(row.Item);
+                Activate(filteredItems[row.ItemIndex]);
             };
             rows.Add(row);
         }
@@ -380,7 +409,10 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Render()
     {
-        filteredItems = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(registry.RootItems))
+        IEnumerable<PaletteEntry> items = showingHistory
+            ? history
+            : string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(registry.RootItems);
+        filteredItems = items
             .Where(entry => Matches(entry, query))
             .ToList();
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, filteredItems.Count - 1));
@@ -394,7 +426,6 @@ public sealed class CommandPaletteController : MonoBehaviour
             if (!row.Panel.ActiveSelf) continue;
 
             PaletteEntry entry = filteredItems[itemIndex];
-            row.Item = entry.Item;
             row.ItemIndex = itemIndex;
             row.Button.Toggled = itemIndex == selectedIndex;
             row.Selection.ActiveSelf = itemIndex == selectedIndex;
@@ -429,8 +460,10 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void ClearQuery()
     {
+        showingHistory = false;
         query = "";
         queryField.SetTextWithoutNotify(query);
+        placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
         placeholderText.ActiveSelf = true;
     }
 
@@ -440,7 +473,6 @@ public sealed class CommandPaletteController : MonoBehaviour
         public CanvasButton Button { get; } = button;
         public CanvasText Detail { get; } = detail;
         public CanvasBorder Selection { get; } = selection;
-        public CommandPaletteItem Item { get; set; }
         public int ItemIndex { get; set; }
     }
 
