@@ -238,7 +238,6 @@ public partial class DebugMod : BaseUnityPlugin
         {
             string path = Path.Combine(ModBaseDirectory, "Settings.json");
             File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
-            LogDebug("Saved settings");
         }
         catch (Exception e)
         {
