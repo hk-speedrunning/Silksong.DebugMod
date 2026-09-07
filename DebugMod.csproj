@@ -40,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\**\*.png" />
-    <EmbeddedResource Include="CommandPalette\TransitionPoints.json" />
   </ItemGroup>
 
   <ItemGroup>
