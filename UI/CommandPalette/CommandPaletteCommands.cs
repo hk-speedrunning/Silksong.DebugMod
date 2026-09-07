@@ -21,9 +21,39 @@ public static class CommandPaletteCommands
         }
         
         registry.RegisterSubmenu("Savestate files", FileSavestates);
+        registry.RegisterSubmenu("Teleport", TeleportPoints);
 
         return registry;
     }
+    
+    #region Teleport
+
+    private static IEnumerable<CommandPaletteItem> TeleportPoints()
+    {
+        Dictionary<string, SceneTeleportMap.SceneInfo> teleportMap = SceneTeleportMap.GetTeleportMap();
+        if (teleportMap == null) yield break;
+
+        foreach (var scene in teleportMap.Where(s => s.Value.TransitionGates.Count > 0).OrderBy(s => s.Key))
+        {
+            yield return new CommandPaletteItem.SubmenuItem(
+                scene.Key,
+                () => scene.Value.TransitionGates.OrderBy(g => g).Select(gate =>
+                    new CommandPaletteItem.ActionItem(gate, () => Teleport(scene.Key, gate))),
+                searchChildren: false
+            );
+        }
+    }
+
+    private static void Teleport(string scene, string gate)
+    {
+        GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
+        {
+            SceneName = scene,
+            EntryGateName = gate,
+        });
+    }
+    
+    #endregion
     
     #region Savestates
 
