@@ -344,15 +344,19 @@ public class SaveState
         if (HeroController.instance.hazardRespawnRoutine != null)
             HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
 
-        // Stop HeroController.Die and GameManager.PlayerDead
-        var abortDeath = HeroController.instance.cState.dead;
+        if (DebugMod.CurrentDieCoro != null)
+            HeroController.instance.StopCoroutine(DebugMod.CurrentDieCoro);
+        if (DebugMod.CurrentPlayerDeadCoro != null)
+            HeroController.instance.StopCoroutine(DebugMod.CurrentPlayerDeadCoro);
+        bool abortDeath = HeroController.instance.cState.dead;
         if (abortDeath)
         {
-            HeroController.instance.StopAllCoroutines();
             HeroController.instance.cState.dead = false;
         }
         DebugMod.CurrentHazardCoro = null;
         DebugMod.CurrentInvulnCoro = null;
+        DebugMod.CurrentDieCoro = null;
+        DebugMod.CurrentPlayerDeadCoro = null;
         HeroController.instance.hazardRespawnRoutine = null;
         HeroController.instance.hazardInvulnRoutine = null;
 
