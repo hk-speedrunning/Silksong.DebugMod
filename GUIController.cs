@@ -23,8 +23,9 @@ public class GUIController : MonoBehaviour
     public Vector3 hazardLocation;
     public string respawnSceneWatch;
     private static readonly HitboxViewer hitboxes = new();
-    private static KeyCode keyWarning;
+    private static Binding? keyWarning;
     internal static string RebindTarget { get; private set; }
+    private static KeyCode pendingModifierKey;
     private Size resolution;
     internal LanguageCode language;
     private bool benchwarpShifted;
@@ -410,7 +411,8 @@ public class GUIController : MonoBehaviour
     internal static void StartRebind(string bindName)
     {
         RebindTarget = bindName;
-        keyWarning = default;
+        pendingModifierKey = KeyCode.None;
+        keyWarning = null;
     }
 
     internal static void CancelRebind(string bindName)
@@ -420,39 +422,68 @@ public class GUIController : MonoBehaviour
 
     private void HandleRebind(string bindName)
     {
+        Modifier held = ModifierExtensions.Held();
+
         foreach (KeyCode kc in allKeyCodes)
         {
-            if (!UnbindableKeys.Contains(kc) && Input.GetKeyDown(kc))
+            if (UnbindableKeys.Contains(kc) || !Input.GetKeyDown(kc)) continue;
+
+            if (ModifierExtensions.IsModifierKey(kc))
             {
-                if (keyWarning != kc)
-                {
-                    foreach (string method in DebugMod.bindActions.Keys)
-                    {
-                        if (method != bindName && DebugMod.settings.binds.TryGetValue(method, out Binding key) && key == kc)
-                        {
-                            DebugMod.LogConsole($"{kc} already bound to {Localization.Get(method)}, press again to confirm");
-                            keyWarning = kc;
-                        }
-                    }
+                pendingModifierKey = kc;
+                continue;
+            }
 
-                    if (keyWarning == kc) return;
-                }
-
-                keyWarning = KeyCode.None;
-
-                if (kc == KeyCode.Escape)
-                {
-                    DebugMod.LogWarn($"The binding {bindName} has been unbound.");
-                    FinishRebind(bindName, null);
-                }
-                else
-                {
-                    FinishRebind(bindName, kc);
-                }
-
+            if (kc == KeyCode.Escape)
+            {
+                DebugMod.LogWarn($"The binding {bindName} has been unbound.");
+                FinishRebind(bindName, null);
                 return;
             }
+
+            Binding candidate = new(held, kc);
+
+            if (ConfirmCandidate(bindName, candidate))
+            {
+                keyWarning = null;
+                FinishRebind(bindName, candidate);
+            }
+            else
+            {
+                pendingModifierKey = KeyCode.None;
+            }
+
+            return;
         }
+
+        // Modifier pressed and released on its own
+        if (pendingModifierKey != KeyCode.None && Input.GetKeyUp(pendingModifierKey))
+        {
+            Binding candidate = new Binding(pendingModifierKey);
+
+            if (ConfirmCandidate(bindName, candidate))
+            {
+                keyWarning = null;
+                FinishRebind(bindName, candidate);
+            }
+        }
+    }
+
+    private bool ConfirmCandidate(string bindName, Binding candidate)
+    {
+        if (keyWarning == candidate) return true;
+
+        foreach (string method in DebugMod.bindActions.Keys)
+        {
+            if (method != bindName && DebugMod.settings.binds.TryGetValue(method, out Binding key) && key == candidate)
+            {
+                DebugMod.LogConsole($"{candidate} already bound to {Localization.Get(method)}, press again to confirm");
+                keyWarning = candidate;
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void FinishRebind(string bindName, Binding? binding)
