@@ -64,6 +64,7 @@ public class GUIController : MonoBehaviour
     public static void Unload()
     {
         hitboxes.Unload();
+        CommandPaletteController.Unload();
 
         if (_instance)
         {
@@ -370,11 +371,6 @@ public class GUIController : MonoBehaviour
                 hitboxes.Unload();
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        CommandPaletteController.Unload();
     }
 
     private void HandleKeybinds()

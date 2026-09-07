@@ -2,6 +2,7 @@ using DebugMod.Helpers;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using DebugMod.MonoBehaviours;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using UnityEngine.EventSystems;
 
 namespace DebugMod.CommandPalette;
 
+[HarmonyPatch]
 public sealed class CommandPaletteController : MonoBehaviour
 {
     #region UI Properties
@@ -21,14 +23,13 @@ public sealed class CommandPaletteController : MonoBehaviour
     private const int SelectionThickness = 2;
     private const string SubmenuIndicator = "›";
     private static int PanelWidth => UICommon.ScaleWidth(560);
-    private static int HorizontalPadding => UICommon.ScaleWidth(12);
-    private static int VerticalPadding => UICommon.ScaleHeight(12);
+    private static int Padding => UICommon.ScaleWidth(12);
     private static int RowHeight => UICommon.ScaleHeight(30);
     private static int RowPadding => UICommon.ScaleHeight(4);
-    private static int RowsTop => VerticalPadding + RowHeight + VerticalPadding;
+    private static int RowsTop => Padding + RowHeight + Padding;
 
     private static int PanelHeight =>
-        RowsTop + MaxVisibleItems * RowHeight + (MaxVisibleItems - 1) * RowPadding + VerticalPadding;
+        RowsTop + MaxVisibleItems * RowHeight + (MaxVisibleItems - 1) * RowPadding + Padding;
 
     private static int PanelTop => UICommon.ScaleHeight(400);
     private static int QueryTextPadding => UICommon.ScaleWidth(6);
@@ -36,6 +37,10 @@ public sealed class CommandPaletteController : MonoBehaviour
     private static int DetailPadding => UICommon.ScaleWidth(10);
 
     #endregion
+
+    [HarmonyPatch(typeof(InputHandler), "Update")]
+    [HarmonyPrefix]
+    private static bool InputHandler_Update() => !IsInputBlocked;
 
     private static CommandPaletteController _instance;
     private static int? _closedFrame;
@@ -340,7 +345,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void BuildPanel()
     {
         Vector2 panelSize = new(PanelWidth, PanelHeight);
-        panel = new CanvasPanel("Panel")
+        panel = new CanvasPanel(nameof(CommandPaletteController))
         {
             LocalPosition = new Vector2((Screen.width - panelSize.x) / 2f, PanelTop),
             Size = panelSize,
@@ -349,8 +354,8 @@ public sealed class CommandPaletteController : MonoBehaviour
         UICommon.AddBackground(panel);
 
         CanvasButton queryButton = panel.Add(new CanvasButton("Query"));
-        queryButton.LocalPosition = new Vector2(HorizontalPadding, VerticalPadding);
-        queryButton.Size = new Vector2(panelSize.x - HorizontalPadding * 2, RowHeight);
+        queryButton.LocalPosition = new Vector2(Padding, Padding);
+        queryButton.Size = new Vector2(panelSize.x - Padding * 2, RowHeight);
         queryButton.SetImage(UICommon.panelDarkBG);
         queryButton.RemoveHoverBorder();
         queryField = queryButton.SetTextField();
@@ -359,15 +364,15 @@ public sealed class CommandPaletteController : MonoBehaviour
         queryField.OnValueChanged += OnQueryChanged;
 
         placeholderText = panel.Add(new CanvasText("Placeholder"));
-        placeholderText.LocalPosition = new Vector2(HorizontalPadding + QueryTextPadding, VerticalPadding);
-        placeholderText.Size = new Vector2(panelSize.x - (HorizontalPadding + QueryTextPadding) * 2, RowHeight);
+        placeholderText.LocalPosition = new Vector2(Padding + QueryTextPadding, Padding);
+        placeholderText.Size = new Vector2(panelSize.x - (Padding + QueryTextPadding) * 2, RowHeight);
         placeholderText.Alignment = TextAnchor.MiddleLeft;
         placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
 
+        panel.ActiveSelf = false;
+        
         BuildRows(panel, panelSize);
         panel.Build();
-
-        panel.ActiveSelf = false;
     }
 
     private void BuildRows(CanvasPanel parent, Vector2 panelSize)
@@ -375,8 +380,8 @@ public sealed class CommandPaletteController : MonoBehaviour
         for (int i = 0; i < MaxVisibleItems; i++)
         {
             CanvasPanel rowPanel = parent.Add(new CanvasPanel($"Row {i}"));
-            rowPanel.LocalPosition = new Vector2(HorizontalPadding, RowsTop + i * (RowHeight + RowPadding));
-            rowPanel.Size = new Vector2(panelSize.x - HorizontalPadding * 2, RowHeight);
+            rowPanel.LocalPosition = new Vector2(Padding, RowsTop + i * (RowHeight + RowPadding));
+            rowPanel.Size = new Vector2(panelSize.x - Padding * 2, RowHeight);
             rowPanel.CollapseMode = CollapseMode.Deny;
 
             CanvasButton button = rowPanel.Add(new CanvasButton("Button"));
