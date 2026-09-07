@@ -8,9 +8,9 @@ namespace DebugMod.UI.CommandPalette;
 
 public static class CommandPaletteCommands
 {
-    public static CommandPaletteRegistry CreateRegistry()
+    public static void Initialize()
     {
-        CommandPaletteRegistry registry = new();
+        CommandPaletteRegistry registry = DebugMod.CommandPaletteRegistry;
         
         foreach (var category in DebugMod.bindActions.Values.GroupBy(action => action.Category))
         {
@@ -22,8 +22,6 @@ public static class CommandPaletteCommands
         
         registry.RegisterSubmenu("Savestate files", FileSavestates);
         registry.RegisterSubmenu("Teleport", TeleportPoints);
-
-        return registry;
     }
     
     #region Teleport

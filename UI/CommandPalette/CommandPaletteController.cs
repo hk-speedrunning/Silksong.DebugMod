@@ -1,8 +1,7 @@
 using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
-using DebugMod.MonoBehaviours;
-using DebugMod.UI.CommandPalette;
 using HarmonyLib;
 using System;
 using System.Collections;
@@ -38,7 +37,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private static CommandPaletteController _instance;
     private static int? _closedFrame;
 
-    private CommandPaletteRegistry registry;
     private CanvasPanel panel;
     private CanvasTextField queryField;
     private CanvasText placeholderText;
@@ -63,7 +61,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     public static void Build()
     {
         _instance = GUIController.Instance.gameObject.AddComponent<CommandPaletteController>();
-        _instance.registry = CommandPaletteCommands.CreateRegistry();
     }
 
     public static void Unload()
@@ -265,7 +262,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     }
 
     private IEnumerable<PaletteEntry> CurrentItems()
-        => (navigation.Count == 0 ? registry.RootItems : navigation[^1].GetChildren())
+        => (navigation.Count == 0 ? DebugMod.CommandPaletteRegistry.RootItems : navigation[^1].GetChildren())
             .Select(item => new PaletteEntry(item, item.Detail));
 
     private IEnumerable<PaletteEntry> SearchItems(IEnumerable<CommandPaletteItem> items, string path = "")
@@ -412,7 +409,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     {
         IEnumerable<PaletteEntry> items = showingHistory
             ? history
-            : string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(registry.RootItems);
+            : string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems);
         filteredItems = items
             .Where(entry => Matches(entry, query))
             .ToList();
