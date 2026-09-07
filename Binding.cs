@@ -15,7 +15,6 @@ public readonly struct Binding : IEquatable<Binding>
     }
 
     public static implicit operator Binding(KeyCode key) => new(key);
-    public static implicit operator KeyCode(Binding binding) => binding.Key;
     
     #region Boilerplate
 
@@ -24,6 +23,8 @@ public readonly struct Binding : IEquatable<Binding>
     public override int GetHashCode() => Key.GetHashCode();
     public static bool operator ==(Binding left, Binding right) => left.Equals(right);
     public static bool operator !=(Binding left, Binding right) => !(left == right);
+
+    public bool IsDown() => Key != KeyCode.None && Input.GetKeyDown(Key);
 
     public override string ToString() => Key.ToString();
     

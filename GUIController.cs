@@ -372,14 +372,12 @@ public class GUIController : MonoBehaviour
     {
         for (int i = 0; i < DebugMod.settings.binds.Count; i++)
         {
-            var bind = DebugMod.settings.binds.ElementAt(i);
-            string bindName = bind.Key;
-            KeyCode bindKeyCode = bind.Value;
+            (string bindName, Binding binding) = DebugMod.settings.binds.ElementAt(i);
 
             if (DebugMod.bindActions.ContainsKey(bindName))
             {
                 //check for keys that are waiting to be bound
-                if (bindKeyCode == KeyCode.None)
+                if (binding.Key == KeyCode.None)
                 {
                     foreach (KeyCode kc in allKeyCodes)
                     {
@@ -417,7 +415,7 @@ public class GUIController : MonoBehaviour
                         }
                     }
                 }
-                else if (Input.GetKeyDown(bindKeyCode))
+                else if (binding.IsDown())
                 {
                     //This makes sure atleast you can close the UI when the KeyBindLock is active.
                     //Im sure theres a better way to do this but idk. 

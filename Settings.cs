@@ -215,11 +215,11 @@ public class Settings
                 DebugMod.UpdateBind(toggleAllUIName, toggleAllUI.Value);
             }
         };
-        DebugMod.bindUpdated += (name, key) =>
+        DebugMod.bindUpdated += (name, binding) =>
         {
             if (name == toggleAllUIName)
             {
-                toggleAllUI.Value = key ?? KeyCode.None;
+                toggleAllUI.Value = binding?.Key ?? KeyCode.None;
             }
         };
 
