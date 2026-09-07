@@ -1,9 +1,10 @@
+using DebugMod.CommandPalette;
 using DebugMod.Helpers;
 using DebugMod.SaveStates;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DebugMod.CommandPalette;
+namespace DebugMod.UI.CommandPalette;
 
 public static class CommandPaletteCommands
 {

@@ -2,6 +2,7 @@ using DebugMod.Helpers;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using DebugMod.MonoBehaviours;
+using DebugMod.UI.CommandPalette;
 using HarmonyLib;
 using System;
 using System.Collections;
