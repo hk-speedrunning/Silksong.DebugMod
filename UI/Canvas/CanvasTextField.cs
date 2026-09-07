@@ -19,6 +19,7 @@ public class CanvasTextField : CanvasText
     public bool Persistent { get; set; }
 
     public event Action<string> OnSubmit;
+    public event Action<string> OnValueChanged;
 
     protected override bool Interactable => true;
 
@@ -56,12 +57,14 @@ public class CanvasTextField : CanvasText
             InputManager.enabled = true;
         });
 
-        inputField.onValueChanged.AddListener(_ =>
+        inputField.onValueChanged.AddListener(val =>
         {
             if (Persistent)
             {
-                Text = inputField.text;
+                Text = val;
             }
+            // Trigger an event when the text changes
+            OnValueChanged?.Invoke(val);
         });
 
         AddEventTrigger(EventTriggerType.PointerDown, _ =>
