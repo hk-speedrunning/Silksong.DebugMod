@@ -389,7 +389,7 @@ public class GUIController : MonoBehaviour
                             {
                                 foreach (string method in DebugMod.bindActions.Keys)
                                 {
-                                    if (DebugMod.settings.binds.TryGetValue(method, out KeyCode key) && key == kc)
+                                    if (DebugMod.settings.binds.TryGetValue(method, out Binding key) && key == kc)
                                     {
                                         DebugMod.LogConsole($"{kc} already bound to {Localization.Get(method)}, press again to confirm");
                                         keyWarning = kc;

@@ -1,7 +1,5 @@
 using BepInEx.Configuration;
 using DebugMod.UI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +7,7 @@ namespace DebugMod;
 
 public class Settings
 {
-    [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
-    public Dictionary<string, KeyCode> binds = new();
+    public Dictionary<string, Binding> binds = new();
 
     private string lastLoadedPack = "";
     private string mainPanelCurrentTab;

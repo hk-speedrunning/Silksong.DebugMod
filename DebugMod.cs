@@ -232,7 +232,7 @@ public partial class DebugMod : BaseUnityPlugin
             return;
         }
 
-        settings.binds = new Dictionary<string, KeyCode>(settings.binds.OrderBy(pair => pair.Key));
+        settings.binds = new Dictionary<string, Binding>(settings.binds.OrderBy(pair => pair.Key));
 
         try
         {

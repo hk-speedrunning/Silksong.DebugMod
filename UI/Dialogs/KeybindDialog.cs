@@ -89,7 +89,7 @@ public class KeybindDialog : CanvasDialog
 
     public static string GetKeycodeText(string action)
     {
-        if (DebugMod.settings.binds.TryGetValue(action, out KeyCode keycode))
+        if (DebugMod.settings.binds.TryGetValue(action, out Binding keycode))
         {
             return keycode == KeyCode.None ? Localization.Get("KEYBIND_REBINDPROMPT") : keycode.ToString();
         }
