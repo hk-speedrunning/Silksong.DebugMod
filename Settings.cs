@@ -23,7 +23,7 @@ public class Settings
 
     private bool logUnityExceptions = true;
 
-    private static ConfigEntry<KeyCode> toggleAllUI;
+    private static ConfigEntry<Binding> toggleAllUI;
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
@@ -201,7 +201,7 @@ public class Settings
         toggleAllUI = config.Bind(
             "General",
             "Toggle All UI Keybind",
-            KeyCode.F2,
+            new Binding(KeyCode.F2),
             "Press this key to toggle DebugMod's UI."
         );
         toggleAllUI.SettingChanged += (_, _) =>
@@ -219,7 +219,7 @@ public class Settings
         {
             if (name == toggleAllUIName)
             {
-                toggleAllUI.Value = binding?.Key ?? KeyCode.None;
+                toggleAllUI.Value = binding ?? default;
             }
         };
 
