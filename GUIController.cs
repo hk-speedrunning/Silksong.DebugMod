@@ -24,11 +24,25 @@ public class GUIController : MonoBehaviour
     public string respawnSceneWatch;
     private static readonly HitboxViewer hitboxes = new();
     private static Binding? keyWarning;
-    internal static string RebindTarget { get; private set; }
     private static KeyCode pendingModifierKey;
     private Size resolution;
     internal LanguageCode language;
     private bool benchwarpShifted;
+    
+    internal static event Action<string> RebindTargetChanged;
+    internal static string RebindTarget
+    {
+        get;
+        private set
+        {
+            string old = field;
+            if (old == value) return;
+            field = value;
+            RebindTargetChanged?.Invoke(old);
+            RebindTargetChanged?.Invoke(value);
+        }
+    }
+
 
     private float? lastRescale;
     private const float RebuildDelay = 0.1f;
