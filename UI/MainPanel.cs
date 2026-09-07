@@ -899,17 +899,11 @@ public class MainPanel : CanvasPanel
                 CanvasText keycode = builder.AppendFlex(new CanvasText("Keycode"));
                 keycode.Alignment = TextAnchor.MiddleLeft;
                 keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
-                DebugMod.bindUpdated += (name, _) =>
-                {
-                    if (name == action.Name)
-                    {
-                        keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
-                    }
-                };
+                keycode.OnUpdate += () => keycode.Text = KeybindDialog.GetKeycodeText(action.Name);
 
                 CanvasButton edit = builder.AppendSquare(new CanvasButton("Edit"));
                 edit.ImageOnly(UICommon.images["IconDotCircled"]);
-                edit.OnClicked += () => DebugMod.UpdateBind(action.Name, KeyCode.None);
+                edit.OnClicked += () => GUIController.StartRebind(action.Name);
 
                 builder.AppendPadding(UICommon.Margin);
 

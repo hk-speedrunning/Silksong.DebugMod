@@ -77,7 +77,7 @@ public class KeybindDialog : CanvasDialog
 
         CanvasButton editButton = row.AppendSquare(new CanvasButton("Edit"));
         editButton.ImageOnly(UICommon.images["IconDotCircled"]);
-        editButton.OnClicked += () => DebugMod.UpdateBind(actions[index].Name, KeyCode.None);
+        editButton.OnClicked += () => GUIController.StartRebind(actions[index].Name);
 
         CanvasButton clearButton = row.AppendSquare(new CanvasButton("Clear"));
         clearButton.ImageOnly(UICommon.images["IconX"]);
@@ -89,9 +89,14 @@ public class KeybindDialog : CanvasDialog
 
     public static string GetKeycodeText(string action)
     {
+        if (GUIController.RebindTarget == action)
+        {
+            return Localization.Get("KEYBIND_REBINDPROMPT");
+        }
+
         if (DebugMod.settings.binds.TryGetValue(action, out Binding keycode))
         {
-            return keycode == KeyCode.None ? Localization.Get("KEYBIND_REBINDPROMPT") : keycode.ToString();
+            return keycode.ToString();
         }
         else
         {

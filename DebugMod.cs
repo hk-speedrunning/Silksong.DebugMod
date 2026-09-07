@@ -255,6 +255,7 @@ public partial class DebugMod : BaseUnityPlugin
         else
         {
             settings.binds.Remove(name);
+            GUIController.CancelRebind(name);
         }
         SaveSettings();
         bindUpdated?.Invoke(name, binding);

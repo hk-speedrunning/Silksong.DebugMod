@@ -10,7 +10,6 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -24,7 +23,8 @@ public class GUIController : MonoBehaviour
     public Vector3 hazardLocation;
     public string respawnSceneWatch;
     private static readonly HitboxViewer hitboxes = new();
-    private KeyCode keyWarning;
+    private static KeyCode keyWarning;
+    internal static string RebindTarget { get; private set; }
     private Size resolution;
     internal LanguageCode language;
     private bool benchwarpShifted;
@@ -371,79 +371,94 @@ public class GUIController : MonoBehaviour
     private void HandleKeybinds()
     {
         Modifier modifiers = ModifierExtensions.Held();
-        
-        for (int i = 0; i < DebugMod.settings.binds.Count; i++)
+
+        foreach ((string bindName, Binding binding) in DebugMod.settings.binds)
         {
-            (string bindName, Binding binding) = DebugMod.settings.binds.ElementAt(i);
+            if (bindName == RebindTarget) continue;
 
-            if (DebugMod.bindActions.ContainsKey(bindName))
+            if (binding.IsDown(modifiers))
             {
-                //check for keys that are waiting to be bound
-                if (binding.Key == KeyCode.None)
+                // This makes sure atleast you can close the UI when the KeyBindLock is active.
+                // Im sure theres a better way to do this but idk. 
+                try
                 {
-                    foreach (KeyCode kc in allKeyCodes)
+                    BindAction action;
+
+                    if (DebugMod.bindActions.TryGetValue(bindName, out action))
                     {
-                        if (Input.GetKeyDown(kc) && !UnbindableKeys.Contains(kc))
+                        //run if not locked or locked but bind doesnt allow locks
+                        if (!DebugMod.KeyBindLock || DebugMod.KeyBindLock && !action.AllowLock)
                         {
-                            if (keyWarning != kc)
-                            {
-                                foreach (string method in DebugMod.bindActions.Keys)
-                                {
-                                    if (DebugMod.settings.binds.TryGetValue(method, out Binding key) && key == kc)
-                                    {
-                                        DebugMod.LogConsole($"{kc} already bound to {Localization.Get(method)}, press again to confirm");
-                                        keyWarning = kc;
-                                    }
-                                }
-
-                                if (keyWarning == kc) break;
-                            }
-
-                            keyWarning = KeyCode.None;
-
-                            //remove bind
-                            if (kc == KeyCode.Escape)
-                            {
-                                DebugMod.UpdateBind(bindName, null);
-                                i--;
-                                DebugMod.LogWarn($"The key {Enum.GetName(typeof(KeyCode), kc)} has been unbound from {bindName}");
-                            }
-                            else if (kc != KeyCode.Escape)
-                            {
-                                DebugMod.UpdateBind(bindName, kc);
-                            }
-
-                            break;
+                            action.Action.Invoke();
                         }
                     }
+
                 }
-                else if (binding.IsDown(modifiers))
+                catch (Exception e)
                 {
-                    //This makes sure atleast you can close the UI when the KeyBindLock is active.
-                    //Im sure theres a better way to do this but idk. 
-                    try
-                    {
-                        BindAction action;
-
-                        if (DebugMod.bindActions.TryGetValue(bindName, out action))
-                        {
-                            //run if not locked or locked but bind doesnt allow locks
-                            if (!DebugMod.KeyBindLock || DebugMod.KeyBindLock && !action.AllowLock)
-                            {
-                                action.Action.Invoke();
-                            }
-                        }
-
-                    }
-                    catch (Exception e)
-                    {
-                        DebugMod.LogError("Error running keybind method " + bindName + ":\n" +
-                                                   e.ToString());
-                    }
-
+                    DebugMod.LogError("Error running keybind method " + bindName + ":\n" + e);
                 }
             }
         }
+
+        if (RebindTarget != null)
+        {
+            HandleRebind(RebindTarget);
+        }
+    }
+
+    internal static void StartRebind(string bindName)
+    {
+        RebindTarget = bindName;
+        keyWarning = default;
+    }
+
+    internal static void CancelRebind(string bindName)
+    {
+        if (RebindTarget == bindName) RebindTarget = null;
+    }
+
+    private void HandleRebind(string bindName)
+    {
+        foreach (KeyCode kc in allKeyCodes)
+        {
+            if (!UnbindableKeys.Contains(kc) && Input.GetKeyDown(kc))
+            {
+                if (keyWarning != kc)
+                {
+                    foreach (string method in DebugMod.bindActions.Keys)
+                    {
+                        if (method != bindName && DebugMod.settings.binds.TryGetValue(method, out Binding key) && key == kc)
+                        {
+                            DebugMod.LogConsole($"{kc} already bound to {Localization.Get(method)}, press again to confirm");
+                            keyWarning = kc;
+                        }
+                    }
+
+                    if (keyWarning == kc) return;
+                }
+
+                keyWarning = KeyCode.None;
+
+                if (kc == KeyCode.Escape)
+                {
+                    DebugMod.LogWarn($"The binding {bindName} has been unbound.");
+                    FinishRebind(bindName, null);
+                }
+                else
+                {
+                    FinishRebind(bindName, kc);
+                }
+
+                return;
+            }
+        }
+    }
+
+    private static void FinishRebind(string bindName, Binding? binding)
+    {
+        RebindTarget = null;
+        DebugMod.UpdateBind(bindName, binding);
     }
 
     [HarmonyPatch(typeof(InputHandler), nameof(InputHandler.SetCursorVisible))]
