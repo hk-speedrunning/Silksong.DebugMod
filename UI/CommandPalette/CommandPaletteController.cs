@@ -24,16 +24,8 @@ public sealed class CommandPaletteController : MonoBehaviour
     private const int SelectionThickness = 2;
     private const string SubmenuIndicator = "›";
     private static int PanelWidth => UICommon.ScaleWidth(560);
-    private static int Padding => UICommon.ScaleWidth(12);
     private static int RowHeight => UICommon.ScaleHeight(30);
-    private static int RowPadding => UICommon.ScaleHeight(4);
-    private static int RowsTop => Padding + RowHeight + Padding;
-
-    private static int PanelHeight =>
-        RowsTop + MaxVisibleItems * RowHeight + (MaxVisibleItems - 1) * RowPadding + Padding;
-
     private static int PanelTop => UICommon.ScaleHeight(400);
-    private static int QueryTextPadding => UICommon.ScaleWidth(6);
     private static int DetailWidth => UICommon.ScaleWidth(140);
     private static int DetailPadding => UICommon.ScaleWidth(10);
 
@@ -345,45 +337,48 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void BuildPanel()
     {
-        Vector2 panelSize = new(PanelWidth, PanelHeight);
         panel = new CanvasPanel(nameof(CommandPaletteController))
         {
-            LocalPosition = new Vector2((Screen.width - panelSize.x) / 2f, PanelTop),
-            Size = panelSize,
+            LocalPosition = new Vector2((Screen.width - PanelWidth) / 2f, PanelTop),
+            Size = new Vector2(PanelWidth, 0),
             CollapseMode = CollapseMode.Deny,
         };
         UICommon.AddBackground(panel);
 
-        CanvasButton queryButton = panel.Add(new CanvasButton("Query"));
-        queryButton.LocalPosition = new Vector2(Padding, Padding);
-        queryButton.Size = new Vector2(panelSize.x - Padding * 2, RowHeight);
-        queryButton.SetImage(UICommon.panelDarkBG);
-        queryButton.RemoveHoverBorder();
-        queryField = queryButton.SetTextField();
-        queryField.Persistent = true;
-        queryField.Alignment = TextAnchor.MiddleLeft;
-        queryField.OnValueChanged += OnQueryChanged;
+        float contentMargin = panel.ContentMargin(UICommon.Margin);
+        using (PanelBuilder builder = new(panel))
+        {
+            builder.DynamicLength = true;
+            builder.OuterPadding = contentMargin;
+            builder.InnerPadding = UICommon.Margin;
 
-        placeholderText = panel.Add(new CanvasText("Placeholder"));
-        placeholderText.LocalPosition = new Vector2(Padding + QueryTextPadding, Padding);
-        placeholderText.Size = new Vector2(panelSize.x - (Padding + QueryTextPadding) * 2, RowHeight);
-        placeholderText.Alignment = TextAnchor.MiddleLeft;
-        placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
+            CanvasButton queryButton = builder.AppendFixed(new CanvasButton("Query"), RowHeight);
+            queryButton.SetImage(UICommon.panelDarkBG);
+            queryButton.RemoveHoverBorder();
+            queryField = queryButton.SetTextField();
+            queryField.Persistent = true;
+            queryField.Alignment = TextAnchor.MiddleLeft;
+            queryField.OnValueChanged += OnQueryChanged;
 
-        panel.ActiveSelf = false;
-        
-        BuildRows(panel, panelSize);
+            placeholderText = panel.Add(new CanvasText("Placeholder"));
+            placeholderText.LocalPosition = new Vector2(contentMargin + CanvasButton.TextMargin, contentMargin);
+            placeholderText.Size = new Vector2(PanelWidth - (contentMargin + CanvasButton.TextMargin) * 2, RowHeight);
+            placeholderText.Alignment = TextAnchor.MiddleLeft;
+            placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
+
+            BuildRows(builder);
+
+            panel.ActiveSelf = false;
+        }
+
         panel.Build();
     }
 
-    private void BuildRows(CanvasPanel parent, Vector2 panelSize)
+    private void BuildRows(PanelBuilder builder)
     {
         for (int i = 0; i < MaxVisibleItems; i++)
         {
-            CanvasPanel rowPanel = parent.Add(new CanvasPanel($"Row {i}"));
-            rowPanel.LocalPosition = new Vector2(Padding, RowsTop + i * (RowHeight + RowPadding));
-            rowPanel.Size = new Vector2(panelSize.x - Padding * 2, RowHeight);
-            rowPanel.CollapseMode = CollapseMode.Deny;
+            CanvasPanel rowPanel = builder.AppendFixed(new CanvasPanel($"Row {i}") { CollapseMode = CollapseMode.Deny }, RowHeight);
 
             CanvasButton button = rowPanel.Add(new CanvasButton("Button"));
             button.Size = rowPanel.Size;
