@@ -8,26 +8,36 @@ namespace DebugMod;
 [JsonConverter(typeof(BindingJsonConverter))]
 public readonly struct Binding : IEquatable<Binding>
 {
+    public Modifier Modifiers { get; }
     public KeyCode Key { get; }
 
-    public Binding(KeyCode key)
+    public Binding(Modifier modifiers, KeyCode key)
     {
+        Modifiers = modifiers;
         Key = key;
     }
+
+    public Binding(KeyCode key) : this(Modifier.None, key) {}
 
     public static implicit operator Binding(KeyCode key) => new(key);
     
     #region Boilerplate
 
-    public bool Equals(Binding other) => Key == other.Key;
+    public bool Equals(Binding other) => Modifiers == other.Modifiers && Key == other.Key;
     public override bool Equals(object obj) => obj is Binding other && Equals(other);
-    public override int GetHashCode() => Key.GetHashCode();
+    public override int GetHashCode() => HashCode.Combine(Modifiers, Key);
     public static bool operator ==(Binding left, Binding right) => left.Equals(right);
     public static bool operator !=(Binding left, Binding right) => !(left == right);
 
-    public bool IsDown() => Key != KeyCode.None && Input.GetKeyDown(Key);
+    public bool IsDown() => IsDown(ModifierExtensions.Held());
+    public bool IsDown(Modifier modifiers) => Key != KeyCode.None && Input.GetKeyDown(Key) 
+                                                                  && (modifiers & Modifiers) == Modifiers;
 
-    public override string ToString() => Key.ToString();
+    public override string ToString()
+    {
+        if (Modifiers == Modifier.None) return Key.ToString();
+        return string.Join("+", Modifiers.Active()) + "+" + Key;
+    }
     
     #endregion
     
@@ -40,13 +50,20 @@ public readonly struct Binding : IEquatable<Binding>
     
     private static bool TryParse(string value, out Binding binding)
     {
-        if (!Enum.TryParse(value, out KeyCode keyCode))
+        binding = default;
+        if (string.IsNullOrEmpty(value)) return false;
+
+        string[] parts = value.Split('+');
+        if (!Enum.TryParse(parts[^1], out KeyCode key)) return false;
+
+        Modifier modifiers = Modifier.None;
+        for (int i = 0; i < parts.Length - 1; i++)
         {
-            binding = default;
-            return false;
+            if (!Enum.TryParse(parts[i], out Modifier flag)) return false;
+            modifiers |= flag;
         }
 
-        binding = new Binding(keyCode);
+        binding = new Binding(modifiers, key);
         return true;
     }
     

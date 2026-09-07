@@ -370,6 +370,8 @@ public class GUIController : MonoBehaviour
 
     private void HandleKeybinds()
     {
+        Modifier modifiers = ModifierExtensions.Held();
+        
         for (int i = 0; i < DebugMod.settings.binds.Count; i++)
         {
             (string bindName, Binding binding) = DebugMod.settings.binds.ElementAt(i);
@@ -415,7 +417,7 @@ public class GUIController : MonoBehaviour
                         }
                     }
                 }
-                else if (binding.IsDown())
+                else if (binding.IsDown(modifiers))
                 {
                     //This makes sure atleast you can close the UI when the KeyBindLock is active.
                     //Im sure theres a better way to do this but idk. 
