@@ -54,12 +54,12 @@ public readonly struct Binding : IEquatable<Binding>
         if (string.IsNullOrEmpty(value)) return false;
 
         string[] parts = value.Split('+');
-        if (!Enum.TryParse(parts[^1], out KeyCode key)) return false;
+        if (!Enum.TryParse(parts[^1], ignoreCase: true, out KeyCode key)) return false;
 
         Modifier modifiers = Modifier.None;
         for (int i = 0; i < parts.Length - 1; i++)
         {
-            if (!Enum.TryParse(parts[i], out Modifier flag)) return false;
+            if (!Enum.TryParse(parts[i], ignoreCase: true, out Modifier flag)) return false;
             modifiers |= flag;
         }
 
