@@ -1,8 +1,10 @@
 using BepInEx;
+using DebugMod.CommandPalette;
 using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
+using DebugMod.UI.CommandPalette;
 using GlobalEnums;
 using HarmonyLib;
 using HutongGames.PlayMaker;
@@ -53,6 +55,8 @@ public partial class DebugMod : BaseUnityPlugin
     public static Settings settings { get; set; } = new Settings();
     private static bool settingsLoaded;
 
+    public static readonly CommandPaletteRegistry CommandPaletteRegistry = new();
+    
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
     private static float _loadTime;
@@ -131,6 +135,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         SaveStateManager.Initialize();
         TimeScale.Initialize();
+        CommandPaletteCommands.Initialize();
 
         harmony = new Harmony(Id);
         harmony.PatchAll();

@@ -1,0 +1,483 @@
+using DebugMod.Helpers;
+using DebugMod.MonoBehaviours;
+using DebugMod.UI;
+using DebugMod.UI.Canvas;
+using HarmonyLib;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace DebugMod.CommandPalette;
+
+[HarmonyPatch]
+public sealed class CommandPaletteController : MonoBehaviour
+{
+    #region UI Properties
+
+    private const int MaxVisibleItems = 8;
+    private const float RepeatInitialDelay = .2f;
+    private const float RepeatInterval = .05f;
+    private const int SelectionThickness = 2;
+    private const string SubmenuIndicator = "›";
+    private static int PanelWidth => UICommon.ScaleWidth(560);
+    private static int RowHeight => UICommon.ScaleHeight(30);
+    private static int PanelTop => UICommon.ScaleHeight(400);
+    private static int DetailWidth => UICommon.ScaleWidth(140);
+    private static int DetailPadding => UICommon.ScaleWidth(10);
+
+    #endregion
+
+    [HarmonyPatch(typeof(InputHandler), "Update")]
+    [HarmonyPrefix]
+    private static bool InputHandler_Update() => !IsInputBlocked;
+
+    private static CommandPaletteController _instance;
+    private static int? _closedFrame;
+
+    private CanvasPanel panel;
+    private CanvasTextField queryField;
+    private CanvasText placeholderText;
+    private readonly List<PaletteRow> rows = [];
+    private readonly List<CommandPaletteItem.SubmenuItem> navigation = [];
+    private readonly List<PaletteEntry> history = [];
+    private List<PaletteEntry> filteredItems = [];
+    private string query = "";
+    private int selectedIndex;
+    private bool showingHistory;
+    private KeyCode repeatingNavigationKey;
+    private float nextNavigationRepeat;
+    private string queryBeforeWordDelete;
+    private readonly object freezeOwner = new();
+    private readonly object inputBlocker = new();
+
+    public static bool IsOpen => _instance != null && _instance.panel != null && _instance.panel.ActiveSelf;
+    public static bool IsInputBlocked => IsOpen || _closedFrame == Time.frameCount;
+
+    #region Lifecycle Methods
+
+    public static void Build()
+    {
+        _instance = GUIController.Instance.gameObject.AddComponent<CommandPaletteController>();
+    }
+
+    public static void Unload()
+    {
+        if (_instance == null) return;
+        if (IsOpen) _instance.Close();
+        _instance.panel?.Destroy();
+        _instance = null;
+    }
+
+    private void OnDestroy()
+    {
+        try
+        {
+            TimeScale.VoteFreeze(freezeOwner, false);
+            SetGameInputBlocked(false);
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error during command palette OnDestroy: {e}");
+        }
+    }
+
+    private void Update()
+    {
+        try
+        {
+            HandleKeybindings();
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error during command palette Update: {e}");
+        }
+    }
+
+    private void LateUpdate()
+    {
+        try
+        {
+            HandleWordDeletion();
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error during command palette LateUpdate: {e}");
+        }
+    }
+    
+    #endregion
+
+    private void HandleKeybindings()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) &&
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+        {
+            if (IsOpen) Close();
+            else Open();
+            return;
+        }
+
+        if (!IsOpen) return;
+
+        if (Input.GetKeyDown(KeyCode.Backspace) &&
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+        {
+            queryBeforeWordDelete = queryField.Text;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (showingHistory)
+            {
+                ClearQuery();
+                selectedIndex = 0;
+                Render();
+            }
+            else if (navigation.Count == 0) Close();
+            else NavigateBack();
+            return;
+        }
+
+        HandleNavigationRepeat();
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) ActivateSelected();
+    }
+
+    #region Navigation
+
+    private void HandleNavigationRepeat()
+    {
+        if (repeatingNavigationKey != KeyCode.None && !Input.GetKey(repeatingNavigationKey)) repeatingNavigationKey = KeyCode.None;
+
+        if (Input.GetKeyDown(KeyCode.UpArrow)) StartNavigationRepeat(KeyCode.UpArrow);
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) StartNavigationRepeat(KeyCode.DownArrow);
+
+        if (repeatingNavigationKey != KeyCode.None && Time.realtimeSinceStartup >= nextNavigationRepeat)
+        {
+            RunNavigationAction(repeatingNavigationKey);
+            nextNavigationRepeat += RepeatInterval;
+        }
+    }
+    
+    private void StartNavigationRepeat(KeyCode key)
+    {
+        repeatingNavigationKey = key;
+        RunNavigationAction(key);
+        nextNavigationRepeat = Time.realtimeSinceStartup + RepeatInitialDelay;
+    }
+
+    private void RunNavigationAction(KeyCode key)
+    {
+        switch (key)
+        {
+            case KeyCode.UpArrow:
+                MoveSelection(-1);
+                break;
+            case KeyCode.DownArrow:
+                MoveSelection(1);
+                break;
+        }
+    }
+
+    private void MoveSelection(int offset)
+    {
+        if (filteredItems.Count == 0) return;
+        if (offset < 0 && selectedIndex == 0 && navigation.Count == 0 && string.IsNullOrEmpty(query) && !showingHistory && history.Count > 0)
+        {
+            showingHistory = true;
+            placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH_HISTORY");
+            Render();
+            return;
+        }
+
+        selectedIndex = Mathf.Clamp(selectedIndex + offset, 0, filteredItems.Count - 1);
+        Render();
+    }
+    
+    private void NavigateBack()
+    {
+        navigation.RemoveAt(navigation.Count - 1);
+        ClearQuery();
+        selectedIndex = 0;
+        Render();
+        StartCoroutine(ActivateQueryField());
+    }
+
+    #endregion
+
+    private void HandleWordDeletion()
+    {
+        if (queryBeforeWordDelete == null) return;
+
+        string beforeWordDelete = queryBeforeWordDelete;
+        queryBeforeWordDelete = null;
+        if (!IsOpen) return;
+
+        int end = beforeWordDelete.Length;
+        while (end > 0 && char.IsWhiteSpace(beforeWordDelete[end - 1])) end--;
+        while (end > 0 && !char.IsWhiteSpace(beforeWordDelete[end - 1])) end--;
+
+        string updatedQuery = beforeWordDelete[..end];
+        query = updatedQuery;
+        queryField.SetTextWithoutNotify(updatedQuery);
+        placeholderText.ActiveSelf = string.IsNullOrEmpty(updatedQuery);
+        selectedIndex = 0;
+        Render();
+    }
+
+    private void Open()
+    {
+        if (panel == null) BuildPanel();
+        TimeScale.VoteFreeze(freezeOwner, true);
+        navigation.Clear();
+        ClearQuery();
+        selectedIndex = 0;
+        repeatingNavigationKey = KeyCode.None;
+        panel.ActiveSelf = true;
+        SetGameInputBlocked(true);
+        queryField.Activate();
+        Render();
+    }
+
+    private void Close()
+    {
+        _closedFrame = Time.frameCount;
+        TimeScale.VoteFreeze(freezeOwner, false);
+        SetGameInputBlocked(false);
+        panel.ActiveSelf = false;
+        repeatingNavigationKey = KeyCode.None;
+        queryField.Deactivate();
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    private void SetGameInputBlocked(bool shouldBlock)
+    {
+        HeroController hero = HeroController.SilentInstance;
+        if (!hero) return;
+        if (shouldBlock) hero.AddInputBlocker(inputBlocker);
+        else hero.RemoveInputBlocker(inputBlocker);
+    }
+
+    private IEnumerable<PaletteEntry> CurrentItems()
+        => (navigation.Count == 0 ? DebugMod.CommandPaletteRegistry.RootItems : navigation[^1].GetChildren())
+            .Select(item => new PaletteEntry(item, item.Detail));
+
+    private IEnumerable<PaletteEntry> SearchItems(IEnumerable<CommandPaletteItem> items, string path = "")
+    {
+        foreach (CommandPaletteItem item in items)
+        {
+            if (item is CommandPaletteItem.SubmenuItem submenu)
+            {
+                string submenuPath = string.IsNullOrEmpty(path) ? submenu.Title : $"{path} {SubmenuIndicator} {submenu.Title}";
+                yield return new PaletteEntry(submenu, path);
+                if (!submenu.SearchChildren) continue;
+                foreach (PaletteEntry entry in SearchItems(submenu.GetChildren(), submenuPath)) yield return entry;
+                continue;
+            }
+
+            string detail = string.IsNullOrEmpty(path) ? item.Detail : string.IsNullOrEmpty(item.Detail) ? path : $"{path} {SubmenuIndicator} {item.Detail}";
+            yield return new PaletteEntry(item, detail);
+        }
+    }
+
+    private void ActivateSelected()
+    {
+        if (filteredItems.Count == 0) return;
+        Activate(filteredItems[selectedIndex]);
+    }
+
+    private void Activate(PaletteEntry entry)
+    {
+        switch (entry.Item)
+        {
+            case CommandPaletteItem.SubmenuItem submenu:
+                navigation.Add(submenu);
+                ClearQuery();
+                selectedIndex = 0;
+                Render();
+                StartCoroutine(ActivateQueryField());
+                break;
+            case CommandPaletteItem.ToggleItem toggle:
+                Remember(entry);
+                toggle.Toggle();
+                Close();
+                break;
+            case CommandPaletteItem.ActionItem action:
+                Remember(entry);
+                action.Execute();
+                Close();
+                break;
+        }
+    }
+
+    private void Remember(PaletteEntry entry)
+    {
+        if (string.IsNullOrEmpty(entry.Detail) && navigation.Count > 0)
+        {
+            entry = new PaletteEntry(entry.Item, string.Join($" {SubmenuIndicator} ", navigation.Select(item => item.Title)));
+        }
+
+        history.RemoveAll(historyEntry => historyEntry.Item == entry.Item);
+        history.Insert(0, entry);
+    }
+
+    private IEnumerator ActivateQueryField()
+    {
+        yield return null;
+        if (IsOpen) queryField.Activate();
+    }
+    
+    #region UI
+
+    private void BuildPanel()
+    {
+        panel = new CanvasPanel(nameof(CommandPaletteController))
+        {
+            LocalPosition = new Vector2((Screen.width - PanelWidth) / 2f, PanelTop),
+            Size = new Vector2(PanelWidth, 0),
+            CollapseMode = CollapseMode.Deny,
+        };
+        UICommon.AddBackground(panel);
+
+        float contentMargin = panel.ContentMargin(UICommon.Margin);
+        using (PanelBuilder builder = new(panel))
+        {
+            builder.DynamicLength = true;
+            builder.OuterPadding = contentMargin;
+            builder.InnerPadding = UICommon.Margin;
+
+            CanvasButton queryButton = builder.AppendFixed(new CanvasButton("Query"), RowHeight);
+            queryButton.SetImage(UICommon.panelDarkBG);
+            queryButton.RemoveHoverBorder();
+            queryField = queryButton.SetTextField();
+            queryField.Persistent = true;
+            queryField.Alignment = TextAnchor.MiddleLeft;
+            queryField.OnValueChanged += OnQueryChanged;
+
+            placeholderText = panel.Add(new CanvasText("Placeholder"));
+            placeholderText.LocalPosition = new Vector2(contentMargin + CanvasButton.TextMargin, contentMargin);
+            placeholderText.Size = new Vector2(PanelWidth - (contentMargin + CanvasButton.TextMargin) * 2, RowHeight);
+            placeholderText.Alignment = TextAnchor.MiddleLeft;
+            placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
+
+            BuildRows(builder);
+
+            panel.ActiveSelf = false;
+        }
+
+        panel.Build();
+    }
+
+    private void BuildRows(PanelBuilder builder)
+    {
+        for (int i = 0; i < MaxVisibleItems; i++)
+        {
+            CanvasPanel rowPanel = builder.AppendFixed(new CanvasPanel($"Row {i}") { CollapseMode = CollapseMode.Deny }, RowHeight);
+
+            CanvasButton button = rowPanel.Add(new CanvasButton("Button"));
+            button.Size = rowPanel.Size;
+            button.Text.Alignment = TextAnchor.MiddleLeft;
+            button.RemoveBorder();
+
+            CanvasText detail = rowPanel.Add(new CanvasText("Detail"));
+            detail.LocalPosition = new Vector2(rowPanel.Size.x - DetailWidth - DetailPadding, 0);
+            detail.Size = new Vector2(DetailWidth, rowPanel.Size.y);
+            detail.Alignment = TextAnchor.MiddleRight;
+            detail.Color = UICommon.iconColor;
+
+            CanvasBorder selection = rowPanel.Add(new CanvasBorder("Selection"));
+            selection.Size = rowPanel.Size;
+            selection.Thickness = SelectionThickness;
+            selection.Color = UICommon.accentColor;
+            selection.Sides = BorderSides.LEFT;
+            selection.ActiveSelf = false;
+
+            PaletteRow row = new(rowPanel, button, detail, selection);
+            button.OnClicked += () =>
+            {
+                selectedIndex = row.ItemIndex;
+                Activate(filteredItems[row.ItemIndex]);
+            };
+            rows.Add(row);
+        }
+    }
+
+    private void Render()
+    {
+        IEnumerable<PaletteEntry> items = showingHistory
+            ? history
+            : string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems);
+        filteredItems = items
+            .Where(entry => Matches(entry, query))
+            .ToList();
+        selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, filteredItems.Count - 1));
+        int firstVisibleIndex = Mathf.Clamp(selectedIndex - MaxVisibleItems + 1, 0, Mathf.Max(0, filteredItems.Count - MaxVisibleItems));
+
+        for (int i = 0; i < rows.Count; i++)
+        {
+            PaletteRow row = rows[i];
+            int itemIndex = firstVisibleIndex + i;
+            row.Panel.ActiveSelf = itemIndex < filteredItems.Count;
+            if (!row.Panel.ActiveSelf) continue;
+
+            PaletteEntry entry = filteredItems[itemIndex];
+            row.ItemIndex = itemIndex;
+            row.Button.Toggled = itemIndex == selectedIndex;
+            row.Selection.ActiveSelf = itemIndex == selectedIndex;
+            row.Button.Text.Text = entry.Item.Title;
+            row.Detail.Text = entry.Item switch
+            {
+                CommandPaletteItem.ToggleItem toggle => Localization.Get(toggle.IsEnabled() ? "COMMANDPALETTE_ON" : "COMMANDPALETTE_OFF"),
+                CommandPaletteItem.SubmenuItem => string.IsNullOrEmpty(entry.Detail) ? SubmenuIndicator : entry.Detail,
+                _ => entry.Detail ?? ""
+            };
+        }
+    }
+    
+    #endregion
+
+    private static bool Matches(PaletteEntry entry, string query)
+    {
+        string text = NormalizeSearch($"{entry.Item.Title} {entry.Detail}");
+        return query.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .All(term => text.Contains(NormalizeSearch(term), StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string NormalizeSearch(string text) => text.Replace(" ", "").Replace("_", "");
+
+    private void OnQueryChanged(string value)
+    {
+        query = value;
+        selectedIndex = 0;
+        placeholderText.ActiveSelf = string.IsNullOrEmpty(value);
+        Render();
+    }
+
+    private void ClearQuery()
+    {
+        showingHistory = false;
+        query = "";
+        queryField.SetTextWithoutNotify(query);
+        placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
+        placeholderText.ActiveSelf = true;
+    }
+
+    private sealed class PaletteRow(CanvasPanel panel, CanvasButton button, CanvasText detail, CanvasBorder selection)
+    {
+        public CanvasPanel Panel { get; } = panel;
+        public CanvasButton Button { get; } = button;
+        public CanvasText Detail { get; } = detail;
+        public CanvasBorder Selection { get; } = selection;
+        public int ItemIndex { get; set; }
+    }
+
+    private sealed class PaletteEntry(CommandPaletteItem item, string detail)
+    {
+        public CommandPaletteItem Item { get; } = item;
+        public string Detail { get; } = detail;
+    }
+
+}

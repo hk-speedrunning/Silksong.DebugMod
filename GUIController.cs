@@ -6,6 +6,7 @@ using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.Canvas;
 using DebugMod.UI.Dialogs;
+using DebugMod.CommandPalette;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ public class GUIController : MonoBehaviour
     public static void Unload()
     {
         hitboxes.Unload();
+        CommandPaletteController.Unload();
 
         if (_instance)
         {
@@ -102,6 +104,7 @@ public class GUIController : MonoBehaviour
     {
         try
         {
+            CommandPaletteController.Unload();
             resolution = new Size(Screen.width, Screen.height);
             language = GetLanguage();
             benchwarpShifted = false;
@@ -129,6 +132,8 @@ public class GUIController : MonoBehaviour
             rt.sizeDelta = new Vector2(Screen.width, Screen.height);
 
             DontDestroyOnLoad(canvas);
+
+            CommandPaletteController.Build();
 
             MainPanel.BuildPanel();
             EnemiesPanel.BuildPanel();
@@ -250,7 +255,7 @@ public class GUIController : MonoBehaviour
             BuildMenus();
         }
 
-        if (!CanvasTextField.AnyFieldFocused)
+        if (!CanvasTextField.AnyFieldFocused && !CommandPaletteController.IsOpen)
         {
             HandleKeybinds();
         }
