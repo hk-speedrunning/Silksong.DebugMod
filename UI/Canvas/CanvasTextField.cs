@@ -19,6 +19,7 @@ public class CanvasTextField : CanvasText
     public bool Persistent { get; set; }
 
     public event Action<string> OnSubmit;
+    public event Action<string> OnValueChanged;
 
     protected override bool Interactable => true;
 
@@ -62,6 +63,8 @@ public class CanvasTextField : CanvasText
             {
                 Text = inputField.text;
             }
+
+            OnValueChanged?.Invoke(inputField.text);
         });
 
         AddEventTrigger(EventTriggerType.PointerDown, _ =>
@@ -81,7 +84,7 @@ public class CanvasTextField : CanvasText
         {
             inputField.text = t.text;
             inputField.enabled = true;
-            inputField.Select();
+            inputField.ActivateInputField();
             AnyFieldFocused = true;
             InputManager.enabled = false;
 
@@ -108,6 +111,22 @@ public class CanvasTextField : CanvasText
 
         Text = text;
         inputField.text = text;
+    }
+
+    public void SetTextWithoutNotify(string text)
+    {
+        Text = text;
+        inputField.SetTextWithoutNotify(text);
+        inputField.caretPosition = text.Length;
+    }
+
+    public void Deactivate()
+    {
+        if (!inputField) return;
+        inputField.DeactivateInputField();
+        inputField.enabled = false;
+        AnyFieldFocused = false;
+        InputManager.enabled = true;
     }
 
     public bool IsFocused() => inputField && inputField.enabled;
