@@ -31,7 +31,9 @@ public static class CommandPaletteCommands
         Dictionary<string, SceneTeleportMap.SceneInfo> teleportMap = SceneTeleportMap.GetTeleportMap();
         if (teleportMap == null) yield break;
 
-        foreach (var scene in teleportMap.Where(s => s.Value.TransitionGates.Count > 0).OrderBy(s => s.Key))
+        foreach (var scene in teleportMap
+            .Where(s => s.Value.TransitionGates.Count > 0 && !WorldInfo.NameLooksLikeAdditiveLoadScene(s.Key))
+            .OrderBy(s => s.Key))
         {
             yield return new CommandPaletteItem.SubmenuItem(
                 scene.Key,
