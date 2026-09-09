@@ -30,9 +30,23 @@ internal static class ModifierExtensions
         (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) ? Modifier.Alt : 0) |
         (Input.GetKey(KeyCode.LeftMeta) || Input.GetKey(KeyCode.RightMeta) ? Modifier.Meta : 0);
 
-    internal static bool IsModifierKey(KeyCode key) =>
-        key is KeyCode.LeftControl or KeyCode.RightControl
-            or KeyCode.LeftShift or KeyCode.RightShift
-            or KeyCode.LeftAlt or KeyCode.RightAlt
-            or KeyCode.LeftMeta or KeyCode.RightMeta;
+    internal static bool IsModifierKey(KeyCode key) => FromKeyCode(key) != Modifier.None;
+
+    internal static Modifier FromKeyCode(KeyCode key) => key switch
+    {
+        KeyCode.LeftControl or KeyCode.RightControl => Modifier.Control,
+        KeyCode.LeftShift or KeyCode.RightShift => Modifier.Shift,
+        KeyCode.LeftAlt or KeyCode.RightAlt => Modifier.Alt,
+        KeyCode.LeftMeta or KeyCode.RightMeta => Modifier.Meta,
+        _ => Modifier.None
+    };
+
+    internal static KeyCode ToKeyCode(this Modifier modifier) => modifier switch
+    {
+        Modifier.Control => KeyCode.LeftControl,
+        Modifier.Shift => KeyCode.LeftShift,
+        Modifier.Alt => KeyCode.LeftAlt,
+        Modifier.Meta => KeyCode.LeftMeta,
+        _ => throw new ArgumentException($"Cannot convert {modifier} to a key code", nameof(modifier))
+    };
 }

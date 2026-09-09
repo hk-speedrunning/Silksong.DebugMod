@@ -1,6 +1,7 @@
 using BepInEx.Configuration;
 using DebugMod.UI;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DebugMod;
@@ -23,7 +24,6 @@ public class Settings
 
     private bool logUnityExceptions = true;
 
-    private static ConfigEntry<Binding> toggleAllUI;
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
@@ -196,32 +196,8 @@ public class Settings
         // We store all the settings ourselves
         config.SaveOnConfigSet = false;
 
-        string toggleAllUIName = "MODUI_TOGGLEALLUI";
-
-        toggleAllUI = config.Bind(
-            "General",
-            "Toggle All UI Keybind",
-            new Binding(KeyCode.F2),
-            "Press this key to toggle DebugMod's UI."
-        );
-        toggleAllUI.SettingChanged += (_, _) =>
-        {
-            if (toggleAllUI.Value == KeyCode.None)
-            {
-                DebugMod.UpdateBind(toggleAllUIName, null);
-            }
-            else
-            {
-                DebugMod.UpdateBind(toggleAllUIName, toggleAllUI.Value);
-            }
-        };
-        DebugMod.bindUpdated += (name, binding) =>
-        {
-            if (name == toggleAllUIName)
-            {
-                toggleAllUI.Value = binding ?? default;
-            }
-        };
+        AddConfigEntryKeybind(config, "MODUI_TOGGLEALLUI", "Toggle All UI Keybind",
+            new Binding(KeyCode.F2), "Press this key to toggle DebugMod's UI.");
 
         noclipSpeedModifier = config.Bind(
             "General",
@@ -267,5 +243,42 @@ public class Settings
             false,
             "Fixes some obscure issues when using savestates, but makes loading take longer."
         );
+    }
+
+    private static void AddConfigEntryKeybind(ConfigFile config, string bindName, string displayName, Binding defaultBinding, string description)
+    {
+        // KeyboardShortcut instead of Binding, so that ConfigManager knows how to handle it
+        ConfigEntry<KeyboardShortcut> entry = config.Bind("General", displayName, ToShortcut(defaultBinding), description);
+        entry.SettingChanged += (_, _) =>
+        {
+            DebugMod.UpdateBind(bindName, ToBinding(entry.Value));
+        };
+        DebugMod.bindUpdated += (name, binding) =>
+        {
+            if (name == bindName && ToBinding(entry.Value) != binding)
+            {
+                entry.Value = ToShortcut(binding);
+            }
+        };
+    }
+
+    private static Binding? ToBinding(KeyboardShortcut shortcut)
+    {
+        if (shortcut.MainKey == KeyCode.None) return null;
+
+        Modifier modifiers = Modifier.None;
+        foreach (KeyCode key in shortcut.Modifiers)
+        {
+            modifiers |= ModifierExtensions.FromKeyCode(key);
+        }
+        return new Binding(modifiers, shortcut.MainKey);
+    }
+
+    private static KeyboardShortcut ToShortcut(Binding? binding)
+    {
+        if (binding is null || binding.Value.Key == KeyCode.None) return KeyboardShortcut.Empty;
+
+        KeyCode[] modifiers = [..binding.Value.Modifiers.Active().Select(modifier => modifier.ToKeyCode())];
+        return new KeyboardShortcut(binding.Value.Key, modifiers);
     }
 }
