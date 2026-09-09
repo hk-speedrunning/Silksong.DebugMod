@@ -102,7 +102,7 @@ public static class UICommon
         {
             foreach (BindAction action in actions)
             {
-                if (DebugMod.settings.binds.TryGetValue(action.Name, out KeyCode keyCode) && keyCode != KeyCode.None)
+                if (DebugMod.settings.binds.TryGetValue(action.Name, out Binding keyCode) && keyCode != KeyCode.None)
                 {
                     keybindButton.SetImage(UICommon.images["IconDot"]);
                     return;

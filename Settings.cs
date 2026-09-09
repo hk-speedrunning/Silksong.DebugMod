@@ -1,7 +1,5 @@
 using BepInEx.Configuration;
 using DebugMod.UI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +7,7 @@ namespace DebugMod;
 
 public class Settings
 {
-    [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
-    public Dictionary<string, KeyCode> binds = new();
+    public Dictionary<string, Binding> binds = new();
 
     private string lastLoadedPack = "";
     private string mainPanelCurrentTab;
@@ -26,7 +23,7 @@ public class Settings
 
     private bool logUnityExceptions = true;
 
-    private static ConfigEntry<KeyCode> toggleAllUI;
+    private static ConfigEntry<Binding> toggleAllUI;
     private static ConfigEntry<float> noclipSpeedModifier;
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
@@ -204,7 +201,7 @@ public class Settings
         toggleAllUI = config.Bind(
             "General",
             "Toggle All UI Keybind",
-            KeyCode.F2,
+            new Binding(KeyCode.F2),
             "Press this key to toggle DebugMod's UI."
         );
         toggleAllUI.SettingChanged += (_, _) =>
@@ -218,11 +215,11 @@ public class Settings
                 DebugMod.UpdateBind(toggleAllUIName, toggleAllUI.Value);
             }
         };
-        DebugMod.bindUpdated += (name, key) =>
+        DebugMod.bindUpdated += (name, binding) =>
         {
             if (name == toggleAllUIName)
             {
-                toggleAllUI.Value = key ?? KeyCode.None;
+                toggleAllUI.Value = binding ?? default;
             }
         };
 

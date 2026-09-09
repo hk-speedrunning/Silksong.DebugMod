@@ -82,10 +82,11 @@ public partial class DebugMod : BaseUnityPlugin
     public static readonly Dictionary<string, BindAction> bindActions = new();
     internal static readonly Dictionary<MethodInfo, BindAction> bindsByMethod = new();
     public static readonly Dictionary<KeyCode, int> alphaKeyDict = new();
-    public static event Action<string, KeyCode?> bindUpdated;
+    public static event Action<string, Binding?> bindUpdated;
 
     public void Awake()
     {
+        Binding.RegisterTomlConverter();
         settings.InitMenu(Config);
         LoadSettings();
 
@@ -232,7 +233,7 @@ public partial class DebugMod : BaseUnityPlugin
             return;
         }
 
-        settings.binds = new Dictionary<string, KeyCode>(settings.binds.OrderBy(pair => pair.Key));
+        settings.binds = new Dictionary<string, Binding>(settings.binds.OrderBy(pair => pair.Key));
 
         try
         {
@@ -245,18 +246,19 @@ public partial class DebugMod : BaseUnityPlugin
         }
     }
 
-    public static void UpdateBind(string name, KeyCode? key)
+    public static void UpdateBind(string name, Binding? binding)
     {
-        if (key.HasValue)
+        if (binding.HasValue)
         {
-            settings.binds[name] = key.Value;
+            settings.binds[name] = binding.Value;
         }
         else
         {
             settings.binds.Remove(name);
+            GUIController.CancelRebind(name);
         }
         SaveSettings();
-        bindUpdated?.Invoke(name, key);
+        bindUpdated?.Invoke(name, binding);
     }
 
     private int PlayerDamaged(int damageAmount)
