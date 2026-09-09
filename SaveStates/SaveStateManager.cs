@@ -253,12 +253,6 @@ public static class SaveStateManager
 
     private static bool LoadLockout()
     {
-        if (PlayerDeathWatcher.playerDead)
-        {
-            DebugMod.LogConsole("Savestates cannot be loaded when dead");
-            return false;
-        }
-
         if (HeroController.instance.cState.transitioning)
         {
             DebugMod.LogConsole("Savestates cannot be loaded when transitioning");

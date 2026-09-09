@@ -46,6 +46,10 @@ public partial class DebugMod : BaseUnityPlugin
 
     internal static IEnumerator CurrentInvulnCoro;
 
+    internal static IEnumerator CurrentDieCoro;
+    
+    internal static IEnumerator CurrentPlayerDeadCoro;
+
 
     public static DebugMod instance;
     private Harmony harmony;
@@ -286,6 +290,20 @@ public partial class DebugMod : BaseUnityPlugin
     private static void OnInvulnerable(HeroController __instance, IEnumerator __result)
     {
         CurrentInvulnCoro = __result;
+    }
+
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.PlayerDead))]
+    [HarmonyPostfix]
+    private static void OnPlayerDead(IEnumerator __result)
+    {
+        CurrentPlayerDeadCoro = __result;
+    }
+
+    [HarmonyPatch(typeof(HeroController), nameof(HeroController.Die), typeof(bool), typeof(bool))]
+    [HarmonyPostfix]
+    private static void OnDie(IEnumerator __result)
+    {
+        CurrentDieCoro = __result;
     }
 
     private void NewCharacter() => LoadCharacter(null);
