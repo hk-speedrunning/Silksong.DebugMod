@@ -20,8 +20,8 @@ public static class CommandPaletteCommands
             );
         }
         
-        registry.RegisterSubmenu("Savestate files", FileSavestates);
-        registry.RegisterSubmenu("Warp", TeleportPoints);
+        registry.RegisterSubmenu(Localization.Get("COMMANDPALETTE_SAVESTATE_FILES"), FileSavestates);
+        registry.RegisterSubmenu(Localization.Get("COMMANDPALETTE_WARP"), TeleportPoints);
     }
     
     #region Teleport
