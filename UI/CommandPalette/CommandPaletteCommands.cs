@@ -21,7 +21,7 @@ public static class CommandPaletteCommands
         }
         
         registry.RegisterSubmenu("Savestate files", FileSavestates);
-        registry.RegisterSubmenu("Teleport", TeleportPoints);
+        registry.RegisterSubmenu("Warp", TeleportPoints);
     }
     
     #region Teleport
