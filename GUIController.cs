@@ -53,7 +53,9 @@ public class GUIController : MonoBehaviour
 
     private readonly List<KeyCode> UnbindableKeys = new List<KeyCode>()
     {
-        KeyCode.Mouse0
+        KeyCode.Mouse0,
+        KeyCode.LeftWindows,
+        KeyCode.RightWindows,
     };
 
     private static GUIController _instance;
