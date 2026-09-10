@@ -50,6 +50,25 @@ public class MainPanel : CanvasPanel
     private readonly List<CanvasPanel> tabs = [];
     private readonly List<CanvasButton> tabButtons = [];
 
+    // Storing bind interface elements for dynamic filtering
+    private struct KeybindUIItem
+    {
+        public CanvasPanel Panel;
+        public CanvasText NameText;
+        public BindAction Action;
+        public string LocalizedName;
+    }
+
+    private struct CategoryHeaderUIItem
+    {
+        public CanvasText HeaderText;
+        public string Category;
+    }
+
+    private readonly List<KeybindUIItem> keybindUIItems = [];
+    private readonly List<CategoryHeaderUIItem> categoryHeaderUIItems = [];
+    private CanvasPanel keybindsContentPanel;
+
     // Convenience fields for building
     private PanelBuilder currentTab;
     private CanvasPanel currentRow;
@@ -864,6 +883,31 @@ public class MainPanel : CanvasPanel
         }
 
         AddTab("MAINPANEL_TAB_KEYBINDS");
+        // Clearing the lists before a new build
+        keybindUIItems.Clear();
+        categoryHeaderUIItems.Clear();
+
+        // Add a search bar
+        AppendRow(1);
+        CanvasPanel searchPanel = AppendRowElement("KeybindSearchContainer");
+        PanelBuilder searchBuilder = new(searchPanel);
+        searchBuilder.Horizontal = true;
+
+        CanvasText searchLabel = searchBuilder.AppendFixed(new CanvasText("SearchLabel"), UICommon.ScaleWidth(60));
+        searchLabel.Text = Localization.Get("KEYBINDS_SEARCH");
+        searchLabel.Alignment = TextAnchor.MiddleLeft;
+
+        // Create a container button to display the border and background of the input field
+        CanvasButton searchFieldButton = searchBuilder.AppendFlex(new CanvasButton("SearchFieldButton"));
+        searchFieldButton.SetImage(UICommon.panelBG); // Set the standard panel background
+
+        // Initialize the text field inside the button
+        CanvasTextField searchInput = searchFieldButton.SetTextField();
+        searchInput.Persistent = true;
+        searchInput.Text = "";
+        searchInput.OnValueChanged += query => FilterAndLayoutKeybinds(query);
+
+        searchBuilder.Build();
 
         Dictionary<string, List<BindAction>> keybindData = [];
         foreach (string category in keybindCategoryOrder)
@@ -887,9 +931,17 @@ public class MainPanel : CanvasPanel
             header.FontSize = KeybindHeaderFontSize;
             header.Alignment = TextAnchor.MiddleLeft;
 
+            categoryHeaderUIItems.Add(new CategoryHeaderUIItem
+            {
+                HeaderText = header,
+                Category = category
+            });
+
             foreach (BindAction action in keybindData[category])
             {
-                using PanelBuilder builder = new(currentTab.AppendFixed(new CanvasPanel(action.Name), ListingHeight));
+                CanvasPanel rowPanel = currentTab.AppendFixed(new CanvasPanel(action.Name), ListingHeight);
+                rowPanel.CollapseMode = CollapseMode.Deny;
+                using PanelBuilder builder = new(rowPanel);
                 builder.Horizontal = true;
 
                 CanvasText keybindName = builder.AppendFlex(new CanvasText("KeybindName"));
@@ -922,8 +974,53 @@ public class MainPanel : CanvasPanel
                 CanvasButton run = builder.AppendSquare(new CanvasButton("Run"));
                 run.ImageOnly(UICommon.images["IconRun"]);
                 run.OnClicked += action.Action;
+
+                keybindUIItems.Add(new KeybindUIItem
+                {
+                    Panel = rowPanel,
+                    NameText = keybindName,
+                    Action = action,
+                    LocalizedName = keybindName.Text
+                });
             }
         }
+    }
+
+    private void FilterAndLayoutKeybinds(string query)
+    {
+        if (keybindsContentPanel == null) return;
+
+        bool hasQuery = !string.IsNullOrEmpty(query);
+        query = query?.Trim().ToLowerInvariant();
+
+        // Initial offset along the Y-axis from the search string
+        float currentY = -(UICommon.Margin + UICommon.ControlHeight + UICommon.Margin);
+
+        foreach (var categoryHeader in categoryHeaderUIItems)
+        {
+            currentY -= SectionEndPadding;
+            ConfigureNode(categoryHeader.HeaderText, true, currentY);
+            currentY -= (SectionHeaderHeight + UICommon.Margin);
+
+            // Control the display of bind rows within this category
+            foreach (var row in keybindUIItems.Where(item => item.Action.Category == categoryHeader.Category))
+            {
+                bool matches = !hasQuery || (row.LocalizedName != null && row.LocalizedName.ToLowerInvariant().Contains(query));
+
+                if (matches)
+                {
+                    ConfigureNode(row.Panel, true, currentY);
+                    currentY -= (ListingHeight + UICommon.Margin);
+                }
+                else
+                {
+                    ConfigureNode(row.Panel, false, currentY);
+                }
+            }
+        }
+
+        // Adjusting the size of the scrollable area
+        keybindsContentPanel.Size = new Vector2(keybindsContentPanel.Size.x, -currentY + UICommon.Margin);
     }
 
     private PanelBuilder AddTab(string name)
@@ -955,6 +1052,12 @@ public class MainPanel : CanvasPanel
         currentTab?.Build();
         currentTab = builder;
         rowCounter = 0;
+
+        if (name == "MAINPANEL_TAB_KEYBINDS")
+        {
+            keybindsContentPanel = panel;
+        }
+
         return builder;
     }
 
@@ -1284,7 +1387,7 @@ public class MainPanel : CanvasPanel
         label.Text = Localization.Get(name);
 
         containerBuilder.AppendFlexPadding();
-        containerBuilder.AppendPadding(UICommon.Margin); // Evens spacing between tile border and control row border
+        containerBuilder.AppendPadding(UICommon.Margin);
 
         var controlHeight = rowWidths.Length > 2 ? UICommon.ScaleHeight(20) : UICommon.ControlHeight;
 
@@ -1379,6 +1482,9 @@ public class MainPanel : CanvasPanel
         LayoutTabsNormal();
 
         base.Build();
+
+        // Launch the initial positioning of the bind list with an empty search query
+        FilterAndLayoutKeybinds("");
     }
 
     internal void LayoutTabsNormal()
@@ -1424,6 +1530,175 @@ public class MainPanel : CanvasPanel
         {
             DebugMod.settings.MainPanelCurrentTab = tabs[0].Name;
             tabs[0].ActiveSelf = true;
+        }
+    }
+
+    private static readonly Dictionary<Type, System.Reflection.PropertyInfo> nodeGameObjectProps = new();
+    private static readonly Dictionary<Type, System.Reflection.FieldInfo> nodeGameObjectFields = new();
+    private static readonly Dictionary<Type, System.Reflection.PropertyInfo> nodeTransformProps = new();
+    private static readonly Dictionary<Type, System.Reflection.FieldInfo> nodeTransformFields = new();
+
+    private static System.Reflection.PropertyInfo GetPropertyRecursive(Type type, string name)
+    {
+        while (type != null)
+        {
+            var prop = type.GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            if (prop != null) return prop;
+            type = type.BaseType;
+        }
+        return null;
+    }
+
+    private static System.Reflection.FieldInfo GetFieldRecursive(Type type, string name)
+    {
+        while (type != null)
+        {
+            var field = type.GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            if (field != null) return field;
+            type = type.BaseType;
+        }
+        return null;
+    }
+
+    private static GameObject GetNodeGameObject(CanvasNode node)
+    {
+        if (node == null) return null;
+        Type type = node.GetType();
+
+        if (!nodeGameObjectProps.TryGetValue(type, out var prop))
+        {
+            prop = GetPropertyRecursive(type, "gameObject") ?? GetPropertyRecursive(type, "GameObject");
+            if (prop == null)
+            {
+                var current = type;
+                while (current != null && prop == null)
+                {
+                    prop = current.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                        .FirstOrDefault(p => p.PropertyType == typeof(GameObject));
+                    current = current.BaseType;
+                }
+            }
+            nodeGameObjectProps[type] = prop;
+        }
+        if (prop != null)
+        {
+            try
+            {
+                return prop.GetValue(node) as GameObject;
+            }
+            catch { }
+        }
+
+        if (!nodeGameObjectFields.TryGetValue(type, out var field))
+        {
+            field = GetFieldRecursive(type, "gameObject") ?? GetFieldRecursive(type, "GameObject");
+            if (field == null)
+            {
+                var current = type;
+                while (current != null && field == null)
+                {
+                    field = current.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                        .FirstOrDefault(f => f.FieldType == typeof(GameObject));
+                    current = current.BaseType;
+                }
+            }
+            nodeGameObjectFields[type] = field;
+        }
+        if (field != null)
+        {
+            try
+            {
+                return field.GetValue(node) as GameObject;
+            }
+            catch { }
+        }
+
+        return null;
+    }
+
+    private static Transform GetNodeTransform(CanvasNode node)
+    {
+        if (node == null) return null;
+        Type type = node.GetType();
+
+        if (!nodeTransformProps.TryGetValue(type, out var prop))
+        {
+            prop = GetPropertyRecursive(type, "transform") ?? GetPropertyRecursive(type, "Transform");
+            if (prop == null)
+            {
+                var current = type;
+                while (current != null && prop == null)
+                {
+                    prop = current.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                        .FirstOrDefault(p => typeof(Transform).IsAssignableFrom(p.PropertyType));
+                    current = current.BaseType;
+                }
+            }
+            nodeTransformProps[type] = prop;
+        }
+        if (prop != null)
+        {
+            try
+            {
+                return prop.GetValue(node) as Transform;
+            }
+            catch { }
+        }
+
+        if (!nodeTransformFields.TryGetValue(type, out var field))
+        {
+            field = GetFieldRecursive(type, "transform") ?? GetFieldRecursive(type, "Transform");
+            if (field == null)
+            {
+                var current = type;
+                while (current != null && field == null)
+                {
+                    field = current.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                        .FirstOrDefault(f => typeof(Transform).IsAssignableFrom(f.FieldType));
+                    current = current.BaseType;
+                }
+            }
+            nodeTransformFields[type] = field;
+        }
+        if (field != null)
+        {
+            try
+            {
+                return field.GetValue(node) as Transform;
+            }
+            catch { }
+        }
+
+        return null;
+    }
+
+    private void ConfigureNode(CanvasNode node, bool active, float y)
+    {
+        if (node == null) return;
+
+        node.ActiveSelf = active;
+        node.LocalPosition = new Vector2(node.LocalPosition.x, y);
+
+        GameObject go = GetNodeGameObject(node);
+        if (go != null)
+        {
+            go.SetActive(active);
+            if (active)
+            {
+                RectTransform rect = go.GetComponent<RectTransform>();
+                if (rect != null)
+                {
+                    rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, y);
+                }
+                else
+                {
+                    Transform t = GetNodeTransform(node);
+                    if (t != null)
+                    {
+                        t.localPosition = new Vector3(t.localPosition.x, y, t.localPosition.z);
+                    }
+                }
+            }
         }
     }
 }
