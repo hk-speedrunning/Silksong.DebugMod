@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace DebugMod.UI;
@@ -205,11 +206,11 @@ public class MainPanel : CanvasPanel
 
         AppendRow(1, 1);
         AppendToggleControl("SAVESTATES_SAVESTATEONDEATH", () => DebugMod.stateOnDeath, BindableFunctions.LoadStateOnDeath);
-        AppendBasicControl("SAVESTATES_OPENSAVESTATESFOLDER", () => Process.Start(SaveStateManager.saveStatesBaseDirectory));
+        AppendBasicControl("SAVESTATES_OPENSAVESTATESFOLDER", () => OpenFolder(SaveStateManager.saveStatesBaseDirectory));
 
         AppendRow(1, 1);
         AppendToggleControl("SAVESTATES_OVERRIDELOADLOCKOUT", () => DebugMod.overrideLoadLockout, BindableFunctions.OverrideLoadLockout);
-        AppendBasicControl("SAVESTATES_OPENPACKSFOLDER", () => Process.Start(SaveStateManager.packsBaseDirectory));
+        AppendBasicControl("SAVESTATES_OPENPACKSFOLDER", () => OpenFolder(SaveStateManager.packsBaseDirectory));
 
         AppendSectionHeader("CATEGORY_MISC");
         AppendRow(1, 1);
@@ -928,6 +929,21 @@ public class MainPanel : CanvasPanel
                 }
             }
         }
+    }
+
+    private static void OpenFolder(string path)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            ProcessStartInfo info = new("xdg-open");
+            info.ArgumentList.Add(path);
+            info.UseShellExecute = false; // required if setting environment variables
+            info.EnvironmentVariables.Remove("LD_PRELOAD");
+            Process.Start(info);
+            return;
+        }
+
+        Process.Start(path);
     }
 
     private PanelBuilder AddTab(string name)
