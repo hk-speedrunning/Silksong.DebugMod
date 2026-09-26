@@ -64,7 +64,8 @@ public static class CommandPaletteCommands
     {
         foreach (SaveState state in SaveStateManager.AllSavestates)
         {
-            yield return new CommandPaletteItem.ActionItem(state.ToString(), () => SaveStateManager.LoadState(state));
+            SaveState snapshot = new() { data = state.data.DeepCopy() };
+            yield return new CommandPaletteItem.ActionItem(state.ToString(), () => SaveStateManager.LoadState(snapshot));
         }
     }
     
