@@ -56,6 +56,8 @@ public sealed class CommandPaletteController : MonoBehaviour
     public static bool IsOpen => _instance != null && _instance.panel != null && _instance.panel.ActiveSelf;
     public static bool IsInputBlocked => IsOpen || _closedFrame == Time.frameCount;
 
+    private Binding removeWordBinding = new Binding(Application.platform == RuntimePlatform.OSXPlayer ? Modifier.Alt : Modifier.Ctrl, KeyCode.Backspace);
+
     #region Lifecycle Methods
 
     public static void Build()
@@ -130,8 +132,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Backspace) &&
-            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+        if (removeWordBinding.IsDown())
         {
             queryBeforeWordDelete = queryField.Text;
         }
