@@ -249,7 +249,8 @@ public class Settings
 
     private static void AddConfigEntryKeybind(ConfigFile config, string bindName, string displayName, Binding defaultBinding, string description)
     {
-        ConfigEntry<KeyCode> entry = config.Bind("General", displayName, ToShortcut(defaultBinding), description);
+        // KeyboardShortcut instead of Binding, so that ConfigManager knows how to handle it
+        ConfigEntry<KeyboardShortcut> entry = config.Bind("General", displayName, ToShortcut(defaultBinding), description);
         entry.SettingChanged += (_, _) =>
         {
             DebugMod.UpdateBind(bindName, ToBinding(entry.Value));
@@ -263,7 +264,23 @@ public class Settings
         };
     }
 
-    private static Binding? ToBinding(KeyCode keyCode) => new Binding(keyCode);
+    private static Binding? ToBinding(KeyboardShortcut shortcut)
+    {
+        if (shortcut.MainKey == KeyCode.None) return null;
 
-    private static KeyCode ToShortcut(Binding? binding) => binding?.Key ?? KeyCode.None;
+        Modifier modifiers = Modifier.None;
+        foreach (KeyCode key in shortcut.Modifiers)
+        {
+            modifiers |= Modifiers.FromKeyCode(key);
+        }
+        return new Binding(modifiers, shortcut.MainKey);
+    }
+
+    private static KeyboardShortcut ToShortcut(Binding? binding)
+    {
+        if (binding is null || binding.Value.Key == KeyCode.None) return KeyboardShortcut.Empty;
+
+        KeyCode[] modifiers = [..binding.Value.Modifiers.Active().Select(modifier => modifier.ToKeyCode())];
+        return new KeyboardShortcut(binding.Value.Key, modifiers);
+    }
 }
