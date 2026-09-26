@@ -4,6 +4,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -16,6 +17,8 @@ public static class TimeScale
 {
     static TimeManager.TimeControlInstance tFreeze = new(1, TimeManager.TimeControlInstance.Type.Multiplicative);
     static TimeManager.TimeControlInstance tScale = new(1, TimeManager.TimeControlInstance.Type.Multiplicative);
+    static readonly object debugModFreezeOwner = new();
+    static readonly HashSet<object> freezeOwners = [];
     static float CustomTimeScaleIncludingFreeze => CustomTimeScale * tFreeze.TimeScale;
 
     /// <summary>Sets a custom time scale multiplier for the game. This is relative to the game's existing,
@@ -42,33 +45,38 @@ public static class TimeScale
     /// <summary>Will freeze time in the game, independently of any other time scale settings</summary>
     public static bool Frozen
     {
-        get => tFreeze.TimeScale == 0f;
-        set
+        get => freezeOwners.Contains(debugModFreezeOwner);
+        set => VoteFreeze(debugModFreezeOwner, value);
+    }
+
+    public static void VoteFreeze(object owner, bool frozen)
+    {
+        bool wasFrozen = freezeOwners.Count > 0;
+        if (frozen) freezeOwners.Add(owner);
+        else freezeOwners.Remove(owner);
+
+        bool isFrozen = freezeOwners.Count > 0;
+        if (wasFrozen == isFrozen) return;
+
+        tFreeze.TimeScale = isFrozen ? 0f : 1f;
+
+        bool cameraExistsAndIsntPaused = GameManager.UnsafeInstance != null && GameCameras.instance != null && GameManager.instance.isPaused == false;
+        if (isFrozen)
         {
-            if (value == Frozen)
-                return; // no change
-            tFreeze.TimeScale = value ? 0f : 1f;
-
-            bool cameraExistsAndIsntPaused = GameManager.UnsafeInstance != null && GameCameras.instance != null && GameManager.instance.isPaused == false;
-
-            if (value) // freeze
-            {
-                if (cameraExistsAndIsntPaused)
-                    GameCameras.instance.StopCameraShake();
-            }
-            else // unfreeze
-            {
-                if (cameraExistsAndIsntPaused)
-                    GameCameras.instance.ResumeCameraShake();
-            }
-
-            CheckHookRequirement();
+            if (cameraExistsAndIsntPaused) GameCameras.instance.StopCameraShake();
         }
+        else
+        {
+            if (cameraExistsAndIsntPaused) GameCameras.instance.ResumeCameraShake();
+        }
+
+        CheckHookRequirement();
     }
 
     /// <summary>Unfreezes and resets timescale to 1</summary>
     public static void Reset()
     {
+        freezeOwners.Clear();
         tFreeze?.TimeScale = 1f;
         tScale?.TimeScale = 1f;
     }
