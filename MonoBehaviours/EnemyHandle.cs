@@ -4,9 +4,7 @@ using DebugMod.UI.Canvas;
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Bounds = UnityEngine.Bounds;
@@ -103,13 +101,15 @@ public class EnemyHandle : MonoBehaviour
         {
             if (hpBar == null)
             {
-                string normalizedName =  gameObject.name.Replace("(Clone)", "");
+                string normalizedName = gameObject.name.Replace("(Clone)", "");
+                string bossDisplayName = "";
 
-                foreach ((string sceneName, string goName) in bossPatterns)
+                foreach ((string displayName, string sceneName, string goName) in bossPatterns)
                 {
                     if (normalizedName == goName && SceneManager.GetSceneByName(sceneName).isLoaded)
                     {
                         isBoss = true;
+                        bossDisplayName = displayName;
                         break;
                     }
                 }
@@ -140,7 +140,7 @@ public class EnemyHandle : MonoBehaviour
                     bossName.Size = new Vector2(hpBar.Size.x, BossNameHeight);
                     bossName.FontSize = UICommon.ScaleHeight(18);
                     bossName.Alignment = TextAnchor.MiddleCenter;
-                    bossName.Text = gameObject.name;
+                    bossName.Text = Trolls.ModifyBossName(bossDisplayName);
                 }
 
                 if (staggerFsm != null)
@@ -242,112 +242,58 @@ public class EnemyHandle : MonoBehaviour
         }
     }
 
-    private static readonly (string sceneName, string goName)[] bossPatterns =
+    private static readonly (string displayName, string sceneName, string goName)[] bossPatterns =
     [
-        // === ACT 1 ===
-
-        // Moss Mother 1
-        ("Tut_03", "Mossbone Mother"),
-        // Moss Mother 2
-        ("Weave_03", "Mossbone Mother A"),
-        ("Weave_03", "Mossbone Mother B"),
-        // Bell Beast
-        ("Bone_05", "Bone Beast"),
-        // Lace
-        ("Bone_East_12", "Lace Boss1"),
-        // Fourth Chorus
-        ("Bone_East_08", "SG_head"),
-        // Savage Beastfly 1
-        ("Ant_19", "Bone Flyer Giant"),
-        // Moorwing
-        ("Greymoor_08", "Vampire Gnat"),
-        ("Greymoor_05", "Vampire Gnat"),
-        // Sister Splinter
-        ("Shellwood_18", "Splinter Queen"),
-        // Skull Tyrant 1
-        ("Bone_15", "Skull King"),
-        // Skull Tyrant 2
-        ("Bonetown", "Skull King"),
-        // Great Conchflies
-        ("Coral_11", "Driller A"),
-        // Widow
-        ("Belltown_Shrine", "Spinner Boss"),
-        // Last Judge
-        ("Coral_Judge_Arena", "Last Judge"),
-        // Phantom
-        ("Organ_01", "Phantom"),
-
-        // === ACT 2 ===
-
-        // Cogwork Dancers
-        ("Cog_Dancers", "Dancer A"),
-        ("Cog_Dancers", "Dancer B"),
-        // Trobbio
-        ("Library_13", "Trobbio"),
-        // Savage Beastfly 2
-        ("Bone_East_08", "Bone Flyer Giant"),
-        // The Unravelled
-        ("Ward_02", "Conductor Boss"),
-        // Disgraced Chef Lugoli
-        ("Dust_Chef", "Roachkeeper Chef (1)"),
-        // Voltvyrm
-        ("Coral_29", "Zap Core Enemy"),
-        // Raging Conchfly
-        ("Coral_27", "Coral Conch Driller Giant Solo"),
-        // Broodmother
-        ("Slab_16b", "Slab Fly Broodmother"),
-        // Second Sentinel
-        ("Hang_17b", "Song Knight"),
-        // Groal the Great
-        ("Shadow_18", "Swamp Shaman"),
-        // First Sinner
-        ("Slab_10b", "First Weaver"),
-        // Garmond & Zaza
-        ("Library_09", "Garmond Fighter"),
-        // Shakra
-        ("Greymoor_08", "Mapper Spar NPC"),
-        // Lace 2
-        ("Song_Tower_01", "Lace Boss2 New"),
-        // Grand Mother Silk
-        ("Cradle_03", "Silk Boss"),
-        // Forebrothers Signis & Gron
-        ("Dock_09", "Dock Guard Slasher"),
-        ("Dock_09", "Dock Guard Thrower"),
-        // Summoned Saviour
-        ("Bone_Steel_Servant", "Abyss Mass"),
-
-        // === ACT 3 ===
-
-        // Bell Eater
-        ("Bellway_Centipede_Arena", "Giant Centipede Head"),
-        ("Bellway_Centipede_Arena", "Giant Centipede Butt"),
-        // Pinstress
-        ("Peak_07", "Pinstress Boss"),
-        // Tormented Trobbio
-        ("Library_13", "Tormented Trobbio"),
-        // Lost Garmond
-        ("Coral_33", "Garmond Black Threaded Fighter"),
-        // Plasmified Zango
-        ("Crawl_10", "Blue Assistant"),
-        // Crawfather
-        ("Room_CrowCourt_02", "Crawfather"),
-        // Crust King Khann
-        ("Memory_Coral_Tower", "Coral King"),
-        // Skarrsinger Karmelita
-        ("Memory_Ant_Queen", "Hunter Queen Boss"),
-        // Gurr the Outcast
-        ("Bone_East_18b", "Bone Hunter Trapper"),
-        // Shrine Guardian Seth
-        ("Shellwood_22", "Seth"),
-        // Nyleth
-        ("Shellwood_11b_Memory", "Flower Queen Boss"),
-        // Palestag
-        ("Clover_19", "Cloverstag White Boss"),
-        // Clover Dancers
-        ("Clover_10", "Dancer A"),
-        // Watcher at the Edge
-        ("Coral_39", "Coral Warrior Grey"),
-        // Lost Lace
-        ("Abyss_Cocoon", "Lost Lace Boss"),
+        ("Moss Mother", "Tut_03", "Mossbone Mother"),
+        ("Moss Mother", "Weave_03", "Mossbone Mother A"),
+        ("Moss Mother", "Weave_03", "Mossbone Mother B"),
+        ("Bell Beast", "Bone_05", "Bone Beast"),
+        ("Lace", "Bone_East_12", "Lace Boss1"),
+        ("Fourth Chorus", "Bone_East_08", "SG_head"),
+        ("Savage Beastfly", "Ant_19", "Bone Flyer Giant"),
+        ("Moorwing", "Greymoor_08", "Vampire Gnat"),
+        ("Moorwing", "Greymoor_05", "Vampire Gnat"),
+        ("Sister Splinter", "Shellwood_18", "Splinter Queen"),
+        ("Skull Tyrant", "Bone_15", "Skull King"),
+        ("Skull Tyrant", "Bonetown", "Skull King"),
+        ("Great Conchflies", "Coral_11", "Driller A"),
+        ("Widow", "Belltown_Shrine", "Spinner Boss"),
+        ("Last Judge", "Coral_Judge_Arena", "Last Judge"),
+        ("Phantom", "Organ_01", "Phantom"),
+        ("Cogwork Dancer", "Cog_Dancers", "Dancer A"),
+        ("Cogwork Dancer", "Cog_Dancers", "Dancer B"),
+        ("Trobbio", "Library_13", "Trobbio"),
+        ("Savage Beastfly", "Bone_East_08", "Bone Flyer Giant"),
+        ("The Unravelled", "Ward_02", "Conductor Boss"),
+        ("Disgraced Chef Lugoli", "Dust_Chef", "Roachkeeper Chef (1)"),
+        ("Voltvyrm", "Coral_29", "Zap Core Enemy"),
+        ("Raging Conchfly", "Coral_27", "Coral Conch Driller Giant Solo"),
+        ("Broodmother", "Slab_16b", "Slab Fly Broodmother"),
+        ("Second Sentinel", "Hang_17b", "Song Knight"),
+        ("Groal the Great", "Shadow_18", "Swamp Shaman"),
+        ("First Sinner", "Slab_10b", "First Weaver"),
+        ("Garmond & Zaza", "Library_09", "Garmond Fighter"),
+        ("Shakra", "Greymoor_08", "Mapper Spar NPC"),
+        ("Lace", "Song_Tower_01", "Lace Boss2 New"),
+        ("Grand Mother Silk", "Cradle_03", "Silk Boss"),
+        ("Forebrother Signis", "Dock_09", "Dock Guard Slasher"),
+        ("Forebrother Gron", "Dock_09", "Dock Guard Thrower"),
+        ("Summoned Saviour", "Bone_Steel_Servant", "Abyss Mass"),
+        ("Bell Eater (Head)", "Bellway_Centipede_Arena", "Giant Centipede Head"),
+        ("Bell Eater (Rear)", "Bellway_Centipede_Arena", "Giant Centipede Butt"),
+        ("Pinstress", "Peak_07", "Pinstress Boss"),
+        ("Tormented Trobbio", "Library_13", "Tormented Trobbio"),
+        ("Lost Garmond", "Coral_33", "Garmond Black Threaded Fighter"),
+        ("Plasmified Zango", "Crawl_10", "Blue Assistant"),
+        ("Crawfather", "Room_CrowCourt_02", "Crawfather"),
+        ("Crust King Khann", "Memory_Coral_Tower", "Coral King"),
+        ("Skarrsinger Karmelita", "Memory_Ant_Queen", "Hunter Queen Boss"),
+        ("Gurr the Outcast", "Bone_East_18b", "Bone Hunter Trapper"),
+        ("Shrine Guardian Seth", "Shellwood_22", "Seth"),
+        ("Nyleth", "Shellwood_11b_Memory", "Flower Queen Boss"),
+        ("Palestag", "Clover_19", "Cloverstag White Boss"),
+        ("Clover Dancers", "Clover_10", "Dancer A"),
+        ("Watcher at the Edge", "Coral_39", "Coral Warrior Grey"),
+        ("Lost Lace", "Abyss_Cocoon", "Lost Lace Boss"),
     ];
 }

@@ -12,6 +12,7 @@ namespace DebugMod.Helpers;
 internal static class Trolls
 {
     private static bool? rosaryRocksTroll;
+    private static bool? bossNameTroll;
 
     private static bool RosaryRocksActive()
     {
@@ -89,6 +90,29 @@ internal static class Trolls
                 UICommon.arial = Font.CreateDynamicFontFromOSFont(fontName, UICommon.FontSize);
             }
         }
+    }
+
+    internal static string ModifyBossName(string bossName)
+    {
+        if (!bossNameTroll.HasValue)
+        {
+            bossNameTroll = Random.value < 1 / 200f;
+        }
+
+        if (bossNameTroll.Value)
+        {
+            switch (bossName)
+            {
+                case "Pinstress":
+                    return "Pinterest";
+                case "Forebrother Signis":
+                    return "Forebrother Sigma";
+                case "Forebrother Gron":
+                    return "Forebrother Gronk";
+            }
+        }
+
+        return bossName;
     }
 }
 
