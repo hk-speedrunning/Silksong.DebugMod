@@ -23,7 +23,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private const string SubmenuIndicator = "›";
     private static int PanelWidth => UICommon.ScaleWidth(560);
     private static int RowHeight => UICommon.ScaleHeight(30);
-    private static int PanelTop => UICommon.ScaleHeight(400);
     private static int DetailWidth => UICommon.ScaleWidth(140);
     private static int DetailPadding => UICommon.ScaleWidth(10);
 
@@ -240,6 +239,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void Open()
     {
         if (panel == null) BuildPanel();
+        PositionPanel();
         TimeScale.VoteFreeze(freezeOwner, true);
         navigation.Clear();
         ClearQuery();
@@ -346,7 +346,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     {
         panel = new CanvasPanel(nameof(CommandPaletteController))
         {
-            LocalPosition = new Vector2((Screen.width - PanelWidth) / 2f, PanelTop),
             Size = new Vector2(PanelWidth, 0),
             CollapseMode = CollapseMode.Deny,
         };
@@ -379,6 +378,17 @@ public sealed class CommandPaletteController : MonoBehaviour
         }
 
         panel.Build();
+    }
+
+    private void PositionPanel()
+    {
+        float top = (Screen.height - panel.Size.y) / 2f;
+        if (SaveStatesPanel.Instance != null && SaveStatesPanel.ShouldBeVisible && SaveStatesPanel.ShouldBeExpanded)
+        {
+            top = SaveStatesPanel.Instance.Position.y + SaveStatesPanel.Instance.Size.y + UICommon.ScreenMargin * 2;
+        }
+
+        panel.LocalPosition = new((Screen.width - panel.Size.x) / 2f, top);
     }
 
     private void BuildRows(PanelBuilder builder)
