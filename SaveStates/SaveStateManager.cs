@@ -39,6 +39,7 @@ public static class SaveStateManager
 
     public static SaveState GetQuickState() => quickState;
     public static SaveState GetFileState(int page, int index) => fileStates[page][index];
+    public static IEnumerable<SaveState> AllSavestates => fileStates.SelectMany(page => page).Where(state => state.IsSet());
 
     public static void SetQuickState(SaveState state)
     {

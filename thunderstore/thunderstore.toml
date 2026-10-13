@@ -17,7 +17,7 @@ containsNsfwContent = false
 silksong_modding-BepInExPack_Silksong = "1.0.3"
 silksong_modding-Modlist = "0.3.0"
 silksong_modding-I18N = "1.1.0"
-silksong_modding-ModMenu= "0.7.4"
+silksong_modding-ModMenu= "0.8.0"
 
 # in most cases you should not change this build block, or the first build.copy block; the dist and tmp directories are used
 # by other build scripts
