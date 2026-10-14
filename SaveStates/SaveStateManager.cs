@@ -15,6 +15,7 @@ public static class SaveStateManager
 
     private static readonly string pageDirectoryPattern = @"^(\d+)$";
     private static readonly string savestateFilePattern = @"^savestate(\d)\.json$";
+    private static readonly string fullRelativeFilePattern = @"^(\d+)/savestate(\d)\.json$";
 
     public static readonly string saveStatesBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestates 1.0");
     public static readonly string packsBaseDirectory = Path.Combine(DebugMod.ModBaseDirectory, "Savestate Packs");
@@ -374,6 +375,12 @@ public static class SaveStateManager
 
     public static List<string> GetPackNames() => packNames;
 
+    private static bool IsValidPack(string name)
+    {
+        using ZipArchive zip = ZipFile.OpenRead(GetPackPath(name));
+        return zip.Entries.Any(x => Regex.IsMatch(x.FullName, fullRelativeFilePattern));
+    }
+
     public static void ImportPack(string name)
     {
         string packPath = GetPackPath(name);
@@ -386,6 +393,12 @@ public static class SaveStateManager
         if (!File.Exists(packPath))
         {
             packNames.Remove(name);
+            return;
+        }
+
+        if (!IsValidPack(name))
+        {
+            DebugMod.LogConsole("Invalid savestate pack. Is it formatted correctly?");
             return;
         }
 
