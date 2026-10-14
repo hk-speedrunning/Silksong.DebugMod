@@ -4,6 +4,7 @@ using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using GlobalEnums;
+using GlobalSettings;
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
@@ -47,7 +48,7 @@ public partial class DebugMod : BaseUnityPlugin
     internal static IEnumerator CurrentInvulnCoro;
 
     internal static IEnumerator CurrentDieCoro;
-    
+
     internal static IEnumerator CurrentPlayerDeadCoro;
 
 
@@ -268,11 +269,33 @@ public partial class DebugMod : BaseUnityPlugin
     {
         int damage = infiniteHP ? 0 : damageAmount;
 
-        if (stateOnDeath && SaveState.loadingSavestate == null && (PlayerData.instance.health - damage <= 0))
+        bool WillDie()
         {
-            SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            if (PlayerData.instance.health + PlayerData.instance.healthBlue - damage > 0)
+            {
+                return false;
+            }
+
+            ToolItem fracturedMask = Gameplay.FracturedMaskTool;
+            if (fracturedMask && fracturedMask.IsEquipped && fracturedMask.SavedData.AmountLeft > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        if (stateOnDeath && WillDie() && SaveState.loadingSavestate == null && SaveStateManager.GetQuickState().IsSet())
+        {
             LogConsole("Lethal damage prevented, savestate loading");
+            StartCoroutine(Routine());
             return 0;
+
+            IEnumerator Routine()
+            {
+                yield return new WaitForSecondsRealtime(0.3f);
+                SaveStateManager.LoadState(SaveStateManager.GetQuickState());
+            }
         }
 
         return damage;
