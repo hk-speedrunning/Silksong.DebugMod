@@ -21,7 +21,8 @@ public sealed class CommandPaletteController : MonoBehaviour
     private const int MaxRecentItems = 5;
     private const int ContextRowCount = 1;
     private const int SelectionThickness = 2;
-    private const string SubmenuIndicator = "›";
+    private const float IconHeight = 0.7f;
+    private const string PathSeparator = "›";
     private static int PanelWidth => UICommon.ScaleWidth(560);
     private static int RowHeight => UICommon.ScaleHeight(30);
     private static int DetailWidth => UICommon.ScaleWidth(140);
@@ -264,7 +265,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             if (item is CommandPaletteItem.SubmenuItem submenu)
             {
                 string title = submenu.Title();
-                string submenuPath = string.IsNullOrEmpty(path) ? title : $"{path} {SubmenuIndicator} {title}";
+                string submenuPath = string.IsNullOrEmpty(path) ? title : $"{path} {PathSeparator} {title}";
                 yield return new PaletteEntry(submenu, path);
                 if (!submenu.SearchChildren) continue;
                 foreach (PaletteEntry entry in SearchItems(submenu.GetChildren(), submenuPath)) yield return entry;
@@ -387,6 +388,13 @@ public sealed class CommandPaletteController : MonoBehaviour
             detail.Alignment = TextAnchor.MiddleRight;
             detail.Color = UICommon.iconColor;
 
+            float iconSize = rowPanel.Size.y * IconHeight;
+            float iconMargin = (rowPanel.Size.y - iconSize) / 2;
+            CanvasImage submenuIcon = rowPanel.Add(new CanvasImage("SubmenuIcon"));
+            submenuIcon.LocalPosition = new Vector2(rowPanel.Size.x - iconSize - iconMargin, iconMargin);
+            submenuIcon.Size = new Vector2(iconSize, iconSize);
+            submenuIcon.SetImage(UICommon.images["IconRightMin"]);
+
             CanvasBorder selection = rowPanel.Add(new CanvasBorder("Selection"));
             selection.Size = rowPanel.Size;
             selection.Thickness = SelectionThickness;
@@ -394,7 +402,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             selection.Sides = BorderSides.LEFT;
             selection.ActiveSelf = false;
 
-            PaletteRow row = new(rowPanel, button, detail, selection);
+            PaletteRow row = new(rowPanel, button, detail, submenuIcon, selection);
             button.OnClicked += () =>
             {
                 selectedIndex = row.ItemIndex;
@@ -433,9 +441,9 @@ public sealed class CommandPaletteController : MonoBehaviour
             row.Detail.Text = entry.IsRecent ? Localization.Get("COMMANDPALETTE_RECENTLY_USED") : entry.Item switch
             {
                 CommandPaletteItem.ToggleItem toggle => Localization.Get(toggle.IsEnabled() ? "COMMANDPALETTE_ON" : "COMMANDPALETTE_OFF"),
-                CommandPaletteItem.SubmenuItem => string.IsNullOrEmpty(entry.Detail) ? SubmenuIndicator : entry.Detail,
                 _ => entry.Detail ?? ""
             };
+            row.SubmenuIcon.ActiveSelf = entry.Item is CommandPaletteItem.SubmenuItem && string.IsNullOrEmpty(entry.Detail);
         }
     }
     
@@ -465,11 +473,12 @@ public sealed class CommandPaletteController : MonoBehaviour
         placeholderText.ActiveSelf = true;
     }
 
-    private sealed class PaletteRow(CanvasPanel panel, CanvasButton button, CanvasText detail, CanvasBorder selection)
+    private sealed class PaletteRow(CanvasPanel panel, CanvasButton button, CanvasText detail, CanvasImage submenuIcon, CanvasBorder selection)
     {
         public CanvasPanel Panel { get; } = panel;
         public CanvasButton Button { get; } = button;
         public CanvasText Detail { get; } = detail;
+        public CanvasImage SubmenuIcon { get; } = submenuIcon;
         public CanvasBorder Selection { get; } = selection;
         public int ItemIndex { get; set; }
     }
