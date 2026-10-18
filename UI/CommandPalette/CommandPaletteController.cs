@@ -17,6 +17,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     #region UI Properties
 
     private const int MaxVisibleItems = 8;
+    private const int ContextRowCount = 1;
     private const float RepeatInitialDelay = .2f;
     private const float RepeatInterval = .05f;
     private const int SelectionThickness = 2;
@@ -45,6 +46,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private List<PaletteEntry> filteredItems = [];
     private string query = "";
     private int selectedIndex;
+    private int firstVisibleIndex;
     private bool showingHistory;
     private KeyCode repeatingNavigationKey;
     private float nextNavigationRepeat;
@@ -434,7 +436,11 @@ public sealed class CommandPaletteController : MonoBehaviour
             .Where(entry => Matches(entry, query))
             .ToList();
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, filteredItems.Count - 1));
-        int firstVisibleIndex = Mathf.Clamp(selectedIndex - MaxVisibleItems + 1, 0, Mathf.Max(0, filteredItems.Count - MaxVisibleItems));
+        if (selectedIndex < firstVisibleIndex + ContextRowCount)
+            firstVisibleIndex = selectedIndex - ContextRowCount;
+        if (selectedIndex > firstVisibleIndex + MaxVisibleItems - 1 - ContextRowCount)
+            firstVisibleIndex = selectedIndex - MaxVisibleItems + 1 + ContextRowCount;
+        firstVisibleIndex = Mathf.Clamp(firstVisibleIndex, 0, Mathf.Max(0, filteredItems.Count - MaxVisibleItems));
 
         for (int i = 0; i < rows.Count; i++)
         {
