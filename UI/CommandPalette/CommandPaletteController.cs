@@ -32,10 +32,9 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     [HarmonyPatch(typeof(InputHandler), "Update")]
     [HarmonyPrefix]
-    private static bool InputHandler_Update() => !IsInputBlocked;
+    private static bool InputHandler_Update() => !IsOpen;
 
     private static CommandPaletteController _instance;
-    private static int? _closedFrame;
     private static int? _lastToggleFrame;
 
     private CanvasPanel panel;
@@ -55,7 +54,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private readonly object inputBlocker = new();
 
     public static bool IsOpen => _instance != null && _instance.panel != null && _instance.panel.ActiveSelf;
-    public static bool IsInputBlocked => IsOpen || _closedFrame == Time.frameCount;
 
     private Binding removeWordBinding = new Binding(Application.platform == RuntimePlatform.OSXPlayer ? Modifier.Alt : Modifier.Ctrl, KeyCode.Backspace);
 
@@ -241,7 +239,6 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Close()
     {
-        _closedFrame = Time.frameCount;
         TimeScale.VoteFreeze(freezeOwner, false);
         SetGameInputBlocked(false);
         panel.ActiveSelf = false;

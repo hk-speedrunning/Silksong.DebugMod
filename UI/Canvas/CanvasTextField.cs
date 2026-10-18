@@ -14,6 +14,8 @@ public class CanvasTextField : CanvasText
     public static bool AnyFieldFocused { get; private set; }
 
     private InputField inputField;
+    
+    private static bool waitingForCloseRelease;
 
     public bool Clickable { get; set; } = true;
     public bool Persistent { get; set; }
@@ -54,7 +56,7 @@ public class CanvasTextField : CanvasText
             inputField.enabled = false;
             t.text = Text;
             AnyFieldFocused = false;
-            InputManager.enabled = true;
+            EnableGameInputOnRelease();
         });
 
         inputField.onValueChanged.AddListener(_ =>
@@ -126,7 +128,23 @@ public class CanvasTextField : CanvasText
         inputField.DeactivateInputField();
         inputField.enabled = false;
         AnyFieldFocused = false;
-        InputManager.enabled = true;
+        EnableGameInputOnRelease();
+    }
+
+    // Prevent the key that ended editing from reaching the game.
+    private static void EnableGameInputOnRelease()
+    {
+        if (waitingForCloseRelease) return;
+        waitingForCloseRelease = true;
+        GUIController.Instance.StartCoroutine(Routine());
+        return;
+
+        static IEnumerator Routine()
+        {
+            yield return new WaitWhile(() => Input.GetKey(KeyCode.Escape) || Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter));
+            waitingForCloseRelease = false;
+            if (!AnyFieldFocused) InputManager.enabled = true;
+        }
     }
 
     public bool IsFocused() => inputField && inputField.enabled;
