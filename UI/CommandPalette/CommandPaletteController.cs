@@ -125,6 +125,12 @@ public sealed class CommandPaletteController : MonoBehaviour
     {
         if (!IsOpen) return;
 
+        if (Input.GetMouseButtonDown(0) && !panel.IsMouseOver())
+        {
+            Close();
+            return;
+        }
+
         if (DebugMod.settings.binds.TryGetValue("MODUI_TOGGLECOMMANDPALETTE", out Binding toggle) && toggle.IsDown())
         {
             Toggle();
