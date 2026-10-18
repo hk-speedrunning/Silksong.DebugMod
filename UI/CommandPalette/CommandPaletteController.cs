@@ -20,8 +20,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private const int MaxVisibleItems = 8;
     private const int MaxRecentItems = 5;
     private const int ContextRowCount = 1;
-    private const float RepeatInitialDelay = .2f;
-    private const float RepeatInterval = .05f;
     private const int SelectionThickness = 2;
     private const string SubmenuIndicator = "›";
     private static int PanelWidth => UICommon.ScaleWidth(560);
@@ -48,8 +46,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private string query = "";
     private int selectedIndex;
     private int firstVisibleIndex;
-    private KeyCode repeatingNavigationKey;
-    private float nextNavigationRepeat;
     private string queryBeforeWordDelete;
     private readonly object freezeOwner = new();
     private readonly object inputBlocker = new();
@@ -108,6 +104,18 @@ public sealed class CommandPaletteController : MonoBehaviour
         }
     }
 
+    private void OnGUI()
+    {
+        try
+        {
+            HandleNavigation();
+        }
+        catch (Exception e)
+        {
+            DebugMod.LogError($"Error during command palette OnGUI: {e}");
+        }
+    }
+
     private void LateUpdate()
     {
         try
@@ -150,8 +158,6 @@ public sealed class CommandPaletteController : MonoBehaviour
             return;
         }
 
-        HandleNavigationRepeat();
-
         if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && panel.IsMouseOver())
         {
             MoveSelection(Input.mouseScrollDelta.y > 0 ? -1 : 1, wrapAround: false);
@@ -162,30 +168,11 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     #region Navigation
 
-    private void HandleNavigationRepeat()
+    private void HandleNavigation()
     {
-        if (repeatingNavigationKey != KeyCode.None && !Input.GetKey(repeatingNavigationKey)) repeatingNavigationKey = KeyCode.None;
+        if (!IsOpen || Event.current.type != EventType.KeyDown) return;
 
-        if (Input.GetKeyDown(KeyCode.UpArrow)) StartNavigationRepeat(KeyCode.UpArrow);
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) StartNavigationRepeat(KeyCode.DownArrow);
-
-        if (repeatingNavigationKey != KeyCode.None && Time.realtimeSinceStartup >= nextNavigationRepeat)
-        {
-            RunNavigationAction(repeatingNavigationKey);
-            nextNavigationRepeat += RepeatInterval;
-        }
-    }
-    
-    private void StartNavigationRepeat(KeyCode key)
-    {
-        repeatingNavigationKey = key;
-        RunNavigationAction(key);
-        nextNavigationRepeat = Time.realtimeSinceStartup + RepeatInitialDelay;
-    }
-
-    private void RunNavigationAction(KeyCode key)
-    {
-        switch (key)
+        switch (Event.current.keyCode)
         {
             case KeyCode.UpArrow:
                 MoveSelection(-1);
@@ -243,7 +230,6 @@ public sealed class CommandPaletteController : MonoBehaviour
         navigation.Clear();
         ClearQuery();
         selectedIndex = 0;
-        repeatingNavigationKey = KeyCode.None;
         panel.ActiveSelf = true;
         SetGameInputBlocked(true);
         queryField.Activate();
@@ -255,7 +241,6 @@ public sealed class CommandPaletteController : MonoBehaviour
         TimeScale.VoteFreeze(freezeOwner, false);
         SetGameInputBlocked(false);
         panel.ActiveSelf = false;
-        repeatingNavigationKey = KeyCode.None;
         queryField.Deactivate();
         EventSystem.current.SetSelectedGameObject(null);
     }
