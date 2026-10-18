@@ -17,6 +17,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     #region UI Properties
 
     private const int MaxVisibleItems = 8;
+    private const int MaxRecentItems = 3;
     private const int ContextRowCount = 1;
     private const float RepeatInitialDelay = .2f;
     private const float RepeatInterval = .05f;
@@ -47,7 +48,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private string query = "";
     private int selectedIndex;
     private int firstVisibleIndex;
-    private bool showingHistory;
     private KeyCode repeatingNavigationKey;
     private float nextNavigationRepeat;
     private string queryBeforeWordDelete;
@@ -140,13 +140,7 @@ public sealed class CommandPaletteController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (showingHistory)
-            {
-                ClearQuery();
-                selectedIndex = 0;
-                Render();
-            }
-            else if (navigation.Count == 0) Close();
+            if (navigation.Count == 0) Close();
             else NavigateBack();
             return;
         }
@@ -195,15 +189,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void MoveSelection(int offset)
     {
         if (filteredItems.Count == 0) return;
-        if (offset < 0 && selectedIndex == 0 && navigation.Count == 0 && string.IsNullOrEmpty(query) && !showingHistory && history.Count > 0)
-        {
-            showingHistory = true;
-            placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH_HISTORY");
-            Render();
-            return;
-        }
-
-        selectedIndex = Mathf.Clamp(selectedIndex + offset, 0, filteredItems.Count - 1);
+        selectedIndex = (selectedIndex + offset + filteredItems.Count) % filteredItems.Count;
         Render();
     }
     
@@ -334,6 +320,7 @@ public sealed class CommandPaletteController : MonoBehaviour
 
         history.RemoveAll(historyEntry => historyEntry.Item == entry.Item);
         history.Insert(0, entry);
+        if (history.Count > MaxRecentItems) history.RemoveAt(MaxRecentItems);
     }
 
     private IEnumerator ActivateQueryField()
@@ -429,9 +416,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Render()
     {
-        IEnumerable<PaletteEntry> items = showingHistory
-            ? history
-            : string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems);
+        IEnumerable<PaletteEntry> items = (navigation.Count == 0 ? history : [])
+            .Concat(string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems));
         filteredItems = items
             .Where(entry => Matches(entry, query))
             .ToList();
@@ -484,10 +470,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void ClearQuery()
     {
-        showingHistory = false;
         query = "";
         queryField.SetTextWithoutNotify(query);
-        placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
         placeholderText.ActiveSelf = true;
     }
 
