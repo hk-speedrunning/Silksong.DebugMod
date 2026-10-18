@@ -17,7 +17,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     #region UI Properties
 
     private const int MaxVisibleItems = 8;
-    private const int MaxRecentItems = 3;
+    private const int MaxRecentItems = 5;
     private const int ContextRowCount = 1;
     private const float RepeatInitialDelay = .2f;
     private const float RepeatInterval = .05f;
@@ -411,8 +411,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Render()
     {
-        IEnumerable<PaletteEntry> items = (navigation.Count == 0 ? history : [])
-            .Concat(string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems));
+        IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems))
+            .Concat(navigation.Count == 0 ? history.AsEnumerable().Reverse() : []);
         filteredItems = items
             .Where(entry => Matches(entry, query))
             .ToList();
