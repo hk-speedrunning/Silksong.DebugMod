@@ -151,6 +151,11 @@ public sealed class CommandPaletteController : MonoBehaviour
 
         HandleNavigationRepeat();
 
+        if (!Mathf.Approximately(Input.mouseScrollDelta.y, 0f) && panel.IsMouseOver())
+        {
+            MoveSelection(Input.mouseScrollDelta.y > 0 ? -1 : 1, wrapAround: false);
+        }
+
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) ActivateSelected();
     }
 
@@ -190,10 +195,11 @@ public sealed class CommandPaletteController : MonoBehaviour
         }
     }
 
-    private void MoveSelection(int offset)
+    private void MoveSelection(int offset, bool wrapAround = true)
     {
         if (filteredItems.Count == 0) return;
-        selectedIndex = (selectedIndex + offset + filteredItems.Count) % filteredItems.Count;
+        if (wrapAround) selectedIndex = (selectedIndex + offset + filteredItems.Count) % filteredItems.Count;
+        else selectedIndex = Mathf.Clamp(selectedIndex + offset, 0, filteredItems.Count - 1);
         Render();
     }
     
