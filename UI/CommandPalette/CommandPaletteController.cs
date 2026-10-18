@@ -313,13 +313,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Remember(PaletteEntry entry)
     {
-        if (string.IsNullOrEmpty(entry.Detail) && navigation.Count > 0)
-        {
-            entry = new PaletteEntry(entry.Item, string.Join($" {SubmenuIndicator} ", navigation.Select(item => item.Title())));
-        }
-
         history.RemoveAll(historyEntry => historyEntry.Item == entry.Item);
-        history.Insert(0, entry);
+        history.Insert(0, new PaletteEntry(entry.Item, entry.Detail, isRecent: true));
         if (history.Count > MaxRecentItems) history.RemoveAt(MaxRecentItems);
     }
 
@@ -440,7 +435,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             row.Button.Toggled = itemIndex == selectedIndex;
             row.Selection.ActiveSelf = itemIndex == selectedIndex;
             row.Button.Text.Text = entry.Item.Title();
-            row.Detail.Text = entry.Item switch
+            row.Detail.Text = entry.IsRecent ? Localization.Get("COMMANDPALETTE_RECENTLY_USED") : entry.Item switch
             {
                 CommandPaletteItem.ToggleItem toggle => Localization.Get(toggle.IsEnabled() ? "COMMANDPALETTE_ON" : "COMMANDPALETTE_OFF"),
                 CommandPaletteItem.SubmenuItem => string.IsNullOrEmpty(entry.Detail) ? SubmenuIndicator : entry.Detail,
@@ -484,10 +479,11 @@ public sealed class CommandPaletteController : MonoBehaviour
         public int ItemIndex { get; set; }
     }
 
-    private sealed class PaletteEntry(CommandPaletteItem item, string detail)
+    private sealed class PaletteEntry(CommandPaletteItem item, string detail, bool isRecent = false)
     {
         public CommandPaletteItem Item { get; } = item;
         public string Detail { get; } = detail;
+        public bool IsRecent { get; } = isRecent;
     }
 
 }
