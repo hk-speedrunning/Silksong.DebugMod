@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
@@ -164,6 +165,11 @@ public class InfoPanel : CanvasPanel
             rightLabelColumn.Color = UICommon.iconColor;
         }
 
+        CanvasText roomSpecific = Add(new CanvasText("RoomSpecific"));
+        roomSpecific.Size = new Vector2(Size.x, ListingHeight * 10);
+        roomSpecific.LocalPosition = new Vector2(0f, -roomSpecific.Size.y - ListingHeight);
+        roomSpecific.Alignment = TextAnchor.LowerLeft;
+        roomSpecific.OnUpdate += () => roomSpecific.Text = GetRoomSpecificText();
 
         if (Profiler.enabled)
         {
@@ -364,5 +370,21 @@ public class InfoPanel : CanvasPanel
 
 
         return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{t} {m}{i}{p}";
+    }
+
+    private static string GetRoomSpecificText()
+    {
+        string text = "";
+
+        MazeController mazeController = Object.FindAnyObjectByType<MazeController>();
+        if (mazeController && mazeController.gameObject.scene.name != "Dust_09")
+        {
+            text += $"{Localization.Get("INFOPANEL_MISTSCORE")}: {PlayerData.instance.CorrectMazeDoorsEntered}\n";
+            text += $"{Localization.Get("INFOPANEL_MISTCORRECTEXIT")}: {string.Join(", ",
+                mazeController.correctDoors.Select(gate => gate.name))}\n";
+        }
+
+        text = text.TrimEnd('\n');
+        return text;
     }
 }

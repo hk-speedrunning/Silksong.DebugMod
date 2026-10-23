@@ -93,6 +93,8 @@
     "INFOPANEL_LASTDAMAGEAMOUNT": "Last Damage",
     "INFOPANEL_LASTDAMAGESCALING": "Last Scaling",
     "INFOPANEL_LASTDAMAGETYPE": "Last Type",
+    "INFOPANEL_MISTSCORE": "Mist Score",
+    "INFOPANEL_MISTCORRECTEXIT": "Correct Exit",
     "INFOPANEL_NEEDLEBASE": "Needle Base",
     "INFOPANEL_NONE": "None",
     "INFOPANEL_POSITION": "Position",
