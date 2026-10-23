@@ -129,7 +129,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             DebugMod.LogError($"Error during command palette LateUpdate: {e}");
         }
     }
-    
+
     #endregion
 
     private void HandleKeybindings()
@@ -194,7 +194,7 @@ public sealed class CommandPaletteController : MonoBehaviour
         else selectedIndex = Mathf.Clamp(selectedIndex + offset, 0, filteredItems.Count - 1);
         Render();
     }
-    
+
     private void NavigateBack()
     {
         navigation.RemoveAt(navigation.Count - 1);
@@ -323,7 +323,7 @@ public sealed class CommandPaletteController : MonoBehaviour
         yield return null;
         if (IsOpen) queryField.Activate();
     }
-    
+
     #region UI
 
     private void BuildPanel()
@@ -451,12 +451,12 @@ public sealed class CommandPaletteController : MonoBehaviour
             row.SubmenuIcon.ActiveSelf = entry.Item is CommandPaletteItem.SubmenuItem && string.IsNullOrEmpty(entry.Detail);
         }
     }
-    
+
     #endregion
 
     private static bool Matches(PaletteEntry entry, string query)
     {
-        string[] fields = [entry.Item.Title(), entry.Detail]; 
+        string[] fields = [entry.Item.Title(), entry.Detail];
         return query.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .All(term => fields.Any(f => NormalizeSearch(f).Contains(NormalizeSearch(term), StringComparison.OrdinalIgnoreCase)));
     }
@@ -465,7 +465,7 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void OnQueryChanged(string value)
     {
-        query = value;
+        query = value ?? "";
         selectedIndex = 0;
         placeholderText.ActiveSelf = string.IsNullOrEmpty(value);
         Render();
