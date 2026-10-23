@@ -431,6 +431,7 @@ public class SaveState
 
         // Prevent silk spool regen from continuing after (or during!) the load.
         HeroController.instance.ResetSilkRegen();
+        HeroController.instance.ClearSpoolMossChunks();
 
         // Unparents player object and fixes interpolation
         HeroController.instance.ElevatorReset();
@@ -440,7 +441,7 @@ public class SaveState
         // CustomSceneManager.Start fails to run if the scene is immediately unloaded. Leaves the scene dark on next respawn.
         // Without this wait, on the next respawn the scene stays black.
         if (abortDeath && ScenePreloader._forceEndedOperations.Count > 0)
-            yield return null; 
+            yield return null;
         foreach (ScenePreloader.SceneLoadOp op in ScenePreloader._forceEndedOperations)
         {
             yield return Addressables.UnloadSceneAsync(op.Operation);
