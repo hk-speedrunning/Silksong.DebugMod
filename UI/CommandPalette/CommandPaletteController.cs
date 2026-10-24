@@ -372,7 +372,7 @@ public sealed class CommandPaletteController : MonoBehaviour
         }
 
         panel.Build();
-        
+
         queryField.Size -= new Vector2(RowHeight, 0); // prevent overlapping back button
     }
 
