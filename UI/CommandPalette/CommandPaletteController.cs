@@ -38,6 +38,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private static int? _lastToggleFrame;
 
     private CanvasPanel panel;
+    private CanvasButton backButton;
     private CanvasTextField queryField;
     private CanvasText placeholderText;
     private readonly List<PaletteRow> rows = [];
@@ -356,12 +357,23 @@ public sealed class CommandPaletteController : MonoBehaviour
             placeholderText.Alignment = TextAnchor.MiddleLeft;
             placeholderText.Text = Localization.Get("COMMANDPALETTE_SEARCH");
 
+            float iconSize = RowHeight * IconHeight;
+            float iconMargin = (RowHeight - iconSize) / 2;
+            backButton = panel.Add(new CanvasButton("Back"));
+            backButton.LocalPosition = new Vector2(PanelWidth - contentMargin - iconSize - iconMargin, contentMargin + iconMargin);
+            backButton.Size = new Vector2(iconSize, iconSize);
+            backButton.ImageOnly(UICommon.images["IconLeftMin"]);
+            backButton.OnUpdate += () => backButton.Color = mouseMovedSinceOpen && backButton.IsMouseOver() ? UICommon.accentColor : UICommon.iconColor;
+            backButton.OnClicked += NavigateBack;
+
             BuildRows(builder);
 
             panel.ActiveSelf = false;
         }
 
         panel.Build();
+        
+        queryField.Size -= new Vector2(RowHeight, 0); // prevent overlapping back button
     }
 
     private void PositionPanel()
@@ -419,6 +431,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void Render()
     {
+        backButton.ActiveSelf = navigation.Count > 0;
+
         IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems))
             .Concat(navigation.Count == 0 ? history.AsEnumerable().Reverse() : []);
         filteredItems = items
