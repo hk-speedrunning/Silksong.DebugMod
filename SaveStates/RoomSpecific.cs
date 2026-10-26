@@ -47,7 +47,7 @@ public static class RoomSpecific
     }
 
     // Allow skipping phases
-    internal static string SaveCogworkDancers()
+    private static string SaveCogworkDancers()
     {
         PlayMakerFSM fsm = Utils.FindFSM("Dancer Control", "Control");
 
@@ -61,7 +61,7 @@ public static class RoomSpecific
     }
 
     // Allow skipping the arena
-    internal static string SaveKarmelita()
+    private static string SaveKarmelita()
     {
         BattleScene battleScene = Object.FindAnyObjectByType<BattleScene>();
 
@@ -74,7 +74,7 @@ public static class RoomSpecific
     }
 
     // Red memory has four parts which each get activated when you reach the preceeding cutscene
-    internal static string SaveRedMemory()
+    private static string SaveRedMemory()
     {
         GameObject sceneryRoot = Utils.FindGameObjectByPath("Scenery Groups");
 
@@ -96,7 +96,7 @@ public static class RoomSpecific
     }
 
     // Allow loading into the middle of an arena battle
-    internal static string SaveBattleScene(BattleScene battleScene)
+    private static string SaveBattleScene(BattleScene battleScene)
     {
         return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
     }
@@ -152,7 +152,7 @@ public static class RoomSpecific
         DebugMod.instance.StartCoroutine(Routine());
     }
 
-    internal static void DoCogworkDancers(int phase)
+    private static void DoCogworkDancers(int phase)
     {
         ModifyFSM("Dancer Control", "Control", fsm =>
         {
@@ -208,7 +208,7 @@ public static class RoomSpecific
         ModifyFSM("Dancer B", "Control", ModifyDancer);
     }
 
-    internal static void DoKarmelita()
+    private static void DoKarmelita()
     {
         // Based off randomscorp's Skip Karmelita Arena mod
 
@@ -234,7 +234,7 @@ public static class RoomSpecific
         });
     }
 
-    internal static void DoRedMemory(string options)
+    private static void DoRedMemory(string options)
     {
         int stage = int.Parse(options);
 
@@ -268,7 +268,7 @@ public static class RoomSpecific
         DebugMod.instance.StartCoroutine(Routine());
     }
 
-    internal static void DoBattleScene(string scene, string objectName, int wave)
+    private static void DoBattleScene(string scene, string objectName, int wave)
     {
         void StartBattle()
         {
@@ -324,6 +324,9 @@ public static class RoomSpecific
     {
         switch (scene)
         {
+            case "Bone_East_08":
+                SavageBeastflyRematchFix();
+                break;
             case "Hang_04":
             case "Hang_06":
                 // Hornet always turns towards this object when the roar plays, but for HHA its position
@@ -344,7 +347,7 @@ public static class RoomSpecific
         yield break;
     }
 
-    internal static IEnumerator MemoryFixes()
+    private static IEnumerator MemoryFixes()
     {
         HeroController.instance.SetSilkRegenBlocked(true);
         DarknessRegion.SetDarknessLevel(0);
@@ -354,6 +357,23 @@ public static class RoomSpecific
         yield return new WaitUntil(() => GameCameras.instance.hudCanvasSlideOut.gameObject);
         yield return new WaitForSecondsRealtime(1f);
         GameCameras.instance.hudCanvasSlideOut.SendEvent("OUT");
+    }
+
+    private static void SavageBeastflyRematchFix()
+    {
+        // Fixes a bug in the FSM which breaks the boss AI
+        // if the player loads directly into the arena
+        ModifyFSM("Bone Flyer Giant", "Control", fsm =>
+        {
+            FsmState state = fsm.GetState("Rematch Ready");
+            List<FsmStateAction> actions = state!.Actions.ToList();
+            FsmStateAction action = actions.First(action =>
+                action is CheckAlertRangeByName checkAlertRangeByName &&
+                checkAlertRangeByName.sendEvent.value == "BATTLE START");
+            actions.Remove(action);
+            actions.Add(action);
+            state.Actions = actions.ToArray();
+        });
     }
     #endregion
 
