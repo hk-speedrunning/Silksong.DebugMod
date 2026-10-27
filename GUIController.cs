@@ -273,10 +273,7 @@ public class GUIController : MonoBehaviour
             BuildMenus();
         }
 
-        if (!CanvasTextField.AnyFieldFocused && !CommandPaletteController.IsOpen)
-        {
-            HandleKeybinds();
-        }
+        HandleKeybinds(textInputActive: CanvasTextField.AnyFieldFocused || CommandPaletteController.IsOpen);
 
         if (DebugMod.infiniteSilk
             && PlayerData.instance.silk < PlayerData.instance.silkMax
@@ -391,13 +388,14 @@ public class GUIController : MonoBehaviour
         }
     }
 
-    private void HandleKeybinds()
+    private void HandleKeybinds(bool textInputActive)
     {
         Modifier modifiers = Modifiers.Held();
 
         foreach ((string bindName, Binding binding) in DebugMod.settings.binds)
         {
             if (bindName == RebindTarget) continue;
+            if (textInputActive && binding.IsCapturedByTextField()) continue;
 
             if (binding.IsDown(modifiers))
             {
@@ -424,7 +422,7 @@ public class GUIController : MonoBehaviour
             }
         }
 
-        if (RebindTarget != null)
+        if (RebindTarget != null && !textInputActive)
         {
             HandleRebind(RebindTarget);
         }
