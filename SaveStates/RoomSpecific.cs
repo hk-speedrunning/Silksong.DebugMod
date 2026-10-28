@@ -146,7 +146,7 @@ public static class RoomSpecific
             yield return new WaitUntil(() => !GameManager.instance.isLoading);
 
             PlayMakerFSM fsm = Utils.FindFSM(goName, fsmName);
-            action(fsm);
+            if (fsm) action(fsm); // Should this log an error?
         }
 
         DebugMod.instance.StartCoroutine(Routine());
