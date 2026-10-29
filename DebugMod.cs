@@ -3,6 +3,7 @@ using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
+using DebugMod.UI.CommandPalette;
 using GlobalEnums;
 using GlobalSettings;
 using HarmonyLib;
@@ -58,6 +59,8 @@ public partial class DebugMod : BaseUnityPlugin
     public static Settings settings { get; set; } = new Settings();
     private static bool settingsLoaded;
 
+    public static readonly CommandPaletteRegistry CommandPaletteRegistry = new();
+    
     public static readonly string ModBaseDirectory = Path.Combine(Application.persistentDataPath, "DebugModData");
 
     private static float _loadTime;
@@ -123,8 +126,14 @@ public partial class DebugMod : BaseUnityPlugin
             SaveSettings();
         }
 
-        // Updates the config entry
+        if (!settings.binds.ContainsKey("MODUI_TOGGLECOMMANDPALETTE"))
+        {
+            settings.binds.Add("MODUI_TOGGLECOMMANDPALETTE", new Binding(Modifier.Ctrl, KeyCode.P));
+        }
+
+        // Updates the config entries
         bindUpdated?.Invoke("MODUI_TOGGLEALLUI", settings.binds["MODUI_TOGGLEALLUI"]);
+        bindUpdated?.Invoke("MODUI_TOGGLECOMMANDPALETTE", settings.binds["MODUI_TOGGLECOMMANDPALETTE"]);
 
         int alphaStart = (int)(settings.NumPadForSaveStates ? KeyCode.Keypad0 : KeyCode.Alpha0);
 
@@ -136,6 +145,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         SaveStateManager.Initialize();
         TimeScale.Initialize();
+        CommandPaletteCommands.Initialize();
 
         harmony = new Harmony(Id);
         harmony.PatchAll();

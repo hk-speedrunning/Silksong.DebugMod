@@ -49,6 +49,8 @@ public class CanvasButton : CanvasImage
 
     public event Action OnClicked;
 
+    public Func<bool> ShowHoverBorder { get; set; } = () => true;
+
     protected override bool Interactable => true;
 
     public CanvasButton(string name) : base(name)
@@ -137,7 +139,7 @@ public class CanvasButton : CanvasImage
             {
                 hoverBorder.Parent = this;
                 hoverBorder.Size = Size;
-                hoverBorder.ActiveSelf = IsMouseOver();
+                hoverBorder.ActiveSelf = IsMouseOver() && ShowHoverBorder();
 
                 GameObject sibling = Border != null ? Border.GameObject : GameObject;
                 hoverBorder.GameObject.transform.SetSiblingIndex(sibling.transform.GetSiblingIndex() + 1);
@@ -165,7 +167,7 @@ public class CanvasButton : CanvasImage
     {
         if (hoverBorder.Parent == this)
         {
-            hoverBorder.ActiveSelf = IsMouseOver();
+            hoverBorder.ActiveSelf = IsMouseOver() && ShowHoverBorder();
         }
     }
 }

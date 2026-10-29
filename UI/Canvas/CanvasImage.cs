@@ -10,9 +10,20 @@ public class CanvasImage : CanvasNode
     private Rect subSprite;
     private Sprite sprite;
     private CanvasBorder border;
+    private Color color = UICommon.iconColor;
 
     public CanvasBorder Border => border;
     public bool IsBackground { get; set; }
+
+    public Color Color
+    {
+        get => color;
+        set
+        {
+            color = value;
+            if (gameObject) gameObject.GetComponent<Image>().color = color;
+        }
+    }
 
     protected override bool Interactable => false;
 
@@ -101,6 +112,6 @@ public class CanvasImage : CanvasNode
         Image image = gameObject.GetComponent<Image>();
 
         image.sprite = sprite ? sprite : Sprite.Create(tex, new Rect(subSprite.x, tex.height - subSprite.height - subSprite.y, subSprite.width, subSprite.height), Vector2.zero);
-        image.color = UICommon.iconColor;
+        image.color = color;
     }
 }
