@@ -439,7 +439,10 @@ public sealed class CommandPaletteController : MonoBehaviour
         IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems))
             .Concat(navigation.Count == 0 ? history.AsEnumerable().Reverse() : []);
         filteredItems = items
-            .Where(entry => Matches(entry, query))
+            .Select(entry => (entry, title: entry.Item.Title()))
+            .Where(x => Matches([x.title, x.entry.Detail ?? ""], query))
+            .OrderByDescending(x => Matches([x.title], query))
+            .Select(x => x.entry)
             .ToList();
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, filteredItems.Count - 1));
         if (selectedIndex < firstVisibleIndex + ContextRowCount)
@@ -471,9 +474,8 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     #endregion
 
-    private static bool Matches(PaletteEntry entry, string query)
+    private static bool Matches(string[] fields, string query)
     {
-        string[] fields = [entry.Item.Title(), entry.Detail ?? ""];
         return query.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .All(term => fields.Any(f => NormalizeSearch(f).Contains(NormalizeSearch(term), StringComparison.OrdinalIgnoreCase)));
     }
