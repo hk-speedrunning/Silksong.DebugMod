@@ -263,10 +263,13 @@ public sealed class CommandPaletteController : MonoBehaviour
     }
 
     private IEnumerable<PaletteEntry> CurrentItems()
-        => (navigation.Count == 0 ? DebugMod.CommandPaletteRegistry.RootItems : navigation[^1].GetChildren())
-            .Select(item => new PaletteEntry(item, null));
+    {
+        CommandPaletteItem.SubmenuItem current = navigation.LastOrDefault();
+        return (current?.GetChildren() ?? DebugMod.CommandPaletteRegistry.RootItems)
+            .Select(item => new PaletteEntry(item, null, current));
+    }
 
-    private IEnumerable<PaletteEntry> SearchItems(IEnumerable<CommandPaletteItem> items, string path = "")
+    private IEnumerable<PaletteEntry> SearchItems(IEnumerable<CommandPaletteItem> items, string path = "", CommandPaletteItem.SubmenuItem parent = null)
     {
         foreach (CommandPaletteItem item in items)
         {
@@ -274,14 +277,14 @@ public sealed class CommandPaletteController : MonoBehaviour
             {
                 string title = submenu.Title();
                 string submenuPath = string.IsNullOrEmpty(path) ? title : $"{path} {PathSeparator} {title}";
-                yield return new PaletteEntry(submenu, path);
+                yield return new PaletteEntry(submenu, path, parent);
                 if (!submenu.SearchChildren) continue;
-                foreach (PaletteEntry entry in SearchItems(submenu.GetChildren(), submenuPath)) yield return entry;
+                foreach (PaletteEntry entry in SearchItems(submenu.GetChildren(), submenuPath, submenu)) yield return entry;
                 continue;
             }
 
             string detail = string.IsNullOrEmpty(path) ? null : path;
-            yield return new PaletteEntry(item, detail);
+            yield return new PaletteEntry(item, detail, parent);
         }
     }
 
@@ -318,7 +321,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private void Remember(PaletteEntry entry)
     {
         history.RemoveAll(historyEntry => historyEntry.Item == entry.Item);
-        history.Insert(0, new PaletteEntry(entry.Item, entry.Detail, isRecent: true));
+        history.Insert(0, new PaletteEntry(entry.Item, entry.Detail, entry.Parent, isRecent: true));
         if (history.Count > MaxRecentItems) history.RemoveAt(MaxRecentItems);
     }
 
@@ -439,7 +442,7 @@ public sealed class CommandPaletteController : MonoBehaviour
         IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems))
             .Concat(navigation.Count == 0 ? history.AsEnumerable().Reverse() : []);
         filteredItems = items
-            .Select(entry => (entry, title: entry.Item.Title()))
+            .Select(entry => (entry, title: entry.Title))
             .Where(x => Matches([x.title, x.entry.Detail ?? ""], query))
             .OrderByDescending(x => Matches([x.title], query))
             .Select(x => x.entry)
@@ -462,7 +465,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             row.ItemIndex = itemIndex;
             row.Button.Toggled = itemIndex == selectedIndex;
             row.Selection.ActiveSelf = itemIndex == selectedIndex;
-            row.Button.Text.Text = entry.Item.Title();
+            row.Button.Text.Text = entry.Title;
             row.Detail.Text = entry.IsRecent ? Localization.Get("COMMANDPALETTE_RECENTLY_USED") : entry.Item switch
             {
                 CommandPaletteItem.ToggleItem toggle => Localization.Get(toggle.IsEnabled() ? "COMMANDPALETTE_ON" : "COMMANDPALETTE_OFF"),
@@ -507,11 +510,14 @@ public sealed class CommandPaletteController : MonoBehaviour
         public int ItemIndex { get; set; }
     }
 
-    private sealed class PaletteEntry(CommandPaletteItem item, string detail, bool isRecent = false)
+    private sealed class PaletteEntry(CommandPaletteItem item, string detail, CommandPaletteItem.SubmenuItem parent, bool isRecent = false)
     {
         public CommandPaletteItem Item { get; } = item;
         public string Detail { get; } = detail;
+        public CommandPaletteItem.SubmenuItem Parent { get; } = parent;
         public bool IsRecent { get; } = isRecent;
+
+        public string Title => IsRecent && Parent != null ? $"{Parent.Title()} {PathSeparator} {Item.Title()}" : Item.Title();
     }
 
 }
