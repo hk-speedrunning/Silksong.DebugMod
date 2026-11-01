@@ -306,4 +306,25 @@ public static class HitboxPatches
         if (!HitboxRender.Instance) return;
         HitboxRender.Instance.UpdateHitbox(__instance.gameObject);
     }
+
+    // tk2d adds colliders at runtime once a sprite frame has collision data
+    [HarmonyPatch(typeof(tk2dBaseSprite), nameof(tk2dBaseSprite.UpdateCollider))]
+    [HarmonyPatch(typeof(tk2dBaseSprite), nameof(tk2dBaseSprite.CreateCollider))]
+    [HarmonyPrefix]
+    public static void Tk2DColliderPrefix(tk2dBaseSprite __instance, out int __state)
+    {
+        __state = Tk2DColliderCount(__instance);
+    }
+
+    [HarmonyPatch(typeof(tk2dBaseSprite), nameof(tk2dBaseSprite.UpdateCollider))]
+    [HarmonyPatch(typeof(tk2dBaseSprite), nameof(tk2dBaseSprite.CreateCollider))]
+    [HarmonyPostfix]
+    public static void Tk2DColliderPostfix(tk2dBaseSprite __instance, int __state)
+    {
+        if (!HitboxRender.Instance || Tk2DColliderCount(__instance) == __state) return;
+        HitboxRender.Instance.UpdateHitbox(__instance.gameObject);
+    }
+
+    private static int Tk2DColliderCount(tk2dBaseSprite sprite) =>
+        (sprite.boxCollider2D ? 1 : 0) + sprite.polygonCollider2D.Count(c => c) + sprite.edgeCollider2D.Count(c => c);
 }
