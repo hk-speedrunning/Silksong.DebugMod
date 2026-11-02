@@ -163,8 +163,6 @@ public static class UICommon
                     string[] split = res.Split('.');
                     string internalName = split[split.Length - 2];
                     images.Add(internalName, tex);
-
-                    DebugMod.LogDebug($"Loaded image: {internalName}");
                 }
                 catch (Exception e)
                 {
