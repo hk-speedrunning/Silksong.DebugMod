@@ -1,7 +1,6 @@
 using DebugMod.Helpers;
 using DebugMod.MonoBehaviours;
 using DebugMod.UI.Canvas;
-using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +11,6 @@ using UnityEngine.InputSystem;
 
 namespace DebugMod.UI.CommandPalette;
 
-[HarmonyPatch]
 public sealed class CommandPaletteController : MonoBehaviour
 {
     #region UI Properties
@@ -29,10 +27,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private static int DetailPadding => UICommon.ScaleWidth(10);
 
     #endregion
-
-    [HarmonyPatch(typeof(InputHandler), "Update")]
-    [HarmonyPrefix]
-    private static bool InputHandler_Update() => !IsOpen;
 
     private static CommandPaletteController _instance;
     private static int? _lastToggleFrame;
