@@ -13,6 +13,7 @@ public class HitboxViewer
     {
         State = DebugMod.settings.ShowHitBoxes;
         Unload();
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += AddSceneHitboxes;
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += CreateHitboxRender;
 
 
@@ -24,10 +25,25 @@ public class HitboxViewer
     public void Unload()
     {
         State = DebugMod.settings.ShowHitBoxes;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= AddSceneHitboxes;
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= CreateHitboxRender;
 
         ModHooks.ColliderCreateHook -= UpdateHitboxRender;
         DestroyHitboxRender();
+    }
+    
+    // Order on room transition:
+    //   sceneLoaded Greymoor_08 (skipped)
+    //   activeSceneChanged Greymoor_08
+    //   (later) sceneLoaded Greymoor_08_boss
+    private void AddSceneHitboxes(Scene scene, LoadSceneMode mode)
+    {
+        if (hitboxRender == null || scene.name == GameManager.instance.nextSceneName) return;
+
+        foreach (GameObject root in scene.GetRootGameObjects())
+        {
+            hitboxRender.UpdateHitbox(root);
+        }
     }
 
     private void CreateHitboxRender(Scene current, Scene next) => CreateHitboxRender();
