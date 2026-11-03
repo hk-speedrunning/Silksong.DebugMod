@@ -36,7 +36,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     private CanvasTextField queryField;
     private CanvasText placeholderText;
     private readonly List<PaletteRow> rows = [];
-    private readonly List<CommandPaletteItem.SubmenuItem> navigation = [];
+    private readonly List<(CommandPaletteItem.SubmenuItem Submenu, string Query, int SelectedIndex, int FirstVisibleIndex)> navigation = [];
     private readonly List<PaletteEntry> history = [];
     private List<PaletteEntry> filteredItems = [];
     private string query = "";
@@ -194,9 +194,11 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private void NavigateBack()
     {
+        var (_, previousQuery, previousSelectedIndex, previousFirstVisibleIndex) = navigation[^1];
         navigation.RemoveAt(navigation.Count - 1);
-        ClearQuery();
-        selectedIndex = 0;
+        SetQuery(previousQuery);
+        selectedIndex = previousSelectedIndex;
+        firstVisibleIndex = previousFirstVisibleIndex;
         Render();
         StartCoroutine(ActivateQueryField());
     }
@@ -229,7 +231,7 @@ public sealed class CommandPaletteController : MonoBehaviour
         PositionPanel();
         TimeScale.VoteFreeze(freezeOwner, true);
         navigation.Clear();
-        ClearQuery();
+        SetQuery("");
         selectedIndex = 0;
         mouseMovedSinceOpen = false;
         openedFrame = Time.frameCount;
@@ -258,7 +260,7 @@ public sealed class CommandPaletteController : MonoBehaviour
 
     private IEnumerable<PaletteEntry> CurrentItems()
     {
-        CommandPaletteItem.SubmenuItem current = navigation.LastOrDefault();
+        CommandPaletteItem.SubmenuItem current = navigation.Count == 0 ? null : navigation[^1].Submenu;
         return (current?.GetChildren() ?? DebugMod.CommandPaletteRegistry.RootItems)
             .Select(item => new PaletteEntry(item, null, current));
     }
@@ -293,8 +295,8 @@ public sealed class CommandPaletteController : MonoBehaviour
         switch (entry.Item)
         {
             case CommandPaletteItem.SubmenuItem submenu:
-                navigation.Add(submenu);
-                ClearQuery();
+                navigation.Add((submenu, query, selectedIndex, firstVisibleIndex));
+                SetQuery("");
                 selectedIndex = 0;
                 Render();
                 StartCoroutine(ActivateQueryField());
@@ -487,11 +489,11 @@ public sealed class CommandPaletteController : MonoBehaviour
         Render();
     }
 
-    private void ClearQuery()
+    private void SetQuery(string value)
     {
-        query = "";
+        query = value;
         queryField.SetTextWithoutNotify(query);
-        placeholderText.ActiveSelf = true;
+        placeholderText.ActiveSelf = string.IsNullOrEmpty(query);
     }
 
     private sealed class PaletteRow(CanvasPanel panel, CanvasButton button, CanvasText detail, CanvasImage submenuIcon, CanvasBorder selection)
