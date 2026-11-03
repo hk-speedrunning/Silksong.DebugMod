@@ -1,5 +1,6 @@
 using DebugMod.Helpers;
 using DebugMod.SaveStates;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,21 +27,23 @@ public static class CommandPaletteCommands
     
     #region Teleport
 
+    private static readonly Lazy<Dictionary<string, List<string>>> scenesByArea =
+        new(() => JsonUtil.Deserialize<Dictionary<string, List<string>>>("DebugMod.Resources.scenes_by_area.jsonc"));
+
     private static IEnumerable<CommandPaletteItem> TeleportPoints()
     {
         Dictionary<string, SceneTeleportMap.SceneInfo> teleportMap = SceneTeleportMap.GetTeleportMap();
         if (teleportMap == null) yield break;
 
-        foreach (var scene in teleportMap
-            .Where(s => s.Value.TransitionGates.Count > 0 && !WorldInfo.NameLooksLikeAdditiveLoadScene(s.Key))
-            .OrderBy(s => s.Key))
+        foreach ((string area, List<string> scenes) in scenesByArea.Value)
         {
-            yield return new CommandPaletteItem.SubmenuItem(
-                scene.Key,
-                () => scene.Value.TransitionGates.OrderBy(g => g).Select(gate =>
-                    new CommandPaletteItem.ActionItem(gate, () => GameManager.instance.StartCoroutine(Teleport(scene.Key, gate)))),
-                searchChildren: false
-            );
+            yield return new CommandPaletteItem.SubmenuItem(area, () => scenes.Select(scene =>
+                new CommandPaletteItem.SubmenuItem(
+                    scene,
+                    () => teleportMap[scene].TransitionGates.OrderBy(g => g).Select(gate =>
+                        new CommandPaletteItem.ActionItem(gate, () => GameManager.instance.StartCoroutine(Teleport(scene, gate)))),
+                    searchChildren: false
+                )));
         }
     }
 
