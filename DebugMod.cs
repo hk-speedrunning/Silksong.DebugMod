@@ -144,7 +144,6 @@ public partial class DebugMod : BaseUnityPlugin
 
         SaveStateManager.Initialize();
         TimeScale.Initialize();
-        CommandPaletteCommands.Initialize();
 
         harmony = new Harmony(Id);
         harmony.PatchAll();
@@ -183,6 +182,8 @@ public partial class DebugMod : BaseUnityPlugin
         UICommon.LoadResources();
         GUIController.Instance.BuildMenus();
         SceneWatcher.Init();
+
+        CommandPaletteCommands.Initialize();
     }
 
     private void OnEnable() => TimeScale.Initialize();
