@@ -47,8 +47,6 @@ public sealed class CommandPaletteController : MonoBehaviour
     private readonly object freezeOwner = new();
     private readonly object inputBlocker = new();
 
-    private int openedFrame;
-
     public static bool IsOpen => _instance != null && _instance.panel != null && _instance.panel.ActiveSelf;
 
     private Binding removeWordBinding = new Binding(Application.platform == RuntimePlatform.OSXPlayer ? Modifier.Alt : Modifier.Ctrl, KeyCode.Backspace);
@@ -135,7 +133,7 @@ public sealed class CommandPaletteController : MonoBehaviour
 
         if (Input.mousePositionDelta != Vector3.zero) mouseMovedSinceOpen = true;
 
-        if (Input.GetMouseButtonDown(0) && !panel.IsMouseOver() && Time.frameCount > openedFrame)
+        if (Input.GetMouseButtonDown(0) && !panel.IsMouseOver() && Time.frameCount > _lastToggleFrame)
         {
             Close();
             return;
@@ -234,7 +232,6 @@ public sealed class CommandPaletteController : MonoBehaviour
         SetQuery("");
         selectedIndex = 0;
         mouseMovedSinceOpen = false;
-        openedFrame = Time.frameCount;
         panel.ActiveSelf = true;
         SetGameInputBlocked(true);
         queryField.Activate();
