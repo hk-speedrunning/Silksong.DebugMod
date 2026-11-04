@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DebugMod;
 
@@ -30,6 +31,23 @@ public readonly struct Binding : IEquatable<Binding>
 
     public bool IsDown() => IsDown(global::DebugMod.Modifiers.Held());
     public bool IsDown(Modifier modifiers) => Key != KeyCode.None && Input.GetKeyDown(Key) && modifiers.Without(Key) == Modifiers;
+
+    // These keybinds can't be executed while a text field is focused, namely the command palette
+    public bool IsCapturedByTextField()
+    {
+        if (Key is KeyCode.Backspace or KeyCode.Delete or KeyCode.Home or KeyCode.End
+                or KeyCode.LeftArrow or KeyCode.RightArrow or KeyCode.UpArrow or KeyCode.DownArrow
+                or KeyCode.Return or KeyCode.KeypadEnter or KeyCode.Escape
+            || Key is KeyCode.A or KeyCode.C or KeyCode.V or KeyCode.X && Modifiers == TextShortcutModifier)
+        {
+            return true;
+        }
+
+        bool isRegular = Key is >= KeyCode.Space and <= KeyCode.Tilde or >= KeyCode.Keypad0 and <= KeyCode.KeypadEquals;
+        return isRegular && Modifiers == 0;
+    }
+
+    private static Modifier TextShortcutModifier => Application.platform == RuntimePlatform.OSXPlayer ? Modifier.Meta : Modifier.Ctrl;
 
     public override string ToString()
     {

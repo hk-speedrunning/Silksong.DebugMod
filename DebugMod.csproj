@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\**\*.png" />
+    <EmbeddedResource Include="Resources\*.jsonc" />
   </ItemGroup>
 
   <ItemGroup>

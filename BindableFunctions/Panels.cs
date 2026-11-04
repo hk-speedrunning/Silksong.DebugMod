@@ -1,9 +1,13 @@
 ﻿using DebugMod.UI;
+using DebugMod.UI.CommandPalette;
 
 namespace DebugMod;
 
 public static partial class BindableFunctions
 {
+    [BindableMethod(name = "MODUI_TOGGLECOMMANDPALETTE", category = "CATEGORY_MODUI", allowLock = false)]
+    public static void ToggleCommandPalette() => CommandPaletteController.Toggle();
+
     [BindableMethod(name = "MODUI_TOGGLEALLUI", category = "CATEGORY_MODUI", allowLock = false)]
     public static void ToggleAllPanels()
     {

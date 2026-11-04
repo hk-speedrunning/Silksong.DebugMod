@@ -14,11 +14,14 @@ public class CanvasTextField : CanvasText
     public static bool AnyFieldFocused { get; private set; }
 
     private InputField inputField;
+    
+    private static bool waitingForCloseRelease;
 
     public bool Clickable { get; set; } = true;
     public bool Persistent { get; set; }
 
     public event Action<string> OnSubmit;
+    public event Action<string> OnValueChanged;
 
     protected override bool Interactable => true;
 
@@ -53,7 +56,7 @@ public class CanvasTextField : CanvasText
             inputField.enabled = false;
             t.text = Text;
             AnyFieldFocused = false;
-            InputManager.enabled = true;
+            EnableGameInputOnRelease();
         });
 
         inputField.onValueChanged.AddListener(_ =>
@@ -62,6 +65,8 @@ public class CanvasTextField : CanvasText
             {
                 Text = inputField.text;
             }
+
+            OnValueChanged?.Invoke(inputField.text);
         });
 
         AddEventTrigger(EventTriggerType.PointerDown, _ =>
@@ -81,7 +86,7 @@ public class CanvasTextField : CanvasText
         {
             inputField.text = t.text;
             inputField.enabled = true;
-            inputField.Select();
+            inputField.ActivateInputField();
             AnyFieldFocused = true;
             InputManager.enabled = false;
 
@@ -108,6 +113,38 @@ public class CanvasTextField : CanvasText
 
         Text = text;
         inputField.text = text;
+    }
+
+    public void SetTextWithoutNotify(string text)
+    {
+        Text = text;
+        inputField.SetTextWithoutNotify(text);
+        inputField.caretPosition = text.Length;
+    }
+
+    public void Deactivate()
+    {
+        if (!inputField) return;
+        inputField.DeactivateInputField();
+        inputField.enabled = false;
+        AnyFieldFocused = false;
+        EnableGameInputOnRelease();
+    }
+
+    // Prevent the key that ended editing from reaching the game.
+    private static void EnableGameInputOnRelease()
+    {
+        if (waitingForCloseRelease) return;
+        waitingForCloseRelease = true;
+        GUIController.Instance.StartCoroutine(Routine());
+        return;
+
+        static IEnumerator Routine()
+        {
+            yield return new WaitWhile(() => Input.GetKey(KeyCode.Escape) || Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter));
+            waitingForCloseRelease = false;
+            if (!AnyFieldFocused) InputManager.enabled = true;
+        }
     }
 
     public bool IsFocused() => inputField && inputField.enabled;
