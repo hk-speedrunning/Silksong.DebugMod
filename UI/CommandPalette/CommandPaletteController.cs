@@ -258,11 +258,16 @@ public sealed class CommandPaletteController : MonoBehaviour
         else hero.RemoveInputBlocker(inputBlocker);
     }
 
-    private IEnumerable<PaletteEntry> CurrentItems()
+    private IEnumerable<PaletteEntry> CurrentEntries()
     {
         CommandPaletteItem.SubmenuItem current = navigation.Count == 0 ? null : navigation[^1].Submenu;
-        return (current?.GetChildren() ?? DebugMod.CommandPaletteRegistry.RootItems)
-            .Select(item => new PaletteEntry(item, null, current));
+        return CurrentItems().Select(item => new PaletteEntry(item, null, current));
+    }
+
+    private IEnumerable<CommandPaletteItem> CurrentItems()
+    {
+        CommandPaletteItem.SubmenuItem current = navigation.Count == 0 ? null : navigation[^1].Submenu;
+        return current?.GetChildren() ?? DebugMod.CommandPaletteRegistry.RootItems;
     }
 
     private IEnumerable<PaletteEntry> SearchItems(IEnumerable<CommandPaletteItem> items, string path = "", CommandPaletteItem.SubmenuItem parent = null)
@@ -435,7 +440,7 @@ public sealed class CommandPaletteController : MonoBehaviour
     {
         backButton.ActiveSelf = navigation.Count > 0;
 
-        IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentItems() : SearchItems(DebugMod.CommandPaletteRegistry.RootItems))
+        IEnumerable<PaletteEntry> items = (string.IsNullOrEmpty(query) ? CurrentEntries() : SearchItems(CurrentItems()))
             .Concat(navigation.Count == 0 ? history.AsEnumerable().Reverse() : []);
         filteredItems = items
             .Select(entry => (entry, title: entry.Title))
