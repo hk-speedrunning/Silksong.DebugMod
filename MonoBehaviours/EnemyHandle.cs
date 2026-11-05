@@ -137,12 +137,14 @@ public class EnemyHandle : MonoBehaviour
                 text.Size = hpBar.Size;
                 text.FontSize = UICommon.ScaleHeight(20);
                 text.Alignment = TextAnchor.MiddleCenter;
+                text.DropShadow = true;
 
                 CanvasText damageCounterText = hpBar.Add(new CanvasText("DamageCounter"));
                 damageCounterText.LocalPosition = new Vector2(0, -BossNameOffset);
                 damageCounterText.Size = new Vector2(hpBar.Size.x, BossNameHeight);
                 damageCounterText.FontSize = BossNameTextSize;
                 damageCounterText.Alignment = TextAnchor.LowerRight;
+                damageCounterText.DropShadow = true;
 
                 if (isBoss)
                 {
@@ -152,6 +154,7 @@ public class EnemyHandle : MonoBehaviour
                     bossName.FontSize = BossNameTextSize;
                     bossName.Alignment = TextAnchor.LowerCenter;
                     bossName.Text = bossDisplayName;
+                    bossName.DropShadow = true;
                 }
 
                 if (staggerFsm != null)
@@ -162,6 +165,7 @@ public class EnemyHandle : MonoBehaviour
                     staggerText.Text = GetStaggerText();
                     staggerText.FontSize = BossNameTextSize;
                     staggerText.Alignment = TextAnchor.LowerLeft;
+                    staggerText.DropShadow = true;
                 }
 
                 hpBar.Build();

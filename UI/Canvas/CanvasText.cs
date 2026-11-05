@@ -14,6 +14,7 @@ public class CanvasText : CanvasNode
     private TextAnchor alignment = TextAnchor.UpperLeft;
     private Color color = UICommon.textColor;
     private HorizontalWrapMode overflow = HorizontalWrapMode.Wrap;
+    private bool dropShadow;
 
     public string Text
     {
@@ -85,6 +86,26 @@ public class CanvasText : CanvasNode
         }
     }
 
+    public bool DropShadow
+    {
+        get => dropShadow;
+        set
+        {
+            dropShadow = value;
+            if (gameObject)
+            {
+                if (dropShadow)
+                {
+                    gameObject.AddComponent<Shadow>();
+                }
+                else
+                {
+                    Object.Destroy(gameObject.GetComponent<Shadow>());
+                }
+            }
+        }
+    }
+
     protected override bool Interactable => false;
 
     public CanvasText(string name) : base(name) { }
@@ -120,5 +141,10 @@ public class CanvasText : CanvasNode
         t.alignment = alignment;
         t.horizontalOverflow = overflow;
         t.color = color;
+
+        if (dropShadow)
+        {
+            gameObject.AddComponent<Shadow>();
+        }
     }
 }
