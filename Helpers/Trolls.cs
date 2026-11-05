@@ -91,28 +91,5 @@ internal static class Trolls
             }
         }
     }
-
-    internal static string ModifyBossName(string bossName)
-    {
-        if (!bossNameTroll.HasValue)
-        {
-            bossNameTroll = Random.value < 1 / 200f;
-        }
-
-        if (bossNameTroll.Value)
-        {
-            switch (bossName)
-            {
-                case "Pinstress":
-                    return "Pinterest";
-                case "Forebrother Signis":
-                    return "Forebrother Sigma";
-                case "Forebrother Gron":
-                    return "Forebrother Gronk";
-            }
-        }
-
-        return bossName;
-    }
 }
 

@@ -16,10 +16,11 @@ namespace DebugMod.MonoBehaviours;
 public class EnemyHandle : MonoBehaviour
 {
     private static int BarWidth => UICommon.ScaleWidth(150);
-    private static int BarHeight => UICommon.ScaleHeight(40);
+    private static int BarHeight => UICommon.ScaleHeight(32);
     private static int BossBarWidth => UICommon.ScaleWidth(900);
-    private static int BossNameHeight => UICommon.ScaleHeight(20);
-    private static int BossBarSeparation => UICommon.ScaleHeight(12);
+    private static int BossNameHeight => UICommon.ScaleHeight(30);
+    private static int BossNameTextSize => UICommon.ScaleHeight(18);
+    private static int BossNameOffset => BossNameHeight + 2;
 
     private static List<EnemyHandle> bosses = [];
 
@@ -31,6 +32,10 @@ public class EnemyHandle : MonoBehaviour
     private int maxHP;
     private bool maxHPSet;
     private bool isBoss;
+
+    private int lastHealth;
+    private int damageCounter;
+    private float lastDamageTime;
 
     private PlayMakerFSM? staggerFsm;
 
@@ -133,23 +138,30 @@ public class EnemyHandle : MonoBehaviour
                 text.FontSize = UICommon.ScaleHeight(20);
                 text.Alignment = TextAnchor.MiddleCenter;
 
+                CanvasText damageCounterText = hpBar.Add(new CanvasText("DamageCounter"));
+                damageCounterText.LocalPosition = new Vector2(0, -BossNameOffset);
+                damageCounterText.Size = new Vector2(hpBar.Size.x, BossNameHeight);
+                damageCounterText.FontSize = BossNameTextSize;
+                damageCounterText.Alignment = TextAnchor.LowerRight;
+
                 if (isBoss)
                 {
                     CanvasText bossName = hpBar.Add(new CanvasText("BossName"));
-                    bossName.LocalPosition = new Vector2(0, -BossNameHeight);
+                    bossName.LocalPosition = new Vector2(0, -BossNameOffset);
                     bossName.Size = new Vector2(hpBar.Size.x, BossNameHeight);
-                    bossName.FontSize = UICommon.ScaleHeight(18);
-                    bossName.Alignment = TextAnchor.MiddleCenter;
-                    bossName.Text = Trolls.ModifyBossName(bossDisplayName);
+                    bossName.FontSize = BossNameTextSize;
+                    bossName.Alignment = TextAnchor.LowerCenter;
+                    bossName.Text = bossDisplayName;
                 }
 
                 if (staggerFsm != null)
                 {
                     CanvasText staggerText = hpBar.Add(new CanvasText("Combo"));
+                    staggerText.LocalPosition = new Vector2(0, -BossNameOffset);
+                    staggerText.Size = new Vector2(hpBar.Size.x, BossNameHeight);
                     staggerText.Text = GetStaggerText();
-                    staggerText.FontSize = UICommon.ScaleHeight(18);
-                    staggerText.Size = hpBar.Size;
-                    staggerText.Alignment = TextAnchor.LowerRight;
+                    staggerText.FontSize = BossNameTextSize;
+                    staggerText.Alignment = TextAnchor.LowerLeft;
                 }
 
                 hpBar.Build();
@@ -168,7 +180,7 @@ public class EnemyHandle : MonoBehaviour
                 if (bossIndex == -1) bossIndex = 0;
 
                 barPos.x = (Screen.width - hpBar.Size.x) / 2f;
-                barPos.y = Screen.height - (hpBar.Size.y + BossBarSeparation) * (bossIndex + 1) - BossNameHeight * bossIndex;
+                barPos.y = Screen.height - UICommon.ScreenMargin - hpBar.Size.y * (bossIndex + 1) - BossNameHeight * bossIndex;
             }
             else
             {
@@ -186,9 +198,23 @@ public class EnemyHandle : MonoBehaviour
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
 
+            int damage = lastHealth - HP;
+            if (damage > 0)
+            {
+                damageCounter += damage;
+                lastDamageTime = Time.realtimeSinceStartup;
+            }
+            lastHealth = HP;
+
+            if (Time.realtimeSinceStartup - lastDamageTime >= 2f)
+            {
+                damageCounter = 0;
+            }
+
+            hpBar.Get<CanvasText>("DamageCounter").Text = damageCounter > 0 ? damageCounter.ToString() : "";
+
             if (staggerFsm != null)
             {
-                hpBar.Get<CanvasText>("Combo").LocalPosition = new Vector2(0, -hpBar.Size.y);
                 hpBar.Get<CanvasText>("Combo").Text = GetStaggerText();
             }
         }
