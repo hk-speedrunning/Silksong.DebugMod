@@ -4,6 +4,7 @@ using DebugMod.UI.Canvas;
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,12 +30,14 @@ public class EnemyHandle : MonoBehaviour
     private BoxCollider2D collider;
     private CanvasPanel? hpBar;
     private Texture2D? barTexture;
+    private Texture2D? yellowBarTexture;
     private int maxHP;
     private bool maxHPSet;
     private bool isBoss;
 
     private int lastHealth;
     private int damageCounter;
+    private int decayingDamageCounter;
     private float lastDamageTime;
 
     private PlayMakerFSM? staggerFsm;
@@ -129,23 +132,6 @@ public class EnemyHandle : MonoBehaviour
                 CanvasImage bar = hpBar.Add(new CanvasImage("Bar"));
                 bar.SetImage(barTexture);
 
-                CanvasBorder border = hpBar.Add(new CanvasBorder("Border"));
-                border.Size = hpBar.Size;
-                border.Thickness = 2;
-
-                CanvasText text = hpBar.Add(new CanvasText("HP"));
-                text.Size = hpBar.Size;
-                text.FontSize = UICommon.ScaleHeight(20);
-                text.Alignment = TextAnchor.MiddleCenter;
-                text.DropShadow = true;
-
-                CanvasText damageCounterText = hpBar.Add(new CanvasText("DamageCounter"));
-                damageCounterText.LocalPosition = new Vector2(0, -BossNameOffset);
-                damageCounterText.Size = new Vector2(hpBar.Size.x, BossNameHeight);
-                damageCounterText.FontSize = BossNameTextSize;
-                damageCounterText.Alignment = TextAnchor.LowerRight;
-                damageCounterText.DropShadow = true;
-
                 if (isBoss)
                 {
                     CanvasText bossName = hpBar.Add(new CanvasText("BossName"));
@@ -155,7 +141,31 @@ public class EnemyHandle : MonoBehaviour
                     bossName.Alignment = TextAnchor.LowerCenter;
                     bossName.Text = bossDisplayName;
                     bossName.DropShadow = true;
+
+                    CanvasText damageCounterText = hpBar.Add(new CanvasText("DamageCounter"));
+                    damageCounterText.LocalPosition = new Vector2(0, -BossNameOffset);
+                    damageCounterText.Size = new Vector2(hpBar.Size.x, BossNameHeight);
+                    damageCounterText.FontSize = BossNameTextSize;
+                    damageCounterText.Alignment = TextAnchor.LowerRight;
+                    damageCounterText.DropShadow = true;
+
+                    yellowBarTexture = new Texture2D(1, 1);
+                    yellowBarTexture.SetPixel(0, 0, Color.yellow.SetAlpha(0.5f));
+                    yellowBarTexture.Apply();
+
+                    CanvasImage recentDamage = hpBar.Add(new CanvasImage("RecentDamage"));
+                    recentDamage.SetImage(yellowBarTexture);
                 }
+
+                CanvasText text = hpBar.Add(new CanvasText("HP"));
+                text.Size = hpBar.Size;
+                text.FontSize = UICommon.ScaleHeight(20);
+                text.Alignment = TextAnchor.MiddleCenter;
+                text.DropShadow = true;
+
+                CanvasBorder border = hpBar.Add(new CanvasBorder("Border"));
+                border.Size = hpBar.Size;
+                border.Thickness = 2;
 
                 if (staggerFsm != null)
                 {
@@ -185,6 +195,40 @@ public class EnemyHandle : MonoBehaviour
 
                 barPos.x = (Screen.width - hpBar.Size.x) / 2f;
                 barPos.y = Screen.height - UICommon.ScreenMargin - hpBar.Size.y * (bossIndex + 1) - BossNameHeight * bossIndex;
+
+                // Values were found by scrubbing through Elden Ring boss fight footage frame by frame.
+                // The decay percent was originally 2%, but was lowered to adjust for Silksong's combat.
+                float recentDamageDecayPercent = 0.005f; // per frame on 60fps
+                float recentDamageDecayDelay = 0.7f;
+                float damageCounterResetDelay = 2f;
+
+                int damage = lastHealth - HP;
+                if (damage > 0 && damage < 5000)
+                {
+                    damageCounter += damage;
+                    lastDamageTime = Time.realtimeSinceStartup;
+                    if (damage > MaxHP * recentDamageDecayPercent)
+                    {
+                        decayingDamageCounter += damage;
+                    }
+                }
+                lastHealth = HP;
+
+                if (Time.realtimeSinceStartup - lastDamageTime > damageCounterResetDelay)
+                {
+                    damageCounter = 0;
+                }
+
+                if (Time.realtimeSinceStartup - lastDamageTime > recentDamageDecayDelay)
+                {
+                    decayingDamageCounter -= Math.Max(1, Mathf.RoundToInt(MaxHP * recentDamageDecayPercent * 60 * Time.unscaledDeltaTime));
+                    decayingDamageCounter = Math.Max(0, decayingDamageCounter);
+                }
+
+                hpBar.Get<CanvasImage>("RecentDamage").LocalPosition = new(hpBar.Size.x * Mathf.Clamp01(HP / (float)MaxHP), 0);
+                hpBar.Get<CanvasImage>("RecentDamage").Size = new Vector2(hpBar.Size.x * Mathf.Clamp01(decayingDamageCounter / (float)MaxHP), BarHeight);
+
+                hpBar.Get<CanvasText>("DamageCounter").Text = damageCounter > 0 ? damageCounter.ToString() : "";
             }
             else
             {
@@ -201,21 +245,6 @@ public class EnemyHandle : MonoBehaviour
             hpBar.Get<CanvasImage>("Bar").Size = new Vector2(hpBar.Size.x * Mathf.Clamp01(HP / (float)MaxHP), BarHeight);
             hpBar.Get<CanvasText>("HP").LocalPosition = Vector2.zero;
             hpBar.Get<CanvasText>("HP").Text = $"{HP}/{MaxHP}";
-
-            int damage = lastHealth - HP;
-            if (damage > 0)
-            {
-                damageCounter += damage;
-                lastDamageTime = Time.realtimeSinceStartup;
-            }
-            lastHealth = HP;
-
-            if (Time.realtimeSinceStartup - lastDamageTime >= 2f)
-            {
-                damageCounter = 0;
-            }
-
-            hpBar.Get<CanvasText>("DamageCounter").Text = damageCounter > 0 ? damageCounter.ToString() : "";
 
             if (staggerFsm != null)
             {
