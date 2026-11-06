@@ -388,7 +388,8 @@ public sealed class CommandPaletteController : MonoBehaviour
             top = SaveStatesPanel.Instance.Position.y + SaveStatesPanel.Instance.Size.y + UICommon.ScreenMargin * 2;
         }
 
-        panel.LocalPosition = new((Screen.width - panel.Size.x) / 2f, top);
+        // Absolute coords need to be whole numbers or the border will not render correctly.
+        panel.LocalPosition = new((int)((Screen.width - panel.Size.x) / 2f), (int)top);
     }
 
     private void BuildRows(PanelBuilder builder)
