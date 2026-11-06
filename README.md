@@ -57,21 +57,20 @@ For any questions or bug reports, please join the [Modding Discord](https://disc
 
 - Hollow Knight DebugMod parity: as of right now this needs;
   - Respawn Boss (+ Arena). _This may already be covered by scene data but it's possible bosses have varying implementations reliant on PlayerData._
-  - Give specific keys/items & bellway / ventrica access
 - Expose some way for extensions to present their own UI in Main Panel. Currently they are only appended to the Keybinds list.
 
 ## Installation
 
 DebugMod is distributed on [Thunderstore](https://thunderstore.io/c/hollow-knight-silksong/p/hk_speedrunning/DebugMod/) so any compatible installer can install it.
-We recommend [Gale](https://github.com/Kesomannen/gale/releases/tag/1.11.1), where you can search for DebugMod and install it directly to a profile & launch.
+We recommend [Cogfly](https://ambershadow.dev/cogfly/download), where you can search for DebugMod and install it directly to a profile & launch.
 
-Other compatible installers include [r2modman]() & [Thunderstore](https://get.thunderstore.io) (Overwolf).
+Other compatible installers include [Gale](https://github.com/Kesomannen/gale/releases/latest), [r2modman](https://r2modman.com/download-latest) & [Thunderstore](https://get.thunderstore.io) (Overwolf).
 
 ### Manual Installation 
 
 Required on MacOS as installers don't appear to support it. Instructions are for a Windows install using Steam.
 
-1) Download BepInEx from here: https://thunderstore.io/c/hollow-knight-silksong/p/BepInEx/BepInExPack_Silksong/
+1) Download BepInEx from here: https://thunderstore.io/c/hollow-knight-silksong/p/silksong_modding/BepInExPack_Silksong/
 1) Right click Silksong in Steam -> Properties -> Installed Files -> Browse...
 1) Copy the contents of the BepInEx zip into this folder (overwrite files if asked)
 1) Open and close the game once so BepInEx can generate its initial files
@@ -103,6 +102,7 @@ If Silksong.ModList is not installed, DebugMod will silently fail to load.
 ### Silksong DebugMod
 - Initial Port, Core development & UI Overhaul - spacemonkeyy
 - Minor bugfixing, nitpicking & maintenance - Jamie
+- Many additional features and bugfixes - Jakob Hellermann
 - Additional fixes & assets - Flib, cometcake575, Freya Holmér, Foxyrobo, enadormi
 - Translation credits:
   - Chinese: DUUScarlet & yuniBiscuit
