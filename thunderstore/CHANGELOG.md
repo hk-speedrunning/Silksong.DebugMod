@@ -1,5 +1,26 @@
 ## Changelog
 
+### v1.2.0
+
+- Added the Command Palette (default `Ctrl+P`); this is a searchable menu for any function in DebugMod, with 2 exclusive features:
+    - Warp: a searchable re-implementation of QuickWarp.
+    - Load Savestate File: search through your savestates, loading & setting quickslot to the selected state.
+- All keybinds can now accept key modifiers (`Ctrl`, `Alt`, `Cmd` & `Shift`)
+- Added the Mist score & correct exit to the Info Panel.
+- Boss health bars are now pinned to the bottom of the screen & have a recent damage display.
+- HP bars above enemies are now more vertically stable.
+- Info panel text now has a drop shadow to remain visible over a white screen.
+- Fixed hitboxes not being detected for boss scenes & when a collider changes.
+- Fixed timescale not scaling above 1 when Prepatcher is installed.
+- Savestates:
+    - Fixed issues with loading while in the death animation.
+    - Fixed Savestate on Death triggering incorrectly with Fractured Mask.
+    - Fixed loading into the Savage Beastfly 2's arena breaking their AI.
+    - Druid's Eye's visuals are now correctly cleared on load.
+    - Added a warning when opening an invalid savestate pack.
+- Folders now open correctly on Linux installations.
+- Removed several sources of log spam.
+
 ### v1.1.2
 
 - Fixed an issue added in v1.1.1 causing new installations to not save settings.
