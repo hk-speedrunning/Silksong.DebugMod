@@ -12,7 +12,6 @@ namespace DebugMod.Helpers;
 internal static class Trolls
 {
     private static bool? rosaryRocksTroll;
-    private static bool? bossNameTroll;
 
     private static bool RosaryRocksActive()
     {

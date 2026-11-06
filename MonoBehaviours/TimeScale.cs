@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -95,41 +96,39 @@ public static class TimeScale
         UnhookFreezeCoroutines();
     }
 
-    // This allows DebugMod to control timescale independently of Silksong,
-    // and prevents fighting over who wants to control Time.timeScale.
-    //
-    // One caveat is that CheatManager.IsCheatsEnabled needs to return true during UpdateTimeScale,
-    // in order for it to allow timescales > 1
-    static bool overrideIsCheatsEnabled = false;
-
-    [HarmonyPrefix]
+    // We keep one additional scalar on TimeManager, which is well-designed & manages multiplicative scaling for us :)
+    
+    // On later patches (at least <=1.0.30000) TimeManager.UpdateTimeScale checks for IsCheatsEnabled;
+    // we replace with our own method to shortcut this check when necessary.
+    [HarmonyILManipulator]
     [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
-    public static void UpdateTimeScalePrefix() => overrideIsCheatsEnabled = IsUsingSpedUpTime;
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(TimeManager), "UpdateTimeScale")]
-    public static void UpdateTimeScalePostfix() => overrideIsCheatsEnabled = false;
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(CheatManager), "IsCheatsEnabled")]
-    [HarmonyPatch(MethodType.Getter)]
-    public static void IsCheatsEnabledPostfix(ref bool __result)
+    public static void UpdateTimeScaleILHook(ILContext il)
     {
-        if (overrideIsCheatsEnabled)
-            __result = true;
+        ILCursor cursor = new(il);
+        if (!cursor.TryGotoNext(inst =>
+                inst.OpCode == OpCodes.Call
+                && ((MethodReference)inst.Operand).FullName.Contains("CheatManager::get_IsCheatsEnabled")
+            ))
+        {
+            DebugMod.LogDebug("Cheats check not present; skipping UpdateTimeScale patch");
+            return;
+        }
+
+        cursor.Remove();
+        cursor.EmitDelegate(() => IsUsingSpedUpTime || CheatManager.IsCheatsEnabled);
     }
 
     // FreezeMoment and SetTimeScale (with duration) does not take time scale into account,
     // so this will force those method to scale unscaledDeltaTime
     // by custom time scale we're using
-    private static bool hooksActive = false;
+    private static bool hooksActive;
     private static ILHook[] _coroutineHooks;
 
     static void CheckHookRequirement()
     {
-        if (hooksActive == false && IsScalingTime)
+        if (!hooksActive && IsScalingTime)
             HookFreezeCoroutines();
-        else if (hooksActive && IsScalingTime == false)
+        else if (hooksActive && !IsScalingTime)
             UnhookFreezeCoroutines();
     }
 
