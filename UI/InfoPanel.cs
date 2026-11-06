@@ -205,6 +205,7 @@ public class InfoPanel : CanvasPanel
         labelText.Size = new Vector2(labelWidth, ListingHeight);
         labelText.Alignment = TextAnchor.MiddleLeft;
         labelText.Text = Localization.Get(label);
+        labelText.DropShadow = true;
 
         // Info text is offset slightly downward so the different fonts (approximately) line up
         CanvasText infoText = Add(new CanvasText($"Info{counter}"));
@@ -214,6 +215,7 @@ public class InfoPanel : CanvasPanel
         infoText.Alignment = TextAnchor.MiddleLeft;
         infoText.Overflow = HorizontalWrapMode.Overflow;
         infoText.OnUpdate += () => infoText.Text = info();
+        infoText.DropShadow = true;
 
         // Alt implementation:
         if (DebugMod.settings.AltInfoPanel)
