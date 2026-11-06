@@ -210,7 +210,14 @@ public class EnemyHandle : MonoBehaviour
                     if (damage > MaxHP * recentDamageDecayPercent)
                     {
                         decayingDamageCounter += damage;
+                        decayingDamageCounter = Math.Min(decayingDamageCounter, lastHealth);
+                        decayingDamageCounter = Math.Min(decayingDamageCounter, MaxHP - HP);
                     }
+                }
+                else if (damage < 0)
+                {
+                    // Otherwise it would look like the boss had more health than they actually did
+                    decayingDamageCounter = 0;
                 }
                 lastHealth = HP;
 
@@ -234,6 +241,9 @@ public class EnemyHandle : MonoBehaviour
             {
                 Bounds bounds = sprite?.GetBounds() ?? collider?.bounds ?? new(transform.position, new Vector3(1, 1, 0));
                 barPos.y += (bounds.max.y - bounds.min.y) / 2f;
+
+                // Alternative method which is smoother, but looks worse for very short or tall enemies:
+                //if (collider) barPos.y += collider.size.y + collider.offset.y;
 
                 if (Camera.main) barPos = Camera.main.WorldToScreenPoint(barPos);
 
