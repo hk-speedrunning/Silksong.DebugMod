@@ -67,10 +67,12 @@ internal static class Extensions {
         public void AddToMaxMana(int amount) => hero.AddToMaxSilk(amount);
         public void TakeMana(int amount) => hero.TakeSilk(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddSilk(amount, heroEffect);
+        public bool IsHeroPaused() => hero.IsPaused();
 #else
         public void AddToMaxMana(int amount) => hero.AddToMaxMPReserve(amount);
         public void TakeMana(int amount) => hero.TakeMP(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddMPCharge(amount);
+        public bool IsHeroPaused() => GameManager.instance.isPaused;
         public void AddInputBlocker(object blocker) => throw new NotImplementedException();
         public void RemoveInputBlocker(object blocker) => throw new NotImplementedException();
 #endif
@@ -108,6 +110,11 @@ internal static class Extensions {
     extension(GameCameras cameras)
     {
         public PlayMakerFSM hudCanvasSlideOut => cameras.hudCanvas.LocateMyFSM("Slide Out");
+    }
+
+    extension(HeroControllerStates states)
+    {
+        public bool Invulnerable => states.invulnerable;
     }
 
     extension(NonSlider nonSlider)
