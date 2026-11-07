@@ -329,7 +329,7 @@ public partial class DebugMod : BaseUnityPlugin
         CurrentPlayerDeadCoro = __result;
     }
 
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.Die), typeof(bool), typeof(bool))]
+    [HarmonyPatch(typeof(HeroController), nameof(HeroController.Die))] // don't specify override, HK is parameterless
     [HarmonyPostfix]
     private static void OnDie(IEnumerator __result)
     {
