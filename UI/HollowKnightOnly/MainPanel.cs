@@ -1,3 +1,4 @@
+using DebugMod.UI.Canvas;
 using System;
 
 namespace DebugMod.UI;
@@ -66,8 +67,31 @@ public partial class MainPanel
         ];
         foreach (int charm in charmOrder)
         {
-            AppendLabeledTile($"HK_CHARMS_{charm}", () => PlayerData.instance.GetBool($"gotCharm_{charm}"),
-                () => BindableFunctions.ToggleCharm(charm), image: $"Charm_{charm}", includeLabel: false, defaultRowWidth: 10);
+            // Indexed by BindableFunctions.GetCharmState
+            string[] stateImages = charm switch
+            {
+                23 or 24 or 25 => [$"Charm_{charm}", $"Charm_{charm}_Broken", $"Charm_{charm}_Unbreakable"],
+                36 => ["Charm_36", "Charm_36_1", "Charm_36_2", "Charm_36_3", "Charm_36_4"],
+                40 => ["Charm_40", "Charm_40_2", "Charm_40_3", "Charm_40_4", "Charm_40_5"],
+                _ => [$"Charm_{charm}"],
+            };
+
+            if (stateImages.Length == 1)
+            {
+                AppendLabeledTile($"HK_CHARMS_{charm}", () => PlayerData.instance.GetBool($"gotCharm_{charm}"),
+                    () => BindableFunctions.ToggleCharm(charm), image: $"Charm_{charm}", includeLabel: false, defaultRowWidth: 10);
+            }
+            else
+            {
+                CanvasPanel tile = null;
+                tile = AppendLabeledTile($"HK_CHARMS_{charm}",
+                    () =>
+                    {
+                        tile.Get<CanvasImage>("Icon").SetImage(UICommon.images[stateImages[BindableFunctions.GetCharmState(charm)]]);
+                        return PlayerData.instance.GetBool($"gotCharm_{charm}");
+                    },
+                    () => BindableFunctions.CycleCharm(charm, stateImages.Length), image: $"Charm_{charm}", includeLabel: false, defaultRowWidth: 10);
+            }
         }
     }
 }
