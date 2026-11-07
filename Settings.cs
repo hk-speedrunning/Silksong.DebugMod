@@ -29,8 +29,7 @@ public class Settings
     private static ConfigEntry<bool> expandedInfoPanel;
 
     private static ConfigEntry<bool> disableBossHpBars;
-
-    private static ConfigEntry<bool> numpadForSavestates;
+    
     private static ConfigEntry<bool> safeSavestateLoading;
 
     public string LastLoadedPack
@@ -183,16 +182,6 @@ public class Settings
         }
     }
 
-    public bool NumPadForSaveStates
-    {
-        get => numpadForSavestates.Value;
-        set
-        {
-            numpadForSavestates.Value = value;
-            DebugMod.SaveSettings();
-        }
-    }
-
     public bool SafeSaveStateLoading
     {
         get => safeSavestateLoading.Value;
@@ -253,13 +242,6 @@ public class Settings
         disableBossHpBars.SettingChanged += (_, _) => {
         
         };
-
-        numpadForSavestates = config.Bind(
-            "Savestates",
-            "Savestate Numpad Hotkeys",
-            false,
-            "Use the numpad keys instead of the regular number keys to select file states in the savestate panel. Takes effect on restart."
-        );
 
         safeSavestateLoading = config.Bind(
             "Savestates",

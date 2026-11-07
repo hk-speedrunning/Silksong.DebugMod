@@ -135,12 +135,11 @@ public partial class DebugMod : BaseUnityPlugin
         bindUpdated?.Invoke("MODUI_TOGGLEALLUI", settings.binds["MODUI_TOGGLEALLUI"]);
         bindUpdated?.Invoke("MODUI_TOGGLECOMMANDPALETTE", settings.binds["MODUI_TOGGLECOMMANDPALETTE"]);
 
-        int alphaStart = (int)(settings.NumPadForSaveStates ? KeyCode.Keypad0 : KeyCode.Alpha0);
-
         alphaKeyDict.Clear();
         for (int i = 0; i < 10; i++)
         {
-            alphaKeyDict.Add((KeyCode)(alphaStart + i), i);
+            alphaKeyDict.Add(KeyCode.Keypad0 + i, i);
+            alphaKeyDict.Add(KeyCode.Alpha0 + i, i);
         }
 
         SaveStateManager.Initialize();
