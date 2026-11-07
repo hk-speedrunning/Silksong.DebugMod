@@ -10,9 +10,7 @@ public static partial class BindableFunctions
             + ", reload the scene to apply changes");
     }
 
-    // TODO(port): kill shade on HK
-    [BindableMethod(name = "MISC_BREAKCOCOON", category = "CATEGORY_MISC")]
-    public static void BreakCocoon()
+    private static partial void BreakCorpse()
     {
         HeroController.instance?.CocoonBroken();
         EventRegister.SendEvent("BREAK HERO CORPSE");

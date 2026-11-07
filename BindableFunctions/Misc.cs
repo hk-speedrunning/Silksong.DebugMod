@@ -84,6 +84,14 @@ public static partial class BindableFunctions
         }
     }
 
+    private static partial void BreakCorpse();
+
+    [BindableMethod(name = "MISC_BREAKCOCOON", category = "CATEGORY_MISC")]
+    public static void BreakCocoon()
+    {
+        BreakCorpse();
+    }
+
     private static string saveLevelStateAction;
 
     private static partial void ClearSceneData(string sceneName);
