@@ -25,7 +25,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpool()
     {
-        if (PlayerData.instance.manaMax < 18)
+        if (PlayerData.instance.spools < PlayerData.MaxSpools)
         {
             HeroController.instance.AddToMaxMana(1);
             HudHelper.RefreshMana();
@@ -64,10 +64,9 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeAwaySpool()
     {
-        if (PlayerData.instance.manaMax > 9)
+        if (PlayerData.instance.spools > 0)
         {
-            PlayerData.instance.manaMax--;
-            PlayerData.instance.mana = Math.Min(PlayerData.instance.mana, PlayerData.instance.mana);
+            HeroController.instance.TakeFromMaxMana(1);
             HudHelper.RefreshMana();
 
             DebugMod.LogConsole("Removed spool");
@@ -111,7 +110,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpoolFragment()
     {
-        if (PlayerData.instance.manaFragments < 1)
+        if (PlayerData.instance.manaFragments < PlayerData.MaxManaFragments)
         {
             PlayerData.instance.manaFragments++;
             DebugMod.LogConsole("Added spool fragment");
@@ -133,7 +132,7 @@ public static partial class BindableFunctions
         }
         else
         {
-            PlayerData.instance.manaFragments = 1;
+            PlayerData.instance.manaFragments = PlayerData.MaxManaFragments;
             TakeAwaySpool();
         }
     }

@@ -27,14 +27,13 @@ internal static class Extensions {
             get => playerData.silkSpoolParts;
             set => playerData.silkSpoolParts = value;
         }
+        public static int MaxManaFragments => 1;
         public string corpseScene => playerData.HeroCorpseScene;
         public int corpseMoney => playerData.HeroCorpseMoneyPool;
+        public int spools => playerData.silkMax - 9;
+        public static int MaxSpools => 9;
 #else
-        public int manaMax
-        {
-            get => playerData.maxMP;
-            set => playerData.maxMP = value;
-        }
+        public int manaMax => playerData.maxMP;
         public int mana
         {
             get => playerData.MPCharge;
@@ -46,8 +45,11 @@ internal static class Extensions {
             get => playerData.vesselFragments;
             set => playerData.vesselFragments = value;
         }
+        public static int MaxManaFragments => 2;
         public string corpseScene => playerData.shadeScene;
         public int corpseMoney => playerData.geoPool;
+        public int spools => playerData.MPReserveMax / 33;
+        public static int MaxSpools => 3;
         public int nailUpgrades
         {
             get => playerData.nailSmithUpgrades;
@@ -65,6 +67,11 @@ internal static class Extensions {
     {
 #if SILKSONG
         public void AddToMaxMana(int amount) => hero.AddToMaxSilk(amount);
+        public void TakeFromMaxMana(int amount)
+        {
+            PlayerData.instance.silkMax -= amount;
+            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+        }
         public void TakeMana(int amount) => hero.TakeSilk(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddSilk(amount, heroEffect);
         public bool IsHeroPaused() => hero.IsPaused();
@@ -81,7 +88,12 @@ internal static class Extensions {
             }
         }
 #else
-        public void AddToMaxMana(int amount) => hero.AddToMaxMPReserve(amount);
+        public void AddToMaxMana(int amount) => PlayerData.instance.MPReserveMax += 33 * amount;
+        public void TakeFromMaxMana(int amount)
+        {
+            PlayerData.instance.MPReserveMax -= 33 * amount;
+            PlayerData.instance.MPReserve = Math.Min(PlayerData.instance.MPReserve, PlayerData.instance.MPReserveMax);
+        }
         public void TakeMana(int amount) => hero.TakeMP(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddMPCharge(amount);
         public bool IsHeroPaused() => GameManager.instance.isPaused;

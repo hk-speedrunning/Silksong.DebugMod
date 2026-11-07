@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace DebugMod.Helpers;
@@ -38,5 +37,28 @@ public static partial class HudHelper
         }
     }
 
-    public static partial void RefreshMana() => throw new NotImplementedException();
+    public static partial void RefreshMana()
+    {
+        GameCameras.instance.soulOrbFSM.SendEvent("MP SET");
+
+        Transform vessels = GameCameras.instance.soulOrbFSM.transform.Find("Vessels");
+        foreach (PlayMakerFSM fsm in vessels.GetComponentsInChildren<PlayMakerFSM>())
+        {
+            if (fsm.FsmName == "vessel_orb")
+            {
+                bool isObtained = PlayerData.instance.MPReserveMax >= fsm.FsmVariables.GetFsmInt("Full Amount").Value;
+                bool showsObtained = fsm.ActiveStateName != "Not Obtained";
+                if (isObtained && !showsObtained)
+                {
+                    fsm.SetState("Load Anim");
+                }
+                else if (!isObtained && showsObtained)
+                {
+                    fsm.SendEvent("UNBIND VESSEL ORB");
+                }
+            }
+        }
+
+        GameManager.instance.soulVessel_fsm.SendEvent("MP RESERVE UP");
+    }
 }
