@@ -4,28 +4,28 @@ using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
 
-public partial class CocoonPreviewer : MonoBehaviour
+public partial class CorpsePreviewer : MonoBehaviour
 {
     public bool previewEnabled;
 
-    private static readonly List<GameObject> activeCocoonPreviews = [];
+    private static readonly List<GameObject> activeCorpsePreviews = [];
 
-    private GameObject cocoon;
+    private GameObject corpse;
     private GameObject compass;
 
     private partial bool CalculatePosition(out Vector2 position, out bool atHeroCorpseMarker);
     private partial GameObject SpawnPreview(Vector2 position);
-    private partial void PlacePreview(GameObject cocoon, Vector2 position, bool atHeroCorpseMarker);
+    private partial void PlacePreview(GameObject corpse, Vector2 position, bool atHeroCorpseMarker);
 
     public static void Unload()
     {
-        foreach (GameObject cocoon in activeCocoonPreviews)
+        foreach (GameObject corpse in activeCorpsePreviews)
         {
-            if (cocoon) Destroy(cocoon);
+            if (corpse) Destroy(corpse);
         }
-        activeCocoonPreviews.Clear();
+        activeCorpsePreviews.Clear();
 
-        if (GameManager._instance is { } gameManager && gameManager.TryGetComponent(out CocoonPreviewer previewer))
+        if (GameManager._instance is { } gameManager && gameManager.TryGetComponent(out CorpsePreviewer previewer))
         {
             Destroy(previewer);
         }
@@ -35,19 +35,19 @@ public partial class CocoonPreviewer : MonoBehaviour
     {
         if (!previewEnabled || !HeroController.instance)
         {
-            Destroy(cocoon);
+            Destroy(corpse);
             return;
         }
 
         if (CalculatePosition(out Vector2 position, out bool atHeroCorpseMarker))
         {
-            if (!cocoon)
+            if (!corpse)
             {
-                cocoon = SpawnPreview(position);
-                activeCocoonPreviews.Add(cocoon);
+                corpse = SpawnPreview(position);
+                activeCorpsePreviews.Add(corpse);
 
                 compass = new GameObject("Compass", typeof(SpriteRenderer));
-                compass.transform.parent = cocoon.transform;
+                compass.transform.parent = corpse.transform;
 
                 // arrow facing right because the arctan calculates angle relative to +x so using the right arrow means no extra correction
                 Texture2D texture = UICommon.images["Arrow"];
@@ -64,7 +64,7 @@ public partial class CocoonPreviewer : MonoBehaviour
                 compass.transform.localScale *= 2;
             }
 
-            foreach (SpriteRenderer renderer in cocoon.GetComponentsInChildren<SpriteRenderer>())
+            foreach (SpriteRenderer renderer in corpse.GetComponentsInChildren<SpriteRenderer>())
             {
                 if (renderer.gameObject.name != "Compass")
                 {
@@ -72,7 +72,7 @@ public partial class CocoonPreviewer : MonoBehaviour
                 }
             }
 
-            PlacePreview(cocoon, position, atHeroCorpseMarker);
+            PlacePreview(corpse, position, atHeroCorpseMarker);
 
             Vector2 compassPos = HeroController.instance.transform.position + new Vector3(0f, 2f, 0f);
             Vector2 distance = position - compassPos;
@@ -87,7 +87,7 @@ public partial class CocoonPreviewer : MonoBehaviour
         }
         else
         {
-            Destroy(cocoon);
+            Destroy(corpse);
         }
     }
 }

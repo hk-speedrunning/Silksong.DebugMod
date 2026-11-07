@@ -134,7 +134,7 @@ public partial class MainPanel : CanvasPanel
         AppendToggleControl("VISUAL_PREVIEWCOCOONPOSITION", CocoonPreviewToggled, BindableFunctions.PreviewCocoonPosition);
         static bool CocoonPreviewToggled()
         {
-            CocoonPreviewer previewer = GameManager.instance.GetComponent<CocoonPreviewer>();
+            CorpsePreviewer previewer = GameManager.instance.GetComponent<CorpsePreviewer>();
             if (!previewer) return false;
             return previewer.previewEnabled;
         }

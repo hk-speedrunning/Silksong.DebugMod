@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
 
-public partial class CocoonPreviewer
+public partial class CorpsePreviewer
 {
     private partial bool CalculatePosition(out Vector2 position, out bool atHeroCorpseMarker)
     {

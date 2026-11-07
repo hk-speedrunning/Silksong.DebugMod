@@ -47,8 +47,8 @@ public static partial class BindableFunctions
     [BindableMethod(name = "VISUAL_PREVIEWCOCOONPOSITION", category = "CATEGORY_VISUAL")]
     public static void PreviewCocoonPosition()
     {
-        CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
-            ?? GameManager.instance.gameObject.AddComponent<CocoonPreviewer>();
+        CorpsePreviewer component = GameManager.instance.GetComponent<CorpsePreviewer>()
+            ?? GameManager.instance.gameObject.AddComponent<CorpsePreviewer>();
 
         if (!component.previewEnabled)
         {
