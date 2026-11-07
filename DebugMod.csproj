@@ -61,6 +61,14 @@
 		<PackageReference Include="Silksong.I18N" Version="1.1.1"/>
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(SilksongVersion)' == ''">
+		<Compile Remove="**/SilksongOnly/**"/>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(HollowKnightVersion)' == ''">
+		<Compile Remove="**/HollowKnightOnly/**"/>
+	</ItemGroup>
+
 	<ItemGroup>
 		<Folder Remove="thunderstore/temp;thunderstore/dist"/>
 		<Folder Include="thunderstore\dist\"/>
