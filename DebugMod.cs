@@ -4,7 +4,6 @@ using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.CommandPalette;
-using GlobalSettings;
 using HarmonyLib;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -67,8 +66,6 @@ public partial class DebugMod : BaseUnityPlugin
 
     internal static HitInstance? lastHit;
     internal static int lastDamage;
-    [CanBeNull] internal static HealthManager.DamageScalingConfig lastScaling;
-    internal static int lastScaleLevel;
 
     public static bool stateOnDeath;
     public static bool infiniteHP;
@@ -273,24 +270,18 @@ public partial class DebugMod : BaseUnityPlugin
         bindUpdated?.Invoke(name, binding);
     }
 
+    static partial void ResetCharacterState();
+    static partial void CheckLethalDamagePrevented(ref bool willDie);
+
     private int PlayerDamaged(int damageAmount)
     {
         int damage = infiniteHP ? 0 : damageAmount;
 
         bool WillDie()
         {
-            if (PlayerData.instance.health + PlayerData.instance.healthBlue - damage > 0)
-            {
-                return false;
-            }
-
-            ToolItem fracturedMask = Gameplay.FracturedMaskTool;
-            if (fracturedMask && fracturedMask.IsEquipped && fracturedMask.SavedData.AmountLeft > 0)
-            {
-                return false;
-            }
-
-            return true;
+            bool willDie = PlayerData.instance.health + PlayerData.instance.healthBlue - damage <= 0;
+            CheckLethalDamagePrevented(ref willDie);
+            return willDie;
         }
 
         if (stateOnDeath && WillDie() && SaveState.loadingSavestate == null && SaveStateManager.GetQuickState().IsSet())
@@ -352,8 +343,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         lastHit = null;
         lastDamage = 0;
-        lastScaling = null;
-        lastScaleLevel = 0;
+        ResetCharacterState();
 
         _loadingChar = true;
     }
