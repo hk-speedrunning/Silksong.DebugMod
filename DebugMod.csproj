@@ -5,9 +5,12 @@
 		If you are checking out from git and need to create a new one, you can use `dotnet new silksongpath` to generate one.
 	-->
 	<Import Condition="Exists('SilksongPath.props')" Project="SilksongPath.props"/>
+	<!-- By default, only do the silksong build in the IDE. -->
+	<PropertyGroup Condition="'$(TargetFramework)' == ''"><TargetFramework>silksong</TargetFramework></PropertyGroup>
+	<Import Project="TargetFrameworks.props"/>
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFrameworks>silksong;hk1512620</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<EnableNETAnalyzers>True</EnableNETAnalyzers>
 		<AnalysisMode>recommended</AnalysisMode>
@@ -46,9 +49,13 @@
 	<ItemGroup>
 		<PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all"/>
 		<PackageReference Include="BepInEx.Core" Version="5.4.21"/>
-		<PackageReference Include="HarmonyX" Version="2.9.0"/>
 		<PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.1.0" PrivateAssets="all"/>
+		
+		<PackageReference Include="HarmonyX" Version="2.9.0"/>
 		<PackageReference Include="Microsoft.Unity.Analyzers" Version="1.27.0" PrivateAssets="all"/>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(SilksongVersion)' != ''">
 		<PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile"/>
 		<PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all"/>
 		<PackageReference Include="Silksong.I18N" Version="1.1.1"/>
@@ -75,14 +82,14 @@
 			<ThunderstoreDir>$(ProjectDir)/thunderstore</ThunderstoreDir>
 		</PropertyGroup>
 		<Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongPluginsFolder)/hk_speedrunning-$(AssemblyTitle)/%(Binaries.LocalDir)" Condition="'$(SilksongPluginsFolder)' != '' And Exists('$(SilksongPluginsFolder)')"/>
-		<RemoveDir Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist"/>
-		<MakeDir Directories="$(ThunderstoreDir)/temp"/>
-		<Copy SourceFiles="@(Binaries)" DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)"/>
-		<Exec Command="dotnet tool restore"/>
-		<Exec Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;$(AssemblyTitle)&quot; --package-version $(Version)" StandardOutputImportance="High" StandardErrorImportance="High"/>
+		<RemoveDir Condition="'$(SilksongVersion)' != ''" Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist"/>
+		<MakeDir Condition="'$(SilksongVersion)' != ''" Directories="$(ThunderstoreDir)/temp"/>
+		<Copy Condition="'$(SilksongVersion)' != ''" SourceFiles="@(Binaries)" DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)"/>
+		<Exec Condition="'$(SilksongVersion)' != ''" Command="dotnet tool restore"/>
+		<Exec Condition="'$(SilksongVersion)' != ''" Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;$(AssemblyTitle)&quot; --package-version $(Version)" StandardOutputImportance="High" StandardErrorImportance="High"/>
 	</Target>
 
-	<Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent">
+	<Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent" Condition="'$(SilksongVersion)' != ''">
 		<RemoveDir Directories="$(IntermediateOutputPath)/archive"/>
 		<Copy SourceFiles="@(Binaries)" DestinationFolder="$(IntermediateOutputPath)/archive/$(TargetName)/%(Binaries.LocalDir)"/>
 
