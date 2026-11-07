@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace DebugMod.Helpers;
 
 [HarmonyPatch]
-public static class VisualMaskHelper
+public static partial class VisualMaskHelper
 {
     internal static bool masksDisabled = false;
     internal static bool vignetteDisabled = false;
@@ -120,6 +120,8 @@ public static class VisualMaskHelper
     }
 
 
+    private static partial bool IsGameSpecificMask(GameObject go);
+
     /// <summary>
     /// Deactivate all renderers attached to objects that DebugMod recongises as being a visual mask.
     /// </summary>
@@ -131,8 +133,7 @@ public static class VisualMaskHelper
 
         bool IsMask(GameObject go)
         {
-            if (go.GetComponent<MaskerBase>()) return true;
-            if (go.GetComponent<OverMaskerBase>()) return true;
+            if (IsGameSpecificMask(go)) return true;
             if (go.GetComponent<MaskerBlackout>()) return true;
             if (go.GetComponent<BlurPlane>()) return true;
             if (go.name.Contains("black_fader")) return true;
