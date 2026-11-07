@@ -47,5 +47,27 @@ public partial class MainPanel
             PlayerData.instance.nailUpgrades = nailUpgrades;
             PlayerData.instance.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
+        AppendIncrementTile("HK_UPGRADES_NOTCHES", () => PlayerData.instance.charmSlots,
+            value => PlayerData.instance.charmSlots = value, min: 3, max: 11);
+    }
+
+    partial void AppendEquippableItems()
+    {
+        AppendSectionHeader("HK_CATEGORY_CHARMS");
+        AppendRow(1);
+        AppendBasicControl("HK_CHARMS_GIVEALLCHARMS", BindableFunctions.GiveAllCharms);
+
+        // Inventory grid order, from InvCharmBackboard.charmNum
+        int[] charmOrder = [
+            2, 1, 4, 20, 19, 21, 31, 37, 3, 35,
+            23, 24, 25, 33, 14, 15, 32, 18, 13, 6,
+            12, 5, 11, 10, 22, 7, 34, 8, 9, 27,
+            29, 17, 16, 28, 26, 39, 30, 38, 40, 36,
+        ];
+        foreach (int charm in charmOrder)
+        {
+            AppendLabeledTile($"HK_CHARMS_{charm}", () => PlayerData.instance.GetBool($"gotCharm_{charm}"),
+                () => BindableFunctions.ToggleCharm(charm), image: $"Charm_{charm}", includeLabel: false, defaultRowWidth: 10);
+        }
     }
 }
