@@ -116,7 +116,7 @@ public class EnemyHandle : MonoBehaviour
                 {
                     if (normalizedName == goName && SceneManager.GetSceneByName(sceneName).isLoaded)
                     {
-                        isBoss = true;
+                        isBoss = !DebugMod.settings.DisableBossHpBars;
                         bossDisplayName = displayName;
                         break;
                     }

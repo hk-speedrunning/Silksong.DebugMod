@@ -28,6 +28,8 @@ public class Settings
     private static ConfigEntry<bool> altInfoPanel;
     private static ConfigEntry<bool> expandedInfoPanel;
 
+    private static ConfigEntry<bool> disableBossHpBars;
+
     private static ConfigEntry<bool> numpadForSavestates;
     private static ConfigEntry<bool> safeSavestateLoading;
 
@@ -171,6 +173,16 @@ public class Settings
         }
     }
 
+    public bool DisableBossHpBars
+    {
+        get => disableBossHpBars.Value;
+        set
+        {
+            disableBossHpBars.Value = value;
+            DebugMod.SaveSettings();
+        }
+    }
+
     public bool NumPadForSaveStates
     {
         get => numpadForSavestates.Value;
@@ -230,6 +242,16 @@ public class Settings
         {
             InfoPanel.Instance.Destroy();
             InfoPanel.BuildPanel();
+        };
+
+        disableBossHpBars = config.Bind(
+            "Visual",
+            "Disable Boss HP Bars",
+            false,
+            "Make bosses use the default HP bar."
+        );
+        disableBossHpBars.SettingChanged += (_, _) => {
+        
         };
 
         numpadForSavestates = config.Bind(
