@@ -1,3 +1,4 @@
+using InControl;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DebugMod.VersionInterop;
@@ -65,4 +66,33 @@ internal static class Extensions {
         public void AddMana(int amount, bool heroEffect) => hero.AddMPCharge(amount);
 #endif
     }
+
+#if !SILKSONG
+    extension(HeroActions actions)
+    {
+        public PlayerAction Left => actions.left;
+        public PlayerAction Right => actions.right;
+        public PlayerAction Up => actions.up;
+        public PlayerAction Down => actions.down;
+        public PlayerAction Jump => actions.jump;
+        public PlayerAction Dash => actions.dash;
+        public PlayerAction Attack => actions.attack;
+        public PlayerAction SuperDash => actions.superDash;
+        public PlayerAction DreamNail => actions.dreamNail;
+        public PlayerAction QuickCast => actions.quickCast;
+        public PlayerAction Cast => actions.cast;
+        public PlayerAction QuickMap => actions.quickMap;
+        public PlayerAction OpenInventory => actions.openInventory;
+        public PlayerAction Pause => actions.pause;
+    }
+
+    extension(HeroBox)
+    {
+        public static bool Inactive
+        {
+            get => HeroBox.inactive;
+            set => HeroBox.inactive = value;
+        }
+    }
+#endif
 }

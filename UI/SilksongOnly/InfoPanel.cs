@@ -4,6 +4,11 @@ namespace DebugMod.UI;
 
 public partial class InfoPanel
 {
+    private static partial string GameSpecificKeys()
+    {
+        return DebugMod.IH.inputActions.Taunt.State ? "t" : "  ";
+    }
+
     partial void AppendProgressInfo()
     {
         AppendInfo("INFOPANEL_FLEAS", () => $"{Gameplay.FleasCollectedCount} / 30");

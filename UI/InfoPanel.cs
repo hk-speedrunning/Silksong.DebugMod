@@ -345,6 +345,8 @@ public partial class InfoPanel : CanvasPanel
         };
     }
 
+    private static partial string GameSpecificKeys();
+
     private static string GetInputs()
     {
         // NB: somewhat random spacing to try and work around lack of monospace font availability
@@ -359,13 +361,12 @@ public partial class InfoPanel : CanvasPanel
         string n = DebugMod.IH.inputActions.DreamNail.State ? "n" : "   ";      // needolin
         string c = DebugMod.IH.inputActions.QuickCast.State ? "c" : "  ";       // cast
         string b = DebugMod.IH.inputActions.Cast.State ? "b" : "  ";            // bind
-        string t = DebugMod.IH.inputActions.Taunt.State ? "t" : "  ";           // taunt
         string m = DebugMod.IH.inputActions.QuickMap.State ? "m" : "   ";       // map
         string i = DebugMod.IH.inputActions.OpenInventory.State ? "i" : "  ";   // inventory
         string p = DebugMod.IH.inputActions.Pause.State ? "p" : "  ";           // pause
 
 
-        return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{t} {m}{i}{p}";
+        return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{GameSpecificKeys()} {m}{i}{p}";
     }
 
     private static string GetRoomSpecificText()
