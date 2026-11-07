@@ -40,6 +40,16 @@ internal static class Extensions {
             get => playerData.vesselFragments;
             set => playerData.vesselFragments = value;
         }
+        public int nailUpgrades
+        {
+            get => playerData.nailSmithUpgrades;
+            set
+            {
+                playerData.nailSmithUpgrades = value;
+                playerData.nailDamage = 5 + 4 * value;
+                PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+            }
+        }
 #endif
     }
 

@@ -1,4 +1,6 @@
-﻿namespace DebugMod;
+﻿using DebugMod.VersionInterop;
+
+namespace DebugMod;
 
 public static partial class BindableFunctions
 {
