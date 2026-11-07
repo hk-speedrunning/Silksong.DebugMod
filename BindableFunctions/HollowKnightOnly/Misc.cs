@@ -11,7 +11,7 @@ public static partial class BindableFunctions
         PlayerData.instance.shadeScene = "None";
         GameManager.instance.EndSoulLimiter();
         HeroController.instance.AddGeo(geo);
-        GameCameras.instance.soulOrbFSM.SendEvent("SOUL LIMITER DOWN");
+        FSMUtility.SendEventToGameObject(GameCameras.instance.soulOrbFSM.gameObject, "SOUL LIMITER DOWN", true);
 
         GameObject shade = GameObject.Find("Hollow Shade(Clone)");
         if (shade)
