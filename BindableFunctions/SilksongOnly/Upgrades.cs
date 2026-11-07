@@ -1,7 +1,6 @@
-﻿using DebugMod.VersionInterop;
+﻿namespace DebugMod;
 
-namespace DebugMod;
-
+// TODO(port): HK equivalents
 public static partial class BindableFunctions
 {
     [BindableMethod(name = "UPGRADES_INCREASENEEDLEDAMAGE", category = "CATEGORY_UPGRADES")]
