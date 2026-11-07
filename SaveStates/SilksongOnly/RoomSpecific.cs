@@ -15,10 +15,10 @@ using Random = UnityEngine.Random;
 namespace DebugMod.SaveStates;
 
 [HarmonyPatch]
-public static class RoomSpecific
+public static partial class RoomSpecific
 {
     #region roomspecifics
-    internal static string SaveRoomSpecific(string scene)
+    internal static partial string SaveRoomSpecific(string scene)
     {
         if (scene == "Cog_Dancers")
         {
@@ -101,7 +101,7 @@ public static class RoomSpecific
         return $"BattleScene|{battleScene.gameObject.name}|{battleScene.currentWave}";
     }
 
-    internal static IEnumerator DoRoomSpecific(string scene, string options)
+    internal static partial IEnumerator DoRoomSpecific(string scene, string options)
     {
         if (scene == "Cog_Dancers")
         {
@@ -320,7 +320,7 @@ public static class RoomSpecific
 
     #region genericfixes
     // Fixes specific to a room that do not require additional options
-    internal static IEnumerator DoGenericFixes(string scene)
+    internal static partial IEnumerator DoGenericFixes(string scene)
     {
         switch (scene)
         {
@@ -379,7 +379,7 @@ public static class RoomSpecific
 
     #region backwardscompat
     // Fill in missing roomspecifics / change format if needed and possible
-    internal static void BackwardsCompat(string scene, ref string options)
+    internal static partial void BackwardsCompat(string scene, ref string options)
     {
         switch (scene)
         {
