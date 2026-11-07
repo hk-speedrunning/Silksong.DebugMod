@@ -182,7 +182,7 @@ public class GUIController : MonoBehaviour
         }
         else
         {
-            return Language.CurrentLanguage();
+            return TeamCherry.Localization.Language.CurrentLanguage();
         }
     }
 

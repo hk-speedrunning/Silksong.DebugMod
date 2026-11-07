@@ -23,7 +23,7 @@ internal static class I18NInterop
 
     internal static LanguageCode GetLanguage()
     {
-        if (getLanguageOverride == null) return Language.CurrentLanguage();
-        return getLanguageOverride() ?? Language.CurrentLanguage();
+        if (getLanguageOverride == null) return TeamCherry.Localization.Language.CurrentLanguage();
+        return getLanguageOverride() ?? TeamCherry.Localization.Language.CurrentLanguage();
     }
 }

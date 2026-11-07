@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Bounds = UnityEngine.Bounds;
+using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod.MonoBehaviours;
 #nullable enable
@@ -114,7 +115,7 @@ public class EnemyHandle : MonoBehaviour
 
                 foreach ((string displayName, string sceneName, string goName) in bossPatterns)
                 {
-                    if (normalizedName == goName && SceneManager.GetSceneByName(sceneName).isLoaded)
+                    if (normalizedName == goName && USceneManager.GetSceneByName(sceneName).isLoaded)
                     {
                         isBoss = !DebugMod.settings.DisableBossHpBars;
                         bossDisplayName = displayName;

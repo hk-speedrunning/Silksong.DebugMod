@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TeamCherry.Localization;
 
 namespace DebugMod.Helpers;
 
@@ -57,8 +56,8 @@ internal static class Localization
         foreach (string sheetName in sheets)
         {
             // Silent reimplementation of Language.Get to avoid I18N warning us of extensions missing keys
-            if (Language._currentEntrySheets == null || !Language._currentEntrySheets.ContainsKey(sheetName)) continue;
-            if (!Language._currentEntrySheets.TryGetValue(sheetName, out Dictionary<string, string> sheet)) continue;
+            if (TeamCherry.Localization.Language._currentEntrySheets == null || !TeamCherry.Localization.Language._currentEntrySheets.ContainsKey(sheetName)) continue;
+            if (!TeamCherry.Localization.Language._currentEntrySheets.TryGetValue(sheetName, out Dictionary<string, string> sheet)) continue;
             if (sheet.TryGetValue(key, out string result)) return result;
         }
 

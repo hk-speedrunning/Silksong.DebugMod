@@ -21,7 +21,7 @@ public class CocoonPreviewer : MonoBehaviour
         }
         activeCocoonPreviews.Clear();
 
-        if (GameManager.SilentInstance is { } gameManager && gameManager.TryGetComponent(out CocoonPreviewer previewer))
+        if (GameManager._instance is { } gameManager && gameManager.TryGetComponent(out CocoonPreviewer previewer))
         {
             Destroy(previewer);
         }
