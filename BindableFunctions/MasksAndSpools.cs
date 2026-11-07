@@ -25,9 +25,9 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpool()
     {
-        if (PlayerData.instance.silkMax < 18)
+        if (PlayerData.instance.manaMax < 18)
         {
-            HeroController.instance.AddToMaxSilk(1);
+            HeroController.instance.AddToMaxMana(1);
             HudHelper.RefreshSpool();
 
             DebugMod.LogConsole("Added spool");
@@ -37,8 +37,10 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("You have the maximum number of spools");
         }
 
+#if SILKSONG
         PlayerData.instance.IsSilkSpoolBroken = false;
         EventRegister.SendEvent("SPOOL UNBROKEN");
+#endif
     }
 
     [BindableMethod(name = "MASKSANDSPOOLS_TAKEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
@@ -62,10 +64,10 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeAwaySpool()
     {
-        if (PlayerData.instance.silkMax > 9)
+        if (PlayerData.instance.manaMax > 9)
         {
-            PlayerData.instance.silkMax--;
-            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+            PlayerData.instance.manaMax--;
+            PlayerData.instance.mana = Math.Min(PlayerData.instance.mana, PlayerData.instance.mana);
             HudHelper.RefreshSpool();
 
             DebugMod.LogConsole("Removed spool");
@@ -109,14 +111,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpoolFragment()
     {
-        if (PlayerData.instance.silkSpoolParts < 1)
+        if (PlayerData.instance.manaFragments < 1)
         {
-            PlayerData.instance.silkSpoolParts++;
+            PlayerData.instance.manaFragments++;
             DebugMod.LogConsole("Added spool fragment");
         }
         else
         {
-            PlayerData.instance.silkSpoolParts = 0;
+            PlayerData.instance.manaFragments = 0;
             GiveSpool();
         }
     }
@@ -124,14 +126,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeSpoolFragment()
     {
-        if (PlayerData.instance.silkSpoolParts > 0)
+        if (PlayerData.instance.manaFragments > 0)
         {
-            PlayerData.instance.silkSpoolParts--;
+            PlayerData.instance.manaFragments--;
             DebugMod.LogConsole("Removed spool fragment");
         }
         else
         {
-            PlayerData.instance.silkSpoolParts = 1;
+            PlayerData.instance.manaFragments = 1;
             TakeAwaySpool();
         }
     }
@@ -186,7 +188,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_ADDSILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void AddSilk()
     {
-        HeroController.instance.AddSilk(1, true);
+        HeroController.instance.AddMana(1, true);
 
         DebugMod.LogConsole("Added silk");
     }
@@ -194,7 +196,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeSilk()
     {
-        HeroController.instance.TakeSilk(1);
+        HeroController.instance.TakeMana(1);
 
         DebugMod.LogConsole("Attempting to take silk");
     }

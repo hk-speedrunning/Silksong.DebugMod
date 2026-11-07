@@ -276,14 +276,14 @@ public class GUIController : MonoBehaviour
         HandleKeybinds(textInputActive: CanvasTextField.AnyFieldFocused || CommandPaletteController.IsOpen);
 
         if (DebugMod.infiniteSilk
-            && PlayerData.instance.silk < PlayerData.instance.silkMax
+            && PlayerData.instance.mana < PlayerData.instance.manaMax
             && PlayerData.instance.health > 0
             && HeroController.instance != null
             && !HeroController.instance.cState.dead
             && GameManager.instance.IsGameplayScene())
         {
-            PlayerData.instance.silk = PlayerData.instance.silkMax;
-            HeroController.instance.AddSilk(1, false);
+            PlayerData.instance.mana = PlayerData.instance.manaMax;
+            HeroController.instance.AddMana(1, false);
         }
 
         if (DebugMod.infiniteTools && ToolItemManager.Instance && ToolItemManager.Instance.toolItems)

@@ -82,7 +82,7 @@ public class InfoPanel : CanvasPanel
         y += sectionBreak;
 
         AppendInfo("INFOPANEL_HEALTH", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
-        AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
+        AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.mana} / {PlayerData.instance.CurrentManaMax}");
         AppendInfo("INFOPANEL_COMPLETION", () => $"{PlayerData.instance.completionPercentage}%");
         AppendInfo("INFOPANEL_FLEAS", () => $"{Gameplay.FleasCollectedCount} / 30");
         AppendInfo("INFOPANEL_QUESTPOINTS", GetQuestPoints);

@@ -283,11 +283,11 @@ public class MainPanel : CanvasPanel
             }
             HudHelper.RefreshMasks();
         }
-        AppendIncrementTile("MASKSANDSPOOLS_SPOOLS", () => PlayerData.instance.silkMax, SetMaxSilk, image: "Inv_Spool", min: 9, max: 18);
+        AppendIncrementTile("MASKSANDSPOOLS_SPOOLS", () => PlayerData.instance.manaMax, SetMaxSilk, image: "Inv_Spool", min: 9, max: 18);
         static void SetMaxSilk(int value)
         {
-            PlayerData.instance.silkMax = value;
-            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
+            PlayerData.instance.manaMax = value;
+            PlayerData.instance.mana = Math.Min(PlayerData.instance.mana, PlayerData.instance.manaMax);
             HudHelper.RefreshSpool();
             if (PlayerData.instance.IsSilkSpoolBroken && value > 9)
             {
@@ -299,8 +299,8 @@ public class MainPanel : CanvasPanel
         AppendIncrementTile("MASKSANDSPOOLS_MASKSHARDS", () => PlayerData.instance.heartPieces,
             value => PlayerData.instance.heartPieces = value, "Inv_MaskShard", max: 3,
             customAdd: BindableFunctions.GiveMaskShard, customRemove: BindableFunctions.TakeMaskShard);
-        AppendIncrementTile("MASKSANDSPOOLS_SPOOLFRAGMENTS", () => PlayerData.instance.silkSpoolParts,
-            value => PlayerData.instance.silkSpoolParts = value, "Inv_SpoolFragment", max: 1,
+        AppendIncrementTile("MASKSANDSPOOLS_SPOOLFRAGMENTS", () => PlayerData.instance.manaFragments,
+            value => PlayerData.instance.manaFragments = value, "Inv_SpoolFragment", max: 1,
             customAdd: BindableFunctions.GiveSpoolFragment, customRemove: BindableFunctions.TakeSpoolFragment);
         AppendTileRow(3);
         AppendIncrementTile("MASKSANDSPOOLS_HEALTH", () => PlayerData.instance.health, SetHealth, image: "Inv_Health", min: 1, max: 10);
@@ -312,16 +312,16 @@ public class MainPanel : CanvasPanel
                 HudHelper.RefreshMasks();
             }
         }
-        AppendIncrementTile("MASKSANDSPOOLS_SILK", () => PlayerData.instance.silk, SetSilk, image: "Inv_Silk");
+        AppendIncrementTile("MASKSANDSPOOLS_SILK", () => PlayerData.instance.mana, SetSilk, image: "Inv_Silk");
         static void SetSilk(int value)
         {
-            if (value > PlayerData.instance.silk)
+            if (value > PlayerData.instance.mana)
             {
-                HeroController.instance.AddSilk(value - PlayerData.instance.silk, true);
+                HeroController.instance.AddMana(value - PlayerData.instance.mana, true);
             }
-            else if (value < PlayerData.instance.silk)
+            else if (value < PlayerData.instance.mana)
             {
-                HeroController.instance.TakeSilk(PlayerData.instance.silk - value);
+                HeroController.instance.TakeMana(PlayerData.instance.mana - value);
             }
         }
         AppendWideTile("MASKSANDSPOOLS_LIFEBLOOD", BuildLifebloodTile, image: "Inv_Lifeblood");
