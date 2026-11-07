@@ -26,5 +26,12 @@ public partial class SaveState
         yield return USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
     }
 
+    private partial IEnumerator ResetGameSpecificState(bool loadSafely)
+    {
+        yield break;
+    }
+
+    private partial void GameSpecificSaveStateGlitchFixes() { }
+
     private partial void HUDFixes() { }
 }

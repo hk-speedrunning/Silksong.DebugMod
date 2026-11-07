@@ -43,7 +43,6 @@ public partial class SaveState
         public bool facingLeft; // for backwards compatibility
         public bool facingRight;
         public bool isKinematized;
-        public List<string> toolAmountsOverride;
         public string[] loadedScenes;
         public string[] loadedSceneActiveScenes;
         public string roomSpecificOptions;
@@ -66,11 +65,6 @@ public partial class SaveState
             facingRight = _data.facingRight;
             isKinematized = _data.isKinematized;
             roomSpecificOptions = _data.roomSpecificOptions;
-
-            if (_data.toolAmountsOverride is not null)
-            {
-                toolAmountsOverride = new List<string>(_data.toolAmountsOverride);
-            }
 
             CopyGameSpecific(_data);
 
@@ -143,6 +137,7 @@ public partial class SaveState
     private partial IEnumerator PrepareSceneLoad(bool abortDeath);
     private partial IEnumerator LoadDummyScene();
     private partial IEnumerator LoadDupedScene(string sceneName);
+    private partial IEnumerator ResetGameSpecificState(bool loadSafely);
 
     partial void SaveGameSpecific();
     partial void RestoreGameSpecific();
@@ -177,16 +172,6 @@ public partial class SaveState
         data.facingLeft = !HeroController.instance.cState.facingRight;
         data.facingRight = HeroController.instance.cState.facingRight;
         data.isKinematized = HeroController.instance.GetComponent<Rigidbody2D>().bodyType == RigidbodyType2D.Kinematic;
-
-        if (PlayerData.instance.toolAmountsOverride != null)
-        {
-            // Unity seems to refuse to serialize all sensible ways of storing this
-            data.toolAmountsOverride = [];
-            foreach (var kvp in PlayerData.instance.toolAmountsOverride)
-            {
-                data.toolAmountsOverride.Add($"{kvp.Key}:{kvp.Value}");
-            }
-        }
 
         var scenes = SceneWatcher.LoadedScenes;
         data.loadedScenes = scenes.Select(s => s.name).ToArray();
@@ -271,6 +256,7 @@ public partial class SaveState
             }
         }
 
+#if SILKSONG
         // Fixes spawning into surface water (can't do this any earlier since you would get forced out)
         foreach (SurfaceWaterRegion water in Object.FindObjectsByType<SurfaceWaterRegion>(FindObjectsSortMode.None))
         {
@@ -283,6 +269,7 @@ public partial class SaveState
                 break;
             }
         }
+#endif
     }
 
     private IEnumerator LoadImpl()
@@ -305,8 +292,10 @@ public partial class SaveState
             HeroController.instance.StopCoroutine(DebugMod.CurrentHazardCoro);
         if (DebugMod.CurrentInvulnCoro != null)
             HeroController.instance.StopCoroutine(DebugMod.CurrentInvulnCoro);
+#if SILKSONG
         if (HeroController.instance.hazardRespawnRoutine != null)
             HeroController.instance.StopCoroutine(HeroController.instance.hazardRespawnRoutine);
+#endif
 
         if (DebugMod.CurrentDieCoro != null)
             HeroController.instance.StopCoroutine(DebugMod.CurrentDieCoro);
@@ -321,7 +310,9 @@ public partial class SaveState
         DebugMod.CurrentInvulnCoro = null;
         DebugMod.CurrentDieCoro = null;
         DebugMod.CurrentPlayerDeadCoro = null;
+#if SILKSONG
         HeroController.instance.hazardRespawnRoutine = null;
+#endif
         HeroController.instance.hazardInvulnRoutine = null;
 
         //fixes knockback storage
@@ -339,66 +330,7 @@ public partial class SaveState
 
         // Close inventory and dialogue
         EventRegister.SendEvent("INVENTORY CANCEL");
-        DialogueBox.EndConversation();
-        DialogueBox.HideInstant();
-        if (DialogueYesNoBox._instance.pane.isActiveAndEnabled) DialogueYesNoBox.ForceClose();
-        if (QuestYesNoBox._instance.pane.isActiveAndEnabled) QuestYesNoBox.ForceClose();
-
-        // Force end cutscenes to fix audio
-        foreach (CinematicPlayer cinematicPlayer in Object.FindObjectsByType<CinematicPlayer>(FindObjectsSortMode.None))
-        {
-            if (cinematicPlayer.videoType == CinematicPlayer.VideoType.InGameVideo)
-            {
-                cinematicPlayer.actCard = null;
-                yield return cinematicPlayer.FinishInGameVideo();
-            }
-        }
-
-        // Fast-forwards mist void-out (would cause audio to break if normal preload fix was used instead)
-        foreach (SceneTransitionZoneBase zone in Object.FindObjectsByType<SceneTransitionZoneBase>(FindObjectsSortMode.None))
-        {
-            if (zone.respawnRoutine != null)
-            {
-                zone.StopCoroutine(zone.respawnRoutine);
-                GameManager.instance.BeginSceneTransition
-                (
-                    new DebugModSaveStateSceneLoadInfo
-                    {
-                        SceneName = zone.TargetScene,
-                        EntryGateName = zone.TargetGate,
-                        EntryDelay = 0f,
-                        PreventCameraFadeOut = true,
-                        WaitForSceneTransitionCameraFade = false,
-                        Visualization = GameManager.SceneLoadVisualizations.Default,
-                        AlwaysUnloadUnusedAssets = loadSafely
-                    }
-                );
-                yield return new WaitUntil(() => !GameManager.instance.isLoading);
-            }
-        }
-
-        EventRegister.SendEvent("REST AREA MUSIC STOP");
-        ToolItemManager.SetIsInCutscene(false);
-        CameraBlurPlane.Spacing = 0f;
-        CameraBlurPlane.Vibrancy = 0f;
-        CameraBlurPlane.MaskLerp = 0f;
-        ScreenFaderUtils.Fade(ScreenFaderUtils.GetColour(), Color.clear, 0f);
-
-        // Fix slopes
-        foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
-        {
-            if (surface.isHeroAttached)
-            {
-                surface.Detach(false);
-            }
-        }
-
-        // Prevent silk spool regen from continuing after (or during!) the load.
-        HeroController.instance.ResetSilkRegen();
-        HeroController.instance.ClearSpoolMossChunks();
-
-        // Unparents player object and fixes interpolation
-        HeroController.instance.ElevatorReset();
+        yield return ResetGameSpecificState(loadSafely);
 
         yield return PrepareSceneLoad(abortDeath);
 
@@ -416,12 +348,15 @@ public partial class SaveState
         GameManager.instance.ResetSemiPersistentItems();
         RestoreGameSpecific();
 
+#if SILKSONG
         StaticVariableList.ClearSceneTransitions(); // Clears cached data like quest board contents
         GameManager.ReportUnload(previousScene); // Clears object pools in case the same scene is reloaded
+#endif
 
         yield return null;
 
         JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data.savedPd), PlayerData.instance);
+#if SILKSONG
         PlayerData.instance.ResetCutsceneBools(); // These fields are NonSerialized so aren't overwritten
 
         if (data.toolAmountsOverride != null)
@@ -437,6 +372,7 @@ public partial class SaveState
         {
             PlayerData.instance.toolAmountsOverride = null;
         }
+#endif
 
         SceneWatcher.LoadedSceneInfo[] sceneData = data
             .loadedScenes
@@ -495,9 +431,11 @@ public partial class SaveState
 
         HeroController.instance.CharmUpdate();
 
+#if SILKSONG
         // invalidates caches
         QuestManager.IncrementVersion();
         CollectableItemManager.IncrementVersion();
+#endif
 
         PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
         PlayMakerFSM.BroadcastEvent("TOOL EQUIPS CHANGED");
@@ -534,7 +472,7 @@ public partial class SaveState
         }
 
         // Reset various things that could be out of place depending on when the load started
-        HeroController.instance.SetLockStates(HeroLockStates.None);
+        HeroController.instance.ResetLockStates();
         HeroController.instance.GetComponent<MeshRenderer>().enabled = true;
         DebugMod.RefHeroCollider.enabled = !DebugMod.heroColliderDisabled;
         HeroBox.Inactive = DebugMod.heroColliderDisabled;
@@ -591,7 +529,9 @@ public partial class SaveState
         rb2d.gravityScale = 0.79f;
 
         //invuln
+#if SILKSONG
         HeroController.instance.gameObject.LocateMyFSM("Roar and Wound States").FsmVariables.FindFsmBool("Force Roar Lock").Value = false;
+#endif
         HeroController.instance.cState.invulnerable = false;
 
         //no clip
@@ -613,12 +553,10 @@ public partial class SaveState
             HeroController.instance.cState.nearBench = false;
         }
 
-        // Pogo storage
-        if (HeroController.instance.currentDownspike)
-        {
-            HeroController.instance.currentDownspike.CancelAttack();
-        }
+        GameSpecificSaveStateGlitchFixes();
     }
+
+    private partial void GameSpecificSaveStateGlitchFixes();
 
     //Moving all HUD related code to here for clarity
     private partial void HUDFixes();
@@ -653,17 +591,5 @@ public partial class SaveState
         return loadingSavestate == null;
     }
 
-    // Fixes issue where the inventory FSM can unfreeze time while the game is still paused
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetIsInventoryOpen))]
-    [HarmonyPrefix]
-    private static bool GameManager_SetIsInventoryOpen(bool value)
-    {
-        if (!value && !PlayerData.instance.isInventoryOpen && GameManager.instance.isPaused)
-        {
-            return false;
-        }
-
-        return true;
-    }
     #endregion
 }

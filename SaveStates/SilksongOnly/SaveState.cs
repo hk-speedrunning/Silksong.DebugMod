@@ -1,4 +1,5 @@
 using DebugMod.Helpers;
+using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,11 +19,17 @@ public partial class SaveState
         public bool isMaggoted;
         public SceneData.SerializableBoolData[] semiPersistentBools;
         public SceneData.SerializableIntData[] semiPersistentInts;
+        public List<string> toolAmountsOverride;
 
         partial void CopyGameSpecific(SaveStateData _data)
         {
             evoState = _data.evoState;
             isMaggoted = _data.isMaggoted;
+
+            if (_data.toolAmountsOverride is not null)
+            {
+                toolAmountsOverride = new List<string>(_data.toolAmountsOverride);
+            }
 
             if (_data.semiPersistentBools is not null)
             {
@@ -65,6 +72,70 @@ public partial class SaveState
         yield return Addressables.LoadSceneAsync($"Scenes/{sceneName}", LoadSceneMode.Additive);
     }
 
+    private partial IEnumerator ResetGameSpecificState(bool loadSafely)
+    {
+        DialogueBox.EndConversation();
+        DialogueBox.HideInstant();
+        if (DialogueYesNoBox._instance.pane.isActiveAndEnabled) DialogueYesNoBox.ForceClose();
+        if (QuestYesNoBox._instance.pane.isActiveAndEnabled) QuestYesNoBox.ForceClose();
+
+        // Force end cutscenes to fix audio
+        foreach (CinematicPlayer cinematicPlayer in Object.FindObjectsByType<CinematicPlayer>(FindObjectsSortMode.None))
+        {
+            if (cinematicPlayer.videoType == CinematicPlayer.VideoType.InGameVideo)
+            {
+                cinematicPlayer.actCard = null;
+                yield return cinematicPlayer.FinishInGameVideo();
+            }
+        }
+
+        // Fast-forwards mist void-out (would cause audio to break if normal preload fix was used instead)
+        foreach (SceneTransitionZoneBase zone in Object.FindObjectsByType<SceneTransitionZoneBase>(FindObjectsSortMode.None))
+        {
+            if (zone.respawnRoutine != null)
+            {
+                zone.StopCoroutine(zone.respawnRoutine);
+                GameManager.instance.BeginSceneTransition
+                (
+                    new DebugModSaveStateSceneLoadInfo
+                    {
+                        SceneName = zone.TargetScene,
+                        EntryGateName = zone.TargetGate,
+                        EntryDelay = 0f,
+                        PreventCameraFadeOut = true,
+                        WaitForSceneTransitionCameraFade = false,
+                        Visualization = GameManager.SceneLoadVisualizations.Default,
+                        AlwaysUnloadUnusedAssets = loadSafely
+                    }
+                );
+                yield return new WaitUntil(() => !GameManager.instance.isLoading);
+            }
+        }
+
+        EventRegister.SendEvent("REST AREA MUSIC STOP");
+        ToolItemManager.SetIsInCutscene(false);
+        CameraBlurPlane.Spacing = 0f;
+        CameraBlurPlane.Vibrancy = 0f;
+        CameraBlurPlane.MaskLerp = 0f;
+        ScreenFaderUtils.Fade(ScreenFaderUtils.GetColour(), Color.clear, 0f);
+
+        // Fix slopes
+        foreach (SlideSurface surface in Object.FindObjectsByType<SlideSurface>(FindObjectsSortMode.None))
+        {
+            if (surface.isHeroAttached)
+            {
+                surface.Detach(false);
+            }
+        }
+
+        // Prevent silk spool regen from continuing after (or during!) the load.
+        HeroController.instance.ResetSilkRegen();
+        HeroController.instance.ClearSpoolMossChunks();
+
+        // Unparents player object and fixes interpolation
+        HeroController.instance.ElevatorReset();
+    }
+
     partial void SaveGameSpecific()
     {
         data.evoState = HeroController.instance.hunterUpgState.CurrentMeterHits;
@@ -72,6 +143,16 @@ public partial class SaveState
         
         data.semiPersistentBools = SaveSemiPersistent(SceneData.instance.persistentBools);
         data.semiPersistentInts = SaveSemiPersistent(SceneData.instance.persistentInts);
+
+        if (PlayerData.instance.toolAmountsOverride != null)
+        {
+            // Unity seems to refuse to serialize all sensible ways of storing this
+            data.toolAmountsOverride = [];
+            foreach (var kvp in PlayerData.instance.toolAmountsOverride)
+            {
+                data.toolAmountsOverride.Add($"{kvp.Key}:{kvp.Value}");
+            }
+        }
     }
 
     partial void RestoreGameSpecific()
@@ -189,5 +270,27 @@ public partial class SaveState
                 };
             }
         }
+    }
+
+    private partial void GameSpecificSaveStateGlitchFixes()
+    {
+        // Pogo storage
+        if (HeroController.instance.currentDownspike)
+        {
+            HeroController.instance.currentDownspike.CancelAttack();
+        }
+    }
+
+    // Fixes issue where the inventory FSM can unfreeze time while the game is still paused
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetIsInventoryOpen))]
+    [HarmonyPrefix]
+    private static bool GameManager_SetIsInventoryOpen(bool value)
+    {
+        if (!value && !PlayerData.instance.isInventoryOpen && GameManager.instance.isPaused)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
