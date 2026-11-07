@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DebugMod.MonoBehaviours;
 
-public class CocoonPreviewer : MonoBehaviour
+public partial class CocoonPreviewer : MonoBehaviour
 {
     public bool previewEnabled;
 
@@ -12,6 +12,10 @@ public class CocoonPreviewer : MonoBehaviour
 
     private GameObject cocoon;
     private GameObject compass;
+
+    private partial bool CalculatePosition(out Vector2 position, out bool atHeroCorpseMarker);
+    private partial GameObject SpawnPreview(Vector2 position);
+    private partial void PlacePreview(GameObject cocoon, Vector2 position, bool atHeroCorpseMarker);
 
     public static void Unload()
     {
@@ -39,15 +43,8 @@ public class CocoonPreviewer : MonoBehaviour
         {
             if (!cocoon)
             {
-                GameObject prefab = FindAnyObjectByType<CustomSceneManager>().heroCorpsePrefab;
-                cocoon = Instantiate(prefab, new Vector3(position.x, position.y, prefab.transform.position.z), Quaternion.identity);
+                cocoon = SpawnPreview(position);
                 activeCocoonPreviews.Add(cocoon);
-
-                Destroy(cocoon.GetComponent<BoxCollider2D>());
-                Destroy(cocoon.GetComponent<HarpoonHook>());
-                Destroy(cocoon.GetComponent<HitResponse>());
-                Destroy(cocoon.GetComponent<EnemyHitEffectsRegular>());
-                Destroy(cocoon.GetComponent<PlayRandomAudioEvent>());
 
                 compass = new GameObject("Compass", typeof(SpriteRenderer));
                 compass.transform.parent = cocoon.transform;
@@ -75,17 +72,7 @@ public class CocoonPreviewer : MonoBehaviour
                 }
             }
 
-            RepositionFromWalls repositionFromWalls = cocoon.GetComponent<RepositionFromWalls>();
-            if (atHeroCorpseMarker)
-            {
-                repositionFromWalls.enabled = false;
-                cocoon.transform.position = new Vector3(position.x, position.y, cocoon.transform.position.z);
-            }
-            else
-            {
-                repositionFromWalls.enabled = true;
-                repositionFromWalls.Reposition();
-            }
+            PlacePreview(cocoon, position, atHeroCorpseMarker);
 
             Vector2 compassPos = HeroController.instance.transform.position + new Vector3(0f, 2f, 0f);
             Vector2 distance = position - compassPos;
@@ -102,29 +89,5 @@ public class CocoonPreviewer : MonoBehaviour
         {
             Destroy(cocoon);
         }
-    }
-
-    private bool CalculatePosition(out Vector2 position, out bool atHeroCorpseMarker)
-    {
-        if (HeroCorpseMarkerProxy.Instance)
-        {
-            position = HeroCorpseMarkerProxy.Instance.TargetScenePos;
-            atHeroCorpseMarker = HeroCorpseMarkerProxy.Instance.TargetGuid != null;
-            return HeroCorpseMarkerProxy.Instance.TargetSceneName == GameManager.instance.GetSceneNameString();
-        }
-
-        HeroCorpseMarker marker = HeroCorpseMarker.GetClosest(HeroController.instance.transform.position);
-        if (marker)
-        {
-            position = marker.Position;
-            atHeroCorpseMarker = true;
-        }
-        else
-        {
-            position = HeroController.instance.transform.position;
-            atHeroCorpseMarker = false;
-        }
-
-        return true;
     }
 }
