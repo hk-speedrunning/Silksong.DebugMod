@@ -1,7 +1,6 @@
 using DebugMod.Helpers;
 using DebugMod.UI.Canvas;
 using GlobalEnums;
-using GlobalSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
-public class InfoPanel : CanvasPanel
+public partial class InfoPanel : CanvasPanel
 {
     internal record InjectedInfo
     {
@@ -38,6 +37,8 @@ public class InfoPanel : CanvasPanel
     private float lineGap;  // Alt implementation
     private int counter;
     private float injectedHeight;
+
+    partial void AppendProgressInfo();
 
     public static void BuildPanel()
     {
@@ -84,8 +85,7 @@ public class InfoPanel : CanvasPanel
         AppendInfo("INFOPANEL_HEALTH", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
         AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.mana} / {PlayerData.instance.CurrentManaMax}");
         AppendInfo("INFOPANEL_COMPLETION", () => $"{PlayerData.instance.completionPercentage}%");
-        AppendInfo("INFOPANEL_FLEAS", () => $"{Gameplay.FleasCollectedCount} / 30");
-        AppendInfo("INFOPANEL_QUESTPOINTS", GetQuestPoints);
+        AppendProgressInfo();
 
         if (DebugMod.settings.ExpandedInfoPanel)
         {
@@ -258,12 +258,6 @@ public class InfoPanel : CanvasPanel
         float heroY = DebugMod.RefKnight.transform.position.y;
 
         return $"{heroX:.000000#}, {heroY:.000000#}";
-    }
-
-    private static string GetQuestPoints()
-    {
-        QuestCompleteTotalGroup group = QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0];
-        return $"{group.CurrentValueCount} / {group.target}";
     }
 
     private static string GetStringForBool(bool b)
