@@ -28,7 +28,7 @@ public static partial class BindableFunctions
         if (PlayerData.instance.manaMax < 18)
         {
             HeroController.instance.AddToMaxMana(1);
-            HudHelper.RefreshSpool();
+            HudHelper.RefreshMana();
 
             DebugMod.LogConsole("Added spool");
         }
@@ -68,7 +68,7 @@ public static partial class BindableFunctions
         {
             PlayerData.instance.manaMax--;
             PlayerData.instance.mana = Math.Min(PlayerData.instance.mana, PlayerData.instance.mana);
-            HudHelper.RefreshSpool();
+            HudHelper.RefreshMana();
 
             DebugMod.LogConsole("Removed spool");
         }

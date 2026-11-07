@@ -104,7 +104,7 @@ public static partial class BindableFunctions
         else
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
-            HudHelper.RefreshSpool();
+            HudHelper.RefreshMana();
             DebugMod.LogConsole("Enabling HUD");
         }
     }

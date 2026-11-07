@@ -126,7 +126,7 @@ public partial class SaveState
         EventRegister.SendEvent("HEALTH UPDATE");
 
         HudHelper.RefreshMasks();
-        HudHelper.RefreshSpool();
+        HudHelper.RefreshMana();
 
         // Spawns tool icons if they weren't already visible
         EventRegister.SendEvent("LAST HP ADDED");

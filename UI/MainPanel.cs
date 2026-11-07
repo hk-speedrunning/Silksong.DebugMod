@@ -252,7 +252,7 @@ public partial class MainPanel : CanvasPanel
         {
             PlayerData.instance.manaMax = value;
             PlayerData.instance.mana = Math.Min(PlayerData.instance.mana, PlayerData.instance.manaMax);
-            HudHelper.RefreshSpool();
+            HudHelper.RefreshMana();
             if (PlayerData.instance.IsSilkSpoolBroken && value > 9)
             {
                 PlayerData.instance.IsSilkSpoolBroken = false;
