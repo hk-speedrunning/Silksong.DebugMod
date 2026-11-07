@@ -68,11 +68,23 @@ internal static class Extensions {
         public void TakeMana(int amount) => hero.TakeSilk(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddSilk(amount, heroEffect);
         public bool IsHeroPaused() => hero.IsPaused();
+        public void AddLifeblood()
+        {
+            bool wasInLifebloodState = hero.IsInLifebloodState;
+
+            EventRegister.SendEvent("ADD BLUE HEALTH");
+
+            if (!wasInLifebloodState && hero.IsInLifebloodState)
+            {
+                hero.HitMaxBlueHealthBurst();
+            }
+        }
 #else
         public void AddToMaxMana(int amount) => hero.AddToMaxMPReserve(amount);
         public void TakeMana(int amount) => hero.TakeMP(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddMPCharge(amount);
         public bool IsHeroPaused() => GameManager.instance.isPaused;
+        public void AddLifeblood() => EventRegister.SendEvent("ADD BLUE HEALTH");
         public void DamageSelf(int amount) => hero.TakeDamage(hero.gameObject, hero.cState.facingRight ? CollisionSide.right : CollisionSide.left, amount, 1);
         public IEnumerator Die(bool nonLethal, bool frostDeath) => hero.Die();
         public void AddInputBlocker(object blocker) => throw new NotImplementedException();
