@@ -19,7 +19,7 @@ using UnityEngine.UI;
 namespace DebugMod;
 
 [HarmonyPatch]
-public class GUIController : MonoBehaviour
+public partial class GUIController : MonoBehaviour
 {
     public Vector3 hazardLocation;
     public string respawnSceneWatch;
@@ -174,6 +174,8 @@ public class GUIController : MonoBehaviour
         }
     }
 
+    partial void GameActiveUpdate();
+
     private LanguageCode GetLanguage()
     {
         if (InteropHelper.IsModInstalled(InteropHelper.I18NModId, "1.1.0"))
@@ -286,25 +288,7 @@ public class GUIController : MonoBehaviour
             HeroController.instance.AddMana(1, false);
         }
 
-        if (DebugMod.infiniteTools && ToolItemManager.Instance && ToolItemManager.Instance.toolItems)
-        {
-            foreach (ToolItem tool in ToolItemManager.Instance.toolItems)
-            {
-                if (tool)
-                {
-                    ToolItemsData.Data data = tool.SavedData;
-                    int oldAmount = data.AmountLeft;
-                    data.AmountLeft = ToolItemManager.GetToolStorageAmount(tool);
-                    tool.SavedData = data;
-
-                    AttackToolBinding? binding = ToolItemManager.GetAttackToolBinding(tool);
-                    if (binding.HasValue && oldAmount != data.AmountLeft)
-                    {
-                        ToolItemManager.ReportBoundAttackToolUpdated(binding.Value);
-                    }
-                }
-            }
-        }
+        GameActiveUpdate();
 
         if (DebugMod.playerInvincible && PlayerData.instance != null)
         {
