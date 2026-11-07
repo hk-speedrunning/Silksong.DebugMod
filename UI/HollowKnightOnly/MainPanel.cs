@@ -1,3 +1,5 @@
+using System;
+
 namespace DebugMod.UI;
 
 public partial class MainPanel
@@ -33,6 +35,17 @@ public partial class MainPanel
         {
             PlayerData pd = PlayerData.instance;
             pd.hasSpell = pd.fireballLevel > 0 || pd.quakeLevel > 0 || pd.screamLevel > 0;
+        }
+
+        AppendSectionHeader("CATEGORY_UPGRADES");
+        AppendTileRow(2);
+        AppendIncrementTile("UPGRADES_NEEDLEDAMAGE", () => PlayerData.instance.nailDamage, SetNailDamage,
+            customAdd: BindableFunctions.IncreaseNeedleDamage, customRemove: BindableFunctions.DecreaseNeedleDamage);
+        static void SetNailDamage(int value)
+        {
+            int nailUpgrades = Math.Clamp((value - 5) / 4, 0, 4);
+            PlayerData.instance.nailUpgrades = nailUpgrades;
+            PlayerData.instance.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
     }
 }

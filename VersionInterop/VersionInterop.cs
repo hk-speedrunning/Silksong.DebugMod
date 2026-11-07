@@ -30,6 +30,11 @@ internal static class Extensions {
         public static int MaxManaFragments => 1;
         public string corpseScene => playerData.HeroCorpseScene;
         public int corpseMoney => playerData.HeroCorpseMoneyPool;
+        public int extraNailDamage
+        {
+            get => DebugMod.extraNailDamage;
+            set => DebugMod.extraNailDamage = value;
+        }
         public int spools => playerData.silkMax - 9;
         public static int MaxSpools => 9;
 #else
@@ -50,6 +55,15 @@ internal static class Extensions {
         public int corpseMoney => playerData.geoPool;
         public int spools => playerData.MPReserveMax / 33;
         public static int MaxSpools => 3;
+        public int extraNailDamage
+        {
+            get => playerData.nailDamage - (5 + 4 * playerData.nailSmithUpgrades);
+            set
+            {
+                playerData.nailDamage = 5 + 4 * playerData.nailSmithUpgrades + value;
+                PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
+            }
+        }
         public int nailUpgrades
         {
             get => playerData.nailSmithUpgrades;
