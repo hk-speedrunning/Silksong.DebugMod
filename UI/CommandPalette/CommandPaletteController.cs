@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
 namespace DebugMod.UI.CommandPalette;
 
@@ -150,7 +149,7 @@ public sealed class CommandPaletteController : MonoBehaviour
             queryBeforeWordDelete = queryField.Text;
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape) || Mouse.current?.backButton.wasPressedThisFrame == true)
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(3))
         {
             if (navigation.Count == 0) Close();
             else NavigateBack();
