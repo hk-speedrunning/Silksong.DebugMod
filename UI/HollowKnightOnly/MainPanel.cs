@@ -26,12 +26,18 @@ public partial class MainPanel
         AppendLabeledTile("HK_SKILLS_DASHSLASH", () => PlayerData.instance.hasUpwardSlash, BindableFunctions.ToggleDashSlash, "NailArt_DashSlash");
         AppendLabeledTile("HK_SKILLS_GREATSLASH", () => PlayerData.instance.hasDashSlash, BindableFunctions.ToggleGreatSlash, "NailArt_GreatSlash");
         AppendTileRow(3);
-        AppendIncrementTile("HK_SKILLS_FIREBALL", () => PlayerData.instance.fireballLevel,
-            value => { PlayerData.instance.fireballLevel = value; UpdateHasSpell(); }, max: 2);
-        AppendIncrementTile("HK_SKILLS_QUAKE", () => PlayerData.instance.quakeLevel,
-            value => { PlayerData.instance.quakeLevel = value; UpdateHasSpell(); }, max: 2);
-        AppendIncrementTile("HK_SKILLS_SCREAM", () => PlayerData.instance.screamLevel,
-            value => { PlayerData.instance.screamLevel = value; UpdateHasSpell(); }, max: 2);
+        AppendSpellTile("HK_SKILLS_FIREBALL", "Spell_Fireball", () => PlayerData.instance.fireballLevel,
+            value => PlayerData.instance.fireballLevel = value);
+        AppendSpellTile("HK_SKILLS_QUAKE", "Spell_Quake", () => PlayerData.instance.quakeLevel,
+            value => PlayerData.instance.quakeLevel = value);
+        AppendSpellTile("HK_SKILLS_SCREAM", "Spell_Scream", () => PlayerData.instance.screamLevel,
+            value => PlayerData.instance.screamLevel = value);
+        void AppendSpellTile(string name, string image, Func<int> getter, Action<int> setter)
+        {
+            CanvasPanel tile = AppendIncrementTile(name, getter, value => { setter(value); UpdateHasSpell(); },
+                $"{image}_1", max: 2);
+            tile.OnUpdate += () => tile.Get<CanvasImage>("Icon").SetImage(UICommon.images[$"{image}_{Math.Max(getter(), 1)}"]);
+        }
         static void UpdateHasSpell()
         {
             PlayerData pd = PlayerData.instance;
@@ -40,8 +46,9 @@ public partial class MainPanel
 
         AppendSectionHeader("CATEGORY_UPGRADES");
         AppendTileRow(2);
-        AppendIncrementTile("UPGRADES_NEEDLEDAMAGE", () => PlayerData.instance.nailDamage, SetNailDamage,
+        CanvasPanel nailTile = AppendIncrementTile("UPGRADES_NEEDLEDAMAGE", () => PlayerData.instance.nailDamage, SetNailDamage, "Nail_0",
             customAdd: BindableFunctions.IncreaseNeedleDamage, customRemove: BindableFunctions.DecreaseNeedleDamage);
+        nailTile.OnUpdate += () => nailTile.Get<CanvasImage>("Icon").SetImage(UICommon.images[$"Nail_{PlayerData.instance.nailUpgrades}"]);
         static void SetNailDamage(int value)
         {
             int nailUpgrades = Math.Clamp((value - 5) / 4, 0, 4);
@@ -49,7 +56,7 @@ public partial class MainPanel
             PlayerData.instance.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
         AppendIncrementTile("HK_UPGRADES_NOTCHES", () => PlayerData.instance.charmSlots,
-            value => PlayerData.instance.charmSlots = value, min: 3, max: 11);
+            value => PlayerData.instance.charmSlots = value, "Charm_Notch", min: 3, max: 11);
     }
 
     partial void AppendEquippableItems()
