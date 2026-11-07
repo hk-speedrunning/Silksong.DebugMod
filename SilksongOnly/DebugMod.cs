@@ -1,8 +1,10 @@
+using BepInEx;
 using GlobalSettings;
 using JetBrains.Annotations;
 
 namespace DebugMod;
 
+[BepInDependency("org.silksong-modding.modlist", "0.2.0")]
 public partial class DebugMod
 {
     [CanBeNull] internal static HealthManager.DamageScalingConfig lastScaling;
