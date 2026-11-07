@@ -362,4 +362,236 @@ public partial class MainPanel
             AppendToolTile(ToolKey, ToolDefs, 6);
         }
     }
+
+    partial void AppendItems()
+    {
+        AppendSectionHeader("CATEGORY_ITEMS");
+
+        static void ToggleItem(CollectableItem item)
+        {
+            if (item.CollectedAmount == 0)
+            {
+                item.Collect(1, false);
+            }
+            else
+            {
+                item.Take(1, false);
+            }
+        }
+
+        void AddItemsLabeledTiles(List<(string, string, string)> items)
+        {
+            foreach ((string name, string displayName, string iconName) in items)
+            {
+                CollectableItem item = CollectableItemManager.GetItemByName(name);
+                AppendLabeledTile(
+                    displayName,
+                    () => item.IsVisible,
+                    () => ToggleItem(item),
+                    image: iconName
+                );
+            }
+        }
+
+        AppendLabeledTile("ITEMS_ARCHITECTSMELODY", () => PlayerData.instance.HasMelodyArchitect,
+            () => PlayerData.instance.HasMelodyArchitect = !PlayerData.instance.HasMelodyArchitect, image: "Inv_MelodyArchitect");
+        AppendLabeledTile("ITEMS_VAULTKEEPERSMELODY", () => PlayerData.instance.HasMelodyLibrarian,
+            () => PlayerData.instance.HasMelodyLibrarian = !PlayerData.instance.HasMelodyLibrarian, image: "Inv_MelodyVaultkeeper");
+        AppendLabeledTile("ITEMS_CONDUCTORSMELODY", () => PlayerData.instance.HasMelodyConductor,
+            () => PlayerData.instance.HasMelodyConductor = !PlayerData.instance.HasMelodyConductor, image: "Inv_MelodyConductor");
+
+        CanvasPanel quillTile = AppendLabeledTile(
+            "ITEMS_QUILL",
+            () => PlayerData.instance.hasQuill,
+            () =>
+            {
+                if (!PlayerData.instance.hasQuill)
+                {
+                    PlayerData.instance.hasQuill = true;
+                    PlayerData.instance.QuillState = 1;
+                }
+                else if (PlayerData.instance.QuillState >= 3)
+                {
+                    PlayerData.instance.hasQuill = false;
+                }
+                else
+                {
+                    PlayerData.instance.QuillState++;
+                }
+
+                CollectableItemManager.IncrementVersion();
+            }
+        );
+        quillTile.OnUpdate += () =>
+        {
+            string image;
+
+            if (PlayerData.instance.hasQuill && PlayerData.instance.QuillState > 1)
+            {
+                if (PlayerData.instance.QuillState == 2)
+                {
+                    image = "Inv_RedQuill";
+                }
+                else
+                {
+                    image = "Inv_PurpleQuill";
+                }
+            }
+            else
+            {
+                image = "Inv_Quill";
+            }
+
+            quillTile.Get<CanvasImage>("Icon").SetImage(UICommon.images[image]);
+        };
+
+        AppendLabeledTile("ITEMS_FARSIGHT", () => PlayerData.instance.ConstructedFarsight,
+            () => PlayerData.instance.ConstructedFarsight = !PlayerData.instance.ConstructedFarsight,
+            image: "Inv_Farsight");
+
+        AddItemsLabeledTiles([
+            ("Coral Heart", "ITEMS_HEARTOFMIGHT", "Inv_HeartCoral"),
+            ("Flower Heart", "ITEMS_HEARTOFTHEWOODS", "Inv_HeartFlower"),
+            ("Hunter Heart", "ITEMS_HEARTOFTHEWILD", "Inv_HeartAnt"),
+            ("Clover Heart", "ITEMS_CONJOINEDHEART", "Inv_HeartJoined"),
+            ("White Flower", "ITEMS_EVERBLOOM", "Inv_Everbloom")
+        ]);
+
+        AppendLabeledTile("ITEMS_KEYOFINDOLENT", () => PlayerData.instance.HasSlabKeyA, () =>
+        {
+            PlayerData.instance.HasSlabKeyA = !PlayerData.instance.HasSlabKeyA;
+            CollectableItemManager.IncrementVersion();
+        }, image: "Inv_KeyIndolent");
+        AppendLabeledTile("ITEMS_KEYOFHERETIC", () => PlayerData.instance.HasSlabKeyB, () =>
+        {
+            PlayerData.instance.HasSlabKeyB = !PlayerData.instance.HasSlabKeyB;
+            CollectableItemManager.IncrementVersion();
+        }, image: "Inv_KeyHeretic");
+        AppendLabeledTile("ITEMS_KEYOFAPOSTATE", () => PlayerData.instance.HasSlabKeyC, () =>
+        {
+            PlayerData.instance.HasSlabKeyC = !PlayerData.instance.HasSlabKeyC;
+            CollectableItemManager.IncrementVersion();
+        }, image: "Inv_KeyApostate");
+
+        AddItemsLabeledTiles([
+            ("Ward Key", "ITEMS_WHITEKEY", "Inv_WhiteKey"),
+            ("Ward Boss Key", "ITEMS_SURGEONSKEY", "Inv_SurgeonsKey"),
+            ("Architect Key", "ITEMS_ARCHITECTSKEY", "Inv_ArchitectKey"),
+            ("Dock Key", "ITEMS_DIVINGBELLKEY", "Inv_DockKey"),
+            ("Belltown House Key", "ITEMS_BELLHOMEKEY", "Inv_BellhomeKey"),
+            ("Craw Summons", "ITEMS_CRAWSUMMONS", "Inv_CrawSummons")
+        ]);
+    }
+
+    partial void AppendWorld()
+    {
+        AppendSectionHeader("CATEGORY_WORLD");
+        AppendRow(1, 1);
+        AppendBasicControl("WORLD_ALLMAPS", BindableFunctions.UnlockAllMaps);
+        AppendBasicControl("WORLD_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_DEEPDOCKSBELLWAY", () => PlayerData.instance.UnlockedDocksStation,
+            () => PlayerData.instance.UnlockedDocksStation = !PlayerData.instance.UnlockedDocksStation);
+        AppendToggleControl("WORLD_FARFIELDSBELLWAY", () => PlayerData.instance.UnlockedBoneforestEastStation,
+            () => PlayerData.instance.UnlockedBoneforestEastStation = !PlayerData.instance.UnlockedBoneforestEastStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_GREYMOORBELLWAY", () => PlayerData.instance.UnlockedGreymoorStation,
+            () => PlayerData.instance.UnlockedGreymoorStation = !PlayerData.instance.UnlockedGreymoorStation);
+        AppendToggleControl("WORLD_BELLHARTBELLWAY", () => PlayerData.instance.UnlockedBelltownStation,
+            () => PlayerData.instance.UnlockedBelltownStation = !PlayerData.instance.UnlockedBelltownStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_SHELLWOODBELLWAY", () => PlayerData.instance.UnlockedShellwoodStation,
+            () => PlayerData.instance.UnlockedShellwoodStation = !PlayerData.instance.UnlockedShellwoodStation);
+        AppendToggleControl("WORLD_BLASTEDSTEPSBELLWAY", () => PlayerData.instance.UnlockedCoralTowerStation,
+            () => PlayerData.instance.UnlockedCoralTowerStation = !PlayerData.instance.UnlockedCoralTowerStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_THESLABBELLWAY", () => PlayerData.instance.UnlockedPeakStation,
+            () => PlayerData.instance.UnlockedPeakStation = !PlayerData.instance.UnlockedPeakStation);
+        AppendToggleControl("WORLD_GRANDBELLWAY", () => PlayerData.instance.UnlockedCityStation,
+            () => PlayerData.instance.UnlockedCityStation = !PlayerData.instance.UnlockedCityStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_BILEWATERBELLWAY", () => PlayerData.instance.UnlockedShadowStation,
+            () => PlayerData.instance.UnlockedShadowStation = !PlayerData.instance.UnlockedShadowStation);
+        AppendToggleControl("WORLD_PUTRIFIEDDUCTSBELLWAY", () => PlayerData.instance.UnlockedAqueductStation,
+            () => PlayerData.instance.UnlockedAqueductStation = !PlayerData.instance.UnlockedAqueductStation);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_MEMORIUMVENTRICA", () => PlayerData.instance.UnlockedArboriumTube,
+            () => PlayerData.instance.UnlockedArboriumTube = !PlayerData.instance.UnlockedArboriumTube);
+        AppendToggleControl("WORLD_HIGHHALLSVENTRICA", () => PlayerData.instance.UnlockedHangTube,
+            () => PlayerData.instance.UnlockedHangTube = !PlayerData.instance.UnlockedHangTube);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_FIRSTSHRINEVENTRICA", () => PlayerData.instance.UnlockedEnclaveTube,
+            () => PlayerData.instance.UnlockedEnclaveTube = !PlayerData.instance.UnlockedEnclaveTube);
+        AppendToggleControl("WORLD_CHORALCHAMBERSVENTRICA", () => PlayerData.instance.UnlockedSongTube,
+            () => PlayerData.instance.UnlockedSongTube = !PlayerData.instance.UnlockedSongTube);
+        AppendRow(1, 1);
+        AppendToggleControl("WORLD_GRANDBELLWAYVENTRICA", () => PlayerData.instance.UnlockedCityBellwayTube,
+            () => PlayerData.instance.UnlockedCityBellwayTube = !PlayerData.instance.UnlockedCityBellwayTube);
+        AppendToggleControl("WORLD_UNDERWORKSVENTRICA", () => PlayerData.instance.UnlockedUnderTube,
+            () => PlayerData.instance.UnlockedUnderTube = !PlayerData.instance.UnlockedUnderTube);
+    }
+
+    partial void AppendConsumables()
+    {
+        AppendSectionHeader("CATEGORY_CONSUMABLES");
+        AppendRow(1);
+        AppendBasicControl("CONSUMABLES_GIVEQUESTITEMS", BindableFunctions.GiveQuestItems);
+        AppendTileRow(2);
+        AppendIncrementTile(
+            "CONSUMABLES_ROSARIES",
+            () => PlayerData.instance.geo,
+            value => HeroController.instance.AddGeo(value - PlayerData.instance.geo),
+            image: "Inv_Rosaries",
+            step: 100
+        );
+        AppendIncrementTile(
+            "CONSUMABLES_SHELLSHARDS",
+            () => PlayerData.instance.ShellShards,
+            value => HeroController.instance.AddShards(value - PlayerData.instance.ShellShards),
+            image: "Inv_ShellShards",
+            step: 100
+        );
+
+
+        static void SetCollectableAmount(string name, Func<int, int> affector)
+        {
+            if (CollectableItemManager.IsInHiddenMode())
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.AmountWhileHidden = affector(data.AmountWhileHidden));
+            }
+            else
+            {
+                CollectableItemManager.Instance.AffectItemData(name, (ref data) => data.Amount = affector(data.Amount));
+            }
+        }
+
+        List<(string, string, string)> consumables =
+        [
+            ("Simple Key", "CONSUMABLES_SIMPLEKEY", "Inv_SimpleKey"),
+            ("Crest Socket Unlocker", "CONSUMABLES_MEMORYLOCKET", "Inv_MemoryLocket"),
+            ("Tool Metal", "CONSUMABLES_CRAFTMETAL", "Inv_Craftmetal"),
+            ("Pale_Oil", "CONSUMABLES_PALEOIL", "Inv_PaleOil"),
+            ("Rosary_Set_Frayed", "CONSUMABLES_FRAYEDROSARYSTRING", "Inv_RosaryString1"),
+            ("Silk Grub", "CONSUMABLES_SILKEATER", "Inv_Silkeater"),
+            ("Rosary_Set_Small", "CONSUMABLES_ROSARYSTRING", "Inv_RosaryString2"),
+            ("Fixer Idol", "CONSUMABLES_HORNETSTATUETTE", "Inv_ShardStatue"),
+            ("Rosary_Set_Medium", "CONSUMABLES_ROSARYNECKLACE", "Inv_RosaryString3"),
+            ("Shard Pouch", "CONSUMABLES_SHARDBUNDLE", "Inv_ShardBundle"),
+            ("Rosary_Set_Large", "CONSUMABLES_HEAVYROSARYNECKLACE", "Inv_RosaryString4"),
+            ("Great Shard", "CONSUMABLES_BEASTSHARD", "Inv_ShardBeast"),
+            ("Rosary_Set_Huge_White", "CONSUMABLES_PALEROSARYNECKLACE", "Inv_RosaryString5"),
+            ("Pristine Core", "CONSUMABLES_PRISTINECORE", "Inv_ShardCore"),
+        ];
+
+        foreach ((string name, string displayName, string iconName) in consumables)
+        {
+            CollectableItem item = CollectableItemManager.GetItemByName(name);
+            AppendIncrementTile(
+                displayName,
+                () => item.CollectedAmount,
+                value => SetCollectableAmount(name, _ => value),
+                image: iconName
+            );
+        }
+    }
 }
