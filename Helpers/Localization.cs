@@ -9,7 +9,9 @@ internal static class Localization
 {
     private static readonly List<string> sheets = [$"Mods.{DebugMod.Id}"];
     private static Dictionary<string, string> fallbackSheet;
+#if SILKSONG
     private static bool warnedEntryMissing;
+#endif
 
     internal static Dictionary<string, string> FallbackSheet
     {
@@ -53,6 +55,8 @@ internal static class Localization
 
     internal static string Get(string key)
     {
+        // TODO(port): backport I18N for HK, until then only the english fallback sheet is used
+#if SILKSONG
         foreach (string sheetName in sheets)
         {
             // Silent reimplementation of Language.Get to avoid I18N warning us of extensions missing keys
@@ -66,6 +70,7 @@ internal static class Localization
             DebugMod.LogWarn("Entry not found in language sheet (is Silksong.I18N installed?)");
             warnedEntryMissing = true;
         }
+#endif
 
         if (FallbackSheet.TryGetValue(key, out string value))
         {

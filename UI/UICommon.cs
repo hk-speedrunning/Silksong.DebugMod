@@ -51,6 +51,11 @@ public static class UICommon
     public static Font trajanBold;
     public static Font trajanNormal;
     public static Font arial;
+#if SILKSONG
+    private const string ArialFontName = "ARIAL";
+#else
+    private const string ArialFontName = "LegacyRuntime";
+#endif
 
     public static readonly Dictionary<string, Texture2D> images = new();
 
@@ -132,7 +137,7 @@ public static class UICommon
                 case "TrajanPro-Regular":
                     trajanNormal = f;
                     break;
-                case "ARIAL":
+                case ArialFontName:
                     arial = f;
                     break;
             }
