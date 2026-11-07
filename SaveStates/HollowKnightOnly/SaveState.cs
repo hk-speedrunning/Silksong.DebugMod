@@ -1,3 +1,4 @@
+using DebugMod.Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -33,5 +34,10 @@ public partial class SaveState
 
     private partial void GameSpecificSaveStateGlitchFixes() { }
 
-    private partial void HUDFixes() { }
+    private partial void HUDFixes()
+    {
+        // CharmUpdate refills health
+        PlayerData.instance.health = data.savedPd.health;
+        HudHelper.RefreshMasks();
+    }
 }
