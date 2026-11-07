@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.2.1
+
+- Fixed an issue causing the Command Palette to not be usable on early patches.
+- Added a setting to disable Boss HP bars.
+- Removed NumpadForSavestates setting; both numpad & alphanumeric keys work simultaneously.
+
 ### v1.2.0
 
 - Added the Command Palette (default `Ctrl+P`); this is a searchable menu for any function in DebugMod, with 2 exclusive features:
