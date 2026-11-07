@@ -90,8 +90,9 @@ internal static class Extensions {
         public void AddLifeblood() => EventRegister.SendEvent("ADD BLUE HEALTH");
         public void DamageSelf(int amount) => hero.TakeDamage(hero.gameObject, hero.cState.facingRight ? CollisionSide.right : CollisionSide.left, amount, 1);
         public IEnumerator Die(bool nonLethal, bool frostDeath) => hero.Die();
-        public void AddInputBlocker(object blocker) => throw new NotImplementedException();
-        public void RemoveInputBlocker(object blocker) => throw new NotImplementedException();
+        // TODO(port): block hero input on HK. is this necessary?
+        public void AddInputBlocker(object blocker) { }
+        public void RemoveInputBlocker(object blocker) { }
 #endif
     }
 
