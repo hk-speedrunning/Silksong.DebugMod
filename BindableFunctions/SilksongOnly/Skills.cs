@@ -1,6 +1,5 @@
 ﻿namespace DebugMod;
 
-// TODO(port): HK equivalents
 public static partial class BindableFunctions
 {
     [BindableMethod(name = "SKILLS_GIVEALLSKILLS", category = "CATEGORY_SKILLS")]
