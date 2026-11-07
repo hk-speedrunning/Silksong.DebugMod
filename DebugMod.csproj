@@ -63,10 +63,12 @@
 
 	<ItemGroup Condition="'$(SilksongVersion)' == ''">
 		<Compile Remove="**/SilksongOnly/**"/>
+		<EmbeddedResource Remove="Images/**/SilksongOnly/**"/>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(HollowKnightVersion)' == ''">
 		<Compile Remove="**/HollowKnightOnly/**"/>
+		<EmbeddedResource Remove="Images/**/HollowKnightOnly/**"/>
 	</ItemGroup>
 
 	<ItemGroup>
