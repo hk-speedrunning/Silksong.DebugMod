@@ -1,15 +1,11 @@
-﻿using DebugMod.UI;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Steamworks;
-using System;
-using System.Linq;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace DebugMod.Helpers;
 
 [HarmonyPatch]
-internal static class Trolls
+internal static partial class Trolls
 {
     private static bool? rosaryRocksTroll;
 
@@ -75,20 +71,4 @@ internal static class Trolls
             __result += extraRosaryCount;
         }
     }
-
-    public static void OnResourcesLoaded()
-    {
-        DateTime time = DateTime.Now;
-
-        if (time.Month == 4 && time.Day == 1)
-        {
-            string fontName = Font.GetOSInstalledFontNames().FirstOrDefault(x => x.Contains("Comic Sans"));
-
-            if (fontName != null)
-            {
-                UICommon.arial = Font.CreateDynamicFontFromOSFont(fontName, UICommon.FontSize);
-            }
-        }
-    }
 }
-
