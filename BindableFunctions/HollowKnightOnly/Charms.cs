@@ -10,7 +10,7 @@ public static partial class BindableFunctions
         {
             PlayerData.instance.SetBool($"gotCharm_{id}", true);
         }
-        PlayerData.instance.hasCharm = true;
+        PlayerData.instance.SetBool(nameof(PlayerData.hasCharm), true);
         PlayerData.instance.CountCharms();
 
         DebugMod.LogConsole("Giving player all charms");
@@ -22,7 +22,7 @@ public static partial class BindableFunctions
         if (!pd.GetBool($"gotCharm_{id}"))
         {
             pd.SetBool($"gotCharm_{id}", true);
-            pd.hasCharm = true;
+            pd.SetBool(nameof(PlayerData.hasCharm), true);
         }
         else
         {
@@ -60,24 +60,24 @@ public static partial class BindableFunctions
         switch (id)
         {
             case 23:
-                pd.brokenCharm_23 = state == CharmStateBroken;
-                pd.fragileHealth_unbreakable = state == CharmStateUnbreakable;
+                pd.SetBool(nameof(PlayerData.brokenCharm_23), state == CharmStateBroken);
+                pd.SetBool(nameof(PlayerData.fragileHealth_unbreakable), state == CharmStateUnbreakable);
                 break;
             case 24:
-                pd.brokenCharm_24 = state == CharmStateBroken;
-                pd.fragileGreed_unbreakable = state == CharmStateUnbreakable;
+                pd.SetBool(nameof(PlayerData.brokenCharm_24), state == CharmStateBroken);
+                pd.SetBool(nameof(PlayerData.fragileGreed_unbreakable), state == CharmStateUnbreakable);
                 break;
             case 25:
-                pd.brokenCharm_25 = state == CharmStateBroken;
-                pd.fragileStrength_unbreakable = state == CharmStateUnbreakable;
+                pd.SetBool(nameof(PlayerData.brokenCharm_25), state == CharmStateBroken);
+                pd.SetBool(nameof(PlayerData.fragileStrength_unbreakable), state == CharmStateUnbreakable);
                 break;
             case 36:
-                pd.royalCharmState = state;
-                pd.charmCost_36 = state == 4 ? 0 : 5;
+                pd.SetInt(nameof(PlayerData.royalCharmState), state);
+                pd.SetInt(nameof(PlayerData.charmCost_36), state == 4 ? 0 : 5);
                 break;
             case 40:
-                pd.grimmChildLevel = state + 1;
-                pd.charmCost_40 = state == 4 ? 3 : 2;
+                pd.SetInt(nameof(PlayerData.grimmChildLevel), state + 1);
+                pd.SetInt(nameof(PlayerData.charmCost_40), state == 4 ? 3 : 2);
                 break;
         }
 

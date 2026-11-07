@@ -27,11 +27,11 @@ public partial class MainPanel
         AppendLabeledTile("HK_SKILLS_GREATSLASH", () => PlayerData.instance.hasDashSlash, BindableFunctions.ToggleGreatSlash, "NailArt_GreatSlash");
         AppendTileRow(3);
         AppendSpellTile("HK_SKILLS_FIREBALL", "Spell_Fireball", () => PlayerData.instance.fireballLevel,
-            value => PlayerData.instance.fireballLevel = value);
+            value => PlayerData.instance.SetInt(nameof(PlayerData.fireballLevel), value));
         AppendSpellTile("HK_SKILLS_QUAKE", "Spell_Quake", () => PlayerData.instance.quakeLevel,
-            value => PlayerData.instance.quakeLevel = value);
+            value => PlayerData.instance.SetInt(nameof(PlayerData.quakeLevel), value));
         AppendSpellTile("HK_SKILLS_SCREAM", "Spell_Scream", () => PlayerData.instance.screamLevel,
-            value => PlayerData.instance.screamLevel = value);
+            value => PlayerData.instance.SetInt(nameof(PlayerData.screamLevel), value));
         void AppendSpellTile(string name, string image, Func<int> getter, Action<int> setter)
         {
             CanvasPanel tile = AppendIncrementTile(name, getter, value => { setter(value); UpdateHasSpell(); },
@@ -41,7 +41,7 @@ public partial class MainPanel
         static void UpdateHasSpell()
         {
             PlayerData pd = PlayerData.instance;
-            pd.hasSpell = pd.fireballLevel > 0 || pd.quakeLevel > 0 || pd.screamLevel > 0;
+            pd.SetBool(nameof(PlayerData.hasSpell), pd.fireballLevel > 0 || pd.quakeLevel > 0 || pd.screamLevel > 0);
         }
 
         AppendSectionHeader("CATEGORY_UPGRADES");
@@ -56,7 +56,7 @@ public partial class MainPanel
             PlayerData.instance.extraNailDamage = value - (nailUpgrades * 4 + 5);
         }
         AppendIncrementTile("HK_UPGRADES_NOTCHES", () => PlayerData.instance.charmSlots,
-            value => PlayerData.instance.charmSlots = value, "Charm_Notch", min: 3, max: 11);
+            value => PlayerData.instance.SetInt(nameof(PlayerData.charmSlots), value), "Charm_Notch", min: 3, max: 11);
     }
 
     partial void AppendEquippableItems()

@@ -5,30 +5,30 @@ public static partial class BindableFunctions
     [BindableMethod(name = "SKILLS_GIVEALLSKILLS", category = "CATEGORY_SKILLS")]
     public static void GiveAllSkills()
     {
-        PlayerData.instance.hasDash = true;
-        PlayerData.instance.canDash = true;
-        PlayerData.instance.hasWalljump = true;
-        PlayerData.instance.canWallJump = true;
-        PlayerData.instance.hasSuperDash = true;
-        PlayerData.instance.canSuperDash = true;
-        PlayerData.instance.hasDoubleJump = true;
-        PlayerData.instance.hasAcidArmour = true;
-        PlayerData.instance.hasShadowDash = true;
-        PlayerData.instance.canShadowDash = true;
+        PlayerData.instance.SetBool(nameof(PlayerData.hasDash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.canDash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasWalljump), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.canWallJump), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasSuperDash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.canSuperDash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasDoubleJump), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasAcidArmour), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasShadowDash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.canShadowDash), true);
 
-        PlayerData.instance.hasDreamNail = true;
-        PlayerData.instance.hasDreamGate = true;
-        PlayerData.instance.dreamNailUpgraded = true;
+        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamNail), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasDreamGate), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.dreamNailUpgraded), true);
 
-        PlayerData.instance.hasCyclone = true;
-        PlayerData.instance.hasUpwardSlash = true;
-        PlayerData.instance.hasDashSlash = true;
+        PlayerData.instance.SetBool(nameof(PlayerData.hasCyclone), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasUpwardSlash), true);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasDashSlash), true);
         UpdateNailArts();
 
-        PlayerData.instance.fireballLevel = 2;
-        PlayerData.instance.quakeLevel = 2;
-        PlayerData.instance.screamLevel = 2;
-        PlayerData.instance.hasSpell = true;
+        PlayerData.instance.SetInt(nameof(PlayerData.fireballLevel), 2);
+        PlayerData.instance.SetInt(nameof(PlayerData.quakeLevel), 2);
+        PlayerData.instance.SetInt(nameof(PlayerData.screamLevel), 2);
+        PlayerData.instance.SetBool(nameof(PlayerData.hasSpell), true);
 
         PlayerData.instance.nailUpgrades = 4;
         DebugMod.extraNailDamage = 0;
@@ -41,14 +41,14 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasDash)
         {
-            PlayerData.instance.hasDash = true;
-            PlayerData.instance.canDash = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDash), true);
+            PlayerData.instance.SetBool(nameof(PlayerData.canDash), true);
             DebugMod.LogConsole("Giving player Mothwing Cloak");
         }
         else
         {
-            PlayerData.instance.hasDash = false;
-            PlayerData.instance.canDash = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDash), false);
+            PlayerData.instance.SetBool(nameof(PlayerData.canDash), false);
             DebugMod.LogConsole("Taking away Mothwing Cloak");
         }
     }
@@ -58,14 +58,14 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasWalljump)
         {
-            PlayerData.instance.hasWalljump = true;
-            PlayerData.instance.canWallJump = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasWalljump), true);
+            PlayerData.instance.SetBool(nameof(PlayerData.canWallJump), true);
             DebugMod.LogConsole("Giving player Mantis Claw");
         }
         else
         {
-            PlayerData.instance.hasWalljump = false;
-            PlayerData.instance.canWallJump = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasWalljump), false);
+            PlayerData.instance.SetBool(nameof(PlayerData.canWallJump), false);
             DebugMod.LogConsole("Taking away Mantis Claw");
         }
     }
@@ -75,14 +75,14 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasSuperDash)
         {
-            PlayerData.instance.hasSuperDash = true;
-            PlayerData.instance.canSuperDash = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasSuperDash), true);
+            PlayerData.instance.SetBool(nameof(PlayerData.canSuperDash), true);
             DebugMod.LogConsole("Giving player Crystal Heart");
         }
         else
         {
-            PlayerData.instance.hasSuperDash = false;
-            PlayerData.instance.canSuperDash = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasSuperDash), false);
+            PlayerData.instance.SetBool(nameof(PlayerData.canSuperDash), false);
             DebugMod.LogConsole("Taking away Crystal Heart");
         }
     }
@@ -92,12 +92,12 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasDoubleJump)
         {
-            PlayerData.instance.hasDoubleJump = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDoubleJump), true);
             DebugMod.LogConsole("Giving player Monarch Wings");
         }
         else
         {
-            PlayerData.instance.hasDoubleJump = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDoubleJump), false);
             DebugMod.LogConsole("Taking away Monarch Wings");
         }
     }
@@ -107,12 +107,12 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasAcidArmour)
         {
-            PlayerData.instance.hasAcidArmour = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasAcidArmour), true);
             DebugMod.LogConsole("Giving player Isma's Tear");
         }
         else
         {
-            PlayerData.instance.hasAcidArmour = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasAcidArmour), false);
             DebugMod.LogConsole("Taking away Isma's Tear");
         }
     }
@@ -122,14 +122,14 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasShadowDash)
         {
-            PlayerData.instance.hasShadowDash = true;
-            PlayerData.instance.canShadowDash = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasShadowDash), true);
+            PlayerData.instance.SetBool(nameof(PlayerData.canShadowDash), true);
             DebugMod.LogConsole("Giving player Shade Cloak");
         }
         else
         {
-            PlayerData.instance.hasShadowDash = false;
-            PlayerData.instance.canShadowDash = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasShadowDash), false);
+            PlayerData.instance.SetBool(nameof(PlayerData.canShadowDash), false);
             DebugMod.LogConsole("Taking away Shade Cloak");
         }
     }
@@ -139,12 +139,12 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasDreamNail)
         {
-            PlayerData.instance.hasDreamNail = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDreamNail), true);
             DebugMod.LogConsole("Giving player Dream Nail");
         }
         else
         {
-            PlayerData.instance.hasDreamNail = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDreamNail), false);
             DebugMod.LogConsole("Taking away Dream Nail");
         }
     }
@@ -154,12 +154,12 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasDreamGate)
         {
-            PlayerData.instance.hasDreamGate = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDreamGate), true);
             DebugMod.LogConsole("Giving player Dream Gate");
         }
         else
         {
-            PlayerData.instance.hasDreamGate = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDreamGate), false);
             DebugMod.LogConsole("Taking away Dream Gate");
         }
     }
@@ -169,12 +169,12 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.dreamNailUpgraded)
         {
-            PlayerData.instance.dreamNailUpgraded = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.dreamNailUpgraded), true);
             DebugMod.LogConsole("Giving player Awoken Dream Nail");
         }
         else
         {
-            PlayerData.instance.dreamNailUpgraded = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.dreamNailUpgraded), false);
             DebugMod.LogConsole("Taking away Awoken Dream Nail");
         }
     }
@@ -184,13 +184,13 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasCyclone)
         {
-            PlayerData.instance.hasCyclone = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasCyclone), true);
             UpdateNailArts();
             DebugMod.LogConsole("Giving player Cyclone Slash");
         }
         else
         {
-            PlayerData.instance.hasCyclone = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasCyclone), false);
             UpdateNailArts();
             DebugMod.LogConsole("Taking away Cyclone Slash");
         }
@@ -201,13 +201,13 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasUpwardSlash)
         {
-            PlayerData.instance.hasUpwardSlash = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasUpwardSlash), true);
             UpdateNailArts();
             DebugMod.LogConsole("Giving player Dash Slash");
         }
         else
         {
-            PlayerData.instance.hasUpwardSlash = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasUpwardSlash), false);
             UpdateNailArts();
             DebugMod.LogConsole("Taking away Dash Slash");
         }
@@ -218,13 +218,13 @@ public static partial class BindableFunctions
     {
         if (!PlayerData.instance.hasDashSlash)
         {
-            PlayerData.instance.hasDashSlash = true;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDashSlash), true);
             UpdateNailArts();
             DebugMod.LogConsole("Giving player Great Slash");
         }
         else
         {
-            PlayerData.instance.hasDashSlash = false;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasDashSlash), false);
             UpdateNailArts();
             DebugMod.LogConsole("Taking away Great Slash");
         }
@@ -233,7 +233,7 @@ public static partial class BindableFunctions
     private static void UpdateNailArts()
     {
         PlayerData pd = PlayerData.instance;
-        pd.hasNailArt = pd.hasCyclone || pd.hasUpwardSlash || pd.hasDashSlash;
-        pd.hasAllNailArts = pd.hasCyclone && pd.hasUpwardSlash && pd.hasDashSlash;
+        pd.SetBool(nameof(PlayerData.hasNailArt), pd.hasCyclone || pd.hasUpwardSlash || pd.hasDashSlash);
+        pd.SetBool(nameof(PlayerData.hasAllNailArts), pd.hasCyclone && pd.hasUpwardSlash && pd.hasDashSlash);
     }
 }
