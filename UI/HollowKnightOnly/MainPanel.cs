@@ -101,4 +101,86 @@ public partial class MainPanel
             }
         }
     }
+
+    partial void AppendItems()
+    {
+        AppendSectionHeader("CATEGORY_ITEMS");
+        AppendItemTile("HK_ITEMS_LANTERN", nameof(PlayerData.hasLantern), "Inv_Lantern");
+        AppendItemTile("HK_ITEMS_TRAMPASS", nameof(PlayerData.hasTramPass), "Inv_TramPass");
+        AppendLabeledTile("HK_ITEMS_MAPANDQUILL", () => PlayerData.instance.hasQuill, () =>
+        {
+            bool value = !PlayerData.instance.hasQuill;
+            PlayerData.instance.SetBool(nameof(PlayerData.hasQuill), value);
+            PlayerData.instance.SetBool(nameof(PlayerData.hasMap), value);
+        }, image: "Inv_MapAndQuill");
+        AppendItemTile("HK_ITEMS_CITYCREST", nameof(PlayerData.hasCityKey), "Inv_CityKey");
+        AppendItemTile("HK_ITEMS_SHOPKEEPERSKEY", nameof(PlayerData.hasSlykey), "Inv_StoreKey");
+        AppendItemTile("HK_ITEMS_ELEGANTKEY", nameof(PlayerData.hasWhiteKey), "Inv_WhiteKey");
+        AppendItemTile("HK_ITEMS_LOVEKEY", nameof(PlayerData.hasLoveKey), "Inv_LoveKey");
+        AppendItemTile("HK_ITEMS_KINGSBRAND", nameof(PlayerData.hasKingsBrand), "Inv_KingsBrand");
+        AppendItemTile("HK_ITEMS_DELICATEFLOWER", nameof(PlayerData.hasXunFlower), "Inv_XunFlower");
+
+        void AppendItemTile(string name, string boolName, string image)
+        {
+            AppendLabeledTile(name, () => PlayerData.instance.GetBool(boolName),
+                () => PlayerData.instance.SetBool(boolName, !PlayerData.instance.GetBool(boolName)), image: image);
+        }
+    }
+
+    partial void AppendWorld()
+    {
+        AppendSectionHeader("CATEGORY_WORLD");
+        AppendRow(1, 1);
+        AppendBasicControl("WORLD_ALLMAPS", BindableFunctions.UnlockAllMaps);
+        AppendBasicControl("WORLD_ALLFASTTRAVEL", BindableFunctions.UnlockAllFastTravel);
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_DIRTMOUTHSTAG", nameof(PlayerData.openedTown));
+        AppendStagToggle("HK_WORLD_CROSSROADSSTAG", nameof(PlayerData.openedCrossroads));
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_GREENPATHSTAG", nameof(PlayerData.openedGreenpath));
+        AppendStagToggle("HK_WORLD_QUEENSSTATIONSTAG", nameof(PlayerData.openedFungalWastes));
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_QUEENSGARDENSSTAG", nameof(PlayerData.openedRoyalGardens));
+        AppendStagToggle("HK_WORLD_CITYSTOREROOMSSTAG", nameof(PlayerData.openedRuins1));
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_KINGSSTATIONSTAG", nameof(PlayerData.openedRuins2));
+        AppendStagToggle("HK_WORLD_RESTINGGROUNDSSTAG", nameof(PlayerData.openedRestingGrounds));
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_DISTANTVILLAGESTAG", nameof(PlayerData.openedDeepnest));
+        AppendStagToggle("HK_WORLD_HIDDENSTATIONSTAG", nameof(PlayerData.openedHiddenStation));
+        AppendRow(1, 1);
+        AppendStagToggle("HK_WORLD_STAGNEST", nameof(PlayerData.openedStagNest));
+
+        void AppendStagToggle(string name, string boolName)
+        {
+            AppendToggleControl(name, () => PlayerData.instance.GetBool(boolName),
+                () => PlayerData.instance.SetBool(boolName, !PlayerData.instance.GetBool(boolName)));
+        }
+    }
+
+    partial void AppendConsumables()
+    {
+        AppendSectionHeader("CATEGORY_CONSUMABLES");
+        AppendTileRow(2);
+        AppendIncrementTile(
+            "HK_CONSUMABLES_GEO",
+            () => PlayerData.instance.geo,
+            value => HeroController.instance.AddGeo(value - PlayerData.instance.geo),
+            image: "Inv_Geo",
+            step: 100
+        );
+        AppendIncrementTile(
+            "HK_CONSUMABLES_ESSENCE",
+            () => PlayerData.instance.dreamOrbs,
+            value => PlayerData.instance.SetInt(nameof(PlayerData.dreamOrbs), value),
+            image: "Inv_Essence",
+            step: 100
+        );
+        AppendIncrementTile("HK_CONSUMABLES_PALEORE", () => PlayerData.instance.ore,
+            value => PlayerData.instance.SetInt(nameof(PlayerData.ore), value), image: "Inv_Ore");
+        AppendIncrementTile("HK_CONSUMABLES_SIMPLEKEY", () => PlayerData.instance.simpleKeys,
+            value => PlayerData.instance.SetInt(nameof(PlayerData.simpleKeys), value), image: "Inv_SimpleKey");
+        AppendIncrementTile("HK_CONSUMABLES_RANCIDEGG", () => PlayerData.instance.rancidEggs,
+            value => PlayerData.instance.SetInt(nameof(PlayerData.rancidEggs), value), image: "Inv_RancidEgg");
+    }
 }
