@@ -73,6 +73,8 @@ internal static class Extensions {
         public void TakeMana(int amount) => hero.TakeMP(amount);
         public void AddMana(int amount, bool heroEffect) => hero.AddMPCharge(amount);
         public bool IsHeroPaused() => GameManager.instance.isPaused;
+        public void DamageSelf(int amount) => hero.TakeDamage(hero.gameObject, hero.cState.facingRight ? CollisionSide.right : CollisionSide.left, amount, 1);
+        public IEnumerator Die(bool nonLethal, bool frostDeath) => hero.Die();
         public void AddInputBlocker(object blocker) => throw new NotImplementedException();
         public void RemoveInputBlocker(object blocker) => throw new NotImplementedException();
 #endif

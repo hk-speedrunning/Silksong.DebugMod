@@ -213,15 +213,25 @@ public partial class MainPanel : CanvasPanel
         AppendRow(1, 1);
         AppendBasicControl("MISC_SETHAZARDRESPAWN", BindableFunctions.SetHazardRespawn);
         AppendBasicControl("MISC_HAZARDRESPAWN", BindableFunctions.Respawn);
+#if SILKSONG
         AppendRow(1, 1, 1);
+#else
+        AppendRow(1, 1);
+#endif
         AppendBasicControl("MISC_DAMAGESELF", BindableFunctions.SelfDamage);
         AppendBasicControl("MISC_KILLSELF", BindableFunctions.KillSelf);
+#if SILKSONG
         AppendBasicControl("MISC_BREAKCOCOON", BindableFunctions.BreakCocoon);
+#endif
         AppendRow(1, 1);
         AppendBasicControl("MISC_RESETCURRENTSCENEDATA", BindableFunctions.ResetCurrentScene);
         AppendBasicControl("MISC_BLOCKSCENEDATACHANGES", BindableFunctions.BlockCurrentSceneChanges);
+#if SILKSONG
         AppendRow(1, 1, 1);
         AppendToggleControl("MISC_TOGGLEACT3", () => PlayerData.instance.blackThreadWorld, BindableFunctions.ToggleAct3);
+#else
+        AppendRow(1, 1);
+#endif
         AppendToggleControl("MISC_LOCKKEYBINDS", () => DebugMod.KeyBindLock, BindableFunctions.ToggleLockKeyBinds);
         AppendBasicControl("MISC_RESETALL", BindableFunctions.Reset);
 

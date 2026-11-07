@@ -9,14 +9,6 @@ namespace DebugMod;
 [HarmonyPatch]
 public static partial class BindableFunctions
 {
-    [BindableMethod(name = "MISC_TOGGLEACT3", category = "CATEGORY_MISC")]
-    public static void ToggleAct3()
-    {
-        PlayerData.instance.blackThreadWorld = !PlayerData.instance.blackThreadWorld;
-        DebugMod.LogConsole("Act 3 world is now " + (PlayerData.instance.blackThreadWorld ? "enabled" : "disabled")
-            + ", reload the scene to apply changes");
-    }
-
     [BindableMethod(name = "MISC_SETHAZARDRESPAWN", category = "CATEGORY_MISC")]
     public static void SetHazardRespawn()
     {
@@ -92,14 +84,9 @@ public static partial class BindableFunctions
         }
     }
 
-    [BindableMethod(name = "MISC_BREAKCOCOON", category = "CATEGORY_MISC")]
-    public static void BreakCocoon()
-    {
-        HeroController.instance?.CocoonBroken();
-        EventRegister.SendEvent("BREAK HERO CORPSE");
-    }
-
     private static string saveLevelStateAction;
+
+    private static partial void ClearSceneData(string sceneName);
 
     [BindableMethod(name = "MISC_RESETCURRENTSCENEDATA", category = "CATEGORY_MISC")]
     public static void ResetCurrentScene()
@@ -113,12 +100,6 @@ public static partial class BindableFunctions
     {
         saveLevelStateAction = "block";
         DebugMod.LogConsole("Scene data changes made since entering this scene will not be saved");
-    }
-
-    [BindableMethod(name = "MISC_QUEUEWALLJUMPINTERRUPT", category = "CATEGORY_MISC")]
-    public static void QueueWallJump()
-    {
-        HeroController.instance.queuedWallJumpInterrupt = true;
     }
 
     [HarmonyPatch(typeof(GameManager), nameof(GameManager.SaveLevelState))]
@@ -140,9 +121,7 @@ public static partial class BindableFunctions
     {
         if (saveLevelStateAction != null && saveLevelStateAction != "block")
         {
-            SceneData.instance.persistentBools.scenes.Remove(saveLevelStateAction);
-            SceneData.instance.persistentInts.scenes.Remove(saveLevelStateAction);
-            SceneData.instance.geoRocks.scenes.Remove(saveLevelStateAction);
+            ClearSceneData(saveLevelStateAction);
 
             saveLevelStateAction = null;
         }
