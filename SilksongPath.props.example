@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <SilksongFolder>C:/Program Files (x86)/Steam/steamapps/common/Hollow Knight Silksong</SilksongFolder>
+    <!-- If you use a mod manager rather than manually installing BepInEx, this should be a profile directory for that mod manager. -->
+    <SilksongPluginsFolder>$(SilksongFolder)/BepInEx/plugins</SilksongPluginsFolder>
+  </PropertyGroup>
+</Project>
