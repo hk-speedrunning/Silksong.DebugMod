@@ -4,11 +4,7 @@ using DebugMod.MonoBehaviours;
 using DebugMod.SaveStates;
 using DebugMod.UI;
 using DebugMod.UI.CommandPalette;
-using GlobalEnums;
-using GlobalSettings;
 using HarmonyLib;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using System;
@@ -19,11 +15,11 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace DebugMod;
 
 [BepInAutoPlugin("io.github.hk-speedrunning.debugmod")]
-[BepInDependency("org.silksong-modding.modlist", "0.2.0")]
 [HarmonyPatch]
 public partial class DebugMod : BaseUnityPlugin
 {
@@ -35,7 +31,7 @@ public partial class DebugMod : BaseUnityPlugin
     private static Collider2D _refHeroCollider;
     private static LightBlurredBackground _lbb;
 
-    internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager.SilentInstance);
+    internal static GameManager GM => _gm != null ? _gm : (_gm = GameManager._instance);
     internal static InputHandler IH => _ih != null ? _ih : (_ih = GM.inputHandler);
     internal static HeroController HC => _hc != null ? _hc : (_hc = HeroController.instance);
     internal static GameObject RefKnight => _refKnight != null ? _refKnight : (_refKnight = HC.gameObject);
@@ -69,8 +65,6 @@ public partial class DebugMod : BaseUnityPlugin
 
     internal static HitInstance? lastHit;
     internal static int lastDamage;
-    [CanBeNull] internal static HealthManager.DamageScalingConfig lastScaling;
-    internal static int lastScaleLevel;
 
     public static bool stateOnDeath;
     public static bool infiniteHP;
@@ -145,12 +139,20 @@ public partial class DebugMod : BaseUnityPlugin
         SaveStateManager.Initialize();
         TimeScale.Initialize();
 
-        harmony = new Harmony(Id);
-        harmony.PatchAll();
+        try
+        {
+            harmony = new Harmony(Id);
+            harmony.PatchAll();
+        }
+        catch (Exception e)
+        {
+            LogError($"Failed to patch methods with harmony: {e}");
+            throw;
+        }
 
         PlayerDeathWatcher.Init();
 
-        SceneManager.activeSceneChanged += LevelActivated;
+        USceneManager.activeSceneChanged += LevelActivated;
         ModHooks.AfterSavegameLoadHook += LoadCharacter;
         ModHooks.NewGameHook += NewCharacter;
         ModHooks.BeforeSceneLoadHook += OnLevelUnload;
@@ -159,7 +161,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         KeyBindLock = false;
 
-        bool isHotReload = GameManager.SilentInstance != null;
+        bool isHotReload = GameManager._instance != null;
         if (isHotReload)
         {
             OnFinishedLoadingMods();
@@ -194,7 +196,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         Application.logMessageReceived -= HandleUnityLog;
 
-        SceneManager.activeSceneChanged -= LevelActivated;
+        USceneManager.activeSceneChanged -= LevelActivated;
         ModHooks.AfterSavegameLoadHook -= LoadCharacter;
         ModHooks.NewGameHook -= NewCharacter;
         ModHooks.BeforeSceneLoadHook -= OnLevelUnload;
@@ -203,7 +205,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         PlayerDeathWatcher.Unload();
         SceneWatcher.Unload();
-        CocoonPreviewer.Unload();
+        CorpsePreviewer.Unload();
         GUIController.Unload();
 
         TimeScale.Release();
@@ -275,24 +277,18 @@ public partial class DebugMod : BaseUnityPlugin
         bindUpdated?.Invoke(name, binding);
     }
 
+    static partial void ResetCharacterState();
+    static partial void CheckLethalDamagePrevented(ref bool willDie);
+
     private int PlayerDamaged(int damageAmount)
     {
         int damage = infiniteHP ? 0 : damageAmount;
 
         bool WillDie()
         {
-            if (PlayerData.instance.health + PlayerData.instance.healthBlue - damage > 0)
-            {
-                return false;
-            }
-
-            ToolItem fracturedMask = Gameplay.FracturedMaskTool;
-            if (fracturedMask && fracturedMask.IsEquipped && fracturedMask.SavedData.AmountLeft > 0)
-            {
-                return false;
-            }
-
-            return true;
+            bool willDie = PlayerData.instance.health + PlayerData.instance.healthBlue - damage <= 0;
+            CheckLethalDamagePrevented(ref willDie);
+            return willDie;
         }
 
         if (stateOnDeath && WillDie() && SaveState.loadingSavestate == null && SaveStateManager.GetQuickState().IsSet())
@@ -333,7 +329,7 @@ public partial class DebugMod : BaseUnityPlugin
         CurrentPlayerDeadCoro = __result;
     }
 
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.Die), typeof(bool), typeof(bool))]
+    [HarmonyPatch(typeof(HeroController), nameof(HeroController.Die))] // don't specify override, HK is parameterless
     [HarmonyPostfix]
     private static void OnDie(IEnumerator __result)
     {
@@ -354,8 +350,7 @@ public partial class DebugMod : BaseUnityPlugin
 
         lastHit = null;
         lastDamage = 0;
-        lastScaling = null;
-        lastScaleLevel = 0;
+        ResetCharacterState();
 
         _loadingChar = true;
     }
@@ -407,158 +402,6 @@ public partial class DebugMod : BaseUnityPlugin
     public static float GetLoadTime()
     {
         return (float)Math.Round(_loadTime - _unloadTime, 2);
-    }
-
-    [HarmonyPatch(typeof(PlayerData), nameof(PlayerData.nailDamage), MethodType.Getter)]
-    [HarmonyPostfix]
-    private static int Get_NailDamage(int nailDamage)
-    {
-        return nailDamage + extraNailDamage;
-    }
-
-
-    [HarmonyPatch(typeof(HealthManager), nameof(HealthManager.TakeDamage))]
-    [HarmonyPrefix]
-    private static void TakeDamage(HealthManager __instance, HitInstance hitInstance)
-    {
-        HitInstance scaled = __instance.ApplyDamageScaling(hitInstance);
-        lastHit = scaled;
-        lastDamage = __instance.damageOverride ? 1 : Mathf.RoundToInt(scaled.DamageDealt * scaled.Multiplier);
-
-        lastScaling = __instance.damageScaling;
-
-        int scaleLevel = hitInstance.DamageScalingLevel - 1;
-        if (hitInstance.IsUsingNeedleDamageMult)
-        {
-            scaleLevel = PlayerData.instance.nailUpgrades;
-        }
-        else if (hitInstance.RepresentingTool && hitInstance.RepresentingTool.Type != ToolItemType.Skill)
-        {
-            scaleLevel = PlayerData.instance.ToolKitUpgrades;
-        }
-        lastScaleLevel = scaleLevel;
-    }
-
-    // Prevents clipping through water when invincible
-    [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
-    [HarmonyPrefix]
-    private static void OnTriggerEnter2D_Prefix(Collider2D collision)
-    {
-        if (collision.gameObject.GetComponent<HeroController>() && playerInvincible)
-        {
-            PlayerData.instance.isInvincible = false;
-        }
-    }
-
-    [HarmonyPatch(typeof(SurfaceWaterRegion), nameof(SurfaceWaterRegion.OnTriggerEnter2D))]
-    [HarmonyPostfix]
-    private static void OnTriggerEnter2D_Postfix()
-    {
-        if (playerInvincible)
-        {
-            PlayerData.instance.isInvincible = true;
-        }
-    }
-
-    // Prevents savestates loaded while in water from warping to the wrong point.
-    [HarmonyPatch(typeof(HeroWaterController), nameof(HeroWaterController.TumbleOut))]
-    [HarmonyPrefix]
-    private static bool HeroWaterController_TumbleOut_Prefix(HeroWaterController __instance)
-    {
-        if (SaveState.loadingSavestate == null) return true;
-
-        __instance.ExitedWater();
-        return false;
-    }
-
-    // Bounce off lava when invincible so the player doesn't just fall through the map
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.TakeDamage))]
-    [HarmonyPrefix]
-    private static bool HeroController_TakeDamage(GameObject go, HazardType hazardType)
-    {
-        if (playerInvincible)
-        {
-            PlayerData.instance.isInvincible = true;
-        }
-
-        if (playerInvincible && !noclip && hazardType == HazardType.LAVA && go.name.Contains("Lava Box"))
-        {
-            HeroController.instance.ShroomBounce();
-            return false;
-        }
-
-        return true;
-    }
-
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.TakeSilk), typeof(int), typeof(SilkSpool.SilkTakeSource))]
-    [HarmonyPrefix]
-    private static void TakeSilk(ref int amount)
-    {
-        if (infiniteSilk)
-        {
-            amount = 0;
-        }
-    }
-
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.DoSpecialDamage))]
-    [HarmonyPrefix]
-    private static bool HeroController_DoSpecialDamage()
-    {
-        return !playerInvincible;
-    }
-
-    [HarmonyPatch(typeof(HeroController), nameof(HeroController.CanBeBarnacleGrabbed))]
-    [HarmonyPrefix]
-    private static bool HeroController_CanBeBarnacleGrabbed(ref bool __result)
-    {
-        // This function does not check for invincibility, unlike other types of grabs
-        if (playerInvincible)
-        {
-            __result = false;
-            return false;
-        }
-
-        return true;
-    }
-
-    [HarmonyPatch(typeof(PlayMakerFSM), nameof(PlayMakerFSM.Start))]
-    [HarmonyPrefix]
-    private static void PlayMakerFSM_Start(PlayMakerFSM __instance)
-    {
-        // The Underworks saw block FSM is bugged and damages you even if you are invincible
-        if (__instance.gameObject.name == "Hero Damager" && __instance.FsmName == "Multihitter")
-        {
-            CanHeroTakeDamage action = __instance.GetState("Start Hit?")?.Actions.OfType<CanHeroTakeDamage>().FirstOrDefault();
-            if (action != null && action.canTakeDmgEvent.Name == "HIT" && action.cannotTakeDmgEvent.Name == "HIT")
-            {
-                action.cannotTakeDmgEvent = new FsmEvent("CANCEL");
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(InventoryItemToolManager), nameof(InventoryItemToolManager.CanChangeEquips), [])]
-    [HarmonyPrefix]
-    private static bool InventoryItemToolManager_CanChangeEquips(ref bool __result)
-    {
-        if (freeEquip)
-        {
-            __result = true;
-            return false;
-        }
-
-        return true;
-    }
-
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.SetIsInventoryOpen))]
-    [HarmonyPrefix]
-    private static void GameManager_SetIsInventoryOpen(bool value)
-    {
-        if (freeEquip && !value)
-        {
-            // Would normally be called by the inventory FSM,
-            // but the action is skipped if atBench is false
-            ToolItemManager.SendEquippedChangedEvent();
-        }
     }
 
     /// <summary>

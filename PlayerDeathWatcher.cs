@@ -30,7 +30,7 @@ public static class PlayerDeathWatcher
         DebugMod.LogConsole("Hero death detected");
         DebugMod.LogConsole($"\tGame playtime: {PlayerData.instance.playTime}");
         DebugMod.LogConsole($"\tRespawn scene: {PlayerData.instance.respawnScene}");
-        DebugMod.LogConsole($"\tCocoon scene: {PlayerData.instance.HeroCorpseScene}");
-        DebugMod.LogConsole($"\tCocoon rosaries: {PlayerData.instance.HeroCorpseMoneyPool}");
+        DebugMod.LogConsole($"\tCocoon scene: {PlayerData.instance.corpseScene}");
+        DebugMod.LogConsole($"\tCocoon rosaries: {PlayerData.instance.corpseMoney}");
     }
 }

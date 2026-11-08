@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+	<!-- Uncomment the line below to specify the default build target, or run `dotnet build -f hk1512620` to override it once. -->
+	<!-- <TargetFramework>hk1512620</TargetFramework> -->
+
+    <GameBaseDir>C:/Program Files (x86)/Steam/steamapps/common</GameBaseDir>
+  </PropertyGroup>
+  
+  <!-- This is only required if you want to automatically copy the mod to the game on build -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'hk1512620'"><HkGameDir>$(GameBaseDir)/Hollow Knight</HkGameDir></PropertyGroup>
+  <PropertyGroup Condition="'$(HkGameDir)' != ''"><SilksongPluginsFolder>$(HkGameDir)/hollow_knight_Data/Managed/Mods</SilksongPluginsFolder></PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'silksong'"><SilksongPluginsFolder>$(GameBaseDir)/Hollow Knight Silksong/BepInEx/plugins</SilksongPluginsFolder></PropertyGroup>
+</Project>

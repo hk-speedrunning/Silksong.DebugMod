@@ -25,7 +25,7 @@ public static class SceneWatcher
         LoadedSceneInfo d = new(scene);
         scenes.Add(d);
 
-        if (checkSceneManager && Object.FindObjectsByType<CustomSceneManager>(FindObjectsSortMode.None)
+        if (checkSceneManager && Object.FindObjectsByType<GameSceneManager>(FindObjectsSortMode.None)
                 .Any(m => m.gameObject.scene == scene))
         {
             scenesWithManager.Add(scene, d.id);
@@ -59,9 +59,9 @@ public static class SceneWatcher
         scenes.RemoveAt(index);
     }
 
-    [HarmonyPatch(typeof(CustomSceneManager), nameof(CustomSceneManager.Start))]
+    [HarmonyPatch(typeof(GameSceneManager), nameof(GameSceneManager.Start))]
     [HarmonyPostfix]
-    private static void OnCustomSceneManagerStart(CustomSceneManager __instance)
+    private static void OnGameSceneManagerStart(GameSceneManager __instance)
     {
         if (scenesWithManager == null || !scenesWithManager.ContainsKey(__instance.gameObject.scene))
             return;
@@ -116,13 +116,17 @@ public static class SceneWatcher
         {
             if (activeInfo != null)
             {
+#if SILKSONG
                 if (activeInfo.activeSceneWhenLoaded != __instance.sceneName)
                 {
                     __instance.lastSceneName = __instance.sceneName;
                 }
+#endif
                 __instance.sceneName = activeInfo.activeSceneWhenLoaded;
+#if SILKSONG
                 __instance.rawSceneName = activeInfo.activeSceneWhenLoaded;
                 __instance.sceneNameHash = activeInfo.activeSceneWhenLoaded.GetHashCode();
+#endif
 
                 return false;
             }

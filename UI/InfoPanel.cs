@@ -1,16 +1,14 @@
 using DebugMod.Helpers;
 using DebugMod.UI.Canvas;
 using GlobalEnums;
-using GlobalSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace DebugMod.UI;
 
-public class InfoPanel : CanvasPanel
+public partial class InfoPanel : CanvasPanel
 {
     internal record InjectedInfo
     {
@@ -38,6 +36,8 @@ public class InfoPanel : CanvasPanel
     private float lineGap;  // Alt implementation
     private int counter;
     private float injectedHeight;
+
+    partial void AppendProgressInfo();
 
     public static void BuildPanel()
     {
@@ -77,15 +77,16 @@ public class InfoPanel : CanvasPanel
         AppendInfo("INFOPANEL_LASTDAMAGEAMOUNT", () => DebugMod.lastHit != null ?
             $"{DebugMod.lastDamage} ({DebugMod.lastHit?.DamageDealt} x {DebugMod.lastHit?.Multiplier})" : Localization.Get("INFOPANEL_NONE"));
         AppendInfo("INFOPANEL_LASTDAMAGETYPE", () => DebugMod.lastHit?.AttackType.ToString() ?? Localization.Get("INFOPANEL_NONE"));
+#if SILKSONG
         AppendInfo("INFOPANEL_LASTDAMAGESCALING", GetScaling);
+#endif
 
         y += sectionBreak;
 
         AppendInfo("INFOPANEL_HEALTH", () => $"{PlayerData.instance.health} / {PlayerData.instance.maxHealth}");
-        AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.silk} / {PlayerData.instance.CurrentSilkMaxBasic}");
+        AppendInfo("INFOPANEL_SILK", () => $"{PlayerData.instance.mana} / {PlayerData.instance.CurrentManaMax}");
         AppendInfo("INFOPANEL_COMPLETION", () => $"{PlayerData.instance.completionPercentage}%");
-        AppendInfo("INFOPANEL_FLEAS", () => $"{Gameplay.FleasCollectedCount} / 30");
-        AppendInfo("INFOPANEL_QUESTPOINTS", GetQuestPoints);
+        AppendProgressInfo();
 
         if (DebugMod.settings.ExpandedInfoPanel)
         {
@@ -122,13 +123,15 @@ public class InfoPanel : CanvasPanel
         AppendInfo("INFOPANEL_HARDLAND", () => HeroController.instance.cState.willHardLand);  // Could combine into above to make room if needed
         AppendInfo("INFOPANEL_SWIMMING", () => HeroController.instance.cState.swimming);
         AppendInfo("INFOPANEL_RECOILING", () => HeroController.instance.cState.recoiling);
-        AppendInfo("INFOPANEL_SOARING", () => HeroController.instance.cState.superDashing);
+        AppendInfo("INFOPANEL_SOARING", () => HeroController.instance.cState.superDashing); // TODO(port): rethink this section
 
         y += sectionBreak;
 
         AppendInfo("INFOPANEL_WALLSTATES", GetWallState);
         AppendInfo("INFOPANEL_CANCAST", () => HeroController.instance.CanCast());
+#if SILKSONG
         AppendInfo("INFOPANEL_CANSOAR", () => HeroController.instance.CanSuperJump());
+#endif
         AppendInfo("INFOPANEL_CANQUICKMAP", () => HeroController.instance.CanQuickMap());
         AppendInfo("INFOPANEL_CANINVENTORY", () => HeroController.instance.CanOpenInventory());
 
@@ -138,7 +141,7 @@ public class InfoPanel : CanvasPanel
         {
             AppendInfo("INFOPANEL_ACCEPTINPUT", () => HeroController.instance.acceptingInput);
             AppendInfo("INFOPANEL_CONTROLRELINQUISHED", () => HeroController.instance.controlReqlinquished);
-            AppendInfo("INFOPANEL_HEROPAUSED", () => HeroController.instance.IsPaused());
+            AppendInfo("INFOPANEL_HEROPAUSED", () => HeroController.instance.IsHeroPaused());
             AppendInfo("INFOPANEL_ATBENCH", () => PlayerData.instance.atBench);
             AppendInfo("INFOPANEL_INVULNERABLE", () => HeroController.instance.cState.Invulnerable);
             AppendInfo("INFOPANEL_INVINCIBLE", () => PlayerData.instance.isInvincible);
@@ -260,12 +263,6 @@ public class InfoPanel : CanvasPanel
         return $"{heroX:.000000#}, {heroY:.000000#}";
     }
 
-    private static string GetQuestPoints()
-    {
-        QuestCompleteTotalGroup group = QuestManager.GetQuest("Soul Snare Pre").requiredCompleteTotalGroups[0];
-        return $"{group.CurrentValueCount} / {group.target}";
-    }
-
     private static string GetStringForBool(bool b)
     {
         return b ? "✓" : "X";
@@ -273,11 +270,13 @@ public class InfoPanel : CanvasPanel
 
     private static string GetSprintFlags()
     {
+#if SILKSONG
         if (HeroController.instance.cState.isSprinting)
         {
             // isSprinting && dashing shouldn't be possible, but we'll add an indicator for it regardless.
             return HeroController.instance.cState.dashing ? "✓✓" : "✓–";
         }
+#endif
         return HeroController.instance.cState.dashing ? "✓" : "X";
     }
 
@@ -286,7 +285,9 @@ public class InfoPanel : CanvasPanel
         List<string> jumpStates = [];
         if (HeroController.instance.cState.jumping) jumpStates.Add("✓");
         if (HeroController.instance.cState.doubleJumping) jumpStates.Add("◊");
+#if SILKSONG
         if (HeroController.instance.isUmbrellaActive.Value) jumpStates.Add("†");
+#endif
 
         return jumpStates.Count == 0 ? "X" : string.Join("", jumpStates);
     }
@@ -296,31 +297,10 @@ public class InfoPanel : CanvasPanel
         + (HeroController.instance.cState.touchingWall ? "T" : "‒") // Touch
         + (HeroController.instance.wallLocked ? "L" : "‒") // Lock
         + (HeroController.instance.cState.wallSliding ? "S" : "‒") // Slide
+#if SILKSONG
         + (HeroController.instance.queuedWallJumpInterrupt ? "Q" : "‒") // Queued
+#endif
         + (HeroController.instance.touchingWallR ? ">" : "‒"); // Right
-
-    private static string GetScaling()
-    {
-        if (DebugMod.lastScaling == null) return Localization.Get("INFOPANEL_NONE");
-
-        string[] scaleMultipliers =
-        [
-            $"{DebugMod.lastScaling.Level1Mult:.###}",
-            $"{DebugMod.lastScaling.Level2Mult:.###}",
-            $"{DebugMod.lastScaling.Level3Mult:.###}",
-            $"{DebugMod.lastScaling.Level4Mult:.###}",
-            $"{DebugMod.lastScaling.Level5Mult:.###}"
-        ];
-
-        // Level from HealthManager.ApplyDamageScaling
-        int level = DebugMod.lastScaleLevel;
-
-        if (level > 4) level = 4;
-        if (level >= 0) // Game behaviour; sub-zero levels scale to 1f so don't highlight any multiplier
-            scaleMultipliers[level] = $"({scaleMultipliers[level]})";
-
-        return string.Join("∶", scaleMultipliers);
-    }
 
     private static string GetTransitionStates()
     {
@@ -351,6 +331,8 @@ public class InfoPanel : CanvasPanel
         };
     }
 
+    private static partial string GameSpecificKeys();
+
     private static string GetInputs()
     {
         // NB: somewhat random spacing to try and work around lack of monospace font availability
@@ -365,28 +347,13 @@ public class InfoPanel : CanvasPanel
         string n = DebugMod.IH.inputActions.DreamNail.State ? "n" : "   ";      // needolin
         string c = DebugMod.IH.inputActions.QuickCast.State ? "c" : "  ";       // cast
         string b = DebugMod.IH.inputActions.Cast.State ? "b" : "  ";            // bind
-        string t = DebugMod.IH.inputActions.Taunt.State ? "t" : "  ";           // taunt
         string m = DebugMod.IH.inputActions.QuickMap.State ? "m" : "   ";       // map
         string i = DebugMod.IH.inputActions.OpenInventory.State ? "i" : "  ";   // inventory
         string p = DebugMod.IH.inputActions.Pause.State ? "p" : "  ";           // pause
 
 
-        return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{t} {m}{i}{p}";
+        return $"{l}{u}{d}{r} {j}{s}{a}{h} {n}{c}{b}{GameSpecificKeys()} {m}{i}{p}";
     }
 
-    private static string GetRoomSpecificText()
-    {
-        string text = "";
-
-        MazeController mazeController = Object.FindAnyObjectByType<MazeController>();
-        if (mazeController && mazeController.gameObject.scene.name != "Dust_09")
-        {
-            text += $"{Localization.Get("INFOPANEL_MISTSCORE")}: {PlayerData.instance.CorrectMazeDoorsEntered}\n";
-            text += $"{Localization.Get("INFOPANEL_MISTCORRECTEXIT")}: {string.Join(", ",
-                mazeController.correctDoors.Select(gate => gate.name))}\n";
-        }
-
-        text = text.TrimEnd('\n');
-        return text;
-    }
+    private static partial string GetRoomSpecificText();
 }

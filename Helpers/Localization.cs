@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TeamCherry.Localization;
 
 namespace DebugMod.Helpers;
 
@@ -10,7 +9,9 @@ internal static class Localization
 {
     private static readonly List<string> sheets = [$"Mods.{DebugMod.Id}"];
     private static Dictionary<string, string> fallbackSheet;
+#if SILKSONG
     private static bool warnedEntryMissing;
+#endif
 
     internal static Dictionary<string, string> FallbackSheet
     {
@@ -54,11 +55,13 @@ internal static class Localization
 
     internal static string Get(string key)
     {
+        // TODO(port): backport I18N for HK, until then only the english fallback sheet is used
+#if SILKSONG
         foreach (string sheetName in sheets)
         {
             // Silent reimplementation of Language.Get to avoid I18N warning us of extensions missing keys
-            if (Language._currentEntrySheets == null || !Language._currentEntrySheets.ContainsKey(sheetName)) continue;
-            if (!Language._currentEntrySheets.TryGetValue(sheetName, out Dictionary<string, string> sheet)) continue;
+            if (TeamCherry.Localization.Language._currentEntrySheets == null || !TeamCherry.Localization.Language._currentEntrySheets.ContainsKey(sheetName)) continue;
+            if (!TeamCherry.Localization.Language._currentEntrySheets.TryGetValue(sheetName, out Dictionary<string, string> sheet)) continue;
             if (sheet.TryGetValue(key, out string result)) return result;
         }
 
@@ -67,6 +70,7 @@ internal static class Localization
             DebugMod.LogWarn("Entry not found in language sheet (is Silksong.I18N installed?)");
             warnedEntryMissing = true;
         }
+#endif
 
         if (FallbackSheet.TryGetValue(key, out string value))
         {

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace DebugMod.Hitbox;
 
-public class HitboxRender : MonoBehaviour
+public partial class HitboxRender : MonoBehaviour
 {
     private class HitboxType
     {
@@ -84,13 +84,16 @@ public class HitboxRender : MonoBehaviour
         }
     }
 
+    private static partial bool CategorizeGameSpecific(Collider2D collider2D, out HitboxType result);
+
+    private static partial bool CategorizeGameSpecificDetailed(Collider2D collider2D, out HitboxType result);
+
     private HitboxType CategorizeHitbox(Collider2D collider2D)
     {
+        if (CategorizeGameSpecific(collider2D, out HitboxType gameSpecific)) return gameSpecific;
+
         GameObject go = collider2D.gameObject;
-        if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder")
-            || collider2D.GetComponent<CogMultiHitter>()
-            || (collider2D.GetComponent<TriggerEnterEvent>() && collider2D.transform.parent && collider2D.transform.parent.GetComponent<RangeAttackGroup>()) // This is a messed up heuristic but it works for now. Workaround for sand worm regions.
-            )
+        if (collider2D.GetComponent<DamageHero>() || go.LocateMyFSM("damages_hero") || go.GetTemplatedFsm("hornet_multi_wounder"))
         {
             return HitboxType.Enemy;
         }
@@ -118,24 +121,18 @@ public class HitboxRender : MonoBehaviour
         }
         else if (collider2D.GetComponent<Breakable>() || collider2D.gameObject.layer == LayerMask.NameToLayer("Interactive Object"))
         {
-            if (collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>())
-            {
-                return HitboxType.Trigger;
-            }
-            else if (!collider2D.GetComponent<NonBouncer>() || HitboxViewer.State == 2)
+            if (!collider2D.GetComponent<NonBouncer>() || HitboxViewer.State == 2)
             {
                 return HitboxType.Breakable;
             }
         }
-        else if (collider2D.GetComponent<HarpoonHook>() || collider2D.GetComponent<Lever_tk2d>() || collider2D.GetComponent<Lever>()
-                || collider2D.tag == "Geo")
+        else if (collider2D.tag == "Geo")
         {
             return HitboxType.Trigger;
         }
         else if (HitboxViewer.State == 2)
         {
-            var noClamber = go.GetComponent<NoClamberRegion>();
-            if (noClamber && noClamber.enabled) { return HitboxType.NonMantleRegion; }
+            if (CategorizeGameSpecificDetailed(collider2D, out HitboxType detailed)) { return detailed; }
             else if (go.GetComponent<AlertRange>()) { return HitboxType.AlertRegion; }
             else return HitboxType.Other;
         }

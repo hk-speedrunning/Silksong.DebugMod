@@ -47,8 +47,8 @@ public static partial class BindableFunctions
     [BindableMethod(name = "VISUAL_PREVIEWCOCOONPOSITION", category = "CATEGORY_VISUAL")]
     public static void PreviewCocoonPosition()
     {
-        CocoonPreviewer component = GameManager.instance.GetComponent<CocoonPreviewer>()
-            ?? GameManager.instance.gameObject.AddComponent<CocoonPreviewer>();
+        CorpsePreviewer component = GameManager.instance.GetComponent<CorpsePreviewer>()
+            ?? GameManager.instance.gameObject.AddComponent<CorpsePreviewer>();
 
         if (!component.previewEnabled)
         {
@@ -104,17 +104,9 @@ public static partial class BindableFunctions
         else
         {
             GameCameras.instance.hudCanvasSlideOut.gameObject.SetActive(true);
-            HudHelper.RefreshSpool();
+            HudHelper.RefreshMana();
             DebugMod.LogConsole("Enabling HUD");
         }
-    }
-
-    // Don't try to spawn new silk chunks if the HUD is disabled
-    [HarmonyPatch(typeof(SilkSpool), nameof(SilkSpool.ChangeSilk))]
-    [HarmonyPrefix]
-    private static bool SilkSpool_ChangeSilk()
-    {
-        return GameCameras.instance.hudCanvasSlideOut.gameObject.activeInHierarchy;
     }
 
     [BindableMethod(name = "VISUAL_ZOOMIN", category = "CATEGORY_VISUAL")]

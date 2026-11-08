@@ -25,10 +25,10 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpool()
     {
-        if (PlayerData.instance.silkMax < 18)
+        if (PlayerData.instance.spools < PlayerData.MaxSpools)
         {
-            HeroController.instance.AddToMaxSilk(1);
-            HudHelper.RefreshSpool();
+            HeroController.instance.AddToMaxMana(1);
+            HudHelper.RefreshMana();
 
             DebugMod.LogConsole("Added spool");
         }
@@ -37,8 +37,10 @@ public static partial class BindableFunctions
             DebugMod.LogConsole("You have the maximum number of spools");
         }
 
+#if SILKSONG
         PlayerData.instance.IsSilkSpoolBroken = false;
         EventRegister.SendEvent("SPOOL UNBROKEN");
+#endif
     }
 
     [BindableMethod(name = "MASKSANDSPOOLS_TAKEMASK", category = "CATEGORY_MASKSANDSPOOLS")]
@@ -62,11 +64,10 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOL", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeAwaySpool()
     {
-        if (PlayerData.instance.silkMax > 9)
+        if (PlayerData.instance.spools > 0)
         {
-            PlayerData.instance.silkMax--;
-            PlayerData.instance.silk = Math.Min(PlayerData.instance.silk, PlayerData.instance.silkMax);
-            HudHelper.RefreshSpool();
+            HeroController.instance.TakeFromMaxMana(1);
+            HudHelper.RefreshMana();
 
             DebugMod.LogConsole("Removed spool");
         }
@@ -109,14 +110,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_GIVESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void GiveSpoolFragment()
     {
-        if (PlayerData.instance.silkSpoolParts < 1)
+        if (PlayerData.instance.manaFragments < PlayerData.MaxManaFragments)
         {
-            PlayerData.instance.silkSpoolParts++;
+            PlayerData.instance.manaFragments++;
             DebugMod.LogConsole("Added spool fragment");
         }
         else
         {
-            PlayerData.instance.silkSpoolParts = 0;
+            PlayerData.instance.manaFragments = 0;
             GiveSpool();
         }
     }
@@ -124,14 +125,14 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESPOOLFRAGMENT", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeSpoolFragment()
     {
-        if (PlayerData.instance.silkSpoolParts > 0)
+        if (PlayerData.instance.manaFragments > 0)
         {
-            PlayerData.instance.silkSpoolParts--;
+            PlayerData.instance.manaFragments--;
             DebugMod.LogConsole("Removed spool fragment");
         }
         else
         {
-            PlayerData.instance.silkSpoolParts = 1;
+            PlayerData.instance.manaFragments = PlayerData.MaxManaFragments;
             TakeAwaySpool();
         }
     }
@@ -186,7 +187,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_ADDSILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void AddSilk()
     {
-        HeroController.instance.AddSilk(1, true);
+        HeroController.instance.AddMana(1, true);
 
         DebugMod.LogConsole("Added silk");
     }
@@ -194,7 +195,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_TAKESILK", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void TakeSilk()
     {
-        HeroController.instance.TakeSilk(1);
+        HeroController.instance.TakeMana(1);
 
         DebugMod.LogConsole("Attempting to take silk");
     }
@@ -202,15 +203,7 @@ public static partial class BindableFunctions
     [BindableMethod(name = "MASKSANDSPOOLS_ADDLIFEBLOOD", category = "CATEGORY_MASKSANDSPOOLS")]
     public static void Lifeblood()
     {
-        bool wasInLifebloodState = HeroController.instance.IsInLifebloodState;
-
-        EventRegister.SendEvent("ADD BLUE HEALTH");
-
-        if (!wasInLifebloodState && HeroController.instance.IsInLifebloodState)
-        {
-            HeroController.instance.HitMaxBlueHealthBurst();
-        }
-
+        HeroController.instance.AddLifeblood();
         DebugMod.LogConsole("Attempting to add lifeblood");
     }
 }
