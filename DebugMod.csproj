@@ -43,7 +43,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Images\**\*.png"/>
-		<EmbeddedResource Include="Resources\*.jsonc"/>
+		<EmbeddedResource Include="Resources\**\*.jsonc" LogicalName="DebugMod.Resources.%(Filename)%(Extension)"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -64,11 +64,13 @@
 	<ItemGroup Condition="'$(SilksongVersion)' == ''">
 		<Compile Remove="**/SilksongOnly/**"/>
 		<EmbeddedResource Remove="Images/**/SilksongOnly/**"/>
+		<EmbeddedResource Remove="Resources/**/SilksongOnly/**"/>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(HollowKnightVersion)' == ''">
 		<Compile Remove="**/HollowKnightOnly/**"/>
 		<EmbeddedResource Remove="Images/**/HollowKnightOnly/**"/>
+		<EmbeddedResource Remove="Resources/**/HollowKnightOnly/**"/>
 	</ItemGroup>
 
 	<ItemGroup>
