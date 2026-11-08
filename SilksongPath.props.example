@@ -3,8 +3,12 @@
 	<!-- Uncomment the line below to specify the default build target, or run `dotnet build -f hk1512620` to override it once. -->
 	<!-- <TargetFramework>hk1512620</TargetFramework> -->
 
-    <SilksongFolder>C:/Program Files (x86)/Steam/steamapps/common/Hollow Knight Silksong</SilksongFolder>
-    <!-- If you use a mod manager rather than manually installing BepInEx, this should be a profile directory for that mod manager. -->
-    <SilksongPluginsFolder>$(SilksongFolder)/BepInEx/plugins</SilksongPluginsFolder>
+    <GameBaseDir>C:/Program Files (x86)/Steam/steamapps/common</GameBaseDir>
   </PropertyGroup>
+  
+  <!-- This is only required if you want to automatically copy the mod to the game on build -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'hk1512620'"><HkGameDir>$(GameBaseDir)/Hollow Knight</HkGameDir></PropertyGroup>
+  <PropertyGroup Condition="'$(HkGameDir)' != ''"><SilksongPluginsFolder>$(HkGameDir)/hollow_knight_Data/Managed/Mods</SilksongPluginsFolder></PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'silksong'"><SilksongPluginsFolder>$(GameBaseDir)/Hollow Knight Silksong/BepInEx/plugins</SilksongPluginsFolder></PropertyGroup>
 </Project>
